@@ -72,21 +72,21 @@ suite of different applications.
 
 <h2>Quick examples</h2>
 <p>Here is an example of loading a module on a Linux machine under bash.</p>
-<pre class="highlight"><code class="language-sh" data-lang="sh"><span class="p">$</span> <span class="cmd">module</span> <span class="subcmd">load</span> gcc/9.4</span>
+<pre class="highlight"><code class="language-sh" data-lang="sh"><span class="p">$</span> <span class="cmd">module</span> <span class="subcmd">load</span> gcc/12.4</span>
 <span><span class="p">$</span> which gcc</span>
-<span>/usr/local/gcc/9.4/linux-x86_64/bin/gcc</span></code></pre>
+<span>/usr/local/gcc/12.4.0/linux-x86_64/bin/gcc</span></code></pre>
 <p>Now we'll switch to a different version of the module</p>
-<pre class="highlight"><code class="language-sh" data-lang="sh"><span class="p">$</span> <span class="cmd">module</span> <span class="subcmd">switch</span> gcc gcc/10
+<pre class="highlight"><code class="language-sh" data-lang="sh"><span class="p">$</span> <span class="cmd">module</span> <span class="subcmd">switch</span> gcc/14
 <span class="p">$</span> which gcc
-/usr/local/gcc/10.3/linux-x86_64/bin/gcc</code></pre>
+/usr/local/gcc/14.2.0/linux-x86_64/bin/gcc</code></pre>
 <p>And now we'll unload the module altogether</p>
 <pre class="highlight"><code class="language-sh" data-lang="sh"><span class="p">$</span> <span class="cmd">module</span> <span class="subcmd">unload</span> gcc
 <span class="p">$</span> which gcc
 gcc not found</code></pre>
 <p>Now we'll log into a different machine, using a different shell (tcsh).</p>
-<pre class="highlight"><code class="language-sh" data-lang="sh"><span class="p">%</span> <span class="cmd">module</span> <span class="subcmd">load</span> gcc/10.3
+<pre class="highlight"><code class="language-sh" data-lang="sh"><span class="p">%</span> <span class="cmd">module</span> <span class="subcmd">load</span> gcc/14.2
 <span class="p">%</span> which gcc
-/usr/local/gcc/10.3/linux-aarch64/bin/gcc</code></pre>
+/usr/local/gcc/14.2.0/linux-aarch64/bin/gcc</code></pre>
 <p>Note that the command line is exactly the same, but the path has
 automatically configured to the correct architecture.</p>
 
