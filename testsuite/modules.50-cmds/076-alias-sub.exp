@@ -87,6 +87,7 @@ lappend ans [list set __MODULES_LMREFRESH $module]
 lappend ans [list set _LMFILES_ $modulefile]
 lappend ans [list set LOADEDMODULES $module]
 lappend ans [list alias ts2 {echo "http://an.example.web?&param=one"}]
+lappend ans [list alias ts3 {echo "select[type==BAR && osrel==FOO]" myapp}]
 lappend ans [list alias testsuite {echo $(grep "report .Modules " modulecmd.tcl | tr -d \\ | awk '{print $3}')}]
 
 set ans2 [list]
@@ -94,6 +95,7 @@ lappend ans2 [list set __MODULES_LMREFRESH $module]
 lappend ans2 [list set _LMFILES_ $modulefile]
 lappend ans2 [list set LOADEDMODULES $module]
 lappend ans2 [list alias ts2 {echo "http://an.example.web?&param=one"}]
+lappend ans2 [list alias ts3 {echo "select[type==BAR && osrel==FOO]" myapp}]
 lappend ans2 [list alias testsuite {echo `grep "report .Modules " modulecmd.tcl | tr -d \\ | awk '{print $3}'`}]
 
 set ans3 [list]
@@ -101,6 +103,7 @@ lappend ans3 [list set __MODULES_LMREFRESH $module]
 lappend ans3 [list set _LMFILES_ $modulefile]
 lappend ans3 [list set LOADEDMODULES $module]
 lappend ans3 [list alias ts2 {echo "http://an.example.web?&param=one"}]
+lappend ans3 [list alias ts3 {echo "select[type==BAR && osrel==FOO]" myapp}]
 lappend ans3 [list alias testsuite {echo (grep "report .Modules " modulecmd.tcl | tr -d \\ | awk '{print $3}')}]
 
 

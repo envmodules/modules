@@ -47,9 +47,9 @@ if {[find_bin grep] ne "" && [find_bin tr] ne "" && [find_bin awk] ne ""} {
    foreach shell $shell_list {
       if {$shell eq {csh} || $shell eq {tcsh}} {
          # alias evaluation leads to a syntax error if wa_277 is enabled
-         testall_cmd_re "$shell" "module load $testsuite_modpath/alias/3.0\; testsuite; ts2" [expr {$install_wa277 eq {y} ? {} : "Release\nhttp://an.example.web\\?&param=one"}] ".*" [expr {$install_wa277 eq {y} ? 1 : 0}]
+         testall_cmd_re "$shell" "module load $testsuite_modpath/alias/3.0\; testsuite; ts2; ts3" [expr {$install_wa277 eq {y} ? {} : "Release\nhttp://an.example.web\\?&param=one\nselect\\\[type==BAR && osrel==FOO\\\] myapp"}] ".*" [expr {$install_wa277 eq {y} ? 1 : 0}]
       } else {
-         testall_cmd_re "$shell" "module load $testsuite_modpath/alias/3.0\; testsuite; ts2" "Release\nhttp://an.example.web\\?&param=one" ".*" 0
+         testall_cmd_re "$shell" "module load $testsuite_modpath/alias/3.0\; testsuite; ts2; ts3" "Release\nhttp://an.example.web\\?&param=one\nselect\\\[type==BAR && osrel==FOO\\\] myapp" ".*" 0
       }
    }
 } elseif {$verbose} {

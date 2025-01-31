@@ -26,6 +26,9 @@ Modules 5.6.0 (not yet released)
 * Doc: add :ref:`acknowledgments` page in the documentation.
 * Doc: describe :ref:`GOVERNANCE`.
 * Doc: add :ref:`CHARTER`.
+* Escape square brackets (``[]``) used in values within produced shell code as
+  these characters may have special meaning on some shells (like *csh*). (fix
+  issue #565)
 
 .. _Security policy: https://github.com/envmodules/modules/blob/main/SECURITY.md
 

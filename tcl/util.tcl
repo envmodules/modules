@@ -20,11 +20,11 @@
 
 ##########################################################################
 
-proc charEscaped {str {charlist " \\\\\t{}|<>!;#^\$&*?\"'`()"}} {
+proc charEscaped {str {charlist " \\\\\t{}\\\[\\\]|<>!;#^\$&*?\"'`()"}} {
    return [regsub -all "\(\[$charlist\]\)" $str {\\\1}]
 }
 
-proc charUnescaped {str {charlist " \\\\\t{}|<>!;#^\$&*?\"'`()"}} {
+proc charUnescaped {str {charlist " \\\\\t{}\\\[\\\]|<>!;#^\$&*?\"'`()"}} {
    return [regsub -all "\\\\\(\[$charlist\]\)" $str {\1}]
 }
 

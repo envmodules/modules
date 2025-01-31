@@ -38,3 +38,5 @@ switch -- [module-info shelltype] {
 
 # check '?' and '&' are correctly escaped
 set-alias ts2 {echo "http://an.example.web?&param=one"}
+# check '[' and ']' are correctly escaped
+set-alias ts3 "echo \"select\[type==BAR && osrel==FOO\]\" myapp"

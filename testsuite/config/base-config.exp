@@ -234,7 +234,7 @@ proc shell_val {test_shell val {re_mode 0}} {
     if {$val ne "(.*)"} {
         switch -- $test_shell {
             {sh} - {bash} - {ksh} - {zsh} - {csh} - {tcsh} - {fish} {
-                set val [regsub -all {([\\"'$|<>{}`*? ()!&;])} $val {\\\1}]
+                set val [regsub -all {([\\"'$|<>{}`*? ()!&;\[\]])} $val {\\\1}]
             }
             {lisp} - {cmake} {
                 set val [regsub -all {(["])} $val {\\\1}]
