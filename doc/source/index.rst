@@ -141,9 +141,6 @@ A :ref:`cookbook` of recipes describes how to use the various features of
 Modules and how to extend the :command:`module` command to achieve specific
 needs.
 
-If you have questions, comments or development suggestions for the Modules
-community, please read the :ref:`CONTRIBUTING` guide.
-
 Links
 -----
 
