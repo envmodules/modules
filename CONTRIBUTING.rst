@@ -65,7 +65,7 @@ Submitting patches
   read the `don't be afraid to commit`_ tutorial.
 
 .. _GitHub: https://github.com/
-.. _don't be afraid to commit: https://dont-be-afraid-to-commit.readthedocs.io/en/latest/index.html
+.. _don't be afraid to commit: https://afraid-to-commit.readthedocs.io/en/latest/index.html
 
 Start coding
 ~~~~~~~~~~~~
@@ -80,7 +80,7 @@ Start coding
 * `Run the tests <running-the-tests_>`_ and `verify coverage <running-test-coverage_>`_.
 * Push your commits to GitHub and `create a pull request`_.
 
-.. _committing as you go: https://dont-be-afraid-to-commit.readthedocs.io/en/latest/git/commandlinegit.html#commit-your-changes
+.. _committing as you go: https://afraid-to-commit.readthedocs.io/en/latest/git/commandlinegit.html#commit-your-changes
 .. _create a pull request: https://help.github.com/articles/creating-a-pull-request/
 .. _Tcl 8.5 commands reference: https://www.tcl-lang.org/man/tcl8.5/TclCmd/contents.htm
 
