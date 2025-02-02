@@ -78,6 +78,7 @@ Start coding
 * Include tests that cover any code changes you make. Make sure the test fails
   without your patch.
 * `Run the tests <running-the-tests_>`_ and `verify coverage <running-test-coverage_>`_.
+* `Sign-off your commits <developer-certificate-of-origin_>`_.
 * Push your commits to GitHub and `create a pull request`_.
 
 .. _committing as you go: https://afraid-to-commit.readthedocs.io/en/latest/git/commandlinegit.html#commit-your-changes
@@ -233,6 +234,45 @@ Coding conventions
 * `No trailing space nor misspelling <commit-hooks_>`_
 
 .. _Tcl minimal escaping style: https://wiki.tcl-lang.org/page/Tcl+Minimal+Escaping+Style
+
+.. _developer-certificate-of-origin:
+
+Developer Certificate of Origin (DCO)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In order to ensure that all contributions are properly authorized and in
+compliance with licensing requirements, Modules project follows the `Developer
+Certificate of Origin (DCO)`_ process. The DCO is a lightweight mechanism to
+certify that you, as a contributor, have the right to submit your code and
+agree to the project’s licensing terms.
+
+How to sign off your commits
+""""""""""""""""""""""""""""
+
+Every commit must include a ``Signed-off-by`` line, which certifies that the
+contribution adheres to the DCO. You can do this by adding the following line
+at the end of your commit message::
+
+    Signed-off-by: Your Name <your.email@example.com>
+
+The name and email must match your Git configuration (``git config user.name``
+and ``git config user.email``).
+
+To simplify the process, you can use the ``-s`` flag of ``git`` command when
+committing::
+
+    git commit -s -m "Your commit message"
+
+Verifying DCO Compliance
+""""""""""""""""""""""""
+
+Modules repository automates checks to enforce the DCO. If your contribution
+does not include the proper ``Signed-off-by`` line, the pull request check
+will fail. You will need to amend your commit::
+
+    git commit --amend -s
+
+.. _Developer Certificate of Origin (DCO): https://developercertificate.org/
 
 .. _commit-hooks:
 

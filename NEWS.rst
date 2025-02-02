@@ -31,6 +31,8 @@ Modules 5.6.0 (not yet released)
   issue #565)
 * Doc: advertise the `Modules chat room`_ (``#modules:matrix.org``) to discuss
   with the community.
+* Doc: describe the :ref:`developer-certificate-of-origin` process now applied
+  on contributions.
 
 .. _Security policy: https://github.com/envmodules/modules/blob/main/SECURITY.md
 .. _Modules chat room: https://matrix.to/#/#modules:matrix.org
