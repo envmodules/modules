@@ -125,6 +125,19 @@ if {[cmpversion $tclsh_version 8.5] > 0} {
 unsetenv_var TESTSUITE_ENABLE_SITECONFIG_EXTRA_UNK
 
 
+# variable value not a list
+setenv_var TESTSUITE_ENABLE_SITECONFIG_EXTRA_VALNOTALIST rc_var
+set ans [list]
+lappend ans [list set _LMFILES_ $mp/interp/1:$mp/foo/1.0]
+lappend ans [list set LOADEDMODULES interp/1:foo/1.0]
+testouterr_cmd sh {load interp/1 foo/1.0} $ans {}
+
+setenv_var TESTSUITE_ENABLE_SITECONFIG_EXTRA_VALNOTALIST var
+testouterr_cmd sh {load interp/1 foo/1.0} $ans {}
+
+unsetenv_var TESTSUITE_ENABLE_SITECONFIG_EXTRA_VALNOTALIST
+
+
 # extra cmds and vars that supersede existing cmds or variables
 setenv_var TESTSUITE_ENABLE_SITECONFIG_EXTRA_SUPERSEDE rc_cmd
 set tserr "interp/0\ninterp/1(myproc1:myproc2)\ninterp/2"

@@ -34,6 +34,8 @@ Modules 5.6.0 (not yet released)
 * Doc: describe the :ref:`developer-certificate-of-origin` process now applied
   on contributions.
 * Doc: add :ref:`add-new-maintainer` guide
+* Fix interpreter variable reset between multiple modulefile or modulerc
+  evaluations when variable initial value is an invalid list. (fix issue #570)
 
 .. _Security policy: https://github.com/envmodules/modules/blob/main/SECURITY.md
 .. _Modules chat room: https://matrix.to/#/#modules:matrix.org

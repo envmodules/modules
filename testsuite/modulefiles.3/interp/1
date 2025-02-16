@@ -58,3 +58,9 @@ if {[info exists env(TESTSUITE_ENABLE_SITECONFIG_EXTRA_REGULAR)]} {
         }
     }
 }
+
+if {[info exists env(TESTSUITE_ENABLE_SITECONFIG_EXTRA_VALNOTALIST)]} {
+    switch -- $env(TESTSUITE_ENABLE_SITECONFIG_EXTRA_VALNOTALIST) {
+        var {set myvar value}
+    }
+}

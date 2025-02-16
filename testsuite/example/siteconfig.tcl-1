@@ -671,5 +671,12 @@ if {[info exists env(TESTSUITE_ENABLE_SITECONFIG_GETMODULEFILEFROMLOADINGMODULE)
     report [string length [getModulefileFromLoadingModule foo]]
 }
 
+if {[info exists env(TESTSUITE_ENABLE_SITECONFIG_EXTRA_VALNOTALIST)]} {
+    switch -- $env(TESTSUITE_ENABLE_SITECONFIG_EXTRA_VALNOTALIST) {
+        var    {set modulefile_extra_vars [list myvar {"foo"; "bar"}]}
+        rc_var {set modulerc_extra_vars [list myvar {"foo"; "bar"}]}
+    }
+}
+
 
 }

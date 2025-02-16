@@ -47,3 +47,9 @@ if {[info exists env(TESTSUITE_ENABLE_SITECONFIG_EXTRA_REGULAR)]} {
         mix - override {module-version interp/1 [mycmd] $myvar}
     }
 }
+
+if {[info exists env(TESTSUITE_ENABLE_SITECONFIG_EXTRA_VALNOTALIST)]} {
+    switch -- $env(TESTSUITE_ENABLE_SITECONFIG_EXTRA_VALNOTALIST) {
+        rc_var {set myvar value}
+    }
+}
