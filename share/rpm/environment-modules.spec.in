@@ -102,9 +102,9 @@ have access to the module alias.
            --mandir=%{_mandir} \
            --vimdatadir=%{vimdatadir} \
            --nagelfardatadir=%{_datadir}/Modules/nagelfar \
-           --with-bashcompletiondir=%{_datadir}/bash-completion/completions \
-           --with-fishcompletiondir=%{_datadir}/fish/vendor_completions.d \
-           --with-zshcompletiondir=%{_datadir}/zsh/site-functions \
+           --with-bashcompletiondir=%{bash_completions_dir} \
+           --with-fishcompletiondir=%{fish_completions_dir} \
+           --with-zshcompletiondir=%{zsh_completions_dir} \
            --enable-multilib-support \
            --disable-doc-install \
            --enable-modulespath \
@@ -220,13 +220,13 @@ fi
 %dir %{_datadir}/Modules/init
 %{_datadir}/Modules/init/*
 # do not need to require shell package as we "own" completion dir
-%dir %{_datadir}/bash-completion/completions
-%{_datadir}/bash-completion/completions/module
-%{_datadir}/bash-completion/completions/ml
-%dir %{_datadir}/zsh/site-functions
-%{_datadir}/zsh/site-functions/_module
-%dir %{_datadir}/fish/vendor_completions.d
-%{_datadir}/fish/vendor_completions.d/module.fish
+%dir %{bash_completions_dir}
+%{bash_completions_dir}/module
+%{bash_completions_dir}/ml
+%dir %{zsh_completions_dir}
+%{zsh_completions_dir}/_module
+%dir %{fish_completions_dir}
+%{fish_completions_dir}/module.fish
 %dir %{_sysconfdir}/%{name}
 %config(noreplace) %{_sysconfdir}/%{name}/initrc
 %config(noreplace) %{_sysconfdir}/%{name}/modulespath
