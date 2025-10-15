@@ -413,36 +413,28 @@ set func_cmake "function\\\(module\\\)
 \\s*foreach\\\(_mlv \\\${_mlv_list}\\\)
 \\s*if\\\(\\\${_mlv} MATCHES \"\\\^\\\[A-Za-z_\\\]\\\[A-Za-z0-9_\\\]\\\*\\\$\"\\\)
 \\s*if\\\(DEFINED ENV{\\\${_mlv}}\\\)
-\\s*set\\\(_mlre \"\\\${_mlre}__MODULES_QUAR_\\\${_mlv}=\\\$ENV{\\\${_mlv}};\"\\\)
+\\s*string\\\(APPEND _mlre
+\\s*\" \\\[===\\\[__MODULES_QUAR_\\\${_mlv}=\\\$ENV{\\\${_mlv}}\\\]===\\\]\"\\\)
 \\s*endif\\\(\\\)
 \\s*set\\\(_mlrv \"MODULES_RUNENV_\\\${_mlv}\"\\\)
-\\s*set\\\(_mlre \"\\\${_mlre}\\\${_mlv}=\\\$ENV{\\\${_mlrv}};\"\\\)
+\\s*string\\\(APPEND _mlre \" \\\[===\\\[\\\${_mlv}=\\\$ENV{\\\${_mlrv}}\\\]===\\\]\"\\\)
 \\s*endif\\\(\\\)
 \\s*endforeach\\\(\\\)
 \\s*if \\\(NOT \"\\\${_mlre}\" STREQUAL \"\"\\\)
-\\s*set\\\(_mlre \"env;\\\${_mlre}__MODULES_QUARANTINE_SET=1;\"\\\)
+\\s*set\\\(_mlre \"env \\\${_mlre} __MODULES_QUARANTINE_SET=1\"\\\)
 \\s*endif\\\(\\\)
 \\s*endif\\\(\\\)
 \\s*set\\\(_mlstatus TRUE\\\)
 \\s*execute_process\\\(COMMAND mktemp -t moduleinit.cmake.XXXXXXXXXXXX
 \\s*OUTPUT_VARIABLE tempfile_name
 \\s*OUTPUT_STRIP_TRAILING_WHITESPACE\\\)
-\\s*if\\\(\\\${ARGC} EQUAL 1\\\)
-\\s*execute_process\\\(COMMAND \\\${_mlre} $tclshlocre \"$modulecmd_pathre\" cmake \"\\\${ARGV0}\"
-\\s*OUTPUT_FILE \\\${tempfile_name}\\\)
-\\s*elseif\\\(\\\${ARGC} EQUAL 2\\\)
-\\s*execute_process\\\(COMMAND \\\${_mlre} $tclshlocre \"$modulecmd_pathre\" cmake \"\\\${ARGV0}\" \"\\\${ARGV1}\"
-\\s*OUTPUT_FILE \\\${tempfile_name}\\\)
-\\s*elseif\\\(\\\${ARGC} EQUAL 3\\\)
-\\s*execute_process\\\(COMMAND \\\${_mlre} $tclshlocre \"$modulecmd_pathre\" cmake \"\\\${ARGV0}\" \"\\\${ARGV1}\" \"\\\${ARGV2}\"
-\\s*OUTPUT_FILE \\\${tempfile_name}\\\)
-\\s*elseif\\\(\\\${ARGC} EQUAL 4\\\)
-\\s*execute_process\\\(COMMAND \\\${_mlre} $tclshlocre \"$modulecmd_pathre\" cmake \"\\\${ARGV0}\" \"\\\${ARGV1}\" \"\\\${ARGV2}\" \"\\\${ARGV3}\"
-\\s*OUTPUT_FILE \\\${tempfile_name}\\\)
-\\s*else\\\(\\\)
-\\s*execute_process\\\(COMMAND \\\${_mlre} $tclshlocre \"$modulecmd_pathre\" cmake \\\${ARGV}
-\\s*OUTPUT_FILE \\\${tempfile_name}\\\)
-\\s*endif\\\(\\\)
+\\s*set\\\(quotedArgs \"COMMAND \\\${_mlre} $tclshlocre \\\\\"$modulecmd_pathre\\\\\" cmake \"\\\)
+\\s*cmake_parse_arguments\\\(PARSE_ARGV 0 FWD \"\" \"\" \"\"\\\)
+\\s*foreach\\\(arg IN LISTS FWD_UNPARSED_ARGUMENTS\\\)
+\\s*string\\\(APPEND quotedArgs \" \\\[===\\\[\\\${arg}\\\]===\\\]\"\\\)
+\\s*endforeach\\\(\\\)
+\\s*string\\\(APPEND quotedArgs \" OUTPUT_FILE \\\${tempfile_name}\"\\\)
+\\s*cmake_language\\\(EVAL CODE \"execute_process\\\(\\\${quotedArgs}\\\)\"\\\)
 \\s*if\\\(EXISTS \\\${tempfile_name}\\\)
 \\s*include\\\(\\\${tempfile_name}\\\)
 \\s*file\\\(REMOVE \\\${tempfile_name}\\\)
@@ -619,22 +611,13 @@ set func_cmake "function\\\(module\\\)
 \\s*execute_process\\\(COMMAND mktemp -t moduleinit.cmake.XXXXXXXXXXXX
 \\s*OUTPUT_VARIABLE tempfile_name
 \\s*OUTPUT_STRIP_TRAILING_WHITESPACE\\\)
-\\s*if\\\(\\\${ARGC} EQUAL 1\\\)
-\\s*execute_process\\\(COMMAND $tclshlocre \"$modulecmd_pathre\" cmake \"\\\${ARGV0}\"
-\\s*OUTPUT_FILE \\\${tempfile_name}\\\)
-\\s*elseif\\\(\\\${ARGC} EQUAL 2\\\)
-\\s*execute_process\\\(COMMAND $tclshlocre \"$modulecmd_pathre\" cmake \"\\\${ARGV0}\" \"\\\${ARGV1}\"
-\\s*OUTPUT_FILE \\\${tempfile_name}\\\)
-\\s*elseif\\\(\\\${ARGC} EQUAL 3\\\)
-\\s*execute_process\\\(COMMAND $tclshlocre \"$modulecmd_pathre\" cmake \"\\\${ARGV0}\" \"\\\${ARGV1}\" \"\\\${ARGV2}\"
-\\s*OUTPUT_FILE \\\${tempfile_name}\\\)
-\\s*elseif\\\(\\\${ARGC} EQUAL 4\\\)
-\\s*execute_process\\\(COMMAND $tclshlocre \"$modulecmd_pathre\" cmake \"\\\${ARGV0}\" \"\\\${ARGV1}\" \"\\\${ARGV2}\" \"\\\${ARGV3}\"
-\\s*OUTPUT_FILE \\\${tempfile_name}\\\)
-\\s*else\\\(\\\)
-\\s*execute_process\\\(COMMAND $tclshlocre \"$modulecmd_pathre\" cmake \\\${ARGV}
-\\s*OUTPUT_FILE \\\${tempfile_name}\\\)
-\\s*endif\\\(\\\)
+\\s*set\\\(quotedArgs \"COMMAND $tclshlocre \\\\\"$modulecmd_pathre\\\\\" cmake \"\\\)
+\\s*cmake_parse_arguments\\\(PARSE_ARGV 0 FWD \"\" \"\" \"\"\\\)
+\\s*foreach\\\(arg IN LISTS FWD_UNPARSED_ARGUMENTS\\\)
+\\s*string\\\(APPEND quotedArgs \" \\\[===\\\[\\\${arg}\\\]===\\\]\"\\\)
+\\s*endforeach\\\(\\\)
+\\s*string\\\(APPEND quotedArgs \" OUTPUT_FILE \\\${tempfile_name}\"\\\)
+\\s*cmake_language\\\(EVAL CODE \"execute_process\\\(\\\${quotedArgs}\\\)\"\\\)
 \\s*if\\\(EXISTS \\\${tempfile_name}\\\)
 \\s*include\\\(\\\${tempfile_name}\\\)
 \\s*file\\\(REMOVE \\\${tempfile_name}\\\)

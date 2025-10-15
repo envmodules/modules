@@ -1178,13 +1178,10 @@ end}
       }
       cmake {
          if {[getConf quarantine_support]} {
-            set pre_exec "\n      execute_process(COMMAND \${_mlre} $tclshbin\
-            \"$::argv0\" cmake "
+            set pre_exec "COMMAND \${_mlre} $tclshbin \\\"$::argv0\\\" cmake "
          } else {
-            set pre_exec "\n      execute_process(COMMAND $tclshbin\
-            \"$::argv0\" cmake "
+            set pre_exec "COMMAND $tclshbin \\\"$::argv0\\\" cmake "
          }
-         set post_exec "\n         OUTPUT_FILE \${tempfile_name})\n"
          set fdef {function(module)
    cmake_policy(SET CMP0007 NEW)}
          if {[getConf quarantine_support]} {
@@ -1195,14 +1192,15 @@ end}
       foreach(_mlv ${_mlv_list})
          if(${_mlv} MATCHES "^[A-Za-z_][A-Za-z0-9_]*$")
             if(DEFINED ENV{${_mlv}})
-               set(_mlre "${_mlre}__MODULES_QUAR_${_mlv}=$ENV{${_mlv}};")
+               string(APPEND _mlre
+                      " [===[__MODULES_QUAR_${_mlv}=$ENV{${_mlv}}]===]")
             endif()
             set(_mlrv "MODULES_RUNENV_${_mlv}")
-            set(_mlre "${_mlre}${_mlv}=$ENV{${_mlrv}};")
+            string(APPEND _mlre " [===[${_mlv}=$ENV{${_mlrv}}]===]")
         endif()
       endforeach()
       if (NOT "${_mlre}" STREQUAL "")
-         set(_mlre "env;${_mlre}__MODULES_QUARANTINE_SET=1;")
+         set(_mlre "env ${_mlre} __MODULES_QUARANTINE_SET=1")
       endif()
    endif()}
          }
@@ -1211,23 +1209,17 @@ end}
    execute_process(COMMAND mktemp -t moduleinit.cmake.XXXXXXXXXXXX
       OUTPUT_VARIABLE tempfile_name
       OUTPUT_STRIP_TRAILING_WHITESPACE)
-   if(${ARGC} EQUAL 1)}
-            # adapt command definition depending on the number of args to be
-            # able to pass to some extend (<5 args) empty string element to
-            # modulecmd (no other way as empty element in ${ARGV} are skipped
-            append fdef "$pre_exec\"\${ARGV0}\"$post_exec"
-            append fdef {   elseif(${ARGC} EQUAL 2)}
-            append fdef "$pre_exec\"\${ARGV0}\" \"\${ARGV1}\"$post_exec"
-            append fdef {   elseif(${ARGC} EQUAL 3)}
-            append fdef "$pre_exec\"\${ARGV0}\" \"\${ARGV1}\"\
-               \"\${ARGV2}\"$post_exec"
-            append fdef {   elseif(${ARGC} EQUAL 4)}
-            append fdef "$pre_exec\"\${ARGV0}\" \"\${ARGV1}\"\
-               \"\${ARGV2}\" \"\${ARGV3}\"$post_exec"
-            append fdef {   else()}
-            append fdef "$pre_exec\${ARGV}$post_exec"
-            append fdef {   endif()
-   if(EXISTS ${tempfile_name})
+}
+   append fdef "   set(quotedArgs \"$pre_exec\")"
+   append fdef {
+   cmake_parse_arguments(PARSE_ARGV 0 FWD "" "" "")
+   foreach(arg IN LISTS FWD_UNPARSED_ARGUMENTS)
+      string(APPEND quotedArgs " [===[${arg}]===]")
+   endforeach()
+   string(APPEND quotedArgs " OUTPUT_FILE ${tempfile_name}")
+   cmake_language(EVAL CODE "execute_process(${quotedArgs})")
+}
+   append fdef {   if(EXISTS ${tempfile_name})
       include(${tempfile_name})
       file(REMOVE ${tempfile_name})
    endif()
