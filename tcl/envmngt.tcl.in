@@ -1178,9 +1178,9 @@ end}
       }
       cmake {
          if {[getConf quarantine_support]} {
-            set pre_exec "COMMAND \${_mlre} $tclshbin \\\"$::argv0\\\" cmake "
+            set pre_exec "COMMAND \${_mlre} $tclshbin \\\"$::argv0\\\" cmake"
          } else {
-            set pre_exec "COMMAND $tclshbin \\\"$::argv0\\\" cmake "
+            set pre_exec "COMMAND $tclshbin \\\"$::argv0\\\" cmake"
          }
          set fdef {function(module)
    cmake_policy(SET CMP0007 NEW)}

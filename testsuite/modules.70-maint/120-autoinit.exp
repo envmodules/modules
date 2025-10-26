@@ -428,7 +428,7 @@ set func_cmake "function\\\(module\\\)
 \\s*execute_process\\\(COMMAND mktemp -t moduleinit.cmake.XXXXXXXXXXXX
 \\s*OUTPUT_VARIABLE tempfile_name
 \\s*OUTPUT_STRIP_TRAILING_WHITESPACE\\\)
-\\s*set\\\(quotedArgs \"COMMAND \\\${_mlre} $tclshlocre \\\\\"$modulecmd_pathre\\\\\" cmake \"\\\)
+\\s*set\\\(quotedArgs \"COMMAND \\\${_mlre} $tclshlocre \\\\\"$modulecmd_pathre\\\\\" cmake\"\\\)
 \\s*cmake_parse_arguments\\\(PARSE_ARGV 0 FWD \"\" \"\" \"\"\\\)
 \\s*foreach\\\(arg IN LISTS FWD_UNPARSED_ARGUMENTS\\\)
 \\s*string\\\(APPEND quotedArgs \" \\\[===\\\[\\\${arg}\\\]===\\\]\"\\\)
@@ -611,7 +611,7 @@ set func_cmake "function\\\(module\\\)
 \\s*execute_process\\\(COMMAND mktemp -t moduleinit.cmake.XXXXXXXXXXXX
 \\s*OUTPUT_VARIABLE tempfile_name
 \\s*OUTPUT_STRIP_TRAILING_WHITESPACE\\\)
-\\s*set\\\(quotedArgs \"COMMAND $tclshlocre \\\\\"$modulecmd_pathre\\\\\" cmake \"\\\)
+\\s*set\\\(quotedArgs \"COMMAND $tclshlocre \\\\\"$modulecmd_pathre\\\\\" cmake\"\\\)
 \\s*cmake_parse_arguments\\\(PARSE_ARGV 0 FWD \"\" \"\" \"\"\\\)
 \\s*foreach\\\(arg IN LISTS FWD_UNPARSED_ARGUMENTS\\\)
 \\s*string\\\(APPEND quotedArgs \" \\\[===\\\[\\\${arg}\\\]===\\\]\"\\\)
