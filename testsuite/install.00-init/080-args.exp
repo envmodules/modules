@@ -103,7 +103,7 @@ foreach shell $othlang_list {
          set postmsg "\nError: \nExecution halted"
       }
       cmake {
-         set postmsg "\nCMake Error at testsuite/bin/install_test_cmake:115 \\\(message\\\):\n\n"
+         set postmsg "\nCMake Error at testsuite/bin/install_test_cmake:71 \\\(message\\\):\n\n"
       }
       default {
          set postmsg {}
