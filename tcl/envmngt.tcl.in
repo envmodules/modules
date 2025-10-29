@@ -1808,27 +1808,43 @@ proc add-path {cmd mode dflbhv args} {
    set val [get-env $var]
 
    foreach dir $path_list {
-      if {![info exists countarr($dir)] || $allow_dup} {
+      # remove $dir from path only if path_entry_reorder is true and
+      # $dir is already in path and duplicates are NOT allowed.
+      if {[getConf path_entry_reorder] && [info exists countarr($dir)]\
+         && ! $allow_dup} {
+         set mpath_list [split $val $separator]
+         set mpath_list [lsearch -inline -all -not -exact $mpath_list $dir]
+         set val [join $mpath_list $separator]
+      }
+      # add $dir to beginning or end only if path_entry_reorder is true or
+      # $dir is NOT in path or duplicates are allowed.
+      # Please note: if path_entry_reorder is true and duplicates are not
+      # allowed, $dir is not in path ($val) - either it was not in or it
+      # had been removed. Hence we have to add it.
+      if {[getConf path_entry_reorder] || ![info exists countarr($dir)]\
+         || $allow_dup} {
          # ignore env var set empty if no empty entry found in reference
          # counter array (sometimes var is cleared by setting it empty not
          # unsetting it)
          if {$val ne {} || [info exists countarr()]} {
             set sep [expr {$val eq $separator ? {} : $separator}]
             set val [expr {$bhv eq {prepend} ? "$dir$sep$val" :\
-               "$val$sep$dir"}]
+                              "$val$sep$dir"}]
          } else {
             set val $dir
          }
       }
-      if {[info exists countarr($dir)]} {
-         # do not increase counter if bare separator string is added or if
-         # reference count is ignored (--ignore-refcount set) unless if
-         # duplicate mode is enabled (--duplicates set)
-         if {!$val_set_is_delim && (!$ign_refcount || $allow_dup)} {
-            incr countarr($dir)
-         }
-      } else {
+      #### ref-counting
+      # if $dir is NOT in path
+      #    set ref-count 1
+      # else
+      #    do NOT increase counter if bare separator string is added or if
+      #    reference count is ignored (--ignore-refcount set) unless if
+      #    duplicate mode is enabled (--duplicates set)
+      if {![info exists countarr($dir)]} {
          set countarr($dir) 1
+      } elseif {!$val_set_is_delim && (!$ign_refcount || $allow_dup)} {
+         incr countarr($dir)
       }
    }
 
@@ -2046,7 +2062,10 @@ proc getModulesEnvVarGlobList {{loaded_ctx 0}} {
    return $envvar_glob_list
 }
 
-# ;;; Local Variables: ***
-# ;;; mode:tcl ***
-# ;;; End: ***
+# ;;; Local Variables:
+# ;;; Mode: tcl-mode
+# ;;; tcl-indent-level: 3
+# ;;; tcl-continued-indent-level: 3
+# ;;; indent-tabs-mode: nil
+# ;;; End:
 # vim:set tabstop=3 shiftwidth=3 expandtab autoindent:

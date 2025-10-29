@@ -158,6 +158,9 @@ variantshortcut := @variantshortcut@
 # editor
 editor := @editor@
 
+# Lmod path order
+pathentryreorder := @pathentryreorder@
+
 # shell completion location
 bashcompletiondir := @bashcompletiondir@
 fishcompletiondir := @fishcompletiondir@
