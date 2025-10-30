@@ -34,7 +34,7 @@ multilibsupport libdir64 libdir32 versioning silentshdbgsupport \
 setshellstartup quarantinesupport autohandling availindepth implicitdefault \
 extendeddefault moduleshome initconfin pager pageropts verbosity color \
 darkbgcolors lightbgcolors termbg lockedconfigs icase unloadmatchorder \
-searchmatch modulepath loadedmodules quarantinevars wa277 advversspec ml \
+searchmatch modulepath loadedmodules quarantinevars wa277 lmodpath advversspec ml \
 windowssupport nearlyforbiddendays implicitrequirement tagabbrev \
 tagcolorname mcookieversioncheck availoutput availterseoutput listoutput \
 listterseoutput editor variantshortcut bashcompletiondir fishcompletiondir \
@@ -79,6 +79,7 @@ extendeddefault=y
 advversspec=y
 ml=y
 wa277=n
+lmodpath=n
 loadedmodules=
 quarantinevars=
 binsearchpath=/usr/bin:/bin:/usr/local/bin
@@ -931,6 +932,9 @@ for arg in "$@"; do
       pythonbin=$(get_package_value "$arg") ;;
    --with-module-path=*)
       echo_warning "Option \`--with-module-path' ignored, use \`--modulepath' instead" ;;
+   --enable-lmod-path|--disable-lmod-path)
+      # shellcheck disable=SC2034
+      lmodpath=$(get_feature_value "$arg") ;;
    -h|--help)
       echo_usage
       exit 0

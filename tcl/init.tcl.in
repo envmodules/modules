@@ -111,6 +111,7 @@ array set g_config_defs [list\
       alias indesym sym tag hidden key} {} {} eltlist}\
    list_terse_output {MODULES_LIST_TERSE_OUTPUT {@listterseoutput@} 0 l\
       {header idx variant alias indesym sym tag hidden key} {} {} eltlist}\
+   lmod_path_rule {MODULES_LMOD_PATH_RULE 1 0 b {0 1}}\
    locked_configs {{} {@lockedconfigs@} 0 o}\
    logged_events {MODULES_LOGGED_EVENTS {@loggedevents@} 1 l {auto_eval\
       requested_eval requested_cmd} {} {} eltlist}\
