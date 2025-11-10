@@ -128,10 +128,20 @@ Perl:
 
 Python:
 
+Default installation should have added |file initdir| to the :envvar:`PYTHONPATH` environment variable allowing initialization as follows
+
 .. parsed-literal::
 
-     import os
-     exec(open("\ |initdir|\ /python.py").read(), globals())
+     from env_modules import module
+     module("load", "modulefile", "modulefile", "...")
+
+Otherwise
+
+.. parsed-literal::
+
+     import sys
+     sys.path.insert(1, "\ |initdir|\ ")
+     from env_modules import module
      module("load", "modulefile", "modulefile", "...")
 
 Ruby:

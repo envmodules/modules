@@ -504,6 +504,15 @@ instance :instopt:`--disable-set-manpath<--enable-set-manpath>`):
 
     .. versionadded:: 4.2
 
+.. instopt:: --enable-append-pythonpath
+
+ Append rather prepend init directory to the PYTHONPATH environment variable
+ when the :instopt:`--enable-set-pythonpath` option is enabled. (default=no)
+
+ .. only:: html
+
+    .. versionadded:: 5.7
+
 .. instopt:: --enable-auto-handling
 
  Set modulecmd.tcl to automatically apply automated modulefiles handling
@@ -798,6 +807,16 @@ instance :instopt:`--disable-set-manpath<--enable-set-manpath>`):
  .. only:: html
 
     .. versionadded:: 4.0
+
+.. instopt:: --enable-set-pythonpath
+
+ Prepend init directory defined by the :instopt:`--initdir` option to the
+ PYTHONPATH environment variable in the shell initialization scripts.
+ (default=yes)
+
+ .. only:: html
+
+    .. versionadded:: 5.7
 
 .. instopt:: --enable-set-shell-startup
 
