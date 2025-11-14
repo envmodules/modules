@@ -2157,6 +2157,13 @@ proc cmdModuleAutoinit {} {
       @setmanpath@}
    }
 
+   # add Modules init directory to PYTHONPATH if enabled
+   @setpythonpath@if {![isEnvVarDefined PYTHONPATH]} {
+   @setpythonpath@   setenv PYTHONPATH {@initdir@}
+   @setpythonpath@} elseif {{@initdir@} ni [split [get-env PYTHONPATH] :]} {
+   @setpythonpath@   @appendpythonpath@-path PYTHONPATH {@initdir@}
+   @setpythonpath@}
+
    # source shell completion script if available, not installed in default
    # completion locations and only if shell is interactive
    if {[getState shell] in {@shellcompsource@} && [getState is_stderr_tty]} {
