@@ -1,20 +1,15 @@
-# Note that all variables in this file are prepended with "_" so if someone
-# runs `from python import *` they should only really see the `module` function
-# coming from `env_modules.py` and not implementation details of this file.
-from pathlib import Path as _Path
-from textwrap import fill as _fill
-import sys as _sys
-import warnings as _warnings
-
-_warning = """
+"""
 @initdir@/python.py exists for backwards compatibility with old releases
 of environment modules. Going forward, users should ensure @initdir@ is on
 their PYTHONPATH, then have their Python code include `from env_modules import
 module`.
 """
-with _warnings.catch_warnings():
-    _warnings.simplefilter("always")
-    _warnings.warn('\n' + _fill(_warning), DeprecationWarning)
+
+# Note that all variables in this file are prepended with "_" so if someone
+# runs `from python import *` they should only really see the `module` function
+# coming from `env_modules.py` and not implementation details of this file.
+from pathlib import Path as _Path
+import sys as _sys
 
 # Ensure this directory is in import path
 _init_dir = str(_Path(@initdir@).parent.absolute())
@@ -27,6 +22,3 @@ from env_modules import *
 del _Path
 del _sys
 del _init_dir
-del _warning
-del _warnings
-del _fill
