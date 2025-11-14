@@ -48,6 +48,8 @@ libdir32 := @libdir32@
 # enable or not some specific definition
 setmanpath := @setmanpath@
 appendmanpath := @appendmanpath@
+setpythonpath := @setpythonpath@
+appendpythonpath := @appendpythonpath@
 setbinpath := @setbinpath@
 appendbinpath := @appendbinpath@
 setmodulespath := @setmodulespath@
@@ -178,4 +180,7 @@ BASENAME := @BASENAME@
 # specific command option support
 RMDIR_IGN_NON_EMPTY := @RMDIR_IGN_NON_EMPTY@
 SED_ERE := @SED_ERE@
+
+# profile init scripts put init dir on PYTHONPATH
+setpythonpath := @setpythonpath@
 
