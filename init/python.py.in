@@ -1,34 +1,24 @@
-from __future__ import print_function
-import os, sys, re, subprocess
+"""
+@initdir@/python.py exists for backwards compatibility with old releases
+of environment modules. Going forward, users should ensure @initdir@ is on
+their PYTHONPATH, then have their Python code include `from env_modules import
+module`.
+"""
 
-# define modules runtime quarantine configuration
-@setquarvars@os.environ['MODULES_RUN_QUARANTINE'] = '@RUN_QUARANTINE@'
-@setquarvars@@os.environ['RUNENV_VAR'] = 'RUNENV_VAL'@
-@notsetquarvars@#os.environ['MODULES_RUN_QUARANTINE'] = 'ENVVARNAME'
-@notsetquarvars@
-# setup quarantine if defined
-_mlre = os.environ.copy()
-if 'MODULES_RUN_QUARANTINE' in os.environ:
-   for _mlv in os.environ['MODULES_RUN_QUARANTINE'].split():
-      if re.match('^[A-Za-z_][A-Za-z0-9_]*$', _mlv):
-         if _mlv in os.environ:
-            _mlre['__MODULES_QUAR_' + _mlv] = os.environ[_mlv]
-         _mlrv = 'MODULES_RUNENV_' + _mlv
-         if _mlrv in os.environ:
-            _mlre[_mlv] = os.environ[_mlrv]
-         else:
-            _mlre[_mlv] = ''
-   _mlre['__MODULES_QUARANTINE_SET'] = '1'
+# Note that all variables in this file are prepended with "_" so if someone
+# runs `from python import *` they should only really see the `module` function
+# coming from `env_modules.py` and not implementation details of this file.
+from pathlib import Path as _Path
+import sys as _sys
 
-# define module command and surrounding initial environment (default value
-# for MODULESHOME, MODULEPATH, LOADEDMODULES and parse of init config files)
-out, err = subprocess.Popen(['@TCLSH@', '@libexecdir@/modulecmd.tcl', 'python', 'autoinit'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=_mlre).communicate()
+# Ensure this directory is in import path
+_init_dir = str(_Path(@initdir@).parent.absolute())
+if _init_dir not in _sys.path:
+    _sys.path.insert(1, _init_dir)
 
-exec(out)
-if err.decode():
-   print(err.decode(), end='', file=sys.stderr)
+from env_modules import *
 
 # clean temp variables
-del _mlre
-del out
-del err
+del _Path
+del _sys
+del _init_dir

@@ -11,7 +11,7 @@ INSTALL_DATA = $(INSTALL) -m 644
 
 SH_LIKE  = sh ksh bash zsh profile.sh
 CSH_LIKE = csh tcsh tcsh_completion profile.csh
-OTHER    = perl.pm python.py ruby.rb lisp tcl fish cmake r.R pwsh.ps1
+OTHER    = perl.pm env_modules.py python.py ruby.rb lisp tcl fish cmake r.R pwsh.ps1
 
 # example modulefiles to install
 EXAMPLE_MODFILES_SRCDIR := ../share/modulefiles
