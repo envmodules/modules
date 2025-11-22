@@ -277,7 +277,7 @@ ifeq ($(versioning),y)
 endif
 
 uninstall:
-	rm -f $(foreach initscript,$(ALL_SHELLS),'$(DESTDIR)$(initdir)/$(initscript)')
+	rm -f $(foreach initscript,$(ALL_SHELLS) python.py,'$(DESTDIR)$(initdir)/$(initscript)')
 ifeq ($(windowssupport),y)
 	rm -f '$(DESTDIR)$(initdir)/cmd.cmd'
 endif
