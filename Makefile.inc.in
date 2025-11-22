@@ -181,6 +181,3 @@ BASENAME := @BASENAME@
 RMDIR_IGN_NON_EMPTY := @RMDIR_IGN_NON_EMPTY@
 SED_ERE := @SED_ERE@
 
-# profile init scripts put init dir on PYTHONPATH
-setpythonpath := @setpythonpath@
-
