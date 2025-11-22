@@ -231,6 +231,16 @@ ifeq ($(appendbinpath),y)
 else
   setappendbinpath := prepend
 endif
+ifeq ($(setpythonpath),y)
+  setsetpythonpath :=
+else
+  setsetpythonpath := \#
+endif
+ifeq ($(appendpythonpath),y)
+  setappendpythonpath := append
+else
+  setappendpythonpath := prepend
+endif
 ifeq ($(setmanpath),y)
   setsetmanpath :=
 else
