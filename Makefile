@@ -443,6 +443,7 @@ sed -e 's|@prefix@|$(prefix)|g' \
 	-e 's|@sourcecache@|$(setsourcecache)|g' \
 	-e 's|@searchmatch@|$(searchmatch)|g' \
 	-e 's|@wa277@|$(setwa277)|g' \
+	-e 's|@pathentryreorder@|$(pathentryreorder)|g' \
 	-e 's|@icase@|$(icase)|g' \
 	-e 's|@nearlyforbiddendays@|$(nearlyforbiddendays)|g' \
 	-e 's|@tagabbrev@|$(tagabbrev)|g' \
