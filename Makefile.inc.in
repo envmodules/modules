@@ -48,6 +48,8 @@ libdir32 := @libdir32@
 # enable or not some specific definition
 setmanpath := @setmanpath@
 appendmanpath := @appendmanpath@
+setpythonpath := @setpythonpath@
+appendpythonpath := @appendpythonpath@
 setbinpath := @setbinpath@
 appendbinpath := @appendbinpath@
 setmodulespath := @setmodulespath@

@@ -231,6 +231,16 @@ ifeq ($(appendbinpath),y)
 else
   setappendbinpath := prepend
 endif
+ifeq ($(setpythonpath),y)
+  setsetpythonpath :=
+else
+  setsetpythonpath := \#
+endif
+ifeq ($(appendpythonpath),y)
+  setappendpythonpath := append
+else
+  setappendpythonpath := prepend
+endif
 ifeq ($(setmanpath),y)
   setsetmanpath :=
 else
@@ -479,6 +489,8 @@ sed -e 's|@prefix@|$(prefix)|g' \
 	-e 's|@setmanpath@|$(setsetmanpath)|g' \
 	-e 's|@appendmanpath@|$(setappendmanpath)|g' \
 	-e 's|@usemanpath@|$(setusemanpath)|g' \
+	-e 's|@setpythonpath@|$(setsetpythonpath)|g' \
+	-e 's|@appendpythonpath@|$(setappendpythonpath)|g' \
 	-e 's|@notusemanpath@|$(setnotusemanpath)|g' \
 	-e 's|@shellcompsource@|$(shellcompsource)|g' \
 	-e 's|@tcllintercmd@|$(tcllintercmd)|g' \

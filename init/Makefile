@@ -11,7 +11,7 @@ INSTALL_DATA = $(INSTALL) -m 644
 
 SH_LIKE  = sh ksh bash zsh profile.sh
 CSH_LIKE = csh tcsh tcsh_completion profile.csh
-OTHER    = perl.pm python.py ruby.rb lisp tcl fish cmake r.R pwsh.ps1
+OTHER    = perl.pm env_modules.py ruby.rb lisp tcl fish cmake r.R pwsh.ps1
 
 # example modulefiles to install
 EXAMPLE_MODFILES_SRCDIR := ../share/modulefiles
@@ -246,6 +246,7 @@ endif
 	$(INSTALL_DIR) '$(DESTDIR)$(zshcompletiondir)'
 	$(INSTALL_DIR) '$(DESTDIR)$(modulefilesdir)'
 	$(INSTALL_DATA) $(ALL_SHELLS) '$(DESTDIR)$(initdir)/'
+	ln -s env_modules.py '$(DESTDIR)$(initdir)/python.py'
 ifeq ($(windowssupport),y)
 	$(INSTALL_DATA) cmd.cmd '$(DESTDIR)$(initdir)/'
 endif
@@ -276,7 +277,7 @@ ifeq ($(versioning),y)
 endif
 
 uninstall:
-	rm -f $(foreach initscript,$(ALL_SHELLS),'$(DESTDIR)$(initdir)/$(initscript)')
+	rm -f $(foreach initscript,$(ALL_SHELLS) python.py,'$(DESTDIR)$(initdir)/$(initscript)')
 ifeq ($(windowssupport),y)
 	rm -f '$(DESTDIR)$(initdir)/cmd.cmd'
 endif
@@ -324,7 +325,7 @@ ifeq ($(VERBOSE),1)
 V = 1
 endif
 # let verbose by default the install/clean/test and other specific non-build targets
-$(V).SILENT: sh ksh bash zsh csh tcsh fish perl.pm python.py ruby.rb lisp tcl \
+$(V).SILENT: sh ksh bash zsh csh tcsh fish perl.pm env_modules.py ruby.rb lisp tcl \
 	cmake r.R bash_completion tcsh_completion zsh-functions/_module profile.sh \
 	profile.csh modulespath initrc $(EXAMPLE_MODFILES_SRCDIR)/modules \
 	$(EXAMPLE_MODFILES_SRCDIR)/version pwsh.ps1

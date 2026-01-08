@@ -41,7 +41,7 @@ listterseoutput editor variantshortcut bashcompletiondir fishcompletiondir \
 zshcompletiondir tcllinter tcllinteropts nagelfardatadir nagelfaraddons \
 stickypurge uniquenameloaded abortonerror sourcecache logger loggeropts \
 loggedevents conflictunload spideroutput spiderterseoutput spiderindepth \
-emacsdatadir emacsaddons requirevia"
+emacsdatadir emacsaddons requirevia setpythonpath appendpythonpath"
 libarglist=()
 
 # flags to know if argument has been specified on command-line
@@ -52,6 +52,8 @@ defloggeropts=1
 prefix=/usr/local/Modules
 setmanpath=y
 appendmanpath=n
+setpythonpath=y
+appendpythonpath=n
 setbinpath=y
 appendbinpath=n
 setmodulespath=n
@@ -237,6 +239,9 @@ Optional Features:
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --enable-set-manpath    set mandir to MANPATH in init scripts [yes]
   --enable-append-manpath append rather prepend mandir to MANPATH [no]
+  --enable-set-pythonpath set initdir to PYTHONPATH in init scripts [yes]
+  --enable-append-pythonpath
+                          append rather prepend initdir to PYTHONPATH [no]
   --enable-set-binpath    set bindir to PATH in init scripts [yes]
   --enable-append-binpath append rather prepend bindir to PATH [no]
   --enable-modulespath, --enable-dotmodulespath
@@ -720,6 +725,12 @@ for arg in "$@"; do
    --enable-append-manpath*|--disable-append-manpath)
       # shellcheck disable=SC2034
       appendmanpath=$(get_feature_value "$arg") ;;
+   --enable-set-pythonpath*|--disable-set-pythonpath)
+      # shellcheck disable=SC2034
+      setpythonpath=$(get_feature_value "$arg") ;;
+   --enable-append-pythonpath*|--disable-append-pythonpath)
+      # shellcheck disable=SC2034
+      appendpythonpath=$(get_feature_value "$arg") ;;
    --enable-set-binpath*|--disable-set-binpath)
       # shellcheck disable=SC2034
       setbinpath=$(get_feature_value "$arg") ;;
