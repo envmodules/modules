@@ -165,6 +165,7 @@ testouterr_cmd "sh" "load $module" $ans ""
 set module "append/4.0"
 set modulefile "$modpath/$module"
 
+setenv_var MODULES_PATH_ENTRY_REORDER 0
 unsetenv_path_var FOO
 set env(__MODULES_SHARE_BAR) "/path/to/dir1:2"
 set env(BAR) "/path/to/dir1:/path/to/dir2:/path/to/dir1"
@@ -179,6 +180,22 @@ lappend ans [list set LOADEDMODULES $module]
 
 testouterr_cmd "sh" "load $module" $ans ""
 
+setenv_var MODULES_PATH_ENTRY_REORDER 1
+unsetenv_path_var FOO
+set env(__MODULES_SHARE_BAR) "/path/to/dir1:2"
+set env(BAR) "/path/to/dir1:/path/to/dir2:/path/to/dir1"
+
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO "/path/to/dir1:2"]
+lappend ans [list set FOO "/path/to/dir1:/path/to/dir2:/path/to/dir1"]
+lappend ans [list set __MODULES_SHARE_BAR "/path/to/dir1:3"]
+lappend ans [list set BAR "/path/to/dir2:/path/to/dir1"]
+lappend ans [list set _LMFILES_ $modulefile]
+lappend ans [list set LOADEDMODULES $module]
+
+testouterr_cmd "sh" "load $module" $ans ""
+
+setenv_var MODULES_PATH_ENTRY_REORDER 0
 set env(FOO) "/path/to/dir1"
 
 set ans [list]
@@ -191,6 +208,20 @@ lappend ans [list set LOADEDMODULES $module]
 
 testouterr_cmd "sh" "load $module" $ans ""
 
+setenv_var MODULES_PATH_ENTRY_REORDER 1
+set env(FOO) "/path/to/dir1"
+
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO "/path/to/dir1:3"]
+lappend ans [list set FOO "/path/to/dir1:/path/to/dir1:/path/to/dir2:/path/to/dir1"]
+lappend ans [list set __MODULES_SHARE_BAR "/path/to/dir1:3"]
+lappend ans [list set BAR "/path/to/dir2:/path/to/dir1"]
+lappend ans [list set _LMFILES_ $modulefile]
+lappend ans [list set LOADEDMODULES $module]
+
+testouterr_cmd "sh" "load $module" $ans ""
+
+setenv_var MODULES_PATH_ENTRY_REORDER 0
 set env(__MODULES_SHARE_FOO) "/path/to/dir1:2"
 set env(FOO) "/path/to/dir1"
 
@@ -203,6 +234,23 @@ lappend ans [list set _LMFILES_ $modulefile]
 lappend ans [list set LOADEDMODULES $module]
 
 testouterr_cmd "sh" "load $module" $ans ""
+
+setenv_var MODULES_PATH_ENTRY_REORDER 1
+set env(__MODULES_SHARE_FOO) "/path/to/dir1:2"
+set env(FOO) "/path/to/dir1"
+
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO "/path/to/dir1:4"]
+lappend ans [list set FOO "/path/to/dir1:/path/to/dir1:/path/to/dir2:/path/to/dir1"]
+lappend ans [list set __MODULES_SHARE_BAR "/path/to/dir1:3"]
+lappend ans [list set BAR "/path/to/dir2:/path/to/dir1"]
+lappend ans [list set _LMFILES_ $modulefile]
+lappend ans [list set LOADEDMODULES $module]
+
+testouterr_cmd "sh" "load $module" $ans ""
+
+# reset to default config
+unset env(MODULES_PATH_ENTRY_REORDER)
 
 # test unload mode on append-path --duplicates
 setenv_loaded_module [list $module] [list $modulefile]
@@ -228,14 +276,15 @@ lappend ans [list unset _LMFILES_]
 lappend ans [list unset LOADEDMODULES]
 testouterr_cmd sh "unload $module" $ans {}
 
+set module "append/4.1"
+set modulefile "$modpath/$module"
+
+setenv_var MODULES_PATH_ENTRY_REORDER 0
 setenv_var FOO /path/to/dir1
 setenv_var __MODULES_SHARE_FOO /path/to/dir1:2
 setenv_var BAR /path/to/dir1:/path/to/dir2:/path/to/dir1
 setenv_var __MODULES_SHARE_BAR /path/to/dir1:2
 unsetenv_loaded_module
-
-set module "append/4.1"
-set modulefile "$modpath/$module"
 
 set ans [list]
 lappend ans [list set __MODULES_SHARE_FOO "/path/to/dir1:4"]
@@ -247,6 +296,25 @@ lappend ans [list set LOADEDMODULES $module]
 
 testouterr_cmd "sh" "load $module" $ans [msg_load $module "$warn_msgs: --index option has no effect on append-path"]
 
+setenv_var MODULES_PATH_ENTRY_REORDER 1
+setenv_var FOO /path/to/dir1
+setenv_var __MODULES_SHARE_FOO /path/to/dir1:2
+setenv_var BAR /path/to/dir1:/path/to/dir2:/path/to/dir1
+setenv_var __MODULES_SHARE_BAR /path/to/dir1:2
+unsetenv_loaded_module
+
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO "/path/to/dir1:4"]
+lappend ans [list set FOO "/path/to/dir1:/path/to/dir1:/path/to/dir2:/path/to/dir1"]
+lappend ans [list set __MODULES_SHARE_BAR "/path/to/dir1:3"]
+lappend ans [list set BAR "/path/to/dir2:/path/to/dir1"]
+lappend ans [list set _LMFILES_ $modulefile]
+lappend ans [list set LOADEDMODULES $module]
+
+testouterr_cmd "sh" "load $module" $ans [msg_load $module "$warn_msgs: --index option has no effect on append-path"]
+
+# reset to default config
+unset env(MODULES_PATH_ENTRY_REORDER)
 
 # test setting a large value in variable. For csh shell family, Modules
 # truncates value to avoid going over csh limit (this should be changed in
@@ -297,6 +365,7 @@ testouterr_cmd_re "csh" "load $module" $ans $ts_err
 set module "append/6.0"
 set modulefile "$modpath/$module"
 
+setenv_var MODULES_PATH_ENTRY_REORDER 0
 set env(__MODULES_SHARE_FOO) "/path/to/dir3:2"
 set env(FOO) "/path/to/dir1:/path/to/dir4"
 
@@ -308,6 +377,22 @@ lappend ans [list set LOADEDMODULES $module]
 
 # reference counter is automatically adjusted
 testouterr_cmd "sh" "load $module" $ans {}
+
+setenv_var MODULES_PATH_ENTRY_REORDER 1
+set env(__MODULES_SHARE_FOO) "/path/to/dir3:2"
+set env(FOO) "/path/to/dir1:/path/to/dir4"
+
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO "/path/to/dir1:2"]
+lappend ans [list set FOO "/path/to/dir4:/path/to/dir1:/path/to/dir2"]
+lappend ans [list set _LMFILES_ $modulefile]
+lappend ans [list set LOADEDMODULES $module]
+
+# reference counter is automatically adjusted
+testouterr_cmd "sh" "load $module" $ans {}
+
+# reset to default config
+unset env(MODULES_PATH_ENTRY_REORDER)
 
 # test incoherent state on unload mode
 setenv_loaded_module $module $modulefile
@@ -401,12 +486,32 @@ testouterr_cmd "sh" "unload $module" $ans {}
 
 
 #
+# test that path entry is not removed if added twice and path_entry_reorder
+# is true
+#
+set module "append/2.0"
+set modulefile "$modpath.4/$module"
+
+setenv_var MODULEPATH $modpath.4
+setenv_var MODULES_PATH_ENTRY_REORDER 1
+setenv_var FOO /test/dir2
+unsetenv_var __MODULES_SHARE_FOO
+
+unsetenv_loaded_module
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO "/test/dir2:2"]
+lappend ans [list set FOO "/test/dir1:/test/dir2:/test/dir3"]
+lappend ans [list set _LMFILES_ $modulefile]
+lappend ans [list set LOADEDMODULES $module]
+
+testouterr_cmd "sh" "load $module" $ans ""
+
+#
 # --glob option
 #
 
 unsetenv_loaded_module
 unsetenv_path_var FOO
-setenv_var MODULEPATH $modpath.4
 
 set ans [list]
 lappend ans [list set FOO /tmp*]

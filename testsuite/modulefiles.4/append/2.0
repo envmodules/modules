@@ -1,1 +1,24 @@
-#%Module
+#%Module1.0
+
+##############################################################################
+#   Modules Revision 3.0
+#   Providing a flexible user environment
+#
+#   File:		append/%M%
+#   Revision:		%I%
+#   First Edition:	2026/01/08
+#   Last Mod.:		%U%, %G%
+#
+#   Authors:		Achim Gsell, achim.gsell@psi.ch
+#
+#   Description:	Test appending paths with path_entry_enabled
+#   Command:
+#   Sub-Command:	append-path
+#
+#   Invocation:		load @M@/@V@
+#   Comment:	%C{
+#		}C%
+#
+##############################################################################
+
+append-path FOO /test/dir1 /test/dir2 /test/dir3

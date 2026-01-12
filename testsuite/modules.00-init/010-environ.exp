@@ -188,6 +188,9 @@ catch {unset env(MODULES_COLLECTION_TARGET)}
 catch {unset env(MODULE_VERSION)}
 catch {unset env(MODULE_VERSION_STACK)}
 
+# ensure that tests doesn't run with Lmod path order
+unsetenv_var MODULES_PATH_ENTRY_REORDER
+
 set env(MODULERCFILE) "$env(TESTSUITEDIR)/etc/empty"
 set ORIG_MODULERCFILE $env(MODULERCFILE)
 catch {unset env(MODULESHOME)}

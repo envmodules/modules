@@ -151,14 +151,13 @@ lappend ans [list set LOADEDMODULES $module]
 lappend ans [list set testsuite --delim=,:http://foobar.com]
 testouterr_cmd_re "sh" "load $module" $ans {}
 
-
 #
 # Try prepending empty string and check reference counter
 #
-
 set module "prepend/3.0"
 set modulefile "$modpath/$module"
 
+setenv_var MODULES_PATH_ENTRY_REORDER 0
 set ans [list]
 lappend ans [list set __MODULES_SHARE_FOO ":1"]
 lappend ans [list set FOO ""]
@@ -192,6 +191,42 @@ lappend ans [list set LOADEDMODULES "$module2:$module"]
 
 testouterr_cmd_re "sh" "load $module2 $module" $ans ""
 
+setenv_var MODULES_PATH_ENTRY_REORDER 1
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO ":1"]
+lappend ans [list set FOO ""]
+lappend ans [list set _LMFILES_ $modulefile]
+lappend ans [list set LOADEDMODULES $module]
+
+testouterr_cmd "sh" "load $module" $ans ""
+
+# empty var does not always mean empty path entry set, only if a corresponding
+# reference counter array entry can be found
+set env(FOO) ""
+testouterr_cmd "sh" "load $module" $ans ""
+
+unset env(FOO)
+set module2 "prepend/3.1"
+set modulefile2 "$modpath/$module2"
+
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO ":2"]
+lappend ans [list set FOO "/path/to/dir:"]
+lappend ans [list set _LMFILES_ "$modulefile:$modulefile2"]
+lappend ans [list set LOADEDMODULES "$module:$module2"]
+
+testouterr_cmd_re "sh" "load $module $module2" $ans ""
+
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO ":2"]
+lappend ans [list set FOO ":/path/to/dir"]
+lappend ans [list set _LMFILES_ "$modulefile2:$modulefile"]
+lappend ans [list set LOADEDMODULES "$module2:$module"]
+
+testouterr_cmd_re "sh" "load $module2 $module" $ans ""
+
+# reset to default config
+unset env(MODULES_PATH_ENTRY_REORDER)
 
 #
 # Prepending multiple paths passed as one string

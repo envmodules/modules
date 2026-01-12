@@ -132,7 +132,7 @@ jobs:
   tcl85-2:
     runs-on: ubuntu-22.04
     env:
-      CONFIGURE_OPTS: --with-tclsh=tclsh8.5 --prefix=/tmp/modules --with-tcl=/usr/local/lib --enable-quarantine-support --enable-silent-shell-debug-support --enable-modulespath --with-pager=more --with-dark-background-colors=hi --with-locked-configs=implicit_default --enable-wa-277 --enable-advanced-version-spec --disable-ml --disable-implicit-requirement --enable-set-shell-startup
+      CONFIGURE_OPTS: --with-tclsh=tclsh8.5 --prefix=/tmp/modules --with-tcl=/usr/local/lib --enable-quarantine-support --enable-silent-shell-debug-support --enable-modulespath --with-pager=more --with-dark-background-colors=hi --with-locked-configs=implicit_default --enable-wa-277 --enable-advanced-version-spec --disable-ml --disable-implicit-requirement --enable-set-shell-startup --enable-path-entry-reorder
       COVERAGE: y
       EXTRA_SCRIPT_PRETEST: make install-testinitrc-1 install-testetcrc install-testmodspath
       EXTRA_SCRIPT_POSTTEST: make uninstall-testconfig

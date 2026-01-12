@@ -93,6 +93,7 @@ array set configdfl [list\
     ml                        [expr {$install_ml eq {y}}]\
     nearly_forbidden_days     $install_nearlyforbiddendays\
     pager                     "$install_pagercmd"\
+    path_entry_reorder        [expr {$install_pathentryreorder eq {y}}]\
     protected_envvars         <undef>\
     quarantine_support        [expr {$install_quarantinesupport eq {y}}]\
     rcfile                    <undef>\
@@ -158,6 +159,7 @@ array set configvar [list\
     ml                        MODULES_ML\
     nearly_forbidden_days     MODULES_NEARLY_FORBIDDEN_DAYS\
     pager                     MODULES_PAGER\
+    path_entry_reorder        MODULES_PATH_ENTRY_REORDER\
     protected_envvars         MODULES_PROTECTED_ENVVARS\
     quarantine_support        MODULES_QUARANTINE_SUPPORT\
     rcfile                    MODULERCFILE\
@@ -213,6 +215,7 @@ array set configvalid [list\
     mcookie_version_check     {0 1}\
     ml                        {0 1}\
     nearly_forbidden_days     {0 365}\
+    path_entry_reorder        {0 1}\
     quarantine_support        {0 1}\
     redirect_output           {0 1}\
     require_via               {0 1}\

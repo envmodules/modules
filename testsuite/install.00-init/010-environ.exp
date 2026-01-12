@@ -194,4 +194,7 @@ catch {unset env(MODULERCFILE)}
 # setup basic locale for tests
 set env(LANG) "C"
 
+# ensure that tests doesn't run with Lmod path order
+unsetenv_var MODULES_PATH_ENTRY_REORDER
+
 # vim:set tabstop=3 shiftwidth=3 expandtab autoindent:
