@@ -292,6 +292,9 @@ Optional Features:
   --enable-require-via    set modulecmd.tcl to consider that a module enabling
                           a modulepath is a requirement for the loaded modules
                           stored in this modulepath [no]
+  --enable-path-entry-reorder
+                          change order of entry in a path-like environment
+                          variable when it is added again [no]
   --enable-implicit-requirement
                           implicitly define a requirement toward modules
                           specified on ``module load`` or ``module unload``

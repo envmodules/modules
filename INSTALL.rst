@@ -750,6 +750,19 @@ instance :instopt:`--disable-set-manpath<--enable-set-manpath>`):
     .. versionchanged:: 5.6
        Enables automated *require via* mechanism
 
+.. instopt:: --enable-path-entry-reorder
+
+ Change order of entry in a path-like environment variable, when
+ :mfcmd:`prepend-path`, :mfcmd:`append-path` or :subcmd:`use` target a path
+ entry that is already defined in the environment variable. (default=no)
+
+ This installation option defines the default value of the
+ :mconfig:`path_entry_reorder` configuration option which could be changed
+ after installation with the :subcmd:`config` sub-command.
+
+ .. only:: html or latex
+
+    .. versionadded:: 5.7
 
 .. instopt:: --enable-quarantine-support
 

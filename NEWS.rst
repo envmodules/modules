@@ -38,6 +38,13 @@ Modules 5.7.0 (not yet released)
   environment variable on Fish shell version 4.3.
 * When fetching user's groups, in case a group name cannot be resolved use
   this group gid number as name instead of raising an error. (fix issue #604)
+* Introduce :mconfig:`path_entry_reorder` configuration option that change
+  order of entry in a path-like environment variable when it is added again.
+  This new configuration option is disabled by default. This option can be
+  changed at installation time with :instopt:`--enable-path-entry-reorder`.
+  When :mconfig:`path_entry_reorder` is changed with :subcmd:`config`
+  sub-command, it sets the :envvar:`MODULES_PATH_ENTRY_REORDER` environment
+  variable. (fix issue #595 with contribution from Achim Gsell)
 
 
 .. _5.6 release notes:

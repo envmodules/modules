@@ -158,7 +158,7 @@ variantshortcut := @variantshortcut@
 # editor
 editor := @editor@
 
-# Lmod path order
+# path change behavior
 pathentryreorder := @pathentryreorder@
 
 # shell completion location

@@ -43,7 +43,6 @@ table highlights features that are unique to each implementation.
        * `i18n`_
        * `Find best module`_
        * `Path entry priorities`_
-       * `Update path entry order`_
        * ``--regexp`` search option
        * `settarg`_
        * `Hook functions`_
@@ -158,6 +157,8 @@ implementation.
      - :ref:`Requiring via module`
    * - `Autoswap`_
      - :ref:`Conflict unload MIGRATING`
+   * - `Update path entry order`_
+     - :mconfig:`path_entry_reorder` configuration option
    * - |LMOD_DOWNSTREAM_CONFLICTS|_ environment variable
      - :ref:`Dependencies between modulefiles`
    * - |LMOD_QUARANTINE_VARS|_ environment variable
@@ -286,5 +287,5 @@ additional tools that enhance how modulefiles are handled.
 If you're aware of a ``module``-related project missing from this list, feel
 free to :ref:`contact us<Community>` so we can add it.
 
-.. |modules_version| replace:: Modules 5.6.0
+.. |modules_version| replace:: Modules 5.7.0 (not yet released)
 .. |lmod_version| replace:: Lmod 9.0.5
