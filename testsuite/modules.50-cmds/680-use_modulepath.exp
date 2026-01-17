@@ -79,7 +79,11 @@ lappend ans [list set __MODULES_LMUSE modulepath/1&/path/to/dir1&/path/to/dir2]
 lappend ans [list set _LMFILES_ $mp/modulepath/1]
 lappend ans [list set LOADEDMODULES modulepath/1]
 lappend ans [list set __MODULES_SHARE_MODULEPATH /path/to/dir1:2]
-lappend ans [list set MODULEPATH /path/to/dir2:/path/to/dir1:$mp]
+if {[is_conf_enabled pathentryreorder]} {
+    lappend ans [list set MODULEPATH /path/to/dir1:/path/to/dir2:$mp]
+} else {
+    lappend ans [list set MODULEPATH /path/to/dir2:/path/to/dir1:$mp]
+}
 testouterr_cmd bash {load modulepath/1} $ans {}
 
 setenv_var TESTSUITE_USE_MODULEPATH several_use_same_path
@@ -97,7 +101,11 @@ lappend ans [list set __MODULES_LMUSE modulepath/1&/path/to/dir1&/path/to/dir2]
 lappend ans [list set _LMFILES_ $mp/modulepath/1]
 lappend ans [list set LOADEDMODULES modulepath/1]
 lappend ans [list set __MODULES_SHARE_MODULEPATH /path/to/dir1:2]
-lappend ans [list set MODULEPATH /path/to/dir2:$mp:/path/to/dir1]
+if {[is_conf_enabled pathentryreorder]} {
+    lappend ans [list set MODULEPATH /path/to/dir1:/path/to/dir2:$mp]
+} else {
+    lappend ans [list set MODULEPATH /path/to/dir2:$mp:/path/to/dir1]
+}
 testouterr_cmd bash {load modulepath/1} $ans {}
 
 
@@ -122,6 +130,14 @@ lappend ans [list set MODULEPATH /path/to/dir2:/path/to/dir1:$mp]
 testouterr_cmd bash {load modulepath/1} $ans {}
 
 setenv_var TESTSUITE_USE_MODULEPATH several_mixed_uses3
+if {[is_conf_enabled pathentryreorder]} {
+    set ans [list]
+    lappend ans [list set __MODULES_LMUSE modulepath/1&/path/to/dir1&/path/to/dir2]
+    lappend ans [list set _LMFILES_ $mp/modulepath/1]
+    lappend ans [list set LOADEDMODULES modulepath/1]
+    lappend ans [list set __MODULES_SHARE_MODULEPATH /path/to/dir1:2]
+    lappend ans [list set MODULEPATH /path/to/dir2:$mp:/path/to/dir1]
+}
 testouterr_cmd bash {load modulepath/1} $ans {}
 
 set ans [list]

@@ -132,7 +132,11 @@ set ans [list]
 lappend ans [list set _LMFILES_ $mp/delim/1.0]
 lappend ans [list set LOADEDMODULES delim/1.0]
 lappend ans [list set __MODULES_SHARE_TS :2]
-lappend ans [list set TS :str]
+if {[is_conf_enabled pathentryreorder]} {
+    lappend ans [list set TS str:]
+} else {
+    lappend ans [list set TS :str]
+}
 testouterr_cmd sh {load delim/1.0} $ans {}
 
 setenv_var TS :str
@@ -145,7 +149,11 @@ set ans [list]
 lappend ans [list set _LMFILES_ $mp/delim/1.0]
 lappend ans [list set LOADEDMODULES delim/1.0]
 lappend ans [list set __MODULES_SHARE_TS :3]
-lappend ans [list set TS :str]
+if {[is_conf_enabled pathentryreorder]} {
+    lappend ans [list set TS str:]
+} else {
+    lappend ans [list set TS :str]
+}
 testouterr_cmd sh {load delim/1.0} $ans {}
 
 setenv_var TS :str:
@@ -154,7 +162,11 @@ set ans [list]
 lappend ans [list set _LMFILES_ $mp/delim/1.0]
 lappend ans [list set LOADEDMODULES delim/1.0]
 lappend ans [list set __MODULES_SHARE_TS :2]
-lappend ans [list set TS :str:]
+if {[is_conf_enabled pathentryreorder]} {
+    lappend ans [list set TS str:]
+} else {
+    lappend ans [list set TS :str:]
+}
 testouterr_cmd sh {load delim/1.0} $ans {}
 
 setenv_var TS :str:
@@ -167,7 +179,11 @@ set ans [list]
 lappend ans [list set _LMFILES_ $mp/delim/1.0]
 lappend ans [list set LOADEDMODULES delim/1.0]
 lappend ans [list set __MODULES_SHARE_TS :3]
-lappend ans [list set TS :str:]
+if {[is_conf_enabled pathentryreorder]} {
+    lappend ans [list set TS str:]
+} else {
+    lappend ans [list set TS :str:]
+}
 testouterr_cmd sh {load delim/1.0} $ans {}
 
 setenv_var TS :str::str2
@@ -176,7 +192,11 @@ set ans [list]
 lappend ans [list set _LMFILES_ $mp/delim/1.0]
 lappend ans [list set LOADEDMODULES delim/1.0]
 lappend ans [list set __MODULES_SHARE_TS :2]
-lappend ans [list set TS :str::str2]
+if {[is_conf_enabled pathentryreorder]} {
+    lappend ans [list set TS str:str2:]
+} else {
+    lappend ans [list set TS :str::str2]
+}
 testouterr_cmd sh {load delim/1.0} $ans {}
 
 setenv_var TS :str::str2
@@ -189,7 +209,11 @@ set ans [list]
 lappend ans [list set _LMFILES_ $mp/delim/1.0]
 lappend ans [list set LOADEDMODULES delim/1.0]
 lappend ans [list set __MODULES_SHARE_TS :3]
-lappend ans [list set TS :str::str2]
+if {[is_conf_enabled pathentryreorder]} {
+    lappend ans [list set TS str:str2:]
+} else {
+    lappend ans [list set TS :str::str2]
+}
 testouterr_cmd sh {load delim/1.0} $ans {}
 
 setenv_var TS str::str2
@@ -198,7 +222,11 @@ set ans [list]
 lappend ans [list set _LMFILES_ $mp/delim/1.0]
 lappend ans [list set LOADEDMODULES delim/1.0]
 lappend ans [list set __MODULES_SHARE_TS :2]
-lappend ans [list set TS str::str2]
+if {[is_conf_enabled pathentryreorder]} {
+    lappend ans [list set TS str:str2:]
+} else {
+    lappend ans [list set TS str::str2]
+}
 testouterr_cmd sh {load delim/1.0} $ans {}
 
 
@@ -258,7 +286,11 @@ set ans [list]
 lappend ans [list set _LMFILES_ $mp/delim/1.0]
 lappend ans [list set LOADEDMODULES delim/1.0]
 lappend ans [list set __MODULES_SHARE_TS :1:str:2]
-lappend ans [list set TS str:]
+if {[is_conf_enabled pathentryreorder]} {
+    lappend ans [list set TS :str]
+} else {
+    lappend ans [list set TS str:]
+}
 testouterr_cmd sh {load delim/1.0} $ans {}
 
 setenv_var TS str:
@@ -271,7 +303,11 @@ set ans [list]
 lappend ans [list set _LMFILES_ $mp/delim/1.0]
 lappend ans [list set LOADEDMODULES delim/1.0]
 lappend ans [list set __MODULES_SHARE_TS :2:str:2]
-lappend ans [list set TS str:]
+if {[is_conf_enabled pathentryreorder]} {
+    lappend ans [list set TS :str]
+} else {
+    lappend ans [list set TS str:]
+}
 testouterr_cmd sh {load delim/1.0} $ans {}
 
 setenv_var TS :str
@@ -302,7 +338,11 @@ set ans [list]
 lappend ans [list set _LMFILES_ $mp/delim/1.0]
 lappend ans [list set LOADEDMODULES delim/1.0]
 lappend ans [list set __MODULES_SHARE_TS :1:str:2]
-lappend ans [list set TS :str:]
+if {[is_conf_enabled pathentryreorder]} {
+    lappend ans [list set TS :str]
+} else {
+    lappend ans [list set TS :str:]
+}
 testouterr_cmd sh {load delim/1.0} $ans {}
 
 setenv_var TS :str:
@@ -315,7 +355,11 @@ set ans [list]
 lappend ans [list set _LMFILES_ $mp/delim/1.0]
 lappend ans [list set LOADEDMODULES delim/1.0]
 lappend ans [list set __MODULES_SHARE_TS :2:str:2]
-lappend ans [list set TS :str:]
+if {[is_conf_enabled pathentryreorder]} {
+    lappend ans [list set TS :str]
+} else {
+    lappend ans [list set TS :str:]
+}
 testouterr_cmd sh {load delim/1.0} $ans {}
 
 setenv_var TS :str::str2
@@ -324,7 +368,11 @@ set ans [list]
 lappend ans [list set _LMFILES_ $mp/delim/1.0]
 lappend ans [list set LOADEDMODULES delim/1.0]
 lappend ans [list set __MODULES_SHARE_TS :1:str:2]
-lappend ans [list set TS :str::str2]
+if {[is_conf_enabled pathentryreorder]} {
+    lappend ans [list set TS ::str2:str]
+} else {
+    lappend ans [list set TS :str::str2]
+}
 testouterr_cmd sh {load delim/1.0} $ans {}
 
 setenv_var TS :str::str2
@@ -337,7 +385,11 @@ set ans [list]
 lappend ans [list set _LMFILES_ $mp/delim/1.0]
 lappend ans [list set LOADEDMODULES delim/1.0]
 lappend ans [list set __MODULES_SHARE_TS :2:str:2]
-lappend ans [list set TS :str::str2]
+if {[is_conf_enabled pathentryreorder]} {
+    lappend ans [list set TS ::str2:str]
+} else {
+    lappend ans [list set TS :str::str2]
+}
 testouterr_cmd sh {load delim/1.0} $ans {}
 
 
@@ -445,7 +497,11 @@ set ans [list]
 lappend ans [list set _LMFILES_ $mp/delim/1.0]
 lappend ans [list set LOADEDMODULES delim/1.0]
 lappend ans [list set __MODULES_SHARE_TS :1:str:2]
-lappend ans [list set TS str:]
+if {[is_conf_enabled pathentryreorder]} {
+    lappend ans [list set TS :str]
+} else {
+    lappend ans [list set TS str:]
+}
 testouterr_cmd sh {load delim/1.0} $ans {}
 
 
@@ -466,7 +522,11 @@ set ans [list]
 lappend ans [list set _LMFILES_ $mp/delim/1.0]
 lappend ans [list set LOADEDMODULES delim/1.0]
 lappend ans [list set __MODULES_SHARE_TS :2]
-lappend ans [list set TS :str]
+if {[is_conf_enabled pathentryreorder]} {
+    lappend ans [list set TS str:]
+} else {
+    lappend ans [list set TS :str]
+}
 testouterr_cmd sh {load delim/1.0} $ans {}
 
 setenv_var TS str
@@ -504,7 +564,11 @@ set ans [list]
 lappend ans [list set _LMFILES_ $mp/delim/1.0]
 lappend ans [list set LOADEDMODULES delim/1.0]
 lappend ans [list set __MODULES_SHARE_TS :2]
-lappend ans [list set TS :str]
+if {[is_conf_enabled pathentryreorder]} {
+    lappend ans [list set TS str:]
+} else {
+    lappend ans [list set TS :str]
+}
 testouterr_cmd sh {load delim/1.0} $ans {}
 
 setenv_var TS {}
@@ -513,7 +577,11 @@ set ans [list]
 lappend ans [list set _LMFILES_ $mp/delim/1.0]
 lappend ans [list set LOADEDMODULES delim/1.0]
 lappend ans [list set __MODULES_SHARE_TS :3]
-lappend ans [list set TS :str]
+if {[is_conf_enabled pathentryreorder]} {
+    lappend ans [list set TS str:]
+} else {
+    lappend ans [list set TS :str]
+}
 testouterr_cmd sh {load delim/1.0} $ans {}
 
 setenv_var TS str
@@ -543,7 +611,11 @@ set ans [list]
 lappend ans [list set _LMFILES_ $mp/delim/1.0]
 lappend ans [list set LOADEDMODULES delim/1.0]
 lappend ans [list set __MODULES_SHARE_TS :3]
-lappend ans [list set TS {}]
+if {[is_conf_enabled pathentryreorder]} {
+    lappend ans [list set TS {:}]
+} else {
+    lappend ans [list set TS {}]
+}
 testouterr_cmd sh {load delim/1.0} $ans {}
 
 

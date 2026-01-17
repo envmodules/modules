@@ -20,6 +20,8 @@
 #
 ##############################################################################
 
+setenv_var MODULES_PATH_ENTRY_REORDER 0
+
 #
 #  Test variables
 #

@@ -29,6 +29,7 @@ setenv_path_var MODULEPATH $mp
 setenv_var TESTSUITE_SHTOMOD_PATHDUP 1
 setenv_var TESTSUITE_SHTOMOD_NOCOMP 1
 
+setenv_var MODULES_PATH_ENTRY_REORDER 0
 
 #
 # load and unload tests

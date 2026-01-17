@@ -20,6 +20,8 @@
 #
 ##############################################################################
 
+setenv_var MODULES_PATH_ENTRY_REORDER 0
+
 proc testouterr_shtomod {sh cmdline out err {script {}}} {
     if {$sh eq {ALL}} {
         set shlist $::shtomod_avail_shells

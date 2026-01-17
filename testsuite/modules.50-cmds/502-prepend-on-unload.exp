@@ -213,7 +213,11 @@ testouterr_cmd sh "unload $mod" $ans {}
 setenv_var FOO /tmp
 set ans [list]
 lappend ans [list set __MODULES_SHARE_FOO /tmp:2]
-lappend ans [list set FOO /dir1:/tmp]
+if {[is_conf_enabled pathentryreorder]} {
+    lappend ans [list set FOO /tmp:/dir1]
+} else {
+    lappend ans [list set FOO /dir1:/tmp]
+}
 lappend ans [list unset _LMFILES_]
 lappend ans [list unset LOADEDMODULES]
 testouterr_cmd sh "unload $mod" $ans {}
@@ -370,7 +374,11 @@ testouterr_cmd sh "unload $mod" $ans {}
 setenv_var FOO /dir1
 set ans [list]
 lappend ans [list set __MODULES_SHARE_FOO /dir1:2]
-lappend ans [list set FOO /dir2:/dir1]
+if {[is_conf_enabled pathentryreorder]} {
+    lappend ans [list set FOO /dir1:/dir2]
+} else {
+    lappend ans [list set FOO /dir2:/dir1]
+}
 lappend ans [list unset _LMFILES_]
 lappend ans [list unset LOADEDMODULES]
 testouterr_cmd sh "unload $mod" $ans {}
@@ -560,7 +568,11 @@ setenv_loaded_module [list $mod] [list $modfile]
 setenv_path_var FOO /tmp {}
 set ans [list]
 lappend ans [list set __MODULES_SHARE_FOO /tmp:2::2]
-lappend ans [list set FOO /tmp:]
+if {[is_conf_enabled pathentryreorder]} {
+    lappend ans [list set FOO :/tmp]
+} else {
+    lappend ans [list set FOO /tmp:]
+}
 lappend ans [list unset _LMFILES_]
 lappend ans [list unset LOADEDMODULES]
 testouterr_cmd sh "unload $mod" $ans {}
@@ -703,7 +715,11 @@ set ans [list]
 lappend ans [list unset _LMFILES_]
 lappend ans [list unset LOADEDMODULES]
 lappend ans [list set __MODULES_SHARE_MODULEPATH /tmp:2]
-lappend ans [list set MODULEPATH /dir1:$mp:/tmp]
+if {[is_conf_enabled pathentryreorder]} {
+    lappend ans [list set MODULEPATH /tmp:/dir1:$mp]
+} else {
+    lappend ans [list set MODULEPATH /dir1:$mp:/tmp]
+}
 testouterr_cmd_re sh "unload $mod" $ans {}
 
 # refresh
@@ -956,7 +972,11 @@ set ans [list]
 lappend ans [list unset _LMFILES_]
 lappend ans [list unset LOADEDMODULES]
 lappend ans [list set __MODULES_SHARE_MODULEPATH /tmp:2::1]
-lappend ans [list set MODULEPATH $mp:/tmp:]
+if {[is_conf_enabled pathentryreorder]} {
+    lappend ans [list set MODULEPATH /tmp:$mp:]
+} else {
+    lappend ans [list set MODULEPATH $mp:/tmp:]
+}
 lappend ans [list ERR]
 set tserr [msg_unload $mod $err_emptydirname]
 testouterr_cmd sh "unload $mod" $ans $tserr
