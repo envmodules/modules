@@ -766,9 +766,10 @@ proc getTagList {mod {fpmod {}} {sort 1}} {
 
 # return tags applying to mod that can be exported
 proc getExportTagList {mod {fpmod {}}} {
-   # remove loaded/hidden tags from the list to register
+   # remove loaded, hidden and user-defined non exportable tags from the list
+   # to register
    lassign [getDiffBetweenList [getTagList $mod $fpmod 0] [list loaded\
-      hidden]] ret
+      hidden {*}[getConfList non_exportable_tags]]] ret
    return $ret
 }
 
