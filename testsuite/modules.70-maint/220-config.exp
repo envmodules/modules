@@ -93,6 +93,7 @@ array set configdfl [list\
     mcookie_version_check     [expr {$install_mcookieversioncheck eq {y}}]\
     ml                        [expr {$install_ml eq {y}}]\
     nearly_forbidden_days     $install_nearlyforbiddendays\
+    non_exportable_tags       {}\
     pager                     "$install_pagercmd"\
     paginate                  [expr {$install_paginate eq {y}}]\
     path_entry_reorder        [expr {$install_pathentryreorder eq {y}}]\
@@ -160,6 +161,7 @@ array set configvar [list\
     mcookie_version_check     MODULES_MCOOKIE_VERSION_CHECK\
     ml                        MODULES_ML\
     nearly_forbidden_days     MODULES_NEARLY_FORBIDDEN_DAYS\
+    non_exportable_tags       MODULES_NON_EXPORTABLE_TAGS\
     pager                     MODULES_PAGER\
     paginate                  MODULES_PAGINATE\
     path_entry_reorder        MODULES_PATH_ENTRY_REORDER\
@@ -271,6 +273,7 @@ array set configkind [list\
     list_output               l\
     list_terse_output         l\
     logged_events             l\
+    non_exportable_tags       l\
     protected_envvars         l\
     rcfile                    l\
     shells_with_ksh_fpath     l\

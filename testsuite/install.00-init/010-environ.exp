@@ -124,6 +124,8 @@ catch {unset env(MODULES_NEARLY_FORBIDDEN_DAYS)}
 # clean any tag abbreviation list
 catch {unset env(MODULES_TAG_ABBREV)}
 
+unsetenv_var MODULES_NON_EXPORTABLE_TAGS
+
 # clear specific tag name color setup
 setenv_var MODULES_TAG_COLOR_NAME {}
 
