@@ -2995,10 +2995,21 @@ proc findModulesFromDirsAndFiles {dir full_list depthlvl fetch_mtime\
       if {[info exists dknown_arr($modulename)] || (![info exists\
          fknown_arr($modulename)] && [file isdirectory $element])} {
          if {![info exists ignored_dirs($tail)]} {
-            # prune directories that cannot match the query path: skip if
-            # this dir does not match the corresponding query path component
+            # prune directories that cannot match the query path: read
+            # dir for .modulerc/.version but skip subdirs and files
             if {$prunedepth > 0 && $moddepthlvl <= $prunedepth && [lindex\
                $pruneparts [expr {$moddepthlvl - 1}]] ne $tail} {
+               if {![catch {
+                  set elt_list [getFilesInDirectory $element 1]
+               }]} {
+                  foreach {fpelt hid} $elt_list {
+                     set fptail [file tail $fpelt]
+                     if {$fptail eq {.modulerc} || $fptail eq\
+                        {.version}} {
+                        lappend full_list $fpelt
+                     }
+                  }
+               }
                continue
             }
             if {[catch {
