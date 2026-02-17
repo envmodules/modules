@@ -1,0 +1,55 @@
+##############################################################################
+#   Modules Revision 3.0
+#   Providing a flexible user environment
+#
+#   Description:  Directory pruning for deep module queries
+#   Command:      avail, load
+#   Modulefiles:  prunetest/cat{1,2}/pkg{1,2}/{1.0,2.0}
+#
+#   Test that specific deep queries correctly return matching modules
+#   when directory pruning skips non-matching sibling directories.
+#   Ensures pruning does not omit valid results and broad queries
+#   still return everything.
+#
+##############################################################################
+
+# use deep modulefiles path for these tests
+set deepmodpath "$env(TESTSUITEDIR)/modulefiles.deep"
+setenv_path_var MODULEPATH $deepmodpath
+
+# ensure auto symbolic versions are not set for these tests
+setenv_var MODULES_ADVANCED_VERSION_SPEC 0
+
+# avail on specific 3-level deep path should return only that pkg
+set ts_sh "$deepmodpath:\nprunetest/cat1/pkg1/1.0\nprunetest/cat1/pkg1/2.0"
+testouterr_cmd "sh" "avail -t prunetest/cat1/pkg1" "OK" $ts_sh
+
+# avail on 2-level deep path returns all pkgs under that category
+set ts_sh "$deepmodpath:\nprunetest/cat1/pkg1/1.0\nprunetest/cat1/pkg1/2.0\nprunetest/cat1/pkg2/1.0\nprunetest/cat1/pkg2/2.0"
+testouterr_cmd "sh" "avail -t prunetest/cat1" "OK" $ts_sh
+
+skip_if_quick_mode
+
+# avail on the top level returns all modules (no pruning)
+set ts_sh "$deepmodpath:\nprunetest/cat1/pkg1/1.0\nprunetest/cat1/pkg1/2.0\nprunetest/cat1/pkg2/1.0\nprunetest/cat1/pkg2/2.0\nprunetest/cat2/pkg1/1.0\nprunetest/cat2/pkg1/2.0\nprunetest/cat2/pkg2/1.0\nprunetest/cat2/pkg2/2.0"
+testouterr_cmd "sh" "avail -t prunetest" "OK" $ts_sh
+
+# avail on exact version path
+set ts_sh "$deepmodpath:\nprunetest/cat2/pkg2/2.0"
+testouterr_cmd "sh" "avail -t prunetest/cat2/pkg2/2.0" "OK" $ts_sh
+
+# load a specific deep module
+set ans [list]
+lappend ans [list set _LMFILES_ \
+   "$deepmodpath/prunetest/cat1/pkg2/1.0"]
+lappend ans [list set LOADEDMODULES "prunetest/cat1/pkg2/1.0"]
+test_cmd_re "sh" "load prunetest/cat1/pkg2/1.0" $ans
+
+# wildcard query should not be pruned and return all matches
+set ts_sh "$deepmodpath:\nprunetest/cat1/pkg1/1.0\nprunetest/cat1/pkg1/2.0\nprunetest/cat2/pkg1/1.0\nprunetest/cat2/pkg1/2.0"
+testouterr_cmd_re "sh" "avail -t prunetest/*/pkg1" "OK" $ts_sh
+
+# cleanup
+setenv_path_var MODULEPATH $modpath
+unsetenv_var MODULES_ADVANCED_VERSION_SPEC
+unset ts_sh ans deepmodpath
