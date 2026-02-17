@@ -1,0 +1,65 @@
+##############################################################################
+#   Modules Revision 3.0
+#   Providing a flexible user environment
+#
+#   File:		modules.70-maint/%M%
+#   Revision:		%I%
+#   First Edition:	2026/02/17
+#   Last Mod.:		%U%, %G%
+#
+#   Authors:		Xavier Delaruelle, xavier.delaruelle@cea.fr
+#
+#   Description:	Testuite testsequence
+#   Command:
+#   Modulefiles:    tag
+#   Sub-Command:    load, avail
+#
+#   Comment:	%C{
+#           Test non_exportable_tags config option
+#		}C%
+#
+##############################################################################
+
+set mp $modpath.3
+
+# setup specific environment
+setenv_path_var MODULEPATH $mp
+setenv_path_var TESTSUITE_TAG_OPT duprc2
+
+
+set tserr "$mp:\ntag/8.0 <bar:foo>"
+testouterr_cmd sh {avail -t tag/8.0} OK $tserr
+
+set ans [list]
+lappend ans [list set _LMFILES_ $mp/tag/8.0]
+lappend ans [list set LOADEDMODULES tag/8.0]
+lappend ans [list set __MODULES_LMTAG tag/8.0&foo&bar]
+testouterr_cmd sh {load tag/8.0} $ans {}
+
+
+setenv_path_var MODULES_NON_EXPORTABLE_TAGS bar
+
+testouterr_cmd sh {avail -t tag/8.0} OK $tserr
+
+set ans [list]
+lappend ans [list set _LMFILES_ $mp/tag/8.0]
+lappend ans [list set LOADEDMODULES tag/8.0]
+lappend ans [list set __MODULES_LMTAG tag/8.0&foo]
+testouterr_cmd sh {load tag/8.0} $ans {}
+
+
+setenv_path_var MODULES_NON_EXPORTABLE_TAGS foo:bar
+
+testouterr_cmd sh {avail -t tag/8.0} OK $tserr
+
+set ans [list]
+lappend ans [list set _LMFILES_ $mp/tag/8.0]
+lappend ans [list set LOADEDMODULES tag/8.0]
+testouterr_cmd sh {load tag/8.0} $ans {}
+
+
+#
+#  Cleanup
+#
+
+reset_test_env
