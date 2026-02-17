@@ -1,0 +1,31 @@
+##############################################################################
+#   Modules Revision 3.0
+#   Providing a flexible user environment
+#
+#   Description:  In-memory cache for getFilesInDirectory
+#   Command:      avail
+#   Modulefiles:  loc_rc1, loc_fq
+#
+#   Test that the in-memory directory read cache returns correct results
+#   when the same modulepath is queried multiple times within a single
+#   invocation. The cache wraps getFilesInDirectory so repeated avail
+#   calls on overlapping paths must produce identical results.
+#
+##############################################################################
+
+# test that consecutive avail queries return consistent results
+# first query populates the cache, second should hit it
+set ts1 "$modpath:\nloc_fq/1.0"
+testouterr_cmd "sh" "avail -t loc_fq" "OK" $ts1
+
+# second query on same path exercises the cache
+testouterr_cmd "sh" "avail -t loc_fq" "OK" $ts1
+
+skip_if_quick_mode
+
+# query a different module in the same modulepath
+set ts2 "$modpath:\nloc_rc1/1.0(foo)"
+testouterr_cmd "sh" "avail -t loc_rc1" "OK" $ts2
+
+# unset local variables
+unset ts1 ts2
