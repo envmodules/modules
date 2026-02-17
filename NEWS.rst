@@ -65,6 +65,11 @@ Modules 5.7.0 (not yet released)
   :mconfig:`paginate` is changed with :subcmd:`config` sub-command, it sets
   the :envvar:`MODULES_PAGINATE` environment variable. (fix issue #594)
 * Doc: add :ref:`plan-next-release-content` guide
+* Introduce the :mconfig:`non_exportable_tags` configuration option that lists
+  tags that should not be exported to modules once loaded. When
+  :mconfig:`non_exportable_tags` is changed with :subcmd:`config` sub-command,
+  it sets the :envvar:`MODULES_NON_EXPORTABLE_TAGS` environment variable. (fix
+  issue #608)
 
 
 .. _5.6 release notes:
