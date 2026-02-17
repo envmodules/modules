@@ -1369,6 +1369,21 @@ Module Sub-Commands
 
      .. versionadded:: 4.6
 
+ .. mconfig:: non_exportable_tags
+
+  Prevent export of listed tags to modules once loaded. (colon ``:``
+  separator)
+
+  This configuration option is set to an empty value by default. The
+  :envvar:`MODULES_NON_EXPORTABLE_TAGS` environment variable is defined by
+  :subcmd:`config` sub-command when changing this configuration option from
+  its default value. See :envvar:`MODULES_NON_EXPORTABLE_TAGS` description for
+  details.
+
+  .. only:: html or latex
+
+     .. versionadded:: 5.7
+
  .. mconfig:: pager
 
   Text viewer to paginate message output.
@@ -1415,7 +1430,7 @@ Module Sub-Commands
 
  .. mconfig:: protected_envvars
 
-  Prevents any modification of listed environment variables (colon `:`
+  Prevents any modification of listed environment variables (colon ``:``
   separator).
 
   This configuration option is unset by default. The

@@ -1749,6 +1749,8 @@ installation.
 | :mconfig:`nearly_forbidden_days`  | ``14``                                       | :instopt:`--with-nearly-forbidden-days`,     |              |           |
 |                                   |                                              | :envvar:`MODULES_NEARLY_FORBIDDEN_DAYS`      |              |           |
 +-----------------------------------+----------------------------------------------+----------------------------------------------+--------------+-----------+
+| :mconfig:`non_exportable_tags`    | *Empty by default*                           | :envvar:`MODULES_NON_EXPORTABLE_TAGS`        |              |           |
++-----------------------------------+----------------------------------------------+----------------------------------------------+--------------+-----------+
 | :mconfig:`pager`                  | ``less -eFKRX``                              | :instopt:`--with-pager`,                     |              |           |
 |                                   |                                              | :instopt:`--with-pager-opts`,                |              |           |
 |                                   |                                              | :envvar:`MODULES_PAGER`,                     |              |           |
