@@ -15,8 +15,8 @@
 
 # test that consecutive avail queries return consistent results
 # first query populates the cache, second should hit it
-set ts1 "$modpath:\nloc_fq/1.0"
-testouterr_cmd "sh" "avail -t loc_fq" "OK" $ts1
+set ts2 "$modpath:\nloc_rc1/1.0(foo)\nloc_rc1/2.0"
+testouterr_cmd "sh" "avail -t loc_rc1" "OK" $ts2
 
 # second query on same path exercises the cache
 testouterr_cmd "sh" "avail -t loc_fq" "OK" $ts1
