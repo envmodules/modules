@@ -1074,7 +1074,8 @@ The following environment variables appeared on Modules 5.
 |            | :envvar:`MODULES_REQUIRE_VIA`                                   |
 +------------+-----------------------------------------------------------------+
 | 5.7        | :envvar:`MODULES_PATH_ENTRY_REORDER`,                           |
-|            | :envvar:`MODULES_PAGINATE`                                      |
+|            | :envvar:`MODULES_PAGINATE`,                                     |
+|            | :envvar:`MODULES_NON_EXPORTABLE_TAGS`                           |
 +------------+-----------------------------------------------------------------+
 
 Modules Specific Tcl Commands

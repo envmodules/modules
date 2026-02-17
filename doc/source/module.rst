@@ -5309,6 +5309,19 @@ ENVIRONMENT
 
     .. versionadded:: 4.6
 
+.. envvar:: MODULES_NON_EXPORTABLE_TAGS
+
+ A colon separated list of tags that should not be exported to the module once
+ it is loaded.
+
+ This environment variable value supersedes the default value set in the
+ :mconfig:`non_exportable_tags` configuration option. It can be defined with
+ the :subcmd:`config` sub-command.
+
+ .. only:: html or latex
+
+    .. versionadded:: 5.7
+
 .. envvar:: MODULES_PAGER
 
  Text viewer for use to paginate message output. The value of this variable is
