@@ -3230,12 +3230,23 @@ proc getModules {dir {mod {}} {fetch_mtime 0} {search {}} {filter {}}} {
 
       # enable directory pruning when query is a specific deep path without
       # wildcards (e.g. tools/cat15/pkg10/3.0) to avoid scanning sibling
-      # directories that cannot match
+      # directories that cannot match; verify every path component exists
+      # on disk so virtual names (symbols/aliases) do not trigger pruning
+      set prunespec {}
       if {$hasmoddir && !$find_all && !$contains && $modqe eq\
          [string map {* {} ? {}} $modqe]} {
-         set prunespec $modqe
-      } else {
-         set prunespec {}
+         set _canprune 1
+         set _checkpath $dir
+         foreach _qp [file split $modqe] {
+            set _checkpath [file join $_checkpath $_qp]
+            if {![file isdirectory $_checkpath]} {
+               set _canprune 0
+               break
+            }
+         }
+         if {$_canprune} {
+            set prunespec $modqe
+         }
       }
 
       array set found_list [findModules $dir $findmod $depthlvl $fetch_mtime\
