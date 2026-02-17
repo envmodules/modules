@@ -2905,7 +2905,7 @@ proc __getFilesInDirectory {dir fetch_dotversion} {
 
    # Add each element in the current directory to the list
    foreach elt $elt_list {
-      lappend dir_list $elt 0
+      lappend dir_list $elt 0 [file isdirectory $elt]
    }
 
    # search for hidden files
@@ -2915,11 +2915,11 @@ proc __getFilesInDirectory {dir fetch_dotversion} {
          .modulerc - .version {
             if {($fetch_dotversion || $elt ne {.version}) && [file readable\
                $dir/$elt]} {
-               lappend dir_list $dir/$elt 0
+               lappend dir_list $dir/$elt 0 0
             }
          }
          default {
-            lappend dir_list $dir/$elt 1
+            lappend dir_list $dir/$elt 1 [file isdirectory $dir/$elt]
          }
       }
    }
@@ -2994,11 +2994,18 @@ proc findModulesFromDirsAndFiles {dir full_list depthlvl fetch_mtime\
                   $element] $element]
             } else {
                # Add each element in the current directory to the list
-               foreach {fpelt hid} $elt_list {
+               foreach {fpelt hid isdir} $elt_list {
                   lappend full_list $fpelt
                   # Flag hidden files
                   if {$hid} {
                      set hidden_list($fpelt) 1
+                  }
+                  # Record file type to avoid later stat calls
+                  set fpeltname [getModuleNameFromModulepath $fpelt $dir]
+                  if {$isdir} {
+                     set dknown_arr($fpeltname) 1
+                  } else {
+                     set fknown_arr($fpeltname) 1
                   }
                }
             }
@@ -3084,11 +3091,20 @@ proc findModules {dir mod depthlvl fetch_mtime} {
    # use catch protection to handle non-readable and non-existent dir
    if {[catch {
       set full_list {}
-      foreach {fpelt hid} [getFilesInDirectory $dir 0] {
+      array set init_fknown {}
+      array set init_dknown {}
+      foreach {fpelt hid isdir} [getFilesInDirectory $dir 0] {
          set elt [file tail $fpelt]
          # include any .modulerc file found at the modulepath root
          if {$elt eq {.modulerc} || $findall || [modEqStatic $elt match]} {
             lappend full_list $fpelt
+            # record file type to avoid later stat calls
+            set eltname [getModuleNameFromModulepath $fpelt $dir]
+            if {$isdir} {
+               set init_dknown($eltname) 1
+            } else {
+               set init_fknown($eltname) 1
+            }
          }
       }
    }]} {
@@ -3096,7 +3112,8 @@ proc findModules {dir mod depthlvl fetch_mtime} {
    }
 
    # walk through list of dirs and files to find modules
-   findModulesFromDirsAndFiles $dir $full_list $depthlvl $fetch_mtime mod_list
+   findModulesFromDirsAndFiles $dir $full_list $depthlvl $fetch_mtime \
+      mod_list {} {} init_fknown init_dknown
 
    reportDebug "found [array names mod_list]"
 
