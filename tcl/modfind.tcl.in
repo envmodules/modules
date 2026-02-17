@@ -2955,7 +2955,7 @@ proc findModulesInMemCache {searchid} {
 # Walk through provided list of directories and files to find modules
 proc findModulesFromDirsAndFiles {dir full_list depthlvl fetch_mtime\
    res_arrname {indir_arrname {}} {hidden_listname {}} {fknown_arrname {}}\
-   {dknown_arrname {}}} {
+   {dknown_arrname {}} {prunespec {}}} {
    # link to variables/arrays from upper context
    upvar $res_arrname mod_list
    if {$indir_arrname ne {}} {
@@ -2969,6 +2969,15 @@ proc findModulesFromDirsAndFiles {dir full_list depthlvl fetch_mtime\
    }
    if {$dknown_arrname ne {}} {
       upvar $dknown_arrname dknown_arr
+   }
+
+   # build pruning path components from spec (e.g. tools/cat15/pkg10/3.0 ->
+   # {tools cat15 pkg10 3.0}) to skip non-matching directories during walk
+   if {$prunespec ne {}} {
+      set pruneparts [file split $prunespec]
+      set prunedepth [llength $pruneparts]
+   } else {
+      set prunedepth 0
    }
 
    foreach igndir [getConf ignored_dirs] {
@@ -2986,6 +2995,12 @@ proc findModulesFromDirsAndFiles {dir full_list depthlvl fetch_mtime\
       if {[info exists dknown_arr($modulename)] || (![info exists\
          fknown_arr($modulename)] && [file isdirectory $element])} {
          if {![info exists ignored_dirs($tail)]} {
+            # prune directories that cannot match the query path: skip if
+            # this dir does not match the corresponding query path component
+            if {$prunedepth > 0 && $moddepthlvl <= $prunedepth && [lindex\
+               $pruneparts [expr {$moddepthlvl - 1}]] ne $tail} {
+               continue
+            }
             if {[catch {
                set elt_list [getFilesInDirectory $element 1]
             } errMsg]} {
@@ -3051,12 +3066,12 @@ proc findModulesFromDirsAndFiles {dir full_list depthlvl fetch_mtime\
 }
 
 # finds all module-related files matching mod in the module path dir
-proc findModules {dir mod depthlvl fetch_mtime} {
+proc findModules {dir mod depthlvl fetch_mtime {prunespec {}}} {
    reportDebug "finding '$mod' in $dir (depthlvl=$depthlvl,\
       fetch_mtime=$fetch_mtime)"
 
    # generated search id (for cache search/save) by compacting given args
-   set searchid $dir:$mod:$depthlvl:$fetch_mtime
+   set searchid $dir:$mod:$depthlvl:$fetch_mtime:$prunespec
 
    # look at memory cache for a compatible result
    lassign [findModulesInMemCache $searchid] cache_searchid cache_list
@@ -3095,7 +3110,8 @@ proc findModules {dir mod depthlvl fetch_mtime} {
    }
 
    # walk through list of dirs and files to find modules
-   findModulesFromDirsAndFiles $dir $full_list $depthlvl $fetch_mtime mod_list
+   findModulesFromDirsAndFiles $dir $full_list $depthlvl $fetch_mtime \
+      mod_list {} {} {} {} $prunespec
 
    reportDebug "found [array names mod_list]"
 
@@ -3201,7 +3217,18 @@ proc getModules {dir {mod {}} {fetch_mtime 0} {search {}} {filter {}}} {
       # unless EMS need to be performed (findModules should fetch everything)
       set depthlvl [expr {$indepth || $ems_required ? 0 : $querydepth + 1}]
 
-      array set found_list [findModules $dir $findmod $depthlvl $fetch_mtime]
+      # enable directory pruning when query is a specific deep path without
+      # wildcards (e.g. tools/cat15/pkg10/3.0) to avoid scanning sibling
+      # directories that cannot match
+      if {$hasmoddir && !$find_all && !$contains && $modqe eq\
+         [string map {* {} ? {}} $modqe]} {
+         set prunespec $modqe
+      } else {
+         set prunespec {}
+      }
+
+      array set found_list [findModules $dir $findmod $depthlvl $fetch_mtime\
+         $prunespec]
    }
 
    # Phase #1: consolidate every kind of entries (directory, modulefile,
