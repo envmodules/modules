@@ -290,4 +290,4 @@ If you're aware of a ``module``-related project missing from this list, feel
 free to :ref:`contact us<Community>` so we can add it.
 
 .. |modules_version| replace:: Modules 5.7.0 (not yet released)
-.. |lmod_version| replace:: Lmod 9.1.1
+.. |lmod_version| replace:: Lmod 9.1.2
