@@ -637,7 +637,20 @@ if {[catch {
       rename ::__initStateClockSeconds ::initStateClockSeconds
       rename ::__parseDateTimeArg ::parseDateTimeArg
    }
+   # wrap getFilesInDirectory with in-memory cache to avoid redundant
+   # directory reads within a single modulecmd invocation
+   rename ::getFilesInDirectory ::_getFilesInDirectoryUncached
+   proc getFilesInDirectory {dir fetch_dotversion} {
+      set cachekey $dir:$fetch_dotversion
+      if {[info exists ::g_filesInDirCache($cachekey)]} {
+         return $::g_filesInDirCache($cachekey)
+      }
+      set result [_getFilesInDirectoryUncached $dir $fetch_dotversion]
+      set ::g_filesInDirCache($cachekey) $result
+      return $result
+   }
    ##nagelfar syntax readFile x x? x?
+   ##nagelfar syntax _getFilesInDirectoryUncached x x
    ##nagelfar syntax getFilesInDirectory x x
    ##nagelfar syntax initStateUsergroups
    ##nagelfar syntax initStateUsername
