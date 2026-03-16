@@ -1,0 +1,47 @@
+##############################################################################
+#   Modules Revision 3.0
+#   Providing a flexible user environment
+#
+#   Description:  Deep modulefile directories - symlink directory handling
+#   Command:      avail, load
+#   Modulefiles:  plainlink (symlink to plain)
+#
+#   Test that symlinked directories are correctly identified as directories
+#   when the C extension uses d_type/stat() to pre-compute is_dir. Symlinks
+#   have d_type=DT_LNK and must be resolved via stat() to detect if target
+#   is a directory.
+#
+##############################################################################
+
+# ensure auto symbolic versions are not set for these tests
+setenv_var MODULES_ADVANCED_VERSION_SPEC 0
+
+# plainlink is a symlink to the plain directory within modulefiles.deep
+# it should be traversable and its modules should be available
+
+# test avail on symlinked deep module (terse output)
+set deepmodpath "$env(TESTSUITEDIR)/modulefiles.deep"
+set ts_sh "$deepmodpath:\nplainlink/dir1/1.0\nplainlink/dir1/2.0\nplainlink/dir2/1.0\nplainlink/dir2/2.0"
+setenv_path_var MODULEPATH $deepmodpath
+testouterr_cmd "sh" "avail -t plainlink" "OK" $ts_sh
+
+skip_if_quick_mode
+
+# test load of a specific module through the symlink
+set ans [list]
+lappend ans [list set TEST "plain/dir1/1.0"]
+lappend ans [list set __MODULES_LMCONFLICT \
+   "plainlink/dir1/1.0&plain/dir1"]
+lappend ans [list set _LMFILES_ \
+   "$deepmodpath/plainlink/dir1/1.0"]
+lappend ans [list set LOADEDMODULES "plainlink/dir1/1.0"]
+test_cmd_re "sh" "load plainlink/dir1/1.0" $ans
+
+# test avail on a deeper path within the symlink
+set ts_sh "$deepmodpath:\nplainlink/dir2/1.0\nplainlink/dir2/2.0"
+testouterr_cmd "sh" "avail -t plainlink/dir2" "OK" $ts_sh
+
+# cleanup
+setenv_path_var MODULEPATH $modpath
+unsetenv_var MODULES_ADVANCED_VERSION_SPEC
+unset ts_sh ans deepmodpath
