@@ -323,17 +323,17 @@ setenv_var __MODULES_LMVARIANT variant/1.0&foo|val1|0|1&bar|val3|0|0
 
 
 testouterr_cmd sh {list} OK "$cur_loaded
- 1) variant/1.0{bar=val3:%val1}  
+ 1) variant/1.0{bar=val3:%val1}
 
 Key:
-{%value}={foo=value}  {variant=value}  "
+{%value}={foo=value}  {variant=value}"
 
 setenv_var __MODULES_LMVARIANT variant/1.0&foo|val1|0|1&bar|1|1|0
 testouterr_cmd sh {list} OK "$cur_loaded
- 1) variant/1.0{+bar:%val1}  
+ 1) variant/1.0{+bar:%val1}
 
 Key:
-{+variant}={variant=on}  {%value}={foo=value}  {variant=value}  "
+{+variant}={variant=on}  {%value}={foo=value}  {variant=value}"
 
 # json output
 setenv_var __MODULES_LMVARIANT variant/1.0&foo|val1|0|1&bar|val3|0|0
@@ -345,36 +345,36 @@ testouterr_cmd sh {list -j} OK "{\"variant/1.0\": { \"name\": \"variant/1.0\", \
 setenv_var MODULES_COLORS "se=2:va=33"
 setenv_var __MODULES_LMVARIANT variant/1.0&foo|val1|0|1&bar|val3|0|0
 testouterr_cmd_re sh {list --color=always} OK "$cur_loaded
- 1\\) variant/1.0[sgr 2]{[sgr 22][sgr 33]bar=[sgr 0][sgr 33]val3[sgr 0][sgr 2]:[sgr 22][sgr 33]%[sgr 0][sgr 33]val1[sgr 0][sgr 2]}[sgr 22]  
+ 1\\) variant/1.0[sgr 2]{[sgr 22][sgr 33]bar=[sgr 0][sgr 33]val3[sgr 0][sgr 2]:[sgr 22][sgr 33]%[sgr 0][sgr 33]val1[sgr 0][sgr 2]}[sgr 22]
 
 Key:
-[sgr 2]{[sgr 22][sgr 33]%value[sgr 0][sgr 2]}[sgr 22]=[sgr 2]{[sgr 22][sgr 33]foo=value[sgr 0][sgr 2 ]}[sgr 22]  [sgr 2]{[sgr 22][sgr 33]variant=value[sgr 0][sgr 2]}[sgr 22]  "
+[sgr 2]{[sgr 22][sgr 33]%value[sgr 0][sgr 2]}[sgr 22]=[sgr 2]{[sgr 22][sgr 33]foo=value[sgr 0][sgr 2 ]}[sgr 22]  [sgr 2]{[sgr 22][sgr 33]variant=value[sgr 0][sgr 2]}[sgr 22]"
 
 setenv_var __MODULES_LMVARIANT variant/1.0&foo|val1|0|1&bar|0|1|0
 testouterr_cmd_re sh {list --color=always} OK "$cur_loaded
- 1\\) variant/1.0[sgr 2]{[sgr 22][sgr 33]-bar[sgr 0][sgr 2]:[sgr 22][sgr 33]%[sgr 0][sgr 33]val1[sgr 0][sgr 2]}[sgr 22]  
+ 1\\) variant/1.0[sgr 2]{[sgr 22][sgr 33]-bar[sgr 0][sgr 2]:[sgr 22][sgr 33]%[sgr 0][sgr 33]val1[sgr 0][sgr 2]}[sgr 22]
 
 Key:
-[sgr 2]{[sgr 22][sgr 33]-variant[sgr 0][sgr 2]}[sgr 22]=[sgr 2]{[sgr 22][sgr 33]variant=off[sgr 0][sgr 2 ]}[sgr 22]  [sgr 2]{[sgr 22][sgr 33]%value[sgr 0][sgr 2]}[sgr 22]=[sgr 2]{[sgr 22][sgr 33]foo=value[sgr 0][sgr 2 ]}[sgr 22]  [sgr 2]{[sgr 22][sgr 33]variant=value[sgr 0][sgr 2]}[sgr 22]  "
+[sgr 2]{[sgr 22][sgr 33]-variant[sgr 0][sgr 2]}[sgr 22]=[sgr 2]{[sgr 22][sgr 33]variant=off[sgr 0][sgr 2 ]}[sgr 22]  [sgr 2]{[sgr 22][sgr 33]%value[sgr 0][sgr 2]}[sgr 22]=[sgr 2]{[sgr 22][sgr 33]foo=value[sgr 0][sgr 2 ]}[sgr 22]  [sgr 2]{[sgr 22][sgr 33]variant=value[sgr 0][sgr 2]}[sgr 22]"
 
 # color output with default variant
 setenv_var __MODULES_LMVARIANT variant/1.0&foo|val1|0|1
 setenv_var MODULES_COLORS "se=2:va=33:de=4:aL=100:L=90"
 # shortcut variant value is default, module is loaded, key is reported
 set tserr "$cur_loaded
- 1\\) variant/1.0[sgr 2]{[sgr 22][sgr 33]%[sgr 0][sgr 33][sgr 4]val1[sgr 0][sgr 0][sgr 2]}[sgr 22]  
+ 1\\) variant/1.0[sgr 2]{[sgr 22][sgr 33]%[sgr 0][sgr 33][sgr 4]val1[sgr 0][sgr 0][sgr 2]}[sgr 22]
 
 Key:
-[sgr 4]default-version[sgr 0]  [sgr 2]{[sgr 22][sgr 33]%value[sgr 0][sgr 2]}[sgr 22]=[sgr 2]{[sgr 22][sgr 33]foo=value[sgr 0][sgr 2 ]}[sgr 22]  [sgr 2]{[sgr 22][sgr 33]variant=value[sgr 0][sgr 2]}[sgr 22]  "
+[sgr 4]default-version[sgr 0]  [sgr 2]{[sgr 22][sgr 33]%value[sgr 0][sgr 2]}[sgr 22]=[sgr 2]{[sgr 22][sgr 33]foo=value[sgr 0][sgr 2 ]}[sgr 22]  [sgr 2]{[sgr 22][sgr 33]variant=value[sgr 0][sgr 2]}[sgr 22]"
 testouterr_cmd_re sh {list --color=always} OK $tserr
 # shortcut variant value is default, module is auto-loaded, key is reported
 setenv_var __MODULES_LMVARIANT variant/1.0&foo|val1|0|2
 setenv_var __MODULES_LMTAG variant/1.0&auto-loaded
 set tserr "$cur_loaded
- 1\\) [sgr 100]variant/1.0[sgr 0][sgr 2]{[sgr 22][sgr 33]%[sgr 0][sgr 33][sgr 4]val1[sgr 0][sgr 0][sgr 2]}[sgr 22]  
+ 1\\) [sgr 100]variant/1.0[sgr 0][sgr 2]{[sgr 22][sgr 33]%[sgr 0][sgr 33][sgr 4]val1[sgr 0][sgr 0][sgr 2]}[sgr 22]
 
 Key:
-[sgr 4]default-version[sgr 0]  [sgr 100]auto-loaded[sgr 0]  [sgr 2]{[sgr 22][sgr 33]%value[sgr 0][sgr 2]}[sgr 22]=[sgr 2]{[sgr 22][sgr 33]foo=value[sgr 0][sgr 2 ]}[sgr 22]  [sgr 2]{[sgr 22][sgr 33]variant=value[sgr 0][sgr 2]}[sgr 22]  "
+[sgr 4]default-version[sgr 0]  [sgr 100]auto-loaded[sgr 0]  [sgr 2]{[sgr 22][sgr 33]%value[sgr 0][sgr 2]}[sgr 22]=[sgr 2]{[sgr 22][sgr 33]foo=value[sgr 0][sgr 2 ]}[sgr 22]  [sgr 2]{[sgr 22][sgr 33]variant=value[sgr 0][sgr 2]}[sgr 22]"
 testouterr_cmd_re sh {list --color=always} OK $tserr
 unsetenv_var __MODULES_LMTAG
 

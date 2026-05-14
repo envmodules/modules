@@ -43,7 +43,7 @@ setenv_var MODULES_AVAIL_INDEPTH 1
 setenv_loaded_module [list foo/1.0] [list $mp/foo/1.0]
 setenv_var __MODULES_LMALTNAME foo/1.0&foo/bar
 
-set tserr_list_foo "foo/1.0(bar)  "
+set tserr_list_foo "foo/1.0(bar)"
 set tserr_list_terse_foo "foo/1.0(bar)"
 testouterr_cmd sh {list -o sym} OK $tserr_list_foo
 
@@ -89,7 +89,7 @@ testouterr_cmd sh {list --output=dirwsym:key} ERR $tserr_invalid_output_val
 set ans [list]
 lappend ans [list set _LMFILES_ $mp/foo/1.0:$mp/output/1.0]
 lappend ans [list set LOADEDMODULES foo/1.0:output/1.0]
-set tserr_list_foo "foo/1.0\\(bar\\)  "
+set tserr_list_foo "foo/1.0\\(bar\\)"
 set tserr_list_terse_foo "foo/1.0\\(bar\\)"
 
 if {[cmpversion $tclsh_version 8.6] == -1} {
@@ -145,7 +145,7 @@ unsetenv_var TESTSUITE_OUTPUT_INMODFILE
 setenv_var MODULES_LIST_OUTPUT header
 setenv_var MODULES_LIST_TERSE_OUTPUT header
 
-testouterr_cmd_re sh {list} OK "$cur_loaded\nfoo/1.0  "
+testouterr_cmd_re sh {list} OK "$cur_loaded\nfoo/1.0"
 testouterr_cmd sh {list -t} OK $cur_loaded\nfoo/1.0
 
 # no impact on -l/-j
@@ -158,7 +158,7 @@ testouterr_cmd sh {list -j} OK $tserr_list_json
 setenv_var MODULES_LIST_OUTPUT foo
 setenv_var MODULES_LIST_TERSE_OUTPUT foo
 
-testouterr_cmd_re sh {list} OK "$cur_loaded\n 1\\) $tserr_list_foo\n\nKey:\n\\(symbolic-version\\)  "
+testouterr_cmd_re sh {list} OK "$cur_loaded\n 1\\) $tserr_list_foo\n\nKey:\n\\(symbolic-version\\)"
 testouterr_cmd sh {list -t} OK $cur_loaded\nfoo/1.0
 testouterr_cmd_re sh {list -o sym} OK $tserr_list_foo
 testouterr_cmd_re sh {list -t --output=sym} OK $tserr_list_terse_foo
@@ -170,7 +170,7 @@ testouterr_cmd sh {list -o foo} ERR $tserr_invalid_o_val
 #
 
 testouterr_cmd sh {list -t --output=header} OK $cur_loaded\nfoo/1.0
-testouterr_cmd sh {list -o header} OK "$cur_loaded\nfoo/1.0  "
+testouterr_cmd sh {list -o header} OK "$cur_loaded\nfoo/1.0"
 
 unsetenv_loaded_module
 testouterr_cmd sh {list -o header} OK $no_loaded
@@ -193,8 +193,8 @@ setenv_loaded_module [list foo/1.0] [list $mp/foo/1.0]
 testouterr_cmd sh {list -t --output=sym:header} OK $cur_loaded\nfoo/1.0(bar)
 testouterr_cmd sh {list -t --output=sym:header foo} OK $cur_matchingloaded\nfoo/1.0(bar)
 setenv_var MODULES_LIST_OUTPUT sym:header
-testouterr_cmd sh {list} OK "$cur_loaded\nfoo/1.0(bar)  "
-testouterr_cmd sh {list foo} OK "$cur_matchingloaded\nfoo/1.0(bar)  "
+testouterr_cmd sh {list} OK "$cur_loaded\nfoo/1.0(bar)"
+testouterr_cmd sh {list foo} OK "$cur_matchingloaded\nfoo/1.0(bar)"
 
 unsetenv_var MODULES_LIST_OUTPUT
 
@@ -203,10 +203,10 @@ unsetenv_var MODULES_LIST_OUTPUT
 # key test
 #
 
-testouterr_cmd sh {list -t --output=key:sym:header} OK "$cur_loaded\nfoo/1.0(bar)\n\nKey:\n(symbolic-version)  "
-testouterr_cmd sh {list -o sym:key} OK "foo/1.0(bar)  \n\nKey:\n(symbolic-version)  "
+testouterr_cmd sh {list -t --output=key:sym:header} OK "$cur_loaded\nfoo/1.0(bar)\n\nKey:\n(symbolic-version)"
+testouterr_cmd sh {list -o sym:key} OK "foo/1.0(bar)\n\nKey:\n(symbolic-version)"
 setenv_var MODULES_LIST_TERSE_OUTPUT key:sym
-testouterr_cmd sh {list -t} OK "foo/1.0(bar)\n\nKey:\n(symbolic-version)  "
+testouterr_cmd sh {list -t} OK "foo/1.0(bar)\n\nKey:\n(symbolic-version)"
 unsetenv_var MODULES_LIST_TERSE_OUTPUT
 
 
@@ -214,19 +214,19 @@ unsetenv_var MODULES_LIST_TERSE_OUTPUT
 # idx test
 #
 
-testouterr_cmd sh {list --output=sym:idx} OK " 1) foo/1.0(bar)  "
-testouterr_cmd sh {list --output=sym:idx foo} OK " 1) foo/1.0(bar)  "
-testouterr_cmd sh {list -t -o idx:sym:key:header} OK "$cur_loaded\n 1) foo/1.0(bar) \n\nKey:\n(symbolic-version)  "
+testouterr_cmd sh {list --output=sym:idx} OK " 1) foo/1.0(bar)"
+testouterr_cmd sh {list --output=sym:idx foo} OK " 1) foo/1.0(bar)"
+testouterr_cmd sh {list -t -o idx:sym:key:header} OK "$cur_loaded\n 1) foo/1.0(bar) \n\nKey:\n(symbolic-version)"
 
 
 #
 # sym test
 #
 
-testouterr_cmd sh {list --output=idx} OK " 1) foo/1.0  "
+testouterr_cmd sh {list --output=idx} OK " 1) foo/1.0"
 testouterr_cmd sh {list -t -o idx:key:header} OK "$cur_loaded\n 1) foo/1.0 "
 setenv_var MODULES_LIST_OUTPUT idx:key
-testouterr_cmd sh {list} OK " 1) foo/1.0  "
+testouterr_cmd sh {list} OK " 1) foo/1.0"
 unsetenv_var MODULES_LIST_OUTPUT
 
 
@@ -235,8 +235,8 @@ unsetenv_var MODULES_LIST_OUTPUT
 #
 
 setenv_var __MODULES_LMTAG foo/1.0&baz
-testouterr_cmd sh {list --output=tag:idx} OK " 1) foo/1.0 <baz>  "
-testouterr_cmd sh {list -t -o key:tag:header} OK "$cur_loaded\nfoo/1.0 <baz>\n\nKey:\n<module-tag>  "
+testouterr_cmd sh {list --output=tag:idx} OK " 1) foo/1.0 <baz>"
+testouterr_cmd sh {list -t -o key:tag:header} OK "$cur_loaded\nfoo/1.0 <baz>\n\nKey:\n<module-tag>"
 setenv_var MODULES_LIST_TERSE_OUTPUT idx:tag
 testouterr_cmd sh {list -t} OK " 1) foo/1.0 <baz> "
 unsetenv_var MODULES_LIST_TERSE_OUTPUT
@@ -248,8 +248,8 @@ unsetenv_var __MODULES_LMTAG
 #
 
 setenv_var __MODULES_LMALTNAME foo/1.0&foo/bar&foo&al|alfoo
-testouterr_cmd sh {list --output=alias:idx} OK " 1) alfoo   2) foo/1.0  "
-testouterr_cmd sh {list --output=alias:idx:sym:key} OK " 1) alfoo(@)   2) foo/1.0(bar)  \n\nKey:\n(@)=module-alias  (symbolic-version)  "
+testouterr_cmd sh {list --output=alias:idx} OK " 1) alfoo   2) foo/1.0"
+testouterr_cmd sh {list --output=alias:idx:sym:key} OK " 1) alfoo(@)   2) foo/1.0(bar)\n\nKey:\n(@)=module-alias  (symbolic-version)"
 setenv_var MODULES_LIST_TERSE_OUTPUT idx:alias
 testouterr_cmd sh {list -t} OK " 1) alfoo \n 2) foo/1.0 "
 unsetenv_var MODULES_LIST_TERSE_OUTPUT
@@ -259,8 +259,8 @@ unsetenv_var MODULES_LIST_TERSE_OUTPUT
 # indesym test
 #
 
-testouterr_cmd sh {list --output=indesym:idx} OK " 1) foo/bar   2) foo/1.0  "
-testouterr_cmd sh {list --output=alias:idx:indesym:sym:key} OK " 1) foo/bar   2) alfoo   3) foo/1.0  "
+testouterr_cmd sh {list --output=indesym:idx} OK " 1) foo/bar   2) foo/1.0"
+testouterr_cmd sh {list --output=alias:idx:indesym:sym:key} OK " 1) foo/bar   2) alfoo   3) foo/1.0"
 setenv_var MODULES_LIST_TERSE_OUTPUT idx:alias:sym:indesym
 testouterr_cmd sh {list -t} OK " 1) foo/bar \n 2) alfoo \n 3) foo/1.0 "
 unsetenv_var MODULES_LIST_TERSE_OUTPUT
@@ -271,9 +271,9 @@ unsetenv_var MODULES_LIST_TERSE_OUTPUT
 #
 
 setenv_var __MODULES_LMTAG foo/1.0&hidden-loaded
-set tserr " 1) alfoo   2) foo/1.0  "
+set tserr " 1) alfoo   2) foo/1.0"
 testouterr_cmd sh {list --output=hidden:alias:idx} OK $tserr
-testouterr_cmd sh {list --output=hidden:alias:idx:sym:key} OK " 1) alfoo(@)   2) foo/1.0(bar)  \n\nKey:\n(@)=module-alias  (symbolic-version)  "
+testouterr_cmd sh {list --output=hidden:alias:idx:sym:key} OK " 1) alfoo(@)   2) foo/1.0(bar)\n\nKey:\n(@)=module-alias  (symbolic-version)"
 
 setenv_var MODULES_LIST_OUTPUT idx:alias:hidden
 testouterr_cmd sh {list} OK $tserr
@@ -298,8 +298,8 @@ setenv_var __MODULES_LMTAG foo/1.0&baz
 unsetenv_var MODULES_LIST_OUTPUT
 unsetenv_var MODULES_LIST_TERSE_OUTPUT
 
-testouterr_cmd sh {list --output=-tag:key} OK "$cur_loaded\n 1) foo/1.0(bar)  "
-testouterr_cmd sh {list -o -sym:key} OK "$cur_loaded\n 1) foo/1.0 <baz>  "
+testouterr_cmd sh {list --output=-tag:key} OK "$cur_loaded\n 1) foo/1.0(bar)"
+testouterr_cmd sh {list -o -sym:key} OK "$cur_loaded\n 1) foo/1.0 <baz>"
 
 testouterr_cmd sh {list -t -o +sym} OK "$cur_loaded\nfoo/1.0(bar)"
 testouterr_cmd sh {list -t --output=+tag} OK "$cur_loaded\nfoo/1.0 <baz>"
@@ -311,8 +311,8 @@ testouterr_cmd sh {list -o -bar --terse} ERR $tserr_invalid_o_val
 setenv_var MODULES_LIST_OUTPUT tag
 setenv_var MODULES_LIST_TERSE_OUTPUT {}
 
-testouterr_cmd sh {list -o +sym} OK "foo/1.0(bar) <baz>  "
-testouterr_cmd sh {list --output=-sym:tag} OK "foo/1.0  "
+testouterr_cmd sh {list -o +sym} OK "foo/1.0(bar) <baz>"
+testouterr_cmd sh {list --output=-sym:tag} OK "foo/1.0"
 
 testouterr_cmd sh {list -t -o -sym} OK "foo/1.0"
 testouterr_cmd sh {list -t --output=+sym} OK "foo/1.0(bar)"

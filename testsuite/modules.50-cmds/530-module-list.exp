@@ -45,7 +45,7 @@ setenv_loaded_module [list foo/1.0] [list $mp/foo/1.0]
 set ans [list]
 lappend ans [list set _LMFILES_ $mp/foo/1.0:$modfile]
 lappend ans [list set LOADEDMODULES foo/1.0:$mod]
-set tserr "$cur_loaded\n 1) foo/1.0  "
+set tserr "$cur_loaded\n 1) foo/1.0"
 testouterr_cmd sh "load $mod" $ans $tserr
 
 setenv_loaded_module [list foo/1.0 bar/1.0] [list $mp/foo/1.0 $mp/bar/1.0]
@@ -53,7 +53,7 @@ setenv_loaded_module [list foo/1.0 bar/1.0] [list $mp/foo/1.0 $mp/bar/1.0]
 set ans [list]
 lappend ans [list set _LMFILES_ $mp/foo/1.0:$mp/bar/1.0:$modfile]
 lappend ans [list set LOADEDMODULES foo/1.0:bar/1.0:$mod]
-set tserr "$cur_loaded\n 1) foo/1.0   2) bar/1.0  "
+set tserr "$cur_loaded\n 1) foo/1.0   2) bar/1.0"
 testouterr_cmd sh "load $mod" $ans $tserr
 
 setenv_loaded_module [list foo/1.0 bar/1.0 $mod] [list $mp/foo/1.0 $mp/bar/1.0 $modfile]
@@ -61,7 +61,7 @@ setenv_loaded_module [list foo/1.0 bar/1.0 $mod] [list $mp/foo/1.0 $mp/bar/1.0 $
 set ans [list]
 lappend ans [list set _LMFILES_ $mp/foo/1.0:$mp/bar/1.0]
 lappend ans [list set LOADEDMODULES foo/1.0:bar/1.0]
-set tserr "$cur_loaded\n 1) foo/1.0   2) bar/1.0   3) $mod  "
+set tserr "$cur_loaded\n 1) foo/1.0   2) bar/1.0   3) $mod"
 testouterr_cmd sh "unload $mod" $ans $tserr
 
 unsetenv_loaded_module
@@ -80,7 +80,7 @@ setenv_loaded_module [list foo/1.0] [list $mp/foo/1.0]
 set ans [list]
 lappend ans [list set _LMFILES_ $mp/foo/1.0:$modfile]
 lappend ans [list set LOADEDMODULES foo/1.0:$mod]
-set tserr "$cur_matchingloaded\n 1) foo/1.0  "
+set tserr "$cur_matchingloaded\n 1) foo/1.0"
 testouterr_cmd sh "load $mod" $ans $tserr
 
 setenv_loaded_module [list bar/1.0] [list $mp/bar/1.0]
@@ -96,7 +96,7 @@ setenv_loaded_module [list foo/1.0 bar/1.0] [list $mp/foo/1.0 $mp/bar/1.0]
 set ans [list]
 lappend ans [list set _LMFILES_ $mp/foo/1.0:$mp/bar/1.0:$modfile]
 lappend ans [list set LOADEDMODULES foo/1.0:bar/1.0:$mod]
-set tserr "$cur_matchingloaded\n 1) foo/1.0  "
+set tserr "$cur_matchingloaded\n 1) foo/1.0"
 testouterr_cmd sh "load $mod" $ans $tserr
 
 setenv_loaded_module [list foo/1.0 bar/1.0 $mod] [list $mp/foo/1.0 $mp/bar/1.0 $modfile]
@@ -104,7 +104,7 @@ setenv_loaded_module [list foo/1.0 bar/1.0 $mod] [list $mp/foo/1.0 $mp/bar/1.0 $
 set ans [list]
 lappend ans [list set _LMFILES_ $mp/foo/1.0:$mp/bar/1.0]
 lappend ans [list set LOADEDMODULES foo/1.0:bar/1.0]
-set tserr "$cur_matchingloaded\n 1) foo/1.0  "
+set tserr "$cur_matchingloaded\n 1) foo/1.0"
 testouterr_cmd sh "unload $mod" $ans $tserr
 
 unsetenv_loaded_module
@@ -124,7 +124,7 @@ setenv_loaded_module [list foo/1.0] [list $mp/foo/1.0]
 set ans [list]
 lappend ans [list set _LMFILES_ $mp/foo/1.0:$modfile]
 lappend ans [list set LOADEDMODULES foo/1.0:$mod]
-set tserr "$cur_matchingloaded\n 1) foo/1.0  "
+set tserr "$cur_matchingloaded\n 1) foo/1.0"
 testouterr_cmd sh "load $mod" $ans $tserr
 
 setenv_loaded_module [list bar/1.0] [list $mp/bar/1.0]
@@ -140,7 +140,7 @@ setenv_loaded_module [list foo/1.0 bar/1.0] [list $mp/foo/1.0 $mp/bar/1.0]
 set ans [list]
 lappend ans [list set _LMFILES_ $mp/foo/1.0:$mp/bar/1.0:$modfile]
 lappend ans [list set LOADEDMODULES foo/1.0:bar/1.0:$mod]
-set tserr "$cur_matchingloaded\n 1) foo/1.0  "
+set tserr "$cur_matchingloaded\n 1) foo/1.0"
 testouterr_cmd sh "load $mod" $ans $tserr
 
 setenv_loaded_module [list foo/1.0 bar/1.0 $mod] [list $mp/foo/1.0 $mp/bar/1.0 $modfile]
@@ -148,7 +148,7 @@ setenv_loaded_module [list foo/1.0 bar/1.0 $mod] [list $mp/foo/1.0 $mp/bar/1.0 $
 set ans [list]
 lappend ans [list set _LMFILES_ $mp/foo/1.0:$mp/bar/1.0]
 lappend ans [list set LOADEDMODULES foo/1.0:bar/1.0]
-set tserr "$cur_matchingloaded\n 1) foo/1.0  "
+set tserr "$cur_matchingloaded\n 1) foo/1.0"
 testouterr_cmd sh "unload $mod" $ans $tserr
 
 unsetenv_loaded_module
@@ -168,7 +168,7 @@ setenv_loaded_module [list foo/1.0] [list $mp/foo/1.0]
 set ans [list]
 lappend ans [list set _LMFILES_ $mp/foo/1.0:$modfile]
 lappend ans [list set LOADEDMODULES foo/1.0:$mod]
-set tserr "$cur_matchingloaded\n 1) foo/1.0  "
+set tserr "$cur_matchingloaded\n 1) foo/1.0"
 testouterr_cmd sh "load $mod" $ans $tserr
 
 setenv_loaded_module [list bar/1.0] [list $mp/bar/1.0]
@@ -176,7 +176,7 @@ setenv_loaded_module [list bar/1.0] [list $mp/bar/1.0]
 set ans [list]
 lappend ans [list set _LMFILES_ $mp/bar/1.0:$modfile]
 lappend ans [list set LOADEDMODULES bar/1.0:$mod]
-set tserr "$cur_matchingloaded\n 1) bar/1.0  "
+set tserr "$cur_matchingloaded\n 1) bar/1.0"
 testouterr_cmd sh "load $mod" $ans $tserr
 
 setenv_loaded_module [list foo/1.0 bar/1.0] [list $mp/foo/1.0 $mp/bar/1.0]
@@ -184,7 +184,7 @@ setenv_loaded_module [list foo/1.0 bar/1.0] [list $mp/foo/1.0 $mp/bar/1.0]
 set ans [list]
 lappend ans [list set _LMFILES_ $mp/foo/1.0:$mp/bar/1.0:$modfile]
 lappend ans [list set LOADEDMODULES foo/1.0:bar/1.0:$mod]
-set tserr "$cur_matchingloaded\n 1) foo/1.0   2) bar/1.0  "
+set tserr "$cur_matchingloaded\n 1) foo/1.0   2) bar/1.0"
 testouterr_cmd sh "load $mod" $ans $tserr
 
 setenv_loaded_module [list foo/1.0 bar/1.0 $mod] [list $mp/foo/1.0 $mp/bar/1.0 $modfile]
@@ -192,7 +192,7 @@ setenv_loaded_module [list foo/1.0 bar/1.0 $mod] [list $mp/foo/1.0 $mp/bar/1.0 $
 set ans [list]
 lappend ans [list set _LMFILES_ $mp/foo/1.0:$mp/bar/1.0]
 lappend ans [list set LOADEDMODULES foo/1.0:bar/1.0]
-set tserr "$cur_matchingloaded\n 1) foo/1.0   2) bar/1.0  "
+set tserr "$cur_matchingloaded\n 1) foo/1.0   2) bar/1.0"
 testouterr_cmd sh "unload $mod" $ans $tserr
 
 unsetenv_loaded_module
@@ -212,7 +212,7 @@ setenv_loaded_module [list foo/1.0] [list $mp/foo/1.0]
 set ans [list]
 lappend ans [list set _LMFILES_ $mp/foo/1.0:$modfile]
 lappend ans [list set LOADEDMODULES foo/1.0:$mod]
-set tserr "$cur_matchingloaded\n 1) foo/1.0  "
+set tserr "$cur_matchingloaded\n 1) foo/1.0"
 testouterr_cmd sh "load $mod" $ans $tserr
 
 unsetenv_path_var __MODULES_LMALTNAME
@@ -221,7 +221,7 @@ setenv_loaded_module [list bar/1.0] [list $mp/bar/1.0]
 set ans [list]
 lappend ans [list set _LMFILES_ $mp/bar/1.0:$modfile]
 lappend ans [list set LOADEDMODULES bar/1.0:$mod]
-set tserr "$cur_matchingloaded\n 1) bar/1.0  "
+set tserr "$cur_matchingloaded\n 1) bar/1.0"
 testouterr_cmd sh "load $mod" $ans $tserr
 
 setenv_path_var __MODULES_LMALTNAME foo/1.0&al|alfoo
@@ -230,7 +230,7 @@ setenv_loaded_module [list foo/1.0 bar/1.0] [list $mp/foo/1.0 $mp/bar/1.0]
 set ans [list]
 lappend ans [list set _LMFILES_ $mp/foo/1.0:$mp/bar/1.0:$modfile]
 lappend ans [list set LOADEDMODULES foo/1.0:bar/1.0:$mod]
-set tserr "$cur_matchingloaded\n 1) foo/1.0   2) bar/1.0  "
+set tserr "$cur_matchingloaded\n 1) foo/1.0   2) bar/1.0"
 testouterr_cmd sh "load $mod" $ans $tserr
 
 setenv_loaded_module [list foo/1.0 bar/1.0 $mod] [list $mp/foo/1.0 $mp/bar/1.0 $modfile]
@@ -238,7 +238,7 @@ setenv_loaded_module [list foo/1.0 bar/1.0 $mod] [list $mp/foo/1.0 $mp/bar/1.0 $
 set ans [list]
 lappend ans [list set _LMFILES_ $mp/foo/1.0:$mp/bar/1.0]
 lappend ans [list set LOADEDMODULES foo/1.0:bar/1.0]
-set tserr "$cur_matchingloaded\n 1) foo/1.0   2) bar/1.0  "
+set tserr "$cur_matchingloaded\n 1) foo/1.0   2) bar/1.0"
 testouterr_cmd sh "unload $mod" $ans $tserr
 
 unsetenv_path_var __MODULES_LMALTNAME

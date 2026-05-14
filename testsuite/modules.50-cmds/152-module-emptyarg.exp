@@ -181,7 +181,7 @@ setenv_loaded_module $module/list $modulepath/$module/list
 set ans [list]
 lappend ans [list unset _LMFILES_]
 lappend ans [list unset LOADEDMODULES]
-testouterr_cmd sh "unload $module/list" $ans "$cur_matchingloaded\n 1) $module/list  "
+testouterr_cmd sh "unload $module/list" $ans "$cur_matchingloaded\n 1) $module/list"
 setenv_loaded_module $module/savelist $modulepath/$module/savelist
 set ans [list]
 lappend ans [list unset _LMFILES_]

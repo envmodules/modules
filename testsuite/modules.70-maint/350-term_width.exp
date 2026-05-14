@@ -65,178 +65,185 @@ proc ts_avail_header {w} {
 # Set the output for different width
 
 set width_0 "[ts_avail_header 169]
-loc_rc1/1.0(foo)           loc_rc3/2.0(cur:stable)        loc_rc5/1.0               loc_rc6/bar(@)  loc_rc8/0.9(@)  loc_rcv1/1.2(default:new)  loc_rcv2/2.0  
+loc_rc1/1.0(foo)           loc_rc3/2.0(cur:stable)        loc_rc5/1.0               loc_rc6/bar(@)  loc_rc8/0.9(@)  loc_rcv1/1.2(default:new)  loc_rcv2/2.0
 loc_rc1/2.0                loc_rc3/3.0(chk:exp:new:test)  loc_rc5/2.0               loc_rc7/0.9     loc_rc8/1.0     loc_rcv1/2.0               
 loc_rc2/1.0(bar:blah:foo)  loc_rc4/1.0                    loc_rc6/0.9               loc_rc7/1(@)    loc_rc010/2.0   loc_rcv1/bar(@)            
 loc_rc2/2.0                loc_rc4/2.0(default)           loc_rc6/1(@)              loc_rc7/1.2     loc_rcv1/1(@)   loc_rcv2/1.2               
 loc_rc3/1.0(default)       loc_rc4/3.0                    loc_rc6/1.2(default:new)  loc_rc7/bar(@)  loc_rcv1/1.1    loc_rcv2/1.5               
 
 Key:
-(@)=module-alias  (symbolic-version)  "
+(@)=module-alias  (symbolic-version)"
 
 set width_1 "[ts_avail_header 1]
-loc_rc1/1.0(foo)               
-loc_rc1/2.0                    
-loc_rc2/1.0(bar:blah:foo)      
-loc_rc2/2.0                    
-loc_rc3/1.0(default)           
-loc_rc3/2.0(cur:stable)        
-loc_rc3/3.0(chk:exp:new:test)  
-loc_rc4/1.0                    
-loc_rc4/2.0(default)           
-loc_rc4/3.0                    
-loc_rc5/1.0                    
-loc_rc5/2.0                    
-loc_rc6/0.9                    
-loc_rc6/1(@)                   
-loc_rc6/1.2(default:new)       
-loc_rc6/bar(@)                 
-loc_rc7/0.9                    
-loc_rc7/1(@)                   
-loc_rc7/1.2                    
-loc_rc7/bar(@)                 
-loc_rc8/0.9(@)                 
-loc_rc8/1.0                    
-loc_rc010/2.0                  
-loc_rcv1/1(@)                  
-loc_rcv1/1.1                   
-loc_rcv1/1.2(default:new)      
-loc_rcv1/2.0                   
-loc_rcv1/bar(@)                
-loc_rcv2/1.2                   
-loc_rcv2/1.5                   
-loc_rcv2/2.0                   
+loc_rc1/1.0(foo)
+loc_rc1/2.0
+loc_rc2/1.0(bar:blah:foo)
+loc_rc2/2.0
+loc_rc3/1.0(default)
+loc_rc3/2.0(cur:stable)
+loc_rc3/3.0(chk:exp:new:test)
+loc_rc4/1.0
+loc_rc4/2.0(default)
+loc_rc4/3.0
+loc_rc5/1.0
+loc_rc5/2.0
+loc_rc6/0.9
+loc_rc6/1(@)
+loc_rc6/1.2(default:new)
+loc_rc6/bar(@)
+loc_rc7/0.9
+loc_rc7/1(@)
+loc_rc7/1.2
+loc_rc7/bar(@)
+loc_rc8/0.9(@)
+loc_rc8/1.0
+loc_rc010/2.0
+loc_rcv1/1(@)
+loc_rcv1/1.1
+loc_rcv1/1.2(default:new)
+loc_rcv1/2.0
+loc_rcv1/bar(@)
+loc_rcv2/1.2
+loc_rcv2/1.5
+loc_rcv2/2.0
 
 Key:
-(@)=module-alias           
-(symbolic-version)  "
+(@)=module-alias
+(symbolic-version)"
 
 set width_30 "[ts_avail_header 30]
-loc_rc1/1.0(foo)               
-loc_rc1/2.0                    
-loc_rc2/1.0(bar:blah:foo)      
-loc_rc2/2.0                    
-loc_rc3/1.0(default)           
-loc_rc3/2.0(cur:stable)        
-loc_rc3/3.0(chk:exp:new:test)  
-loc_rc4/1.0                    
-loc_rc4/2.0(default)           
-loc_rc4/3.0                    
-loc_rc5/1.0                    
-loc_rc5/2.0                    
-loc_rc6/0.9                    
-loc_rc6/1(@)                   
-loc_rc6/1.2(default:new)       
-loc_rc6/bar(@)                 
-loc_rc7/0.9                    
-loc_rc7/1(@)                   
-loc_rc7/1.2                    
-loc_rc7/bar(@)                 
-loc_rc8/0.9(@)                 
-loc_rc8/1.0                    
-loc_rc010/2.0                  
-loc_rcv1/1(@)                  
-loc_rcv1/1.1                   
-loc_rcv1/1.2(default:new)      
-loc_rcv1/2.0                   
-loc_rcv1/bar(@)                
-loc_rcv2/1.2                   
-loc_rcv2/1.5                   
-loc_rcv2/2.0                   
+loc_rc1/1.0(foo)
+loc_rc1/2.0
+loc_rc2/1.0(bar:blah:foo)
+loc_rc2/2.0
+loc_rc3/1.0(default)
+loc_rc3/2.0(cur:stable)
+loc_rc3/3.0(chk:exp:new:test)
+loc_rc4/1.0
+loc_rc4/2.0(default)
+loc_rc4/3.0
+loc_rc5/1.0
+loc_rc5/2.0
+loc_rc6/0.9
+loc_rc6/1(@)
+loc_rc6/1.2(default:new)
+loc_rc6/bar(@)
+loc_rc7/0.9
+loc_rc7/1(@)
+loc_rc7/1.2
+loc_rc7/bar(@)
+loc_rc8/0.9(@)
+loc_rc8/1.0
+loc_rc010/2.0
+loc_rcv1/1(@)
+loc_rcv1/1.1
+loc_rcv1/1.2(default:new)
+loc_rcv1/2.0
+loc_rcv1/bar(@)
+loc_rcv2/1.2
+loc_rcv2/1.5
+loc_rcv2/2.0
 
 Key:
-(@)=module-alias           
-(symbolic-version)  "
+(@)=module-alias  (symbolic-version)"
 
 set width_50 "[ts_avail_header 50]
-loc_rc1/1.0(foo)               loc_rcv1/2.0     
-loc_rc1/2.0                    loc_rcv1/bar(@)  
-loc_rc2/1.0(bar:blah:foo)      loc_rcv2/1.2     
-loc_rc2/2.0                    loc_rcv2/1.5     
-loc_rc3/1.0(default)           loc_rcv2/2.0     
-loc_rc3/2.0(cur:stable)        
-loc_rc3/3.0(chk:exp:new:test)  
-loc_rc4/1.0                    
-loc_rc4/2.0(default)           
-loc_rc4/3.0                    
-loc_rc5/1.0                    
-loc_rc5/2.0                    
-loc_rc6/0.9                    
-loc_rc6/1(@)                   
-loc_rc6/1.2(default:new)       
-loc_rc6/bar(@)                 
-loc_rc7/0.9                    
-loc_rc7/1(@)                   
-loc_rc7/1.2                    
-loc_rc7/bar(@)                 
-loc_rc8/0.9(@)                 
-loc_rc8/1.0                    
-loc_rc010/2.0                  
-loc_rcv1/1(@)                  
-loc_rcv1/1.1                   
-loc_rcv1/1.2(default:new)      
+loc_rc1/1.0(foo)
+loc_rc1/2.0
+loc_rc2/1.0(bar:blah:foo)
+loc_rc2/2.0
+loc_rc3/1.0(default)
+loc_rc3/2.0(cur:stable)
+loc_rc3/3.0(chk:exp:new:test)
+loc_rc4/1.0
+loc_rc4/2.0(default)
+loc_rc4/3.0
+loc_rc5/1.0
+loc_rc5/2.0
+loc_rc6/0.9
+loc_rc6/1(@)
+loc_rc6/1.2(default:new)
+loc_rc6/bar(@)
+loc_rc7/0.9
+loc_rc7/1(@)
+loc_rc7/1.2
+loc_rc7/bar(@)
+loc_rc8/0.9(@)
+loc_rc8/1.0
+loc_rc010/2.0
+loc_rcv1/1(@)
+loc_rcv1/1.1
+loc_rcv1/1.2(default:new)
+loc_rcv1/2.0
+loc_rcv1/bar(@)
+loc_rcv2/1.2
+loc_rcv2/1.5
+loc_rcv2/2.0
 
 Key:
-(@)=module-alias  (symbolic-version)  "
+(@)=module-alias  (symbolic-version)"
 
 set width_60 "[ts_avail_header 60]
-loc_rc1/1.0(foo)               loc_rc7/0.9                
-loc_rc1/2.0                    loc_rc7/1(@)               
-loc_rc2/1.0(bar:blah:foo)      loc_rc7/1.2                
-loc_rc2/2.0                    loc_rc7/bar(@)             
-loc_rc3/1.0(default)           loc_rc8/0.9(@)             
-loc_rc3/2.0(cur:stable)        loc_rc8/1.0                
-loc_rc3/3.0(chk:exp:new:test)  loc_rc010/2.0              
-loc_rc4/1.0                    loc_rcv1/1(@)              
-loc_rc4/2.0(default)           loc_rcv1/1.1               
-loc_rc4/3.0                    loc_rcv1/1.2(default:new)  
-loc_rc5/1.0                    loc_rcv1/2.0               
-loc_rc5/2.0                    loc_rcv1/bar(@)            
-loc_rc6/0.9                    loc_rcv2/1.2               
-loc_rc6/1(@)                   loc_rcv2/1.5               
-loc_rc6/1.2(default:new)       loc_rcv2/2.0               
+loc_rc1/1.0(foo)               loc_rc7/0.9              
+loc_rc1/2.0                    loc_rc7/1(@)             
+loc_rc2/1.0(bar:blah:foo)      loc_rc7/1.2              
+loc_rc2/2.0                    loc_rc7/bar(@)           
+loc_rc3/1.0(default)           loc_rc8/0.9(@)           
+loc_rc3/2.0(cur:stable)        loc_rc8/1.0              
+loc_rc3/3.0(chk:exp:new:test)  loc_rc010/2.0            
+loc_rc4/1.0                    loc_rcv1/1(@)            
+loc_rc4/2.0(default)           loc_rcv1/1.1             
+loc_rc4/3.0                    loc_rcv1/1.2(default:new)
+loc_rc5/1.0                    loc_rcv1/2.0             
+loc_rc5/2.0                    loc_rcv1/bar(@)          
+loc_rc6/0.9                    loc_rcv2/1.2             
+loc_rc6/1(@)                   loc_rcv2/1.5             
+loc_rc6/1.2(default:new)       loc_rcv2/2.0             
 loc_rc6/bar(@)                 
 
 Key:
-(@)=module-alias  (symbolic-version)  "
+(@)=module-alias  (symbolic-version)"
 
 set width_80 "[ts_avail_header 80]
-loc_rc1/1.0(foo)               loc_rc6/1(@)               loc_rcv1/2.0     
-loc_rc1/2.0                    loc_rc6/1.2(default:new)   loc_rcv1/bar(@)  
-loc_rc2/1.0(bar:blah:foo)      loc_rc6/bar(@)             loc_rcv2/1.2     
-loc_rc2/2.0                    loc_rc7/0.9                loc_rcv2/1.5     
-loc_rc3/1.0(default)           loc_rc7/1(@)               loc_rcv2/2.0     
-loc_rc3/2.0(cur:stable)        loc_rc7/1.2                
-loc_rc3/3.0(chk:exp:new:test)  loc_rc7/bar(@)             
-loc_rc4/1.0                    loc_rc8/0.9(@)             
-loc_rc4/2.0(default)           loc_rc8/1.0                
-loc_rc4/3.0                    loc_rc010/2.0              
-loc_rc5/1.0                    loc_rcv1/1(@)              
-loc_rc5/2.0                    loc_rcv1/1.1               
-loc_rc6/0.9                    loc_rcv1/1.2(default:new)  
+loc_rc1/1.0(foo)               loc_rc7/0.9              
+loc_rc1/2.0                    loc_rc7/1(@)             
+loc_rc2/1.0(bar:blah:foo)      loc_rc7/1.2              
+loc_rc2/2.0                    loc_rc7/bar(@)           
+loc_rc3/1.0(default)           loc_rc8/0.9(@)           
+loc_rc3/2.0(cur:stable)        loc_rc8/1.0              
+loc_rc3/3.0(chk:exp:new:test)  loc_rc010/2.0            
+loc_rc4/1.0                    loc_rcv1/1(@)            
+loc_rc4/2.0(default)           loc_rcv1/1.1             
+loc_rc4/3.0                    loc_rcv1/1.2(default:new)
+loc_rc5/1.0                    loc_rcv1/2.0             
+loc_rc5/2.0                    loc_rcv1/bar(@)          
+loc_rc6/0.9                    loc_rcv2/1.2             
+loc_rc6/1(@)                   loc_rcv2/1.5             
+loc_rc6/1.2(default:new)       loc_rcv2/2.0             
+loc_rc6/bar(@)                 
 
 Key:
-(@)=module-alias  (symbolic-version)  "
+(@)=module-alias  (symbolic-version)"
 
 set width_100 "[ts_avail_header 100]
-loc_rc1/1.0(foo)               loc_rc4/2.0(default)      loc_rc7/0.9     loc_rcv1/1.1               
-loc_rc1/2.0                    loc_rc4/3.0               loc_rc7/1(@)    loc_rcv1/1.2(default:new)  
-loc_rc2/1.0(bar:blah:foo)      loc_rc5/1.0               loc_rc7/1.2     loc_rcv1/2.0               
-loc_rc2/2.0                    loc_rc5/2.0               loc_rc7/bar(@)  loc_rcv1/bar(@)            
-loc_rc3/1.0(default)           loc_rc6/0.9               loc_rc8/0.9(@)  loc_rcv2/1.2               
-loc_rc3/2.0(cur:stable)        loc_rc6/1(@)              loc_rc8/1.0     loc_rcv2/1.5               
-loc_rc3/3.0(chk:exp:new:test)  loc_rc6/1.2(default:new)  loc_rc010/2.0   loc_rcv2/2.0               
+loc_rc1/1.0(foo)               loc_rc4/2.0(default)      loc_rc7/0.9     loc_rcv1/1.1             
+loc_rc1/2.0                    loc_rc4/3.0               loc_rc7/1(@)    loc_rcv1/1.2(default:new)
+loc_rc2/1.0(bar:blah:foo)      loc_rc5/1.0               loc_rc7/1.2     loc_rcv1/2.0             
+loc_rc2/2.0                    loc_rc5/2.0               loc_rc7/bar(@)  loc_rcv1/bar(@)          
+loc_rc3/1.0(default)           loc_rc6/0.9               loc_rc8/0.9(@)  loc_rcv2/1.2             
+loc_rc3/2.0(cur:stable)        loc_rc6/1(@)              loc_rc8/1.0     loc_rcv2/1.5             
+loc_rc3/3.0(chk:exp:new:test)  loc_rc6/1.2(default:new)  loc_rc010/2.0   loc_rcv2/2.0             
 loc_rc4/1.0                    loc_rc6/bar(@)            loc_rcv1/1(@)   
 
 Key:
-(@)=module-alias  (symbolic-version)  "
+(@)=module-alias  (symbolic-version)"
 
 set width_400 "[ts_avail_header 400]
-loc_rc1/1.0(foo)  loc_rc2/1.0(bar:blah:foo)  loc_rc3/1.0(default)     loc_rc3/3.0(chk:exp:new:test)  loc_rc4/2.0(default)  loc_rc5/1.0  loc_rc6/0.9   loc_rc6/1.2(default:new)  loc_rc7/0.9   loc_rc7/1.2     loc_rc8/0.9(@)  loc_rc010/2.0  loc_rcv1/1.1               loc_rcv1/2.0     loc_rcv2/1.2  loc_rcv2/2.0  
+loc_rc1/1.0(foo)  loc_rc2/1.0(bar:blah:foo)  loc_rc3/1.0(default)     loc_rc3/3.0(chk:exp:new:test)  loc_rc4/2.0(default)  loc_rc5/1.0  loc_rc6/0.9   loc_rc6/1.2(default:new)  loc_rc7/0.9   loc_rc7/1.2     loc_rc8/0.9(@)  loc_rc010/2.0  loc_rcv1/1.1               loc_rcv1/2.0     loc_rcv2/1.2  loc_rcv2/2.0
 loc_rc1/2.0       loc_rc2/2.0                loc_rc3/2.0(cur:stable)  loc_rc4/1.0                    loc_rc4/3.0           loc_rc5/2.0  loc_rc6/1(@)  loc_rc6/bar(@)            loc_rc7/1(@)  loc_rc7/bar(@)  loc_rc8/1.0     loc_rcv1/1(@)  loc_rcv1/1.2(default:new)  loc_rcv1/bar(@)  loc_rcv2/1.5  
 
 Key:
-(@)=module-alias  (symbolic-version)  "
+(@)=module-alias  (symbolic-version)"
 
 
 
@@ -346,14 +353,14 @@ testerr_cmd sh {avail loc_rc --width=1 -w 60} $width_60
 # non-integer value set via MODULES_TERM_WIDTH should be silently ignored
 setenv_var MODULES_TERM_WIDTH "-80"
 testouterr_cmd sh {avail loc_rc} OK "[ts_avail_header 169]
-loc_rc1/1.0(foo)           loc_rc3/2.0(cur:stable)        loc_rc5/1.0               loc_rc6/bar(@)  loc_rc8/0.9(@)  loc_rcv1/1.2(default:new)  loc_rcv2/2.0  
+loc_rc1/1.0(foo)           loc_rc3/2.0(cur:stable)        loc_rc5/1.0               loc_rc6/bar(@)  loc_rc8/0.9(@)  loc_rcv1/1.2(default:new)  loc_rcv2/2.0
 loc_rc1/2.0                loc_rc3/3.0(chk:exp:new:test)  loc_rc5/2.0               loc_rc7/0.9     loc_rc8/1.0     loc_rcv1/2.0               
 loc_rc2/1.0(bar:blah:foo)  loc_rc4/1.0                    loc_rc6/0.9               loc_rc7/1(@)    loc_rc010/2.0   loc_rcv1/bar(@)            
 loc_rc2/2.0                loc_rc4/2.0(default)           loc_rc6/1(@)              loc_rc7/1.2     loc_rcv1/1(@)   loc_rcv2/1.2               
 loc_rc3/1.0(default)       loc_rc4/3.0                    loc_rc6/1.2(default:new)  loc_rc7/bar(@)  loc_rcv1/1.1    loc_rcv2/1.5               
 
 Key:
-(@)=module-alias  (symbolic-version)  "
+(@)=module-alias  (symbolic-version)"
 unsetenv_var MODULES_TERM_WIDTH
 
 
@@ -368,39 +375,39 @@ setenv_var __MODULES_LMALTNAME loc_rc4/1.0&loc_rc4/default&loc_rc4
 # Set the outputs for different width
 
 set width_0 "Currently Loaded Modulefiles:
- 1) loc_rc1/2.0   2) loc_rc2/2.0   3) loc_rc4/1.0(default)   4) loc_rc4/3.0   5) loc_rc5/1.0   6) loc_rc5/2.0   7) loc_rc7/0.9   8) loc_rcv2/1.2  
+ 1) loc_rc1/2.0   2) loc_rc2/2.0   3) loc_rc4/1.0(default)   4) loc_rc4/3.0   5) loc_rc5/1.0   6) loc_rc5/2.0   7) loc_rc7/0.9   8) loc_rcv2/1.2
 
 Key:
-(symbolic-version)  "
+(symbolic-version)"
 
 set width_1 "Currently Loaded Modulefiles:
- 1) loc_rc1/2.0           
- 2) loc_rc2/2.0           
- 3) loc_rc4/1.0(default)  
- 4) loc_rc4/3.0           
- 5) loc_rc5/1.0           
- 6) loc_rc5/2.0           
- 7) loc_rc7/0.9           
- 8) loc_rcv2/1.2          
+ 1) loc_rc1/2.0
+ 2) loc_rc2/2.0
+ 3) loc_rc4/1.0(default)
+ 4) loc_rc4/3.0
+ 5) loc_rc5/1.0
+ 6) loc_rc5/2.0
+ 7) loc_rc7/0.9
+ 8) loc_rcv2/1.2
 
 Key:
-(symbolic-version)  "
+(symbolic-version)"
 
 set width_50 "Currently Loaded Modulefiles:
- 1) loc_rc1/2.0            5) loc_rc5/1.0   
- 2) loc_rc2/2.0            6) loc_rc5/2.0   
- 3) loc_rc4/1.0(default)   7) loc_rc7/0.9   
- 4) loc_rc4/3.0            8) loc_rcv2/1.2  
+ 1) loc_rc1/2.0            5) loc_rc5/1.0 
+ 2) loc_rc2/2.0            6) loc_rc5/2.0 
+ 3) loc_rc4/1.0(default)   7) loc_rc7/0.9 
+ 4) loc_rc4/3.0            8) loc_rcv2/1.2
 
 Key:
-(symbolic-version)  "
+(symbolic-version)"
 
 set width_80 "Currently Loaded Modulefiles:
- 1) loc_rc1/2.0   3) loc_rc4/1.0(default)   5) loc_rc5/1.0   7) loc_rc7/0.9   
- 2) loc_rc2/2.0   4) loc_rc4/3.0            6) loc_rc5/2.0   8) loc_rcv2/1.2  
+ 1) loc_rc1/2.0   3) loc_rc4/1.0(default)   5) loc_rc5/1.0   7) loc_rc7/0.9 
+ 2) loc_rc2/2.0   4) loc_rc4/3.0            6) loc_rc5/2.0   8) loc_rcv2/1.2
 
 Key:
-(symbolic-version)  "
+(symbolic-version)"
 
 
 # Test of default configuration
@@ -460,25 +467,25 @@ setenv_var HOME $ORIG_HOME/home
 
 setenv_var MODULES_TERM_WIDTH "80"
 testerr_cmd sh {savelist} "[msg_named_coll]
- 1) coll1   3) coll3          5) coll6.target   7) infocmd     
- 2) coll2   4) coll4.target   6) default        8) infocmdexp  "
+ 1) coll1   3) coll3          5) coll6.target   7) infocmd   
+ 2) coll2   4) coll4.target   6) default        8) infocmdexp"
 unsetenv_var MODULES_TERM_WIDTH
 
 
 setenv_var MODULES_TERM_WIDTH "80"
 testerr_cmd sh {savelist --width=0} "[msg_named_coll]
- 1) coll1   2) coll2   3) coll3   4) coll4.target   5) coll6.target   6) default   7) infocmd   8) infocmdexp  "
+ 1) coll1   2) coll2   3) coll3   4) coll4.target   5) coll6.target   6) default   7) infocmd   8) infocmdexp"
 unsetenv_var MODULES_TERM_WIDTH
 
 testerr_cmd sh {savelist -w 1} "[msg_named_coll]
- 1) coll1         
- 2) coll2         
- 3) coll3         
- 4) coll4.target  
- 5) coll6.target  
- 6) default       
- 7) infocmd       
- 8) infocmdexp    "
+ 1) coll1
+ 2) coll2
+ 3) coll3
+ 4) coll4.target
+ 5) coll6.target
+ 6) default
+ 7) infocmd
+ 8) infocmdexp"
 
 setenv_var HOME $ORIG_HOME
 

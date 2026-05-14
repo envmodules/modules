@@ -107,16 +107,16 @@ testouterr_cmd sh "unload --no-auto $mod" $ans {}
 
 setenv_var MODULES_TAG_ABBREV auto-loaded=aL:keep-loaded=kL
 
-set tserr "foo/1.0 <aL:kL>  
+set tserr "foo/1.0 <aL:kL>
 
 Key:
-<module-tag>  <aL>=auto-loaded  <kL>=keep-loaded  "
+<module-tag>  <aL>=auto-loaded  <kL>=keep-loaded"
 testouterr_cmd sh "avail -o tag:key foo/1.0" OK $tserr
 
-set tserr "foo/1.0 <aL:kL>  $mod  
+set tserr "foo/1.0 <aL:kL>  $mod
 
 Key:
-<module-tag>  <aL>=auto-loaded  <kL>=keep-loaded  "
+<module-tag>  <aL>=auto-loaded  <kL>=keep-loaded"
 testouterr_cmd sh "list -o tag:key" OK $tserr
 
 #

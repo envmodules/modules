@@ -80,7 +80,7 @@ testouterr_cmd_re "sh" "test $module" "OK" "$out_rc_test\n$modlin\nModule Specif
 
 # test avail
 # no output as defined in modulerc if mode is not set
-testouterr_cmd_re "sh" "avail $module" "OK" "$header\n$module/1.0\\s+$module/2.0\\(avail:bar:default\\)\\s+$module/foo\\(@\\)\\s+\n\nKey:\n\\(@\\)=module-alias  \\(symbolic-version\\)  "
+testouterr_cmd_re "sh" "avail $module" "OK" "$header\n$module/1.0\\s+$module/2.0\\(avail:bar:default\\)\\s+$module/foo\\(@\\)\n\nKey:\n\\(@\\)=module-alias  \\(symbolic-version\\)"
 
 # test aliases
 testouterr_cmd_re "sh" "aliases" "OK" ".*$module/aliases -> $module2\n.*"
@@ -99,7 +99,7 @@ setenv_loaded_module $module2 $modulefile2
 setenv_var __MODULES_LMALTNAME "$module2&inforc/bar&inforc/default&inforc"
 
 # test listing
-testouterr_cmd_re "sh" "list" "OK" "$header_list\n 1\\) $module2\\(bar:default\\)\\s+\n\nKey:\n\\(symbolic-version\\)  "
+testouterr_cmd_re "sh" "list" "OK" "$header_list\n 1\\) $module2\\(bar:default\\)\n\nKey:\n\\(symbolic-version\\)"
 
 # test switching
 # modulerc is interpreted on first resolved internally prior switched-on load phase

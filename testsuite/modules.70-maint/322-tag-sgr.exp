@@ -49,41 +49,41 @@ setenv_var MODULES_TAG_ABBREV auto-loaded=aL:foo=O
 setenv_var MODULES_COLORS {aL=100}
 
 testerr_cmd_re sh {list} "$cur_loaded
- 1\\) [sgr 100]tag/5.0[sgr 0] <BaR:O>  
+ 1\\) [sgr 100]tag/5.0[sgr 0] <BaR:O>
 
 Key:
-[sgr 100]auto-loaded[sgr 0]  <module-tag>  <O>=foo  "
+[sgr 100]auto-loaded[sgr 0]  <module-tag>  <O>=foo"
 
 skip_if_quick_mode
 
 setenv_var MODULES_COLORS {auto-loaded=100}
 testerr_cmd_re sh {list} "$cur_loaded
- 1\\) tag/5.0 <aL:BaR:O>  
+ 1\\) tag/5.0 <aL:BaR:O>
 
 Key:
-<module-tag>  <aL>=auto-loaded  <O>=foo  "
+<module-tag>  <aL>=auto-loaded  <O>=foo"
 
 setenv_var MODULES_TAG_ABBREV foo=O
 testerr_cmd_re sh {list} "$cur_loaded
- 1\\) [sgr 100]tag/5.0[sgr 0] <BaR:O>  
+ 1\\) [sgr 100]tag/5.0[sgr 0] <BaR:O>
 
 Key:
-[sgr 100]auto-loaded[sgr 0]  <module-tag>  <O>=foo  "
+[sgr 100]auto-loaded[sgr 0]  <module-tag>  <O>=foo"
 
 setenv_var MODULES_TAG_ABBREV auto-loaded=aL:foo=O
 setenv_var MODULES_COLORS {aL=100:O=102}
 testerr_cmd_re sh {list} "$cur_loaded
- 1\\) [sgr 100]tag[sgr {0;102}]/5.0[sgr 0] <BaR>  
+ 1\\) [sgr 100]tag[sgr {0;102}]/5.0[sgr 0] <BaR>
 
 Key:
-[sgr 100]auto-loaded[sgr 0]  [sgr 102]foo[sgr 0]  <module-tag>  "
+[sgr 100]auto-loaded[sgr 0]  [sgr 102]foo[sgr 0]  <module-tag>"
 
 setenv_var MODULES_COLORS {aL=100:O=102:BaR=103}
 testerr_cmd_re sh {list} "$cur_loaded
- 1\\) [sgr 100]ta[sgr {0;103}]g/[sgr {0;102}]5.0[sgr 0]  
+ 1\\) [sgr 100]ta[sgr {0;103}]g/[sgr {0;102}]5.0[sgr 0]
 
 Key:
-[sgr 103]BaR[sgr 0]  [sgr 100]auto-loaded[sgr 0]  [sgr 102]foo[sgr 0]  "
+[sgr 103]BaR[sgr 0]  [sgr 100]auto-loaded[sgr 0]  [sgr 102]foo[sgr 0]"
 
 
 #
@@ -286,10 +286,10 @@ setenv_var __MODULES_LMTAG tag/5.0&hidden-loaded
 setenv_var MODULES_TAG_ABBREV hidden-loaded=H
 setenv_var MODULES_COLORS {aL=100:al=96:de=4:H=2}
 testouterr_cmd_re sh {list -a} OK "$cur_loaded
- 1\\\) [sgr 2]tag/5.0[sgr 0]  
+ 1\\\) [sgr 2]tag/5.0[sgr 0]
 
 Key:
-[sgr 2]hidden-loaded[sgr 22]  "
+[sgr 2]hidden-loaded[sgr 22]"
 unsetenv_loaded_module
 unsetenv_var __MODULES_LMTAG
 
@@ -299,10 +299,10 @@ setenv_var __MODULES_LMTAG warn/1&warning
 setenv_var MODULES_TAG_ABBREV warning=W
 setenv_var MODULES_COLORS {aL=100:al=96:de=4:W=30;43}
 testouterr_cmd_re sh {list} OK "$cur_loaded
- 1\\\) [sgr {30;43}]warn/1[sgr 0]  
+ 1\\\) [sgr {30;43}]warn/1[sgr 0]
 
 Key:
-[sgr {30;43}]warning[sgr 0]  "
+[sgr {30;43}]warning[sgr 0]"
 unsetenv_loaded_module
 unsetenv_var __MODULES_LMTAG
 
@@ -313,18 +313,18 @@ setenv_var __MODULES_LMTAG {variant/w s&auto-loaded}
 setenv_var MODULES_TAG_ABBREV auto-loaded=aL
 setenv_var MODULES_COLORS {aL=100:al=96:de=4:H=2}
 testouterr_cmd_re sh {list} OK "$cur_loaded
- 1\\\) '[sgr 100]variant/w s[sgr 0]'  
+ 1\\\) '[sgr 100]variant/w s[sgr 0]'
 
 Key:
-[sgr 100]auto-loaded[sgr 0]  "
+[sgr 100]auto-loaded[sgr 0]"
 
 testouterr_cmd_re sh {avail -w 60 variant} OK "$modlin $mpre $modlin
-variant/1.0      variant/3.0  variant/5.1  variant/7.1    
-variant/2.0      variant/4.0  variant/6.0  variant/8.0    
-variant/2.1/2/1  variant/5.0  variant/7.0  '[sgr 100]variant/w s[sgr 0]'  
+variant/1.0      variant/3.0  variant/5.1  variant/7.1  
+variant/2.0      variant/4.0  variant/6.0  variant/8.0  
+variant/2.1/2/1  variant/5.0  variant/7.0  '[sgr 100]variant/w s[sgr 0]'
 
 Key:
-[sgr 100]auto-loaded[sgr 0]  "
+[sgr 100]auto-loaded[sgr 0]"
 unsetenv_loaded_module
 unsetenv_var __MODULES_LMTAG
 

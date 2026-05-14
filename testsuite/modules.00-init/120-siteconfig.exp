@@ -217,27 +217,38 @@ unset env(TESTSUITE_ENABLE_SITECONFIG_TERSENUM)
 # test displayElementList procedure with a tricky list that triggers unusual condition
 setenv_var TESTSUITE_ENABLE_SITECONFIG_TRICKYLISTDISP 1
 set ans "test:
- 1\\) abc/def                                 22\\) abcdefgh/ij-k-lmno.pq         
- 2\\) abcdefgh/ijklmnop                       23\\) abcdefgh/ijk-l-mnop.qr-stu    
- 3\\) abc/defg                                24\\) abcdefgh/ijklmnop-qr.st       
- 4\\) abcd/ef                                 25\\) abcdef/ghijklmno-pq.rs        
- 5\\) abc/defg-hijkl.mn.op                    26\\) abcdef/ghi-jklm_no_pqrstuv    
- 6\\) abcdefgh/ijklm.nopqrst                  27\\) abcdefgh/ijk-lm-n-opqr.st     
- 7\\) abcdefg/hijklmnop-qr.st.uvw             28\\) abcdefgh/ijklm-n-opqr.st-uvw  
- 8\\) abcdefgh/ijklmnopqrst-u-vwxy.zA-BCD-E   29\\) abcdef/ghijklm-nopq_r         
- 9\\) abcdef/ghijklm-nopq.r_st.uv             30\\) abcdefg/hijkl-mn.op.qzs       
-10\\) abcdefgh/ijklmnop-q-rstu.vw-xyz-A       31\\) abcdefg/hijklmn-op.qr.stz     
-11\\) abcdefg/hijklmn-op.qr.stu               32\\) abcdefgh/ijklmn               
-12\\) abcdefg/hijkl-mn.op.qrs                 
-13\\) abcd/efgh-ij.k                          
-14\\) abcdefg/hijk-lmnop_qr.st.uvw            
-15\\) abcdef/ghijklmno-p.q.r                  
-16\\) abcdefgh/ijklmn-o-pqrs.tu               
-17\\) abcdefgh/ijklmnop-q-rstu.vw-xyz         
-18\\) abcdefg/hij-klm.nopq                    
-19\\) abcdefg/hij-kl.mn.opq                   
-20\\) abcdefgh/ijklmnopq_rstuv-w-xyzA.BC-DEF  
-21\\) abcdefgh/ijklmnopqrstuv-w-xyzA.BC       
+ 1\\) abc/def
+ 2\\) abcdefgh/ijklmnop
+ 3\\) abc/defg
+ 4\\) abcd/ef
+ 5\\) abc/defg-hijkl.mn.op
+ 6\\) abcdefgh/ijklm.nopqrst
+ 7\\) abcdefg/hijklmnop-qr.st.uvw
+ 8\\) abcdefgh/ijklmnopqrst-u-vwxy.zA-BCD-E
+ 9\\) abcdef/ghijklm-nopq.r_st.uv
+10\\) abcdefgh/ijklmnop-q-rstu.vw-xyz-A
+11\\) abcdefg/hijklmn-op.qr.stu
+12\\) abcdefg/hijkl-mn.op.qrs
+13\\) abcd/efgh-ij.k
+14\\) abcdefg/hijk-lmnop_qr.st.uvw
+15\\) abcdef/ghijklmno-p.q.r
+16\\) abcdefgh/ijklmn-o-pqrs.tu
+17\\) abcdefgh/ijklmnop-q-rstu.vw-xyz
+18\\) abcdefg/hij-klm.nopq
+19\\) abcdefg/hij-kl.mn.opq
+20\\) abcdefgh/ijklmnopq_rstuv-w-xyzA.BC-DEF
+21\\) abcdefgh/ijklmnopqrstuv-w-xyzA.BC
+22\\) abcdefgh/ij-k-lmno.pq
+23\\) abcdefgh/ijk-l-mnop.qr-stu
+24\\) abcdefgh/ijklmnop-qr.st
+25\\) abcdef/ghijklmno-pq.rs
+26\\) abcdef/ghi-jklm_no_pqrstuv
+27\\) abcdefgh/ijk-lm-n-opqr.st
+28\\) abcdefgh/ijklm-n-opqr.st-uvw
+29\\) abcdef/ghijklm-nopq_r
+30\\) abcdefg/hijkl-mn.op.qzs
+31\\) abcdefg/hijklmn-op.qr.stz
+32\\) abcdefgh/ijklmn
 
 $vers_reportre"
 testouterr_cmd_re "sh" "-V" "OK" $ans
@@ -666,8 +677,8 @@ lappend ans {      invoked from within}
 lappend ans {  "displaySeparatorLine $header $sgrkey $extra"}
 lappend ans {      (procedure "displayElementList" line 19)}
 lappend ans {      invoked from within}
-lappend ans {  "displayElementList $header $hsgrkey $hstyle $one_per_line $show_idx 1 $display_list $len_list $max_len $via"}
-lappend ans {      (procedure "reportModules" line 155)}
+lappend ans {  "displayElementList $header $hsgrkey $hstyle $one_per_line $show_idx 1 $display_list $len_list $via"}
+lappend ans {      (procedure "reportModules" line 151)}
 lappend ans {      invoked from within}
 lappend ans {  "reportModules $args $dir mp $hstyle $show_mtime 0 $one_per_line $theader_cols hidden-loaded"}
 lappend ans {      (procedure "cmdModuleAvail" line 43)}
@@ -765,6 +776,13 @@ lappend ans {ok}
 lappend ans $vers_reportre
 testouterr_cmd_re sh -V OK [join $ans \n]
 unsetenv_var TESTSUITE_ENABLE_RUNENVCOMMAND_UNSET
+
+setenv_var TESTSUITE_ENABLE_SITECONFIG_COMPUTEOUTPUTGRID 1
+set ans [list]
+lappend ans {0 0 \{0\}}
+lappend ans $vers_reportre
+testouterr_cmd_re sh -V OK [join $ans \n]
+unsetenv_var TESTSUITE_ENABLE_SITECONFIG_COMPUTEOUTPUTGRID
 
 } elseif {$verbose} {
     send_user "\tSkip tests relying on an excepted siteconfig file installed\n"

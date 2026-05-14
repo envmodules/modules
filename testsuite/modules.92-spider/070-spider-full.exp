@@ -43,10 +43,10 @@ set test_cols_small 25
 set test_cols_othos 120
 
 set ts_key "Key:
-(@)=module-alias  (symbolic-version)  "
+(@)=module-alias  (symbolic-version)"
 set ts_key_small "Key:
-(@)=module-alias           
-(symbolic-version)  "
+(@)=module-alias
+(symbolic-version)"
 
 set len  [string length $modpath]
 set lrep [expr {($test_cols - $len - 2)/2}]
@@ -55,166 +55,166 @@ set len2  [string length "$modpath.2 (via use/2.0)"]
 set lrep2 [expr {($test_cols - $len2 - 2)/2}]
 set rrep2 [expr {$test_cols - $len2 - 2 - $lrep2}]
 set ts_sh "[string repeat {-} $lrep] $modpath [string repeat {-} $rrep]
-alias/1.0           info/shells                     loc_sym/alias3                                                       modbad/paths         spread/4.0                                       
-alias/2.0           info/shellsexp                  loc_sym/alias4                                                       modbad/prepend-path  spread/5.0                                       
-alias/3.0           info/specified(foo)             loc_sym/alias5                                                       modbad/remove-path   spread/6.0                                       
-append/0.1          info/type                       loc_sym/alias6                                                       modbad/sh-to-mod     spread/7.0                                       
-append/0.2          info/user                       loc_sym/alias7                                                       module/2.0           spread/8.0                                       
-append/0.3          info/userexp                    loc_sym/alias8                                                       module/bad           spreadrc/dir1/1.0                                
-append/0.4          inforc/1.0                      loc_sym/alias9                                                       module/empty         spreadrc/dir2/1.0                                
-append/0.5          inforc/2.0(bar:default:spider)  loc_sym/alias10                                                      module/err           spreadrc/dir3/1.0                                
-append/1.0          inforc/foo(@)                   loc_sym/alias11                                                      module/lbad          spreadrc/dir4/1.0                                
-append/1.1          load/00                         loc_sym/exec1                                                        module/lerr          spreadrc/dir5/1.0                                
-append/1.3          load/10                         loc_sym/exec2                                                        module/lunk          spreadrc/dir6/1.0                                
-append/1.4          load/11                         loc_sym/exec3                                                        module/meta          spreadrc/dir7/1.0                                
-append/1.5          load/12                         loc_sym/getvers1                                                     module/relpath       spreadrc/dir8/1.0                                
-append/1.6          load/13                         loc_sym/getvers2                                                     module/unk           symlink/0.9                                      
-append/1.7          load/14                         loc_sym/getvers3                                                     modvar/modfile       symlink/1(@)                                     
-append/1.8          load/15                         loc_sym/getvers4                                                     modvar/submodfile    symlink/1.2(default:new)                         
-append/2.0          load/16                         loc_sym/getvers5                                                     prepend/0.1          symlink/bar(@)                                   
-append/2.1          load/17                         loc_sym/getvers6                                                     prepend/0.2          symlink2/1.0                                     
-append/2.2          load/18                         loc_sym/getvers7                                                     prepend/0.3          symlink2/2.0                                     
-append/2.3          load/19                         loc_sym/getvers8                                                     prepend/0.4          system/1.0                                       
-append/2.4          load/20                         loc_sym/getvers9                                                     prepend/0.5          system/2.0                                       
-append/4.0          load/21                         loc_sym/getvers10                                                    prepend/1.0          test/1.0                                         
-append/4.1          load/22                         loc_sym/versinf1                                                     prepend/1.1          test/1.2                                         
-append/5.0          load/23                         loc_sym/versinf2                                                     prepend/1.3          test/2.0                                         
-append/6.0          load/24                         loc_sym/versinf3                                                     prepend/1.4          tr2_loc/(trreg)                                  
-append/7.0          load/25                         loc_sym/versinf4                                                     prepend/1.5          tr2_loc/al1(tr2unstable:@)                       
-append/8.0          load/26                         loc_sym/versinf5                                                     prepend/1.6          tr2_loc/al2(tr2bar:@)                            
-averssort/1(@)      load/27                         loc_sym/versinf6                                                     prepend/1.7          tr2_loc/al3(default:tr2exp:trreg:@)              
-averssort/1.2.4(@)  load/28                         loc_sym/versinf7                                                     prepend/1.8          tr2_loc/al4(@)                                   
-averssort/1.10(@)   load/29                         loc_sym/version1                                                     prepend/1.9          tr2_loc/al5(default:trreg:@)                     
-bad/after(good)     load/30                         loc_sym/version2                                                     prepend/1.10         tr_loc/al1(tr2unstable:trunstable:@)             
-bad/before          load/all(default)               loc_sym/version3                                                     prepend/2.0          tr_loc/al2(default:tr2bar:tr2exp:trbar:trreg:@)  
-bad2/body           loc_def/default                 loc_sym/version4                                                     prepend/2.1          tr_loc/al3(trexp:@)                              
-bad2/proc           loc_def/truedef                 loc_sym/version5                                                     prepend/2.2          tr_loc/al4(@)                                    
-break/1.0           loc_dv1/1.0                     loc_sym/version6                                                     prepend/2.3          tr_loc/al5(@)                                    
-break/2.0           loc_dv1/2.0                     loc_sym/version7                                                     prepend/2.4          trace/all_off                                    
-break/3.0           loc_dv2/1.0(default)            loc_sym/version8                                                     prepend/3.0          trace/all_on                                     
-break/4.0           loc_dv2/2.0                     loc_sym/version9                                                     prepend/3.1          uname/cache                                      
-break/5.0           loc_dv3/1.0                     loc_sym/version10                                                    prepend/4.0          uname/domain                                     
-break/6.0           loc_dv3/2.0                     loc_sym/version11                                                    prepend/8.0          uname/machine                                    
-chdir/1.0           loc_dv4/1.0                     loc_sym/version12                                                    prereq/full          uname/nodename                                   
-chdir/2.0           loc_dv6/1.0                     loc_sym/version13                                                    prereq/fullpath      uname/release                                    
-chdir/3.0           loc_dv6/2.0/1.0                 loc_sym/version14                                                    prereq/module        uname/sysname                                    
-chdir/4.0           loc_dv7/1.0                     loc_sym/version15                                                    prereq/orlist        uname/unk                                        
-coll/a              loc_dv7/2.0/(default)           loc_sym/version16                                                    prereq/relpath       uname/version                                    
-coll/b              loc_dv7/2.0/1.0                 loc_sym/version17                                                    puts/1               unsetenv/0.6                                     
-coll/c              loc_dv7/3.0                     loc_sym/version18                                                    puts/2               unsetenv/0.8                                     
-coll/d              loc_dv8/1.0                     loc_sym/version19                                                    puts/3               unsetenv/0.9                                     
-conflict/full       loc_dv8/2.0                     loc_sym/version20                                                    puts/4               unsetenv/1.0                                     
-conflict/fullpath   loc_dv9/1.0(default)            loc_sym/version21                                                    puts/5               use/1.0(default)                                 
-conflict/module     loc_dv9/2.0                     loc_sym/version22                                                    puts/6               use/2.0                                          
-conflict/relpath    loc_dvv1/1.0(default)           loc_sym/version23                                                    puts/7               use/2.1                                          
-continue/1.0        loc_dvv1/2.0                    loc_sym/version24                                                    puts/8               use/2.2                                          
-continue/2.0        loc_fq/1.0                      loc_sym/version25                                                    puts/9               use/3.0                                          
-continue/3.0        loc_rc1/1.0(foo)                loc_sym/version26                                                    recurs/modA          use/3.1                                          
-continue/4.0        loc_rc1/2.0                     loc_tr/(reg)                                                         recurs/modB          use/3.2                                          
-continue/5.0        loc_rc2/1.0(bar:blah:foo)       loc_tr/1.0(cur:stable)                                               remove/0.3           use/4.0                                          
-continue/6.0        loc_rc2/2.0                     loc_tr/2.0(next:tr2unstable:trunstable:unstable)                     remove/0.4           use/4.1                                          
-dirmodalias(@)      loc_rc3/1.0(default)            loc_tr/3.0(bar:default:exp:foo:reg:tr2bar:tr2exp:trbar:trexp:trreg)  remove/0.5           user/adv                                         
-dirmodalias/1.0     loc_rc3/2.0(cur:stable)         loc_tr/al1(unstable:@)                                               remove/1.0           user/advanced                                    
-dirmodvirt          loc_rc3/3.0(chk:exp:new:test)   loc_tr/al2(bar:default:exp:reg:trexp:@)                              remove/1.3           user/exp                                         
-dirmodvirt/1.0      loc_rc4/1.0                     loc_tr/al3(default:exp:reg:@)                                        remove/1.4           user/expert                                      
-empty/1.0           loc_rc4/2.0(default)            loc_tr/al4(default:reg:@)                                            remove/1.5           user/nov                                         
-eschars/1.0         loc_rc4/3.0                     loc_virt1/1.0                                                        remove/1.6           user/novice                                      
-exit/1.0            loc_rc5/1.0                     loc_virt1/2.0                                                        remove/1.7           user/undef                                       
-exit/2.0            loc_rc5/2.0                     loc_virt1/3.0                                                        remove/1.8           verbose/msg                                      
-exit/3.0            loc_rc6/0.9                     loc_virt1/4.0                                                        remove/2.0           verbose/off                                      
-exit/4.0            loc_rc6/1(@)                    loc_virt2/1.0                                                        remove/2.3           verbose/on                                       
-function/1.0        loc_rc6/1.2(default:new)        loc_virt2/2.0                                                        remove/2.4           verbose/undef                                    
-function/2.0        loc_rc6/bar(@)                  log/badfac                                                           remove/3.0           versions/1.1                                     
-getenv/0.6          loc_rc7/0.9                     log/err_both_1                                                       remove/3.1           versions/1.2                                     
-getenv/1.0          loc_rc7/1(@)                    log/err_both_2                                                       remove/4.0           versions/1.3                                     
-help/2.0            loc_rc7/1.2                     log/err_file                                                         remove/4.1           verssort/1                                       
-info/command        loc_rc7/bar(@)                  log/err_syslog                                                       remove/4.2           verssort/1.2.1                                   
-info/commandexp     loc_rc8/0.9(@)                  modbad/append-path                                                   remove/5.0           verssort/1.2.4                                   
-info/isavail        loc_rc8/1.0                     modbad/autoinit                                                      remove/8.0           verssort/1.8-2015-12-01                          
-info/isloaded       loc_rc010/2.0                   modbad/clear                                                         setenv/0.6           verssort/1.8-2016-02-01                          
-info/issaved        loc_rcv1/1(@)                   modbad/config                                                        setenv/0.7.1         verssort/1.10                                    
-info/isused         loc_rcv1/1.1                    modbad/edit                                                          setenv/0.7.2         whatis/lines                                     
-info/loaded         loc_rcv1/1.2(default:new)       modbad/empty                                                         setenv/0.8           whatis/multiple                                  
-info/mode1          loc_rcv1/2.0                    modbad/foo                                                           setenv/1.0           whatis/none                                      
-info/mode2          loc_rcv1/bar(@)                 modbad/help                                                          source/0.9           whatis/single                                    
-info/mode3          loc_rcv2/1.2                    modbad/info-loaded                                                   source/1.0           whatis/string                                    
-info/mode4          loc_rcv2/1.5                    modbad/is-avail                                                      source/1.1           x-resource/1                                     
+alias/1.0           info/shells                     loc_sym/alias3                                                       modbad/paths         spread/4.0                                     
+alias/2.0           info/shellsexp                  loc_sym/alias4                                                       modbad/prepend-path  spread/5.0                                     
+alias/3.0           info/specified(foo)             loc_sym/alias5                                                       modbad/remove-path   spread/6.0                                     
+append/0.1          info/type                       loc_sym/alias6                                                       modbad/sh-to-mod     spread/7.0                                     
+append/0.2          info/user                       loc_sym/alias7                                                       module/2.0           spread/8.0                                     
+append/0.3          info/userexp                    loc_sym/alias8                                                       module/bad           spreadrc/dir1/1.0                              
+append/0.4          inforc/1.0                      loc_sym/alias9                                                       module/empty         spreadrc/dir2/1.0                              
+append/0.5          inforc/2.0(bar:default:spider)  loc_sym/alias10                                                      module/err           spreadrc/dir3/1.0                              
+append/1.0          inforc/foo(@)                   loc_sym/alias11                                                      module/lbad          spreadrc/dir4/1.0                              
+append/1.1          load/00                         loc_sym/exec1                                                        module/lerr          spreadrc/dir5/1.0                              
+append/1.3          load/10                         loc_sym/exec2                                                        module/lunk          spreadrc/dir6/1.0                              
+append/1.4          load/11                         loc_sym/exec3                                                        module/meta          spreadrc/dir7/1.0                              
+append/1.5          load/12                         loc_sym/getvers1                                                     module/relpath       spreadrc/dir8/1.0                              
+append/1.6          load/13                         loc_sym/getvers2                                                     module/unk           symlink/0.9                                    
+append/1.7          load/14                         loc_sym/getvers3                                                     modvar/modfile       symlink/1(@)                                   
+append/1.8          load/15                         loc_sym/getvers4                                                     modvar/submodfile    symlink/1.2(default:new)                       
+append/2.0          load/16                         loc_sym/getvers5                                                     prepend/0.1          symlink/bar(@)                                 
+append/2.1          load/17                         loc_sym/getvers6                                                     prepend/0.2          symlink2/1.0                                   
+append/2.2          load/18                         loc_sym/getvers7                                                     prepend/0.3          symlink2/2.0                                   
+append/2.3          load/19                         loc_sym/getvers8                                                     prepend/0.4          system/1.0                                     
+append/2.4          load/20                         loc_sym/getvers9                                                     prepend/0.5          system/2.0                                     
+append/4.0          load/21                         loc_sym/getvers10                                                    prepend/1.0          test/1.0                                       
+append/4.1          load/22                         loc_sym/versinf1                                                     prepend/1.1          test/1.2                                       
+append/5.0          load/23                         loc_sym/versinf2                                                     prepend/1.3          test/2.0                                       
+append/6.0          load/24                         loc_sym/versinf3                                                     prepend/1.4          tr2_loc/(trreg)                                
+append/7.0          load/25                         loc_sym/versinf4                                                     prepend/1.5          tr2_loc/al1(tr2unstable:@)                     
+append/8.0          load/26                         loc_sym/versinf5                                                     prepend/1.6          tr2_loc/al2(tr2bar:@)                          
+averssort/1(@)      load/27                         loc_sym/versinf6                                                     prepend/1.7          tr2_loc/al3(default:tr2exp:trreg:@)            
+averssort/1.2.4(@)  load/28                         loc_sym/versinf7                                                     prepend/1.8          tr2_loc/al4(@)                                 
+averssort/1.10(@)   load/29                         loc_sym/version1                                                     prepend/1.9          tr2_loc/al5(default:trreg:@)                   
+bad/after(good)     load/30                         loc_sym/version2                                                     prepend/1.10         tr_loc/al1(tr2unstable:trunstable:@)           
+bad/before          load/all(default)               loc_sym/version3                                                     prepend/2.0          tr_loc/al2(default:tr2bar:tr2exp:trbar:trreg:@)
+bad2/body           loc_def/default                 loc_sym/version4                                                     prepend/2.1          tr_loc/al3(trexp:@)                            
+bad2/proc           loc_def/truedef                 loc_sym/version5                                                     prepend/2.2          tr_loc/al4(@)                                  
+break/1.0           loc_dv1/1.0                     loc_sym/version6                                                     prepend/2.3          tr_loc/al5(@)                                  
+break/2.0           loc_dv1/2.0                     loc_sym/version7                                                     prepend/2.4          trace/all_off                                  
+break/3.0           loc_dv2/1.0(default)            loc_sym/version8                                                     prepend/3.0          trace/all_on                                   
+break/4.0           loc_dv2/2.0                     loc_sym/version9                                                     prepend/3.1          uname/cache                                    
+break/5.0           loc_dv3/1.0                     loc_sym/version10                                                    prepend/4.0          uname/domain                                   
+break/6.0           loc_dv3/2.0                     loc_sym/version11                                                    prepend/8.0          uname/machine                                  
+chdir/1.0           loc_dv4/1.0                     loc_sym/version12                                                    prereq/full          uname/nodename                                 
+chdir/2.0           loc_dv6/1.0                     loc_sym/version13                                                    prereq/fullpath      uname/release                                  
+chdir/3.0           loc_dv6/2.0/1.0                 loc_sym/version14                                                    prereq/module        uname/sysname                                  
+chdir/4.0           loc_dv7/1.0                     loc_sym/version15                                                    prereq/orlist        uname/unk                                      
+coll/a              loc_dv7/2.0/(default)           loc_sym/version16                                                    prereq/relpath       uname/version                                  
+coll/b              loc_dv7/2.0/1.0                 loc_sym/version17                                                    puts/1               unsetenv/0.6                                   
+coll/c              loc_dv7/3.0                     loc_sym/version18                                                    puts/2               unsetenv/0.8                                   
+coll/d              loc_dv8/1.0                     loc_sym/version19                                                    puts/3               unsetenv/0.9                                   
+conflict/full       loc_dv8/2.0                     loc_sym/version20                                                    puts/4               unsetenv/1.0                                   
+conflict/fullpath   loc_dv9/1.0(default)            loc_sym/version21                                                    puts/5               use/1.0(default)                               
+conflict/module     loc_dv9/2.0                     loc_sym/version22                                                    puts/6               use/2.0                                        
+conflict/relpath    loc_dvv1/1.0(default)           loc_sym/version23                                                    puts/7               use/2.1                                        
+continue/1.0        loc_dvv1/2.0                    loc_sym/version24                                                    puts/8               use/2.2                                        
+continue/2.0        loc_fq/1.0                      loc_sym/version25                                                    puts/9               use/3.0                                        
+continue/3.0        loc_rc1/1.0(foo)                loc_sym/version26                                                    recurs/modA          use/3.1                                        
+continue/4.0        loc_rc1/2.0                     loc_tr/(reg)                                                         recurs/modB          use/3.2                                        
+continue/5.0        loc_rc2/1.0(bar:blah:foo)       loc_tr/1.0(cur:stable)                                               remove/0.3           use/4.0                                        
+continue/6.0        loc_rc2/2.0                     loc_tr/2.0(next:tr2unstable:trunstable:unstable)                     remove/0.4           use/4.1                                        
+dirmodalias(@)      loc_rc3/1.0(default)            loc_tr/3.0(bar:default:exp:foo:reg:tr2bar:tr2exp:trbar:trexp:trreg)  remove/0.5           user/adv                                       
+dirmodalias/1.0     loc_rc3/2.0(cur:stable)         loc_tr/al1(unstable:@)                                               remove/1.0           user/advanced                                  
+dirmodvirt          loc_rc3/3.0(chk:exp:new:test)   loc_tr/al2(bar:default:exp:reg:trexp:@)                              remove/1.3           user/exp                                       
+dirmodvirt/1.0      loc_rc4/1.0                     loc_tr/al3(default:exp:reg:@)                                        remove/1.4           user/expert                                    
+empty/1.0           loc_rc4/2.0(default)            loc_tr/al4(default:reg:@)                                            remove/1.5           user/nov                                       
+eschars/1.0         loc_rc4/3.0                     loc_virt1/1.0                                                        remove/1.6           user/novice                                    
+exit/1.0            loc_rc5/1.0                     loc_virt1/2.0                                                        remove/1.7           user/undef                                     
+exit/2.0            loc_rc5/2.0                     loc_virt1/3.0                                                        remove/1.8           verbose/msg                                    
+exit/3.0            loc_rc6/0.9                     loc_virt1/4.0                                                        remove/2.0           verbose/off                                    
+exit/4.0            loc_rc6/1(@)                    loc_virt2/1.0                                                        remove/2.3           verbose/on                                     
+function/1.0        loc_rc6/1.2(default:new)        loc_virt2/2.0                                                        remove/2.4           verbose/undef                                  
+function/2.0        loc_rc6/bar(@)                  log/badfac                                                           remove/3.0           versions/1.1                                   
+getenv/0.6          loc_rc7/0.9                     log/err_both_1                                                       remove/3.1           versions/1.2                                   
+getenv/1.0          loc_rc7/1(@)                    log/err_both_2                                                       remove/4.0           versions/1.3                                   
+help/2.0            loc_rc7/1.2                     log/err_file                                                         remove/4.1           verssort/1                                     
+info/command        loc_rc7/bar(@)                  log/err_syslog                                                       remove/4.2           verssort/1.2.1                                 
+info/commandexp     loc_rc8/0.9(@)                  modbad/append-path                                                   remove/5.0           verssort/1.2.4                                 
+info/isavail        loc_rc8/1.0                     modbad/autoinit                                                      remove/8.0           verssort/1.8-2015-12-01                        
+info/isloaded       loc_rc010/2.0                   modbad/clear                                                         setenv/0.6           verssort/1.8-2016-02-01                        
+info/issaved        loc_rcv1/1(@)                   modbad/config                                                        setenv/0.7.1         verssort/1.10                                  
+info/isused         loc_rcv1/1.1                    modbad/edit                                                          setenv/0.7.2         whatis/lines                                   
+info/loaded         loc_rcv1/1.2(default:new)       modbad/empty                                                         setenv/0.8           whatis/multiple                                
+info/mode1          loc_rcv1/2.0                    modbad/foo                                                           setenv/1.0           whatis/none                                    
+info/mode2          loc_rcv1/bar(@)                 modbad/help                                                          source/0.9           whatis/single                                  
+info/mode3          loc_rcv2/1.2                    modbad/info-loaded                                                   source/1.0           whatis/string                                  
+info/mode4          loc_rcv2/1.5                    modbad/is-avail                                                      source/1.1           x-resource/1                                   
 info/mode5          loc_rcv2/2.0                    modbad/is-loaded                                                     source/1.2           
 info/mode6          loc_sym/1.0                     modbad/is-saved                                                      spread/1.0           
 info/name           loc_sym/alias1                  modbad/is-used                                                       spread/2.0           
 info/others         loc_sym/alias2                  modbad/path                                                          spread/3.0           
 
 [string repeat {-} $lrep2] $modpath.2 (via use/2.0) [string repeat {-} $rrep2]
-1.1/version         advvers5/3.3     advvers7/8.1.2          deepvirt1/dir3/1.0(@)          extdfl7/7.0                  icase/isloaded        restore                                         
-1.2/version         advvers5/4.0     advvers7/8.2.1          deepvirt1/dir3/2.0             extdfl7/7.1                  icase/load            setenv/0.1                                      
-1.3/version         advvers5/4.1     advvers7/8.2.2          deepvirt1/dir4/1.0             extdfl7/8.1(@)               icase/loadi           source-sh/1                                     
-advvers/1.2         advvers5/4.2     advvers7/8.3.1          deepvirt1/dir4/2.0(@)          extdfl7/9.1                  icase/prereq          source-sh/2                                     
-advvers/1.3         advvers5/5.0     advvers7/8.3.2          deepvirt1/dir5/1.0(default:@)  extdfl7/10a                  icase/prereqc         source-sh/3                                     
-advvers/1.4         advvers5/5.1     advvers7/8.4.1          deepvirt1/dir5/2.0(sym)        extdfl7/10foo                icase/unload          source-sh/4.0                                   
-advvers/1.5         advvers5/5.2     advvers7/8.4.2          deepvirt1/dir6/1.0(sym:@)      extdfl7/10g                  icase/z               source-sh/4.1                                   
-advvers/1.6         advvers5/5.3     advvers7/8.5.1          deepvirt1/dir6/2.0(default)    extdfl7/cross(@)             ICASE2/1              source-sh/4.2                                   
-advvers/1.7         advvers5/6.0     advvers7/8.5.2          deepvirt1/dir7/(sym)           extdfl8/1.3.1                iCaSe2/1              source-sh/4.3                                   
-advvers/1.8         advvers5/6.1     advvers7/9.0            deepvirt1/dir7/1.0(@)          extdfl8/1.3.7                ICASE3/1.1            source-sh/5.0                                   
-advvers/deep/1/1.2  advvers5/6.2     advvers7/9.2(@)         deepvirt1/dir7/2.0             extdfl8/1.4.5                icase3/1.2            source-sh/5.1                                   
-advvers2/1.0        advvers5/6.3     advvers8/1              deepvirt2/dir6/1.0(sym:@)      extdfl8/1.33                 iCaSe3/1.3            source-sh/6.0                                   
-advvers2/1.1        advvers5/6.4     advvers8/2              deepvirt2/dir6/2.0(default)    extdflb.4.0                  iCaSe3/1.4            source-sh/7.0                                   
-advvers2/1.2        advvers5/6.5     advvers8/3              e.t.fl/1.3.1                   extdflb.4.1/1                ICASE3/VERS.1         source-sh/7.1                                   
-advvers2/1.3        advvers5/6.6     advvers9/1(default)     e.t.fl/1.3.7                   extdflc-4/1                  ICASE3/vers.1         source-sh/7.2                                   
-advvers2/2.0        advvers5/6.7     advvers9/2              e.t.fl/1.4.5                   extdflc-5/1                  info/usergroups       source-sh/8.0                                   
-advvers2/2.1        advvers5/7.0     advvers9/3              extdfl/1.0.0-alpha.1           f                            info/username         'sp.ce y+/0 2'                                  
-advvers2/2.2        advvers5/8.1.1   advvers10/1             extdfl/1.0.0-alpha.beta        foo/0.1                      load                  'sp.ce y+/1.2'                                  
-advvers2/3.0        advvers5/8.1.2   advvers10/2             extdfl/1.0.0-beta              foo/0.2                      loc                   'sp.ce y+/2.4'                                  
-advvers2/3.1        advvers5/8.2.1   advvers10/3             extdfl/1.0.2                   foo/1                        longerrword           'sp.ce y+/2.6'                                  
-advvers2/3.2        advvers5/8.2.2   advvers10/4             extdfl/1.1.0                   foo/2                        mlinmod               'sp.ce y+/2.7'                                  
-advvers2/3.3        advvers5/8.3.1   advvers10/5             extdfl/1.1.0-beta              hide1/1.0                    modemptyarg/aliases   'sp.ce y+/2.10'                                 
-advvers2/4.0        advvers5/8.3.2   advvers10/6             extdfl/1.2.3                   hide1/2.0                    modemptyarg/apropos   'space ya/1'(ns)                                
-advvers2/4.1        advvers5/8.4.1   advvers10/7             extdfl/1.2.10                  hide1/2.1                    modemptyarg/avail     'space ya/2'(default)                           
-advvers2/4.2        advvers5/8.4.2   advvers10/8             extdfl/1.3.1(default)          hide1/2.2                    modemptyarg/display   'space ya/al'(@)                                
-advvers2/5.0        advvers5/8.5.1   advvers@2.1             extdfl/1.3.7                   hide1/3.0                    modemptyarg/list      'space yb'/(dns)                                
-advvers2/5.1        advvers5/8.5.2   advvers@2.2             extdfl/1.4.5                   hide1/3.1(default)           modemptyarg/load      'space yb/1'                                    
-advvers2/5.2        advvers5/9.0     autosym1/1(default)     extdfl/2.0                     hide1/3.2                    modemptyarg/load-any  'space yc/2'                                    
-advvers2/5.3        advvers5/9.2(@)  autosym1/2              extdfl/2.0.1                   hide1/4.0                    modemptyarg/purge     'space yc/3'                                    
-advvers2/6.0        advvers6/1.2     autosym2/1              extdfl2/2.rc.1                 hide1/5.0                    modemptyarg/reload    'space yc/4'                                    
-advvers2/6.1        advvers6/1.3     autosym2/2(bar:latest)  extdfl2/2.rc.2                 hide2/1.0(1.2)               modemptyarg/restore   'space yc/5'                                    
-advvers2/6.2        advvers6/1.4     autosym3/1(default)     extdfl2/3.0.0                  hide2/1.1(@)                 modemptyarg/save      'space yd/2.1'                                  
-advvers2/6.3        advvers6/1.5.1   autosym3/2(latest)      extdfl2/3.0.2                  hide2/1.5                    modemptyarg/savelist  'space yd/2.2'                                  
-advvers2/6.4        advvers6/1.5.2   autosym4/1              extdfl2/3.0.15                 hide3/1.0                    modemptyarg/saverm    'space yd/2.10'                                 
-advvers2/6.5        advvers6/1.6     autosym4/2              extdfl2/3.1.3                  hide3/al1(@)                 modemptyarg/saveshow  'space yd/3.0'                                  
-advvers2/6.6        advvers6/1.7     autosym4/latest(@)      extdfl2/3.1.7                  hide3/al2(@)                 modemptyarg/swap      'space yd/4.1'                                  
-advvers2/6.7        advvers6/1.8     autosym5/1              extdfl2/3.9.2                  hide3/sub1/(default)         modemptyarg/swap2     'space yd/5.0'                                  
-advvers2/7.0        advvers6/2.0     autosym5/2              extdfl2/3.09.3                 hide3/sub1/2.0               modemptyarg/swap3     'space ye/1.0'                                  
-advvers2/8.1.1      advvers6/2.1     autosym5/default        extdfl2/3.010.1                hide3/sub1/3.0               modemptyarg/test      'space ye/1.1'                                  
-advvers2/8.1.2      advvers6/3.0     autosym6/1(zzz)         extdfl2/3.10.2                 hide3/sub2/(sym)             modemptyarg/try-load  'space ye/1.2'                                  
-advvers2/8.2.1      advvers6/3.1     autosym6/2(yyy)         extdfl3/1.0                    hide3/sub2/4.0(default:sym)  modemptyarg/unload    'space ye/1.3'                                  
-advvers2/8.2.2      advvers6/3.2     autosym6/default(@)     extdfl3/1.00(@)                hide3/sub2/5.0(new)          modemptyarg/unuse     'space ye/1.4'                                  
-advvers2/8.3.1      advvers7/0.9     autosym6/latest         extdfl3/1.1/(1.2)              hidereq/1.0                  modemptyarg/use       'space ye/1.5'                                  
-advvers2/8.3.2      advvers7/1.0     autosym7/dir1/1         extdfl3/1.1/3                  hidereq/1.1                  modemptyarg/whatis    'space ye/1.6'                                  
-advvers2/8.4.1      advvers7/1.1     autosym7/dir1/2         extdfl3/1.3/3(@)               hidereq/1.2                  NaN                   'space ye/1.7'                                  
-advvers2/8.4.2      advvers7/1.2     autosym7/dir2/1         extdfl3/1.3/4                  hidereq/1.3                  nanbar/1              'space ye/1.8'                                  
-advvers2/8.5.1      advvers7/1.3.1   autosym7/dir2/2         extdfl6/conflict               hidereq/1.4                  nanbar/2              'space ye/1.9'                                  
-advvers2/8.5.2      advvers7/1.3.2   autosym8/1              extdfl6/conflict2              hidereq/1.5                  nanbar/nan            'space ye/2.0'                                  
-advvers3(@)         advvers7/2.0     autosym8/2              extdfl6/conflicta              hidereq/2.0                  nanfoo/1(nan)         'space ye/2.1'                                  
-advvers4/1.1        advvers7/2.1     autosym8/3(@)           extdfl6/conflicts              hidereq/2.1                  nocase/1(vers)        'space ye/2.2'                                  
-advvers4/1.2        advvers7/2.2     autosym9/1              extdfl6/info                   hidereq/2.2                  nocase/alias(@)       'space ye/2.3'                                  
-advvers4/1.3        advvers7/3.0     bad3/bodyfor            extdfl6/info2                  hidereq/2.3                  nocase/deep/(dirsym)  'space ye/2.4'                                  
-advvers4/1.4        advvers7/3.1     bad3/bodyif             extdfl6/isloaded               hidereq/2.4                  nocase/deep/2         'space ye/2.5'                                  
-advvers4/1.5.1      advvers7/3.2     bad3/bodyproc           extdfl6/isloaded2              hidereq/2.5                  nocase/deep/3         'space ye/2.6'                                  
-advvers4/1.5.2      advvers7/3.3     bad3/bodysource         extdfl6/load                   hidereq/2.6                  nocase/ialias(@)      'space ye/2.7'                                  
-advvers4/1.6        advvers7/4.0     bad3/bodywhile          extdfl6/load2                  hidereq/3.0                  nocase/regular        'space ye/2.8'                                  
-advvers4/1.7        advvers7/4.1     bad3/proc2              extdfl6/load3                  hidereq/4.0                  nocase/virt           'space ye/2.9'                                  
-advvers4/1.8        advvers7/4.2     bad3/proc3              extdfl6/prereq                 hidereq/4.1                  nocase2               spacen/1(w s)                                   
-advvers4/2.0        advvers7/5.0     bad3/procproc           extdfl6/prereq2                hidereq/4.2                  nocase3(@)            'spacen/2 s'                                    
-advvers4/2.1        advvers7/5.1     bad3/procsource         extdfl6/prereqc                hidereq/4.3                  nocase5(@)            spacen/al(@)                                    
-advvers5/0.9        advvers7/5.2     badrc3/1                extdfl6/prereqi                hidereq/4.4                  nocase6(@)            spacen/vns                                      
-advvers5/1.0        advvers7/5.3     bar/0.1                 extdfl6/prereqi2               ICASE/1                      nocase7/conflictim1   'spacen/vw s'                                   
-advvers5/1.1        advvers7/6.0     bar/0.2                 extdfl6/unload                 IcAsE/1                      nocase7/conflictim2   spacenb/(dw s)                                  
-advvers5/1.2        advvers7/6.1     bar/1                   extdfl6/unload2                iCaSe/1                      nocase7/prereqim1     spacenb/1                                       
-advvers5/1.3.1      advvers7/6.2     bar/2                   extdfl7/1.1                    icASE/1                      nocase7/prereqim2     spacenc/2                                       
-advvers5/1.3.2      advvers7/6.3     baz/1                   extdfl7/1.3(@)                 icase/1                      nocase8(@)            spacenc/3                                       
-advvers5/2.0        advvers7/6.4     baz/2                   extdfl7/2.1                    icase/conflict               nocase9(@)            spacenc/4                                       
-advvers5/2.1        advvers7/6.5     clear/1                 extdfl7/2.10(3.0)              icase/conflicta              putsvar               t                                               
-advvers5/2.2        advvers7/6.6     clear/2                 extdfl7/3.1                    icase/conflictp              quar                  unloc                                           
-advvers5/3.0        advvers7/6.7     clear/3                 extdfl7/4.1                    icase/conflicts              quux/1(default:sym)   veryveryveryveryveryveryveryverylong/name(sym)  
+1.1/version         advvers5/3.3     advvers7/8.1.2          deepvirt1/dir3/1.0(@)          extdfl7/7.0                  icase/isloaded        restore                                       
+1.2/version         advvers5/4.0     advvers7/8.2.1          deepvirt1/dir3/2.0             extdfl7/7.1                  icase/load            setenv/0.1                                    
+1.3/version         advvers5/4.1     advvers7/8.2.2          deepvirt1/dir4/1.0             extdfl7/8.1(@)               icase/loadi           source-sh/1                                   
+advvers/1.2         advvers5/4.2     advvers7/8.3.1          deepvirt1/dir4/2.0(@)          extdfl7/9.1                  icase/prereq          source-sh/2                                   
+advvers/1.3         advvers5/5.0     advvers7/8.3.2          deepvirt1/dir5/1.0(default:@)  extdfl7/10a                  icase/prereqc         source-sh/3                                   
+advvers/1.4         advvers5/5.1     advvers7/8.4.1          deepvirt1/dir5/2.0(sym)        extdfl7/10foo                icase/unload          source-sh/4.0                                 
+advvers/1.5         advvers5/5.2     advvers7/8.4.2          deepvirt1/dir6/1.0(sym:@)      extdfl7/10g                  icase/z               source-sh/4.1                                 
+advvers/1.6         advvers5/5.3     advvers7/8.5.1          deepvirt1/dir6/2.0(default)    extdfl7/cross(@)             ICASE2/1              source-sh/4.2                                 
+advvers/1.7         advvers5/6.0     advvers7/8.5.2          deepvirt1/dir7/(sym)           extdfl8/1.3.1                iCaSe2/1              source-sh/4.3                                 
+advvers/1.8         advvers5/6.1     advvers7/9.0            deepvirt1/dir7/1.0(@)          extdfl8/1.3.7                ICASE3/1.1            source-sh/5.0                                 
+advvers/deep/1/1.2  advvers5/6.2     advvers7/9.2(@)         deepvirt1/dir7/2.0             extdfl8/1.4.5                icase3/1.2            source-sh/5.1                                 
+advvers2/1.0        advvers5/6.3     advvers8/1              deepvirt2/dir6/1.0(sym:@)      extdfl8/1.33                 iCaSe3/1.3            source-sh/6.0                                 
+advvers2/1.1        advvers5/6.4     advvers8/2              deepvirt2/dir6/2.0(default)    extdflb.4.0                  iCaSe3/1.4            source-sh/7.0                                 
+advvers2/1.2        advvers5/6.5     advvers8/3              e.t.fl/1.3.1                   extdflb.4.1/1                ICASE3/VERS.1         source-sh/7.1                                 
+advvers2/1.3        advvers5/6.6     advvers9/1(default)     e.t.fl/1.3.7                   extdflc-4/1                  ICASE3/vers.1         source-sh/7.2                                 
+advvers2/2.0        advvers5/6.7     advvers9/2              e.t.fl/1.4.5                   extdflc-5/1                  info/usergroups       source-sh/8.0                                 
+advvers2/2.1        advvers5/7.0     advvers9/3              extdfl/1.0.0-alpha.1           f                            info/username         'sp.ce y+/0 2'                                
+advvers2/2.2        advvers5/8.1.1   advvers10/1             extdfl/1.0.0-alpha.beta        foo/0.1                      load                  'sp.ce y+/1.2'                                
+advvers2/3.0        advvers5/8.1.2   advvers10/2             extdfl/1.0.0-beta              foo/0.2                      loc                   'sp.ce y+/2.4'                                
+advvers2/3.1        advvers5/8.2.1   advvers10/3             extdfl/1.0.2                   foo/1                        longerrword           'sp.ce y+/2.6'                                
+advvers2/3.2        advvers5/8.2.2   advvers10/4             extdfl/1.1.0                   foo/2                        mlinmod               'sp.ce y+/2.7'                                
+advvers2/3.3        advvers5/8.3.1   advvers10/5             extdfl/1.1.0-beta              hide1/1.0                    modemptyarg/aliases   'sp.ce y+/2.10'                               
+advvers2/4.0        advvers5/8.3.2   advvers10/6             extdfl/1.2.3                   hide1/2.0                    modemptyarg/apropos   'space ya/1'(ns)                              
+advvers2/4.1        advvers5/8.4.1   advvers10/7             extdfl/1.2.10                  hide1/2.1                    modemptyarg/avail     'space ya/2'(default)                         
+advvers2/4.2        advvers5/8.4.2   advvers10/8             extdfl/1.3.1(default)          hide1/2.2                    modemptyarg/display   'space ya/al'(@)                              
+advvers2/5.0        advvers5/8.5.1   advvers@2.1             extdfl/1.3.7                   hide1/3.0                    modemptyarg/list      'space yb'/(dns)                              
+advvers2/5.1        advvers5/8.5.2   advvers@2.2             extdfl/1.4.5                   hide1/3.1(default)           modemptyarg/load      'space yb/1'                                  
+advvers2/5.2        advvers5/9.0     autosym1/1(default)     extdfl/2.0                     hide1/3.2                    modemptyarg/load-any  'space yc/2'                                  
+advvers2/5.3        advvers5/9.2(@)  autosym1/2              extdfl/2.0.1                   hide1/4.0                    modemptyarg/purge     'space yc/3'                                  
+advvers2/6.0        advvers6/1.2     autosym2/1              extdfl2/2.rc.1                 hide1/5.0                    modemptyarg/reload    'space yc/4'                                  
+advvers2/6.1        advvers6/1.3     autosym2/2(bar:latest)  extdfl2/2.rc.2                 hide2/1.0(1.2)               modemptyarg/restore   'space yc/5'                                  
+advvers2/6.2        advvers6/1.4     autosym3/1(default)     extdfl2/3.0.0                  hide2/1.1(@)                 modemptyarg/save      'space yd/2.1'                                
+advvers2/6.3        advvers6/1.5.1   autosym3/2(latest)      extdfl2/3.0.2                  hide2/1.5                    modemptyarg/savelist  'space yd/2.2'                                
+advvers2/6.4        advvers6/1.5.2   autosym4/1              extdfl2/3.0.15                 hide3/1.0                    modemptyarg/saverm    'space yd/2.10'                               
+advvers2/6.5        advvers6/1.6     autosym4/2              extdfl2/3.1.3                  hide3/al1(@)                 modemptyarg/saveshow  'space yd/3.0'                                
+advvers2/6.6        advvers6/1.7     autosym4/latest(@)      extdfl2/3.1.7                  hide3/al2(@)                 modemptyarg/swap      'space yd/4.1'                                
+advvers2/6.7        advvers6/1.8     autosym5/1              extdfl2/3.9.2                  hide3/sub1/(default)         modemptyarg/swap2     'space yd/5.0'                                
+advvers2/7.0        advvers6/2.0     autosym5/2              extdfl2/3.09.3                 hide3/sub1/2.0               modemptyarg/swap3     'space ye/1.0'                                
+advvers2/8.1.1      advvers6/2.1     autosym5/default        extdfl2/3.010.1                hide3/sub1/3.0               modemptyarg/test      'space ye/1.1'                                
+advvers2/8.1.2      advvers6/3.0     autosym6/1(zzz)         extdfl2/3.10.2                 hide3/sub2/(sym)             modemptyarg/try-load  'space ye/1.2'                                
+advvers2/8.2.1      advvers6/3.1     autosym6/2(yyy)         extdfl3/1.0                    hide3/sub2/4.0(default:sym)  modemptyarg/unload    'space ye/1.3'                                
+advvers2/8.2.2      advvers6/3.2     autosym6/default(@)     extdfl3/1.00(@)                hide3/sub2/5.0(new)          modemptyarg/unuse     'space ye/1.4'                                
+advvers2/8.3.1      advvers7/0.9     autosym6/latest         extdfl3/1.1/(1.2)              hidereq/1.0                  modemptyarg/use       'space ye/1.5'                                
+advvers2/8.3.2      advvers7/1.0     autosym7/dir1/1         extdfl3/1.1/3                  hidereq/1.1                  modemptyarg/whatis    'space ye/1.6'                                
+advvers2/8.4.1      advvers7/1.1     autosym7/dir1/2         extdfl3/1.3/3(@)               hidereq/1.2                  NaN                   'space ye/1.7'                                
+advvers2/8.4.2      advvers7/1.2     autosym7/dir2/1         extdfl3/1.3/4                  hidereq/1.3                  nanbar/1              'space ye/1.8'                                
+advvers2/8.5.1      advvers7/1.3.1   autosym7/dir2/2         extdfl6/conflict               hidereq/1.4                  nanbar/2              'space ye/1.9'                                
+advvers2/8.5.2      advvers7/1.3.2   autosym8/1              extdfl6/conflict2              hidereq/1.5                  nanbar/nan            'space ye/2.0'                                
+advvers3(@)         advvers7/2.0     autosym8/2              extdfl6/conflicta              hidereq/2.0                  nanfoo/1(nan)         'space ye/2.1'                                
+advvers4/1.1        advvers7/2.1     autosym8/3(@)           extdfl6/conflicts              hidereq/2.1                  nocase/1(vers)        'space ye/2.2'                                
+advvers4/1.2        advvers7/2.2     autosym9/1              extdfl6/info                   hidereq/2.2                  nocase/alias(@)       'space ye/2.3'                                
+advvers4/1.3        advvers7/3.0     bad3/bodyfor            extdfl6/info2                  hidereq/2.3                  nocase/deep/(dirsym)  'space ye/2.4'                                
+advvers4/1.4        advvers7/3.1     bad3/bodyif             extdfl6/isloaded               hidereq/2.4                  nocase/deep/2         'space ye/2.5'                                
+advvers4/1.5.1      advvers7/3.2     bad3/bodyproc           extdfl6/isloaded2              hidereq/2.5                  nocase/deep/3         'space ye/2.6'                                
+advvers4/1.5.2      advvers7/3.3     bad3/bodysource         extdfl6/load                   hidereq/2.6                  nocase/ialias(@)      'space ye/2.7'                                
+advvers4/1.6        advvers7/4.0     bad3/bodywhile          extdfl6/load2                  hidereq/3.0                  nocase/regular        'space ye/2.8'                                
+advvers4/1.7        advvers7/4.1     bad3/proc2              extdfl6/load3                  hidereq/4.0                  nocase/virt           'space ye/2.9'                                
+advvers4/1.8        advvers7/4.2     bad3/proc3              extdfl6/prereq                 hidereq/4.1                  nocase2               spacen/1(w s)                                 
+advvers4/2.0        advvers7/5.0     bad3/procproc           extdfl6/prereq2                hidereq/4.2                  nocase3(@)            'spacen/2 s'                                  
+advvers4/2.1        advvers7/5.1     bad3/procsource         extdfl6/prereqc                hidereq/4.3                  nocase5(@)            spacen/al(@)                                  
+advvers5/0.9        advvers7/5.2     badrc3/1                extdfl6/prereqi                hidereq/4.4                  nocase6(@)            spacen/vns                                    
+advvers5/1.0        advvers7/5.3     bar/0.1                 extdfl6/prereqi2               ICASE/1                      nocase7/conflictim1   'spacen/vw s'                                 
+advvers5/1.1        advvers7/6.0     bar/0.2                 extdfl6/unload                 IcAsE/1                      nocase7/conflictim2   spacenb/(dw s)                                
+advvers5/1.2        advvers7/6.1     bar/1                   extdfl6/unload2                iCaSe/1                      nocase7/prereqim1     spacenb/1                                     
+advvers5/1.3.1      advvers7/6.2     bar/2                   extdfl7/1.1                    icASE/1                      nocase7/prereqim2     spacenc/2                                     
+advvers5/1.3.2      advvers7/6.3     baz/1                   extdfl7/1.3(@)                 icase/1                      nocase8(@)            spacenc/3                                     
+advvers5/2.0        advvers7/6.4     baz/2                   extdfl7/2.1                    icase/conflict               nocase9(@)            spacenc/4                                     
+advvers5/2.1        advvers7/6.5     clear/1                 extdfl7/2.10(3.0)              icase/conflicta              putsvar               t                                             
+advvers5/2.2        advvers7/6.6     clear/2                 extdfl7/3.1                    icase/conflictp              quar                  unloc                                         
+advvers5/3.0        advvers7/6.7     clear/3                 extdfl7/4.1                    icase/conflicts              quux/1(default:sym)   veryveryveryveryveryveryveryverylong/name(sym)
 advvers5/3.1        advvers7/7.0     deepvirt1/dir1/1.0(@)   extdfl7/5.1                    icase/info                   qux/1                 
 advvers5/3.2        advvers7/8.1.1   deepvirt1/dir2/1.0      extdfl7/6.1                    icase/infoloaded             qux/2                 "
 
@@ -2129,93 +2129,93 @@ set ts_sh_all_json "{\"$modpath\": {
 }}"
 
 set ts_sh_small "- $modpath.deep -
-badmodvers/dir1/2.0                                   
-badmodvers/foo                                        
-dir2/1.0(d1)                                          
-dir2/3.0(d3)                                          
-modalias/1.0(@)                                       
-modalias/3.0                                          
-modalias/dir1/1.0                                     
-modalias/dir1/2.0(@)                                  
-modalias/dir2/2.0                                     
-modalias/dir2/3.0(@)                                  
-moddalias(@)                                          
-moddalias/dir1/1                                      
-moddef/dir2/1.0(default)                              
-moddef/dir2/2.0                                       
-modload/dir2/1.0(md1)                                 
-modload/dir2/3.0(md3)                                 
-modsym/dir1/1.0(3.0)                                  
-modsym/dir2/2.0(3.0)                                  
-modtr/3.0(bar:exp:foo:reg:tr2bar:trbar)               
-modtr/al1(unstable:@)                                 
-modtr/al4(default:reg:@)                              
-modtr/al5(fld:@)                                      
-modtr/al6(sfld:@)                                     
-modtr/dir1/1.0(cur:stable)                            
-modtr/dir2/2.0(next:tr2unstable:trunstable:unstable)  
-modtr/dir3/al2(bar:default:exp:reg:tr2bar:trbar:@)    
-modtr/dir3/al3(default:exp:reg:@)                     
-modtr/dir4/(default:fld:reg:trfld:trreg)              
-modtr/dir4/al7(madj:@)                                
-modtr/dir4/al8(dadj:@)                                
-modtr/dir4/mod4.0                                     
-modtr/dir5/subdir/(dadj:sfld)                         
-modtr/dir5/subdir/mod5.0(madj)                        
-modulerc/dir1/(default)                               
-modulerc/dir1/1.0(default)                            
-modulerc/dir1/2.0                                     
-modulerc/dir2/(foo)                                   
-modulerc/dir2/1.0/(default:foo)                       
-modulerc/dir2/1.0/rc1(default:foo)                    
-modulerc/dir2/1.0/rc2                                 
-modulerc/dir2/2.0                                     
-modulerc/dir2/3.0                                     
-modvirt/1.0(@)                                        
-modvirt/3.0                                           
-modvirt/dir0/sub1/4.0                                 
-modvirt/dir0/sub1/5.0(@)                              
-modvirt/dir0/sub1/6.0                                 
-modvirt/dir1/1.0                                      
-modvirt/dir1/2.0(@)                                   
-modvirt/dir2/2.0                                      
-modvirt/dir2/3.0(@)                                   
-plain/dir1/1.0                                        
-plain/dir1/2.0                                        
-plain/dir2/1.0                                        
-plain/dir2/2.0                                        
-tr2mod/al1(tr2unstable:@)                             
-tr2mod/al5(tr2fld:@)                                  
-tr2mod/dir3/al2(tr2bar:@)                             
-trmod/(trreg)                                         
-trmod/al1(tr2unstable:trunstable:@)                   
-trmod/al5(default:trfld:trreg:@)                      
-trmod/dir3/(tr2fld)                                   
-trmod/dir3/al2(tr2bar:trbar:@)                        
-version/dir1/(default)                                
-version/dir1/1.0(default)                             
-version/dir1/2.0                                      
-version/dir2/1.0                                      
-version/dir2/2.0/(default)                            
-version/dir2/2.0/rc1(default)                         
-version/dir2/2.0/rc2                                  
-version/dir2/3.0                                      "
+badmodvers/dir1/2.0
+badmodvers/foo
+dir2/1.0(d1)
+dir2/3.0(d3)
+modalias/1.0(@)
+modalias/3.0
+modalias/dir1/1.0
+modalias/dir1/2.0(@)
+modalias/dir2/2.0
+modalias/dir2/3.0(@)
+moddalias(@)
+moddalias/dir1/1
+moddef/dir2/1.0(default)
+moddef/dir2/2.0
+modload/dir2/1.0(md1)
+modload/dir2/3.0(md3)
+modsym/dir1/1.0(3.0)
+modsym/dir2/2.0(3.0)
+modtr/3.0(bar:exp:foo:reg:tr2bar:trbar)
+modtr/al1(unstable:@)
+modtr/al4(default:reg:@)
+modtr/al5(fld:@)
+modtr/al6(sfld:@)
+modtr/dir1/1.0(cur:stable)
+modtr/dir2/2.0(next:tr2unstable:trunstable:unstable)
+modtr/dir3/al2(bar:default:exp:reg:tr2bar:trbar:@)
+modtr/dir3/al3(default:exp:reg:@)
+modtr/dir4/(default:fld:reg:trfld:trreg)
+modtr/dir4/al7(madj:@)
+modtr/dir4/al8(dadj:@)
+modtr/dir4/mod4.0
+modtr/dir5/subdir/(dadj:sfld)
+modtr/dir5/subdir/mod5.0(madj)
+modulerc/dir1/(default)
+modulerc/dir1/1.0(default)
+modulerc/dir1/2.0
+modulerc/dir2/(foo)
+modulerc/dir2/1.0/(default:foo)
+modulerc/dir2/1.0/rc1(default:foo)
+modulerc/dir2/1.0/rc2
+modulerc/dir2/2.0
+modulerc/dir2/3.0
+modvirt/1.0(@)
+modvirt/3.0
+modvirt/dir0/sub1/4.0
+modvirt/dir0/sub1/5.0(@)
+modvirt/dir0/sub1/6.0
+modvirt/dir1/1.0
+modvirt/dir1/2.0(@)
+modvirt/dir2/2.0
+modvirt/dir2/3.0(@)
+plain/dir1/1.0
+plain/dir1/2.0
+plain/dir2/1.0
+plain/dir2/2.0
+tr2mod/al1(tr2unstable:@)
+tr2mod/al5(tr2fld:@)
+tr2mod/dir3/al2(tr2bar:@)
+trmod/(trreg)
+trmod/al1(tr2unstable:trunstable:@)
+trmod/al5(default:trfld:trreg:@)
+trmod/dir3/(tr2fld)
+trmod/dir3/al2(tr2bar:trbar:@)
+version/dir1/(default)
+version/dir1/1.0(default)
+version/dir1/2.0
+version/dir2/1.0
+version/dir2/2.0/(default)
+version/dir2/2.0/rc1(default)
+version/dir2/2.0/rc2
+version/dir2/3.0"
 
 set len  [string length $modpath.deep]
 set lrep [expr {($test_cols_othos - $len - 2)/2}]
 set rrep [expr {$test_cols_othos - $len - 2 - $lrep}]
 set ts_sh_noflag_othos "[string repeat {-} $lrep] $modpath.deep [string repeat {-} $rrep]
-badmodvers/dir1/2.0  modload/dir2/3.0  modtr/dir4/mod4.0         modvirt/dir0/sub1/5.0  trmod/al5             
-badmodvers/foo       modsym/dir1/1.0   modtr/dir5/subdir/        modvirt/dir0/sub1/6.0  trmod/dir3/           
-dir2/1.0             modsym/dir2/2.0   modtr/dir5/subdir/mod5.0  modvirt/dir1/1.0       trmod/dir3/al2        
-dir2/3.0             modtr/3.0         modulerc/dir1/            modvirt/dir1/2.0       version/dir1/         
-modalias/1.0         modtr/al1         modulerc/dir1/1.0         modvirt/dir2/2.0       version/dir1/1.0      
-modalias/3.0         modtr/al4         modulerc/dir1/2.0         modvirt/dir2/3.0       version/dir1/2.0      
-modalias/dir1/1.0    modtr/al5         modulerc/dir2/            plain/dir1/1.0         version/dir2/1.0      
-modalias/dir1/2.0    modtr/al6         modulerc/dir2/1.0/        plain/dir1/2.0         version/dir2/2.0/     
-modalias/dir2/2.0    modtr/dir1/1.0    modulerc/dir2/1.0/rc1     plain/dir2/1.0         version/dir2/2.0/rc1  
-modalias/dir2/3.0    modtr/dir2/2.0    modulerc/dir2/1.0/rc2     plain/dir2/2.0         version/dir2/2.0/rc2  
-moddalias            modtr/dir3/al2    modulerc/dir2/2.0         tr2mod/al1             version/dir2/3.0      
+badmodvers/dir1/2.0  modload/dir2/3.0  modtr/dir4/mod4.0         modvirt/dir0/sub1/5.0  trmod/al5           
+badmodvers/foo       modsym/dir1/1.0   modtr/dir5/subdir/        modvirt/dir0/sub1/6.0  trmod/dir3/         
+dir2/1.0             modsym/dir2/2.0   modtr/dir5/subdir/mod5.0  modvirt/dir1/1.0       trmod/dir3/al2      
+dir2/3.0             modtr/3.0         modulerc/dir1/            modvirt/dir1/2.0       version/dir1/       
+modalias/1.0         modtr/al1         modulerc/dir1/1.0         modvirt/dir2/2.0       version/dir1/1.0    
+modalias/3.0         modtr/al4         modulerc/dir1/2.0         modvirt/dir2/3.0       version/dir1/2.0    
+modalias/dir1/1.0    modtr/al5         modulerc/dir2/            plain/dir1/1.0         version/dir2/1.0    
+modalias/dir1/2.0    modtr/al6         modulerc/dir2/1.0/        plain/dir1/2.0         version/dir2/2.0/   
+modalias/dir2/2.0    modtr/dir1/1.0    modulerc/dir2/1.0/rc1     plain/dir2/1.0         version/dir2/2.0/rc1
+modalias/dir2/3.0    modtr/dir2/2.0    modulerc/dir2/1.0/rc2     plain/dir2/2.0         version/dir2/2.0/rc2
+moddalias            modtr/dir3/al2    modulerc/dir2/2.0         tr2mod/al1             version/dir2/3.0    
 moddalias/dir1/1     modtr/dir3/al3    modulerc/dir2/3.0         tr2mod/al5             
 moddef/dir2/1.0      modtr/dir4/       modvirt/1.0               tr2mod/dir3/al2        
 moddef/dir2/2.0      modtr/dir4/al7    modvirt/3.0               trmod/                 

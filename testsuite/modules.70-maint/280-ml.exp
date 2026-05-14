@@ -38,7 +38,7 @@ set mpre [regsub -all "\(\[.+?\]\)" $mp {\\\1}]
 # setup specific environment
 setenv_path_var MODULEPATH $mp
 
-set key_sym "\n\nKey:\n(symbolic-version)  "
+set key_sym "\n\nKey:\n(symbolic-version)"
 
 # call sub-cmd if first arg is a known sub-cmd
 testouterr_cmd sh {ml path extdfl} [list [list text $mp/extdfl/1.3.1]] {}
@@ -70,7 +70,7 @@ testouterr_cmd sh {ml extdfl} $ans {}
 # basic tests over a loaded module
 setenv_loaded_module [list extdfl/1.3.1] [list $mp/extdfl/1.3.1]
 setenv_var __MODULES_LMALTNAME extdfl/1.3.1&extdfl/default&extdfl
-testouterr_cmd sh {ml} OK "$cur_loaded\n 1) extdfl/1.3.1(default)  $key_sym"
+testouterr_cmd sh {ml} OK "$cur_loaded\n 1) extdfl/1.3.1(default)$key_sym"
 testouterr_cmd sh {ml extdfl} OK {}
 set ans [list]
 lappend ans [list unset __MODULES_LMALTNAME]

@@ -1590,7 +1590,6 @@ proc reportModules {search_queries header hsgrkey hstyle show_mtime show_idx\
    }
 
    set len_list {}
-   set max_len 0
    # dictionary-sort results unless if output order is specified
    if {![llength $mod_list_order]} {
       set clean_list [lsort -dictionary $clean_list]
@@ -1607,9 +1606,6 @@ proc reportModules {search_queries header hsgrkey hstyle show_mtime show_idx\
          # compute display element length list on sorted result
          lappend display_list $sgrmap($disp)
          lappend len_list $lenmap($disp)
-         if {$lenmap($disp) > $max_len} {
-            set max_len $lenmap($disp)
-         }
       }
    }
 
@@ -1622,7 +1618,7 @@ proc reportModules {search_queries header hsgrkey hstyle show_mtime show_idx\
 
    # output formatted elements
    displayElementList $header $hsgrkey $hstyle $one_per_line $show_idx 1\
-      $display_list $len_list $max_len $via
+      $display_list $len_list $via
 }
 
 proc showModulePath {} {
@@ -1667,10 +1663,10 @@ proc displaySeparatorLine {{title {}} {sgrkey {}} {extra {}}} {
 # get a list of elements and print them in a column or in a
 # one-per-line fashion
 proc displayElementList {header sgrkey hstyle one_per_line display_idx\
-   start_idx display_list {len_list {}} {max_len 0} {via {}}} {
+   start_idx display_list {len_list {}} {via {}}} {
    set elt_cnt [llength $display_list]
    reportDebug "header=$header, sgrkey=$sgrkey, hstyle=$hstyle,\
-      elt_cnt=$elt_cnt, max_len=$max_len, one_per_line=$one_per_line,\
+      elt_cnt=$elt_cnt, one_per_line=$one_per_line,\
       display_idx=$display_idx, start_idx=$start_idx, via=$via"
 
    # end proc if no element are to print
@@ -1716,97 +1712,10 @@ proc displayElementList {header sgrkey hstyle one_per_line display_idx\
       # save room for numbers and spacing: 2 or 3 digits + ) + space
       set elt_prefix_len [expr {$display_idx ? $idx_len + 2 : {0}}]
       # save room for two spaces after element
-      set elt_suffix_len 2
-
-      # compute rows*cols grid size with optimized column number
-      # the size of each column is computed to display as much column
-      # as possible on each line
-      incr max_len $elt_suffix_len
-      foreach len $len_list {
-         lappend elt_len [incr len $elt_suffix_len]
-      }
-
       set tty_cols [getState term_columns]
-      # find valid grid by starting with non-optimized solution where each
-      # column length is equal to the length of the biggest element to display
-      set cur_cols [tcl::mathfunc::max [expr {int(($tty_cols - \
-         $elt_prefix_len) / $max_len)}] 0]
-      # when display is found too short to display even one column
-      if {$cur_cols == 0} {
-         set cols 1
-         set rows $elt_cnt
-         array set col_width [list 0 $max_len]
-      } else {
-         set cols 0
-         set rows 0
-      }
-      set last_round 0
-      set restart_loop 0
-      while {$cur_cols > $cols} {
-         if {!$restart_loop} {
-            if {$last_round} {
-               incr cur_rows
-            } else {
-               set cur_rows [expr {int(ceil(double($elt_cnt) / $cur_cols))}]
-            }
-            for {set i 0} {$i < $cur_cols} {incr i} {
-               set cur_col_width($i) 0
-            }
-            for {set i 0} {$i < $cur_rows} {incr i} {
-               set row_width($i) 0
-            }
-            set istart 0
-         } else {
-            ##nagelfar ignore Unknown variable
-            set istart [expr {$col * $cur_rows}]
-            # only remove width of elements from current col
-            for {set row 0} {$row < ($i % $cur_rows)} {incr row} {
-               ##nagelfar ignore Unknown variable
-               incr row_width($row) -[expr {$pre_col_width + $elt_prefix_len}]
-            }
-         }
-         set restart_loop 0
-         for {set i $istart} {$i < $elt_cnt} {incr i} {
-            set col [expr {int($i / $cur_rows)}]
-            set row [expr {$i % $cur_rows}]
-            # restart loop if a column width change
-            if {[lindex $elt_len $i] > $cur_col_width($col)} {
-               set pre_col_width $cur_col_width($col)
-               set cur_col_width($col) [lindex $elt_len $i]
-               set restart_loop 1
-               break
-            }
-            # end search of maximum number of columns if computed row width
-            # is larger than terminal width
-            if {[incr row_width($row) +[expr {$cur_col_width($col) \
-               + $elt_prefix_len}]] > $tty_cols} {
-               # start last optimization pass by increasing row number until
-               # reaching number used for previous column number, by doing so
-               # this number of column may pass in terminal width, if not
-               # fallback to previous number of column
-               if {$last_round && $cur_rows == $rows} {
-                  incr cur_cols -1
-               } else {
-                  set last_round 1
-               }
-               break
-            }
-         }
-         # went through all elements without reaching terminal width limit so
-         # this number of column solution is valid, try next with a greater
-         # column number
-         if {$i == $elt_cnt} {
-            set cols $cur_cols
-            set rows $cur_rows
-            array set col_width [array get cur_col_width]
-            # number of column is fixed if last optimization round has started
-            # reach end also if there is only one row of results
-            if {!$last_round && $rows > 1} {
-               incr cur_cols
-            }
-         }
 
-      }
+      lassign [compute_output_grid $tty_cols $len_list $elt_prefix_len] rows\
+         cols cols_width
       reportDebug list=$display_list
       reportDebug "rows/cols=$rows/$cols,\
          lastcol_item_cnt=[expr {int($elt_cnt % $rows)}]"
@@ -1821,7 +1730,8 @@ proc displayElementList {header sgrkey hstyle one_per_line display_idx\
                }
                # cannot use 'format' as strings may contain SGR codes
                append displist [lindex $display_list $index][string repeat\
-                  { } [expr {$col_width($col) - [lindex $len_list $index]}]]
+                  { } [expr {[lindex $cols_width $col] - [lindex $len_list\
+                  $index] - $elt_prefix_len}]]
             }
          }
          append displist \n
@@ -1832,6 +1742,58 @@ proc displayElementList {header sgrkey hstyle one_per_line display_idx\
    }
    report $displist 1
    reportSeparateNextContent
+}
+
+# returns rows, cols and each col width of the output grid with most cols
+proc compute_output_grid {out_width len_list prefix_len} {
+   set col_sepa_len 2
+   set elt_count [llength $len_list]
+   if {!$elt_count} {
+      return {0 0 {0}}
+   }
+
+   # start with max possible columns guessed from shortest element in list
+   set min_len [tcl::mathfunc::min {*}$len_list]
+   set col_min [expr {$prefix_len + $min_len + $col_sepa_len}]
+   # exact same output with 1 elt to print whether width is tiny or large
+   set max_cols [tcl::mathfunc::min $elt_count\
+      [expr {int(floor(double($out_width) / $col_min))}]]
+
+   for {set cols $max_cols} {$cols > 1} {incr cols -1} {
+      set rows [expr {int(ceil(double($elt_count) / $cols))}]
+      set cols_width {}
+
+      # compute width of each column (max length among elements in that col)
+      for {set c 0} {$c < $cols} {incr c} {
+         set idx_first [expr {$c * $rows}]
+         set idx_last [expr {$idx_first + $rows - 1}]
+         # stop when no more element for available columns
+         if {$idx_first >= $elt_count} {
+            break
+         }
+         set col_max [tcl::mathfunc::max {*}[lrange $len_list $idx_first\
+            $idx_last]]
+         set col_width [expr {$prefix_len + $col_max}]
+         # column separator suffix is not added on last column
+         if {($c + 1) < $cols && ($idx_last + 1) < $elt_count} {
+            incr col_width $col_sepa_len
+         }
+         lappend cols_width $col_width
+
+         # immediately try fewer columns if we already exceed output grid
+         if {[tcl::mathop::+ {*}$cols_width] > $out_width} {
+            break
+         }
+      }
+
+      # ff it fits, this is the maximum cols possible
+      if {[tcl::mathop::+ {*}$cols_width] <= $out_width} {
+         return [list $rows $cols $cols_width]
+      }
+   }
+
+   # fits in 1 column
+   return [list $elt_count 1 {0}]
 }
 
 # Report an output key to help understand what the SGR used on this output
@@ -1936,19 +1898,11 @@ proc displayKey {} {
       }
    }
 
-   # find largest element
-   set max_len 0
-   foreach len $len_list {
-      if {$len > $max_len} {
-         set max_len $len
-      }
-   }
-
    if {[llength $display_list]} {
       # display header
       report Key:
       # display key content
-      displayElementList noheader {} {} 0 0 0 $display_list $len_list $max_len
+      displayElementList noheader {} {} 0 0 0 $display_list $len_list
    }
 }
 

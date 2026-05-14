@@ -66,18 +66,18 @@ set header "$modlin $modpathre $modlin\n"
 set header2 "$modlin global/user modulerc $modlin\n"
 
 set key_sym "Key:
-\\(symbolic-version\\)  "
+\\(symbolic-version\\)"
 set key_al "Key:
-\\(@\\)=module-alias  "
+\\(@\\)=module-alias"
 set key_al_sym "Key:
-\\(@\\)=module-alias  \\(symbolic-version\\)  "
+\\(@\\)=module-alias  \\(symbolic-version\\)"
 
 #
 #  tests on a module with single symbol
 #
 
 # Check this only for the /bin/csh
-set ts_csh "$header$module1/$mod1vers1\\($mod1sym\\)\\s+$module1/$mod1vers2\\s+"
+set ts_csh "$header$module1/$mod1vers1\\($mod1sym\\)\\s+$module1/$mod1vers2"
 
 testouterr_cmd_re "csh" "spider $module1" "OK" "$ts_csh\n\n$key_sym"
 testouterr_cmd_re "csh" "spider $module1 $module1" "OK" "$ts_csh\n\n$key_sym"
@@ -87,7 +87,7 @@ testouterr_cmd_re "csh" "spider $module1 $module1" "OK" "$ts_csh\n\n$key_sym"
 #  tests on a module with multiple symbols
 #
 
-set ts_csh "$header$module2/$mod2vers1\\($mod2sym1\\)\\s+$module2/$mod2vers2\\($mod2sym2\\)\\s+$module2/$mod2vers3\\($mod2sym3\\)\\s+"
+set ts_csh "$header$module2/$mod2vers1\\($mod2sym1\\)\\s+$module2/$mod2vers2\\($mod2sym2\\)\\s+$module2/$mod2vers3\\($mod2sym3\\)"
 
 testouterr_cmd_re "csh" "spider $module2" "OK" "$ts_csh\n\n$key_sym"
 testouterr_cmd_re "csh" "spider $module2 $module2" "OK" "$ts_csh\n\n$key_sym"
@@ -97,7 +97,7 @@ testouterr_cmd_re "csh" "spider $module2 $module2" "OK" "$ts_csh\n\n$key_sym"
 #  tests on a module alias
 #
 
-set ts_csh "$header$module3/$mod3vers1\\(@\\)\\s+$module3/$mod3vers2\\(@\\)\\s+$module3/$mod3vers3\\(@\\)\\s+"
+set ts_csh "$header$module3/$mod3vers1\\(@\\)\\s+$module3/$mod3vers2\\(@\\)\\s+$module3/$mod3vers3\\(@\\)"
 
 testouterr_cmd_re "csh" "spider $module3" "OK" "$ts_csh\n\n$key_al"
 testouterr_cmd_re "csh" "spider $module3 $module3" "OK" "$ts_csh\n\n$key_al"
@@ -108,7 +108,7 @@ testouterr_cmd_re "csh" "spider $module3 $module3" "OK" "$ts_csh\n\n$key_al"
 #
 
 set env(MODULERCFILE) "$env(TESTSUITEDIR)/etc/modulerc"
-set ts_csh "$header2$module4\\(special:@\\)\\s+"
+set ts_csh "$header2$module4\\(special:@\\)"
 
 testouterr_cmd_re "csh" "spider $module4" "OK" "$ts_csh\n\n$key_al_sym"
 testouterr_cmd_re "csh" "spider $module4 $module4" "OK" "$ts_csh\n\n$key_al_sym"
@@ -119,10 +119,10 @@ testouterr_cmd_re "csh" "spider $module4 $module4" "OK" "$ts_csh\n\n$key_al_sym"
 #  no error should be displayed
 #
 
-set ts_csh "$header$module5/$mod5vers1\\($mod5sym1\\)\\s+$module5/$mod5vers2\\s+${module5}2/$mod5vers3\\s+${module5}2/$mod5vers4\\s+
+set ts_csh "$header$module5/$mod5vers1\\($mod5sym1\\)\\s+$module5/$mod5vers2\\s+${module5}2/$mod5vers3\\s+${module5}2/$mod5vers4
 
 $modlin $modpathre.2 \\(via use/2.0\\) $modlin
-bad3/bodyfor\\s+bad3/bodyif\\s+bad3/bodyproc\\s+bad3/bodysource\\s+bad3/bodywhile\\s+bad3/proc2\\s+bad3/proc3\\s+bad3/procproc\\s+bad3/procsource\\s+badrc3/1\\s+"
+bad3/bodyfor\\s+bad3/bodyif\\s+bad3/bodyproc\\s+bad3/bodysource\\s+bad3/bodywhile\\s+bad3/proc2\\s+bad3/proc3\\s+bad3/procproc\\s+bad3/procsource\\s+badrc3/1"
 
 testouterr_cmd_re "csh" "spider $module5" "OK" "$ts_csh\n\n$key_sym"
 testouterr_cmd_re "csh" "spider $module5 $module5" "OK" "$ts_csh\n\n$key_sym"
@@ -132,7 +132,7 @@ testouterr_cmd_re "csh" "spider $module5 $module5" "OK" "$ts_csh\n\n$key_sym"
 #  tests on a module mixing aliases, symbols and regular modulefile
 #
 
-set ts_csh "$header$module6/$mod6vers1\\s+$module6/$mod6alias1\\(@\\)\\s+$module6/$mod6vers2\\($mod6sym1:$mod6sym2\\)\\s+$module6/$mod6alias2\\(@\\)\\s+"
+set ts_csh "$header$module6/$mod6vers1\\s+$module6/$mod6alias1\\(@\\)\\s+$module6/$mod6vers2\\($mod6sym1:$mod6sym2\\)\\s+$module6/$mod6alias2\\(@\\)"
 
 testouterr_cmd_re "csh" "spider $module6" "OK" "$ts_csh\n\n$key_al_sym"
 testouterr_cmd_re "csh" "spider $module6 $module6" "OK" "$ts_csh\n\n$key_al_sym"
@@ -150,7 +150,7 @@ testouterr_cmd_re csh "spider unk knu" OK {}
 #
 
 set ts_csh "$header$module1/$mod1vers1\\($mod1sym:special\\)\\s+$module1/$mod1vers2\\s+"
-append ts_csh "$module6/$mod6vers1\\s+$module6/$mod6alias1\\(@\\)\\s+$module6/$mod6vers2\\($mod6sym1:$mod6sym2\\)\\s+$module6/$mod6alias2\\(@\\)\\s+"
+append ts_csh "$module6/$mod6vers1\\s+$module6/$mod6alias1\\(@\\)\\s+$module6/$mod6vers2\\($mod6sym1:$mod6sym2\\)\\s+$module6/$mod6alias2\\(@\\)"
 
 testouterr_cmd_re csh "spider $module1 $module6" OK $ts_csh\n\n$key_al_sym
 
@@ -162,7 +162,7 @@ testouterr_cmd_re csh "spider $module1 $module6" OK $ts_csh\n\n$key_al_sym
 # save the former modulepath setup
 setenv_path_var MODULEPATH "$modpath.deep" $modpath
 set header "$modlin $modpathre.deep $modlin\n"
-set ts_csh "$header$module7\\(@\\)\\s+"
+set ts_csh "$header$module7\\(@\\)"
 
 testouterr_cmd_re "csh" "spider $module7" "OK" "$ts_csh\n\n$key_al"
 testouterr_cmd_re "csh" "spider $module7 $module7" "OK" "$ts_csh\n\n$key_al"
@@ -173,7 +173,7 @@ testouterr_cmd_re "csh" "spider $module7 $module7" "OK" "$ts_csh\n\n$key_al"
 #
 
 append ts_csh "\n\n$modlin $modpathre $modlin\n"
-append ts_csh "$module1/$mod1vers1\\($mod1sym:special\\)\\s+$module1/$mod1vers2\\s+"
+append ts_csh "$module1/$mod1vers1\\($mod1sym:special\\)\\s+$module1/$mod1vers2"
 
 testouterr_cmd_re csh "spider $module1 $module7" OK $ts_csh\n\n$key_al_sym
 

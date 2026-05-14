@@ -34,7 +34,7 @@ setenv_var MODULES_SEARCH_MATCH starts_with
 # ensure auto symbolic versions are not set for these tests
 setenv_var MODULES_ADVANCED_VERSION_SPEC 0
 
-set key_sym "\n\nKey:\n(symbolic-version)  "
+set key_sym "\n\nKey:\n(symbolic-version)"
 
 #
 # tests of modules with whitespace in modulepath without whitespace
@@ -62,7 +62,7 @@ testouterr_cmd sh {path space\ ya/1} [list [list text "{$mp/space ya/1}"]] {}
 testouterr_cmd_re sh {display space\ ya/1} OK "$modlin\n$mpre/space ya/1:\n\nmodule-whatis\t{space ya/1}\n$modlin"
 setenv_loaded_module [list "space ya/1"] [list "$mp/space ya/1"]
 setenv_var __MODULES_LMALTNAME "space ya/1&space ya/ns"
-testouterr_cmd sh {list} OK "$cur_loaded\n 1) 'space ya/1'(ns)  $key_sym"
+testouterr_cmd sh {list} OK "$cur_loaded\n 1) 'space ya/1'(ns)$key_sym"
 set ans [list]
 lappend ans [list unset __MODULES_LMALTNAME]
 lappend ans [list unset _LMFILES_]
@@ -83,7 +83,7 @@ testouterr_cmd sh {load spacen/2\ s} $ans {}
 testouterr_cmd sh {path spacen/2\ s} [list [list text "{$mp/spacen/2 s}"]] {}
 testouterr_cmd_re sh {display spacen/2\ s} OK "$modlin\n$mpre/spacen/2 s:\n\nmodule-whatis\t{spacen/2 s}\n$modlin"
 setenv_loaded_module [list "spacen/2 s"] [list "$mp/spacen/2 s"]
-testouterr_cmd sh {list} OK "$cur_loaded\n 1) 'spacen/2 s'  "
+testouterr_cmd sh {list} OK "$cur_loaded\n 1) 'spacen/2 s'"
 set ans [list]
 lappend ans [list unset _LMFILES_]
 lappend ans [list unset LOADEDMODULES]
@@ -102,7 +102,7 @@ testouterr_cmd sh {path space\ ya/al} [list [list text "{$mp/spacen/1}"]] {}
 testouterr_cmd_re sh {display space\ ya/al} OK "$modlin\n$mpre/spacen/1:\n\nmodule-whatis\tspacen/1\n$modlin"
 setenv_loaded_module [list "spacen/1"] [list "$mp/spacen/1"]
 setenv_var __MODULES_LMALTNAME "spacen/1&spacen/w s&al|space ya/al"
-testouterr_cmd sh {list} OK "$cur_loaded\n 1) spacen/1(w s)  $key_sym"
+testouterr_cmd sh {list} OK "$cur_loaded\n 1) spacen/1(w s)$key_sym"
 set ans [list]
 lappend ans [list unset __MODULES_LMALTNAME]
 lappend ans [list unset _LMFILES_]
@@ -123,7 +123,7 @@ testouterr_cmd sh {path spacen/al} [list [list text "{$mp/space ya/1}"]] {}
 testouterr_cmd_re sh {display spacen/al} OK "$modlin\n$mpre/space ya/1:\n\nmodule-whatis\t{space ya/1}\n$modlin"
 setenv_loaded_module [list "space ya/1"] [list "$mp/space ya/1"]
 setenv_var __MODULES_LMALTNAME "space ya/1&space ya/ns&al|spacen/al"
-testouterr_cmd sh {list} OK "$cur_loaded\n 1) 'space ya/1'(ns)  $key_sym"
+testouterr_cmd sh {list} OK "$cur_loaded\n 1) 'space ya/1'(ns)$key_sym"
 set ans [list]
 lappend ans [list unset __MODULES_LMALTNAME]
 lappend ans [list unset _LMFILES_]
@@ -144,7 +144,7 @@ testouterr_cmd sh {path spacen/w\ s} [list [list text "{$mp/spacen/1}"]] {}
 testouterr_cmd_re sh {display spacen/w\ s} OK "$modlin\n$mpre/spacen/1:\n\nmodule-whatis\tspacen/1\n$modlin"
 setenv_loaded_module [list "spacen/1"] [list "$mp/spacen/1"]
 setenv_var __MODULES_LMALTNAME "spacen/1&spacen/w s"
-testouterr_cmd sh {list} OK "$cur_loaded\n 1) spacen/1(w s)  $key_sym"
+testouterr_cmd sh {list} OK "$cur_loaded\n 1) spacen/1(w s)$key_sym"
 set ans [list]
 lappend ans [list unset __MODULES_LMALTNAME]
 lappend ans [list unset _LMFILES_]
@@ -165,7 +165,7 @@ testouterr_cmd sh {path space\ ya/ns} [list [list text "{$mp/space ya/1}"]] {}
 testouterr_cmd_re sh {display space\ ya/ns} OK "$modlin\n$mpre/space ya/1:\n\nmodule-whatis\t{space ya/1}\n$modlin"
 setenv_loaded_module [list "space ya/1"] [list "$mp/space ya/1"]
 setenv_var __MODULES_LMALTNAME "space ya/1&space ya/ns"
-testouterr_cmd sh {list} OK "$cur_loaded\n 1) 'space ya/1'(ns)  $key_sym"
+testouterr_cmd sh {list} OK "$cur_loaded\n 1) 'space ya/1'(ns)$key_sym"
 set ans [list]
 lappend ans [list unset __MODULES_LMALTNAME]
 lappend ans [list unset _LMFILES_]
@@ -186,7 +186,7 @@ testouterr_cmd sh {path space\ ya} [list [list text "{$mp/space ya/2}"]] {}
 testouterr_cmd_re sh {display space\ ya} OK "$modlin\n$mpre/space ya/2:\n\nmodule-whatis\t{space ya/2}\n$modlin"
 setenv_loaded_module [list "space ya/2"] [list "$mp/space ya/2"]
 setenv_var __MODULES_LMALTNAME "space ya/2&space ya/default&space ya"
-testouterr_cmd sh {list} OK "$cur_loaded\n 1) 'space ya/2'(default)  $key_sym"
+testouterr_cmd sh {list} OK "$cur_loaded\n 1) 'space ya/2'(default)$key_sym"
 set ans [list]
 lappend ans [list unset __MODULES_LMALTNAME]
 lappend ans [list unset _LMFILES_]
@@ -205,7 +205,7 @@ testouterr_cmd sh {load spacen/vw\ s} $ans {}
 testouterr_cmd sh {path spacen/vw\ s} [list [list text "{$mp/spacen/1}"]] {}
 testouterr_cmd_re sh {display spacen/vw\ s} OK "$modlin\n$mpre/spacen/1:\n\nmodule-whatis\t{spacen/vw s}\n$modlin"
 setenv_loaded_module [list "spacen/vw s"] [list "$mp/spacen/1"]
-testouterr_cmd sh {list} OK "$cur_loaded\n 1) 'spacen/vw s'  "
+testouterr_cmd sh {list} OK "$cur_loaded\n 1) 'spacen/vw s'"
 set ans [list]
 lappend ans [list unset _LMFILES_]
 lappend ans [list unset LOADEDMODULES]
@@ -222,7 +222,7 @@ testouterr_cmd sh {load spacen/vns} $ans {}
 testouterr_cmd sh {path spacen/vns} [list [list text "{$mp/space ya/1}"]] {}
 testouterr_cmd_re sh {display spacen/vns} OK "$modlin\n$mpre/space ya/1:\n\nmodule-whatis\tspacen/vns\n$modlin"
 setenv_loaded_module [list "spacen/vns"] [list "$mp/space ya/1"]
-testouterr_cmd sh {list} OK "$cur_loaded\n 1) spacen/vns  "
+testouterr_cmd sh {list} OK "$cur_loaded\n 1) spacen/vns"
 set ans [list]
 lappend ans [list unset _LMFILES_]
 lappend ans [list unset LOADEDMODULES]
@@ -241,7 +241,7 @@ testouterr_cmd sh {path spacenb/dw\ s} [list [list text "{$mp/spacenb/1}"]] {}
 testouterr_cmd_re sh {display spacenb/dw\ s} OK "$modlin\n$mpre/spacenb/1:\n\nmodule-whatis\tspacenb/1\n$modlin"
 setenv_loaded_module [list "spacenb/1"] [list "$mp/spacenb/1"]
 setenv_var __MODULES_LMALTNAME "spacenb/1&spacenb/dw s"
-testouterr_cmd sh {list} OK "$cur_loaded\n 1) spacenb/1(dw s)  $key_sym"
+testouterr_cmd sh {list} OK "$cur_loaded\n 1) spacenb/1(dw s)$key_sym"
 set ans [list]
 lappend ans [list unset __MODULES_LMALTNAME]
 lappend ans [list unset _LMFILES_]
@@ -262,7 +262,7 @@ testouterr_cmd sh {path space\ yb/dns} [list [list text "{$mp/space yb/1}"]] {}
 testouterr_cmd_re sh {display space\ yb/dns} OK "$modlin\n$mpre/space yb/1:\n\nmodule-whatis\t{space yb/1}\n$modlin"
 setenv_loaded_module [list "space yb/1"] [list "$mp/space yb/1"]
 setenv_var __MODULES_LMALTNAME "space yb/1&space yb/dns"
-testouterr_cmd sh {list} OK "$cur_loaded\n 1) 'space yb/1'(dns)  $key_sym"
+testouterr_cmd sh {list} OK "$cur_loaded\n 1) 'space yb/1'(dns)$key_sym"
 set ans [list]
 lappend ans [list unset __MODULES_LMALTNAME]
 lappend ans [list unset _LMFILES_]
@@ -424,7 +424,7 @@ testouterr_cmd sh {path space\ ya/1} [list [list text "{$mp/space ya/1}"]] {}
 testouterr_cmd_re sh {display space\ ya/1} OK "$modlin\n$mpre/space ya/1:\n\nmodule-whatis\t{space ya/1}\n$modlin"
 setenv_loaded_module [list "space\ ya/1"] [list "$mp/space ya/1"]
 setenv_var __MODULES_LMALTNAME "space ya/1&space ya/ns"
-testouterr_cmd sh {list} OK "$cur_loaded\n 1) 'space ya/1'(ns)  $key_sym"
+testouterr_cmd sh {list} OK "$cur_loaded\n 1) 'space ya/1'(ns)$key_sym"
 set ans [list]
 lappend ans [list unset __MODULES_LMALTNAME]
 lappend ans [list unset _LMFILES_]
@@ -443,7 +443,7 @@ testouterr_cmd sh {load spacen/2\ s} $ans {}
 testouterr_cmd sh {path spacen/2\ s} [list [list text "{$mp/spacen/2 s}"]] {}
 testouterr_cmd_re sh {display spacen/2\ s} OK "$modlin\n$mpre/spacen/2 s:\n\nmodule-whatis\t{spacen/2 s}\n$modlin"
 setenv_loaded_module [list "spacen/2 s"] [list "$mp/spacen/2 s"]
-testouterr_cmd sh {list} OK "$cur_loaded\n 1) 'spacen/2 s'  "
+testouterr_cmd sh {list} OK "$cur_loaded\n 1) 'spacen/2 s'"
 set ans [list]
 lappend ans [list unset _LMFILES_]
 lappend ans [list unset LOADEDMODULES]
@@ -462,7 +462,7 @@ testouterr_cmd sh {path space\ ya/al} [list [list text "{$mp/spacen/1}"]] {}
 testouterr_cmd_re sh {display space\ ya/al} OK "$modlin\n$mpre/spacen/1:\n\nmodule-whatis\tspacen/1\n$modlin"
 setenv_loaded_module [list "spacen/1"] [list "$mp/spacen/1"]
 setenv_var __MODULES_LMALTNAME "spacen/1&spacen/w s&al|space ya/al"
-testouterr_cmd sh {list} OK "$cur_loaded\n 1) spacen/1(w s)  $key_sym"
+testouterr_cmd sh {list} OK "$cur_loaded\n 1) spacen/1(w s)$key_sym"
 set ans [list]
 lappend ans [list unset __MODULES_LMALTNAME]
 lappend ans [list unset _LMFILES_]
@@ -483,7 +483,7 @@ testouterr_cmd sh {path spacen/al} [list [list text "{$mp/space ya/1}"]] {}
 testouterr_cmd_re sh {display spacen/al} OK "$modlin\n$mpre/space ya/1:\n\nmodule-whatis\t{space ya/1}\n$modlin"
 setenv_loaded_module [list "space ya/1"] [list "$mp/space ya/1"]
 setenv_var __MODULES_LMALTNAME "space ya/1&space ya/ns&al|spacen/al"
-testouterr_cmd sh {list} OK "$cur_loaded\n 1) 'space ya/1'(ns)  $key_sym"
+testouterr_cmd sh {list} OK "$cur_loaded\n 1) 'space ya/1'(ns)$key_sym"
 set ans [list]
 lappend ans [list unset __MODULES_LMALTNAME]
 lappend ans [list unset _LMFILES_]
@@ -504,7 +504,7 @@ testouterr_cmd sh {path spacen/w\ s} [list [list text "{$mp/spacen/1}"]] {}
 testouterr_cmd_re sh {display spacen/w\ s} OK "$modlin\n$mpre/spacen/1:\n\nmodule-whatis\tspacen/1\n$modlin"
 setenv_loaded_module [list "spacen/1"] [list "$mp/spacen/1"]
 setenv_var __MODULES_LMALTNAME "spacen/1&spacen/w s"
-testouterr_cmd sh {list} OK "$cur_loaded\n 1) spacen/1(w s)  $key_sym"
+testouterr_cmd sh {list} OK "$cur_loaded\n 1) spacen/1(w s)$key_sym"
 set ans [list]
 lappend ans [list unset __MODULES_LMALTNAME]
 lappend ans [list unset _LMFILES_]
@@ -525,7 +525,7 @@ testouterr_cmd sh {path space\ ya/ns} [list [list text "{$mp/space ya/1}"]] {}
 testouterr_cmd_re sh {display space\ ya/ns} OK "$modlin\n$mpre/space ya/1:\n\nmodule-whatis\t{space ya/1}\n$modlin"
 setenv_loaded_module [list "space ya/1"] [list "$mp/space ya/1"]
 setenv_var __MODULES_LMALTNAME "space ya/1&space ya/ns"
-testouterr_cmd sh {list} OK "$cur_loaded\n 1) 'space ya/1'(ns)  $key_sym"
+testouterr_cmd sh {list} OK "$cur_loaded\n 1) 'space ya/1'(ns)$key_sym"
 set ans [list]
 lappend ans [list unset __MODULES_LMALTNAME]
 lappend ans [list unset _LMFILES_]
@@ -546,7 +546,7 @@ testouterr_cmd sh {path space\ ya} [list [list text "{$mp/space ya/2}"]] {}
 testouterr_cmd_re sh {display space\ ya} OK "$modlin\n$mpre/space ya/2:\n\nmodule-whatis\t{space ya/2}\n$modlin"
 setenv_loaded_module [list "space ya/2"] [list "$mp/space ya/2"]
 setenv_var __MODULES_LMALTNAME "space ya/2&space ya/default&space ya"
-testouterr_cmd sh {list} OK "$cur_loaded\n 1) 'space ya/2'(default)  $key_sym"
+testouterr_cmd sh {list} OK "$cur_loaded\n 1) 'space ya/2'(default)$key_sym"
 set ans [list]
 lappend ans [list unset __MODULES_LMALTNAME]
 lappend ans [list unset _LMFILES_]
@@ -565,7 +565,7 @@ testouterr_cmd sh {load spacen/vw\ s} $ans {}
 testouterr_cmd sh {path spacen/vw\ s} [list [list text "{$mp/spacen/1}"]] {}
 testouterr_cmd_re sh {display spacen/vw\ s} OK "$modlin\n$mpre/spacen/1:\n\nmodule-whatis\t{spacen/vw s}\n$modlin"
 setenv_loaded_module [list "spacen/vw s"] [list "$mp/spacen/1"]
-testouterr_cmd sh {list} OK "$cur_loaded\n 1) 'spacen/vw s'  "
+testouterr_cmd sh {list} OK "$cur_loaded\n 1) 'spacen/vw s'"
 set ans [list]
 lappend ans [list unset _LMFILES_]
 lappend ans [list unset LOADEDMODULES]
@@ -582,7 +582,7 @@ testouterr_cmd sh {load spacen/vns} $ans {}
 testouterr_cmd sh {path spacen/vns} [list [list text "{$mp/space ya/1}"]] {}
 testouterr_cmd_re sh {display spacen/vns} OK "$modlin\n$mpre/space ya/1:\n\nmodule-whatis\tspacen/vns\n$modlin"
 setenv_loaded_module [list "spacen/vns"] [list "$mp/space ya/1"]
-testouterr_cmd sh {list} OK "$cur_loaded\n 1) spacen/vns  "
+testouterr_cmd sh {list} OK "$cur_loaded\n 1) spacen/vns"
 set ans [list]
 lappend ans [list unset _LMFILES_]
 lappend ans [list unset LOADEDMODULES]
@@ -601,7 +601,7 @@ testouterr_cmd sh {path spacenb/dw\ s} [list [list text "{$mp/spacenb/1}"]] {}
 testouterr_cmd_re sh {display spacenb/dw\ s} OK "$modlin\n$mpre/spacenb/1:\n\nmodule-whatis\tspacenb/1\n$modlin"
 setenv_loaded_module [list "spacenb/1"] [list "$mp/spacenb/1"]
 setenv_var __MODULES_LMALTNAME "spacenb/1&spacenb/dw s"
-testouterr_cmd sh {list} OK "$cur_loaded\n 1) spacenb/1(dw s)  $key_sym"
+testouterr_cmd sh {list} OK "$cur_loaded\n 1) spacenb/1(dw s)$key_sym"
 set ans [list]
 lappend ans [list unset __MODULES_LMALTNAME]
 lappend ans [list unset _LMFILES_]
@@ -622,7 +622,7 @@ testouterr_cmd sh {path space\ yb/dns} [list [list text "{$mp/space yb/1}"]] {}
 testouterr_cmd_re sh {display space\ yb/dns} OK "$modlin\n$mpre/space yb/1:\n\nmodule-whatis\t{space yb/1}\n$modlin"
 setenv_loaded_module [list "space yb/1"] [list "$mp/space yb/1"]
 setenv_var __MODULES_LMALTNAME "space yb/1&space yb/dns"
-testouterr_cmd sh {list} OK "$cur_loaded\n 1) 'space yb/1'(dns)  $key_sym"
+testouterr_cmd sh {list} OK "$cur_loaded\n 1) 'space yb/1'(dns)$key_sym"
 set ans [list]
 lappend ans [list unset __MODULES_LMALTNAME]
 lappend ans [list unset _LMFILES_]
@@ -676,7 +676,7 @@ testouterr_cmd sh {path space\ y\ /1\ } [list [list text "{$mp/space y /1 }"]] {
 testouterr_cmd_re sh {display space\ y\ /1\ } OK "$modlin\n$mpre/space y /1 :\n\nmodule-whatis\t{space y /1 }\n$modlin"
 setenv_loaded_module [list "space\ y\ /1 "] [list "$mp/space y /1 "]
 setenv_var __MODULES_LMALTNAME "space y /1 &space y /n &al|space y /a "
-testouterr_cmd sh {list} OK "$cur_loaded\n 1) 'space y /1 '(n )  $key_sym"
+testouterr_cmd sh {list} OK "$cur_loaded\n 1) 'space y /1 '(n )$key_sym"
 set ans [list]
 lappend ans [list unset __MODULES_LMALTNAME]
 lappend ans [list unset _LMFILES_]
@@ -703,7 +703,7 @@ testouterr_cmd sh {path space\ y\ /a\ } [list [list text "{$mp/space y /1 }"]] {
 testouterr_cmd_re sh {display space\ y\ /a\ } OK "$modlin\n$mpre/space y /1 :\n\nmodule-whatis\t{space y /1 }\n$modlin"
 setenv_loaded_module [list "space y /1 "] [list "$mp/space y /1 "]
 setenv_var __MODULES_LMALTNAME "space y /1 &space y /n &al|space y /a "
-testouterr_cmd sh {list} OK "$cur_loaded\n 1) 'space y /1 '(n )  $key_sym"
+testouterr_cmd sh {list} OK "$cur_loaded\n 1) 'space y /1 '(n )$key_sym"
 set ans [list]
 lappend ans [list unset __MODULES_LMALTNAME]
 lappend ans [list unset _LMFILES_]
@@ -724,7 +724,7 @@ testouterr_cmd sh {path space\ y\ /n\ } [list [list text "{$mp/space y /1 }"]] {
 testouterr_cmd_re sh {display space\ y\ /n\ } OK "$modlin\n$mpre/space y /1 :\n\nmodule-whatis\t{space y /1 }\n$modlin"
 setenv_loaded_module [list "space y /1 "] [list "$mp/space y /1 "]
 setenv_var __MODULES_LMALTNAME "space y /1 &space y /n &al|space y /a "
-testouterr_cmd sh {list} OK "$cur_loaded\n 1) 'space y /1 '(n )  $key_sym"
+testouterr_cmd sh {list} OK "$cur_loaded\n 1) 'space y /1 '(n )$key_sym"
 set ans [list]
 lappend ans [list unset __MODULES_LMALTNAME]
 lappend ans [list unset _LMFILES_]
@@ -745,7 +745,7 @@ testouterr_cmd sh {path space\ y\ } [list [list text "{$mp/space y /2.2}"]] {}
 testouterr_cmd_re sh {display space\ y\ } OK "$modlin\n$mpre/space y /2.2:\n\nmodule-whatis\t{space y /2.2}\n$modlin"
 setenv_loaded_module [list "space y /2.2"] [list "$mp/space y /2.2"]
 setenv_var __MODULES_LMALTNAME "space y /2.2&space y /default&space y "
-testouterr_cmd sh {list} OK "$cur_loaded\n 1) 'space y /2.2'(default)  $key_sym"
+testouterr_cmd sh {list} OK "$cur_loaded\n 1) 'space y /2.2'(default)$key_sym"
 set ans [list]
 lappend ans [list unset __MODULES_LMALTNAME]
 lappend ans [list unset _LMFILES_]
@@ -764,7 +764,7 @@ testouterr_cmd sh {load space\ y\ /v\ } $ans {}
 testouterr_cmd sh {path space\ y\ /v\ } [list [list text "{$mp/space y /1 }"]] {}
 testouterr_cmd_re sh {display space\ y\ /v\ } OK "$modlin\n$mpre/space y /1 :\n\nmodule-whatis\t{space y /v }\n$modlin"
 setenv_loaded_module [list "space y /v "] [list "$mp/space y /1 "]
-testouterr_cmd sh {list} OK "$cur_loaded\n 1) 'space y /v '  "
+testouterr_cmd sh {list} OK "$cur_loaded\n 1) 'space y /v '"
 set ans [list]
 lappend ans [list unset _LMFILES_]
 lappend ans [list unset LOADEDMODULES]

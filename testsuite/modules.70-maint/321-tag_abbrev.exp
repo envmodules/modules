@@ -62,10 +62,10 @@ tag/5.0 <BaR:F:loaded>"
 testouterr_cmd sh {avail -t tag/5.0} OK $tserr
 
 testouterr_cmd sh {list} OK "$cur_loaded
- 1) tag/5.0 <BaR:F>  
+ 1) tag/5.0 <BaR:F>
 
 Key:
-<module-tag>  <F>=foo  "
+<module-tag>  <F>=foo"
 
 
 # abbrev set for loaded tag, abbrev set on an icase tag
@@ -76,10 +76,10 @@ tag/5.0 <aL:B:F>"
 testouterr_cmd sh {avail -t tag/5.0} OK $tserr
 
 testouterr_cmd sh {list} OK "$cur_loaded
- 1) tag/5.0 <B:F>  
+ 1) tag/5.0 <B:F>
 
 Key:
-<module-tag>  <F>=foo  <B>=BaR  "
+<module-tag>  <F>=foo  <B>=BaR"
 
 
 # abbrev disabled for custom and loaded tag
@@ -90,10 +90,10 @@ tag/5.0 <B>"
 testouterr_cmd sh {avail -t tag/5.0} OK $tserr
 
 testouterr_cmd sh {list} OK "$cur_loaded
- 1) tag/5.0 <B>  
+ 1) tag/5.0 <B>
 
 Key:
-<module-tag>  <B>=BaR  "
+<module-tag>  <B>=BaR"
 
 
 # all abbrev disabled
@@ -104,7 +104,7 @@ tag/5.0"
 testouterr_cmd sh {avail -t tag/5.0} OK $tserr
 
 testouterr_cmd sh {list} OK "$cur_loaded
- 1) tag/5.0  "
+ 1) tag/5.0"
 
 
 # all abbrev disabled with MODULES_TAG_ABBREV defined empty
@@ -115,10 +115,10 @@ tag/5.0 <BaR:foo:loaded>"
 testouterr_cmd sh {avail -t tag/5.0} OK $tserr
 
 testouterr_cmd sh {list} OK "$cur_loaded
- 1) tag/5.0 <BaR:foo>  
+ 1) tag/5.0 <BaR:foo>
 
 Key:
-<module-tag>  "
+<module-tag>"
 
 
 # abbrev including space character
@@ -129,10 +129,10 @@ tag/5.0 < l:f o:r >"
 testouterr_cmd sh {avail -t tag/5.0} OK $tserr
 
 testouterr_cmd sh {list} OK "$cur_loaded
- 1) tag/5.0 <f o:r >  
+ 1) tag/5.0 <f o:r >
 
 Key:
-<module-tag>  <f o>=foo  <r >=BaR  "
+<module-tag>  <f o>=foo  <r >=BaR"
 
 
 # badly set MODULES_TAG_ABBREV
@@ -147,10 +147,10 @@ setenv_loaded_module [list tag/5.0] [list $mp/tag/5.0]
 setenv_var __MODULES_LMTAG tag/5.0&foo&BaR
 testouterr_cmd sh {list} OK "$warn_msgs: Ignore invalid value set in MODULES_TAG_ABBREV (foo:loaded=L)
 $cur_loaded
- 1) tag/5.0 <BaR:foo>  
+ 1) tag/5.0 <BaR:foo>
 
 Key:
-<module-tag>  "
+<module-tag>"
 
 
 # badly set MODULES_TAG_ABBREV (2)
@@ -165,10 +165,10 @@ setenv_loaded_module [list tag/5.0] [list $mp/tag/5.0]
 setenv_var __MODULES_LMTAG tag/5.0&foo&BaR
 testouterr_cmd sh {list} OK "$warn_msgs: Ignore invalid value set in MODULES_TAG_ABBREV (:loaded=L)
 $cur_loaded
- 1) tag/5.0 <BaR:foo>  
+ 1) tag/5.0 <BaR:foo>
 
 Key:
-<module-tag>  "
+<module-tag>"
 
 
 # check excepted siteconfig file is installed
@@ -179,26 +179,26 @@ setenv_var TESTSUITE_ENABLE_SITECONFIG_BADTAGABBREVDFLVALUE 1
 unsetenv_var MODULES_TAG_ABBREV
 testouterr_cmd sh {list} OK "$warn_msgs: Ignore invalid default value for 'tag_abbrev' config (loaded)
 $cur_loaded
- 1) tag/5.0 <BaR:foo>  
+ 1) tag/5.0 <BaR:foo>
 
 Key:
-<module-tag>  "
+<module-tag>"
 
 setenv_var MODULES_TAG_ABBREV {loaded=L}
 testouterr_cmd sh {list} OK "$cur_loaded
- 1) tag/5.0 <BaR:foo>  
+ 1) tag/5.0 <BaR:foo>
 
 Key:
-<module-tag>  "
+<module-tag>"
 
 setenv_var MODULES_TAG_ABBREV {:loaded=L}
 testouterr_cmd sh {list} OK "$warn_msgs: Ignore invalid value set in MODULES_TAG_ABBREV (:loaded=L)
 $warn_msgs: Ignore invalid default value for 'tag_abbrev' config (loaded)
 $cur_loaded
- 1) tag/5.0 <BaR:foo>  
+ 1) tag/5.0 <BaR:foo>
 
 Key:
-<module-tag>  "
+<module-tag>"
 
 unsetenv_var TESTSUITE_ENABLE_SITECONFIG_BADTAGABBREVDFLVALUE
 

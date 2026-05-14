@@ -114,7 +114,7 @@ testouterr_cmd_re "sh" "test $module" [join $ansout "\n"] "$modlin\n$lin_test\n\
 
 # test scan
 setenv_var MODULEPATH $modpath.4
-testouterr_cmd sh {avail -o variant info/mode8} OK "info/mode8{foo=scan}  "
+testouterr_cmd sh {avail -o variant info/mode8} OK "info/mode8{foo=scan}"
 
 
 #

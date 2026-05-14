@@ -188,11 +188,11 @@ testouterr_cmd_re sh "display $module" OK $tserr
 setenv_var MODULES_SEARCH_MATCH starts_with
 setenv_var MODULEPATH $modpath.4
 setenv_var TESTSUITE_RC_GETENV sym
-set tserr {foo/1.0(sym)  }
+set tserr {foo/1.0(sym)}
 testouterr_cmd sh {avail -o sym foo/1.0} OK $tserr
 
 setenv_var TESTSUITE_RC_GETENV unk
-set tserr {foo/1.0(foo)  }
+set tserr {foo/1.0(foo)}
 testouterr_cmd sh {avail -o sym foo/1.0} OK $tserr
 
 

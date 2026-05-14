@@ -464,10 +464,10 @@ unsetenv_var __MODULES_LMALTNAME
 
 # highlighted element (hi) on savelist
 setenv_var HOME $env(HOME)/home
-set tserr ".* 1\\) infocmd   2\\) infocmdexp  "
+set tserr ".* 1\\) infocmd   2\\) infocmdexp"
 colorset_test_case {savelist info} [list hi info] $tserr 1
 set tserr ".*
- 1\\) coll1   3\\) coll3          5\\) coll6.target   7\\) infocmdexp  
+ 1\\) coll1   3\\) coll3          5\\) coll6.target   7\\) infocmdexp
  2\\) coll2   4\\) coll4.target   6\\) infocmd       "
 colorset_test_case {savelist -w 80 coll info} [list hi coll hi info] $tserr 1
 setenv_var HOME $ORIG_HOME
@@ -522,29 +522,29 @@ unsetenv_var TESTSUITE_ENABLE_SITECONFIG_TWICEINITCOLORS
 setenv_path_var MODULEPATH $modpath.2
 setenv_var MODULES_ADVANCED_VERSION_SPEC 0
 setenv_var MODULES_COLORS {hi=1:db=2:tr=2:se=2:er=91:wa=93:me=95:in=94:mp=1;94:di=94:al=96:de=4:sy=95}
-set tserr "[sgr 95][sgr 1]hide3/sym[sgr 22][sgr 0]  
+set tserr "[sgr 95][sgr 1]hide3/sym[sgr 22][sgr 0]
 
 Key:
-[sgr 95]symbolic-version[sgr 0]  "
+[sgr 95]symbolic-version[sgr 0]"
 testouterr_cmd_re sh {avail --color=always -o key:indesym hide3/sym} OK $tserr
-set tserr "[sgr 1]hide3/sub2[sgr 22]/4.0      
-[sgr 1]hide3/sub2[sgr 22]/5.0      
-[sgr 95][sgr 1]hide3/sub2[sgr 22]/default[sgr 0]  
-[sgr 95][sgr 1]hide3/sub2[sgr 22]/new[sgr 0]      
-[sgr 95][sgr 1]hide3/sub2[sgr 22]/sym[sgr 0]      
+set tserr "[sgr 1]hide3/sub2[sgr 22]/4.0
+[sgr 1]hide3/sub2[sgr 22]/5.0
+[sgr 95][sgr 1]hide3/sub2[sgr 22]/default[sgr 0]
+[sgr 95][sgr 1]hide3/sub2[sgr 22]/new[sgr 0]
+[sgr 95][sgr 1]hide3/sub2[sgr 22]/sym[sgr 0]
 
 Key:
-[sgr 95]symbolic-version[sgr 0]  "
+[sgr 95]symbolic-version[sgr 0]"
 testouterr_cmd_re sh {avail -w 20 --color=always -o key:indesym hide3/sub2} OK $tserr
 testouterr_cmd_re sh {avail -w 20 --color=always -o key:indesym:dirwsym hide3/sub2} OK $tserr
-set tserr "[sgr 95][sgr 1]hide3/sub2/default[sgr 22][sgr 0]  
+set tserr "[sgr 95][sgr 1]hide3/sub2/default[sgr 22][sgr 0]
 
 Key:
-[sgr 95]symbolic-version[sgr 0]  "
+[sgr 95]symbolic-version[sgr 0]"
 testouterr_cmd_re sh {avail --color=always -o key:indesym hide3/sub2/default} OK $tserr
 # no color definition for symbolic versions
 setenv_var MODULES_COLORS {hi=1:db=2:tr=2:se=2:er=91:wa=93:me=95:in=94:mp=1;94:di=94:al=96:de=4}
-set tserr "[sgr 1]hide3/sym[sgr 22]  "
+set tserr "[sgr 1]hide3/sym[sgr 22]"
 testouterr_cmd_re sh {avail --color=always -o key:indesym hide3/sym} OK $tserr
 unsetenv_var MODULES_COLORS
 unsetenv_var MODULES_ADVANCED_VERSION_SPEC
@@ -560,17 +560,17 @@ setenv_loaded_module [list foo/1.0] [list $modpath.3/foo/1.0]
 setenv_var __MODULES_LMALTNAME foo/1.0&foo/bar&foo&al|alfoo
 
 #FIXME
-set tserr " 1\\) [sgr 96]alfoo[sgr 0]   2\\) foo/1.0[sgr 2]\\([sgr 22][sgr 95]bar[sgr 0][sgr 2]\\)[sgr 22]  
+set tserr " 1\\) [sgr 96]alfoo[sgr 0]   2\\) foo/1.0[sgr 2]\\([sgr 22][sgr 95]bar[sgr 0][sgr 2]\\)[sgr 22]
 
 Key:
-[sgr 2]\\([sgr 22][sgr 95]symbolic-version[sgr 0][sgr 2]\\)[sgr 22]  [sgr 96]module-alias[sgr 0]  "
+[sgr 2]\\([sgr 22][sgr 95]symbolic-version[sgr 0][sgr 2]\\)[sgr 22]  [sgr 96]module-alias[sgr 0]"
 testouterr_cmd_re sh {list --color=always -o alias:idx:sym:key} OK $tserr
 set tserr " 1\\) [sgr 95]foo/bar[sgr 0] 
  2\\) [sgr 96]alfoo[sgr 0] 
  3\\) foo/1.0 
 
 Key:
-[sgr 95]symbolic-version[sgr 0]  [sgr 96]module-alias[sgr 0]  "
+[sgr 95]symbolic-version[sgr 0]  [sgr 96]module-alias[sgr 0]"
 testouterr_cmd_re sh {list --color=always -t -o alias:idx:indesym:sym:key} OK $tserr
 
 unsetenv_var __MODULES_LMALTNAME

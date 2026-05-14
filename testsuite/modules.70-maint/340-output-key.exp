@@ -47,23 +47,23 @@ setenv_var MODULES_AVAIL_INDEPTH 1
 
 # basic test with one element to report in key
 setenv_var MODULES_COLORS "mp=1;94"
-testerr_cmd_re sh {avail --color=always key/4.0} "$modlin [sgr {1;94}]$mpre[sgr 0] $modlin\nkey/4.0  \n\nKey:\n[sgr {1;94}]modulepath[sgr 0]  "
+testerr_cmd_re sh {avail --color=always key/4.0} "$modlin [sgr {1;94}]$mpre[sgr 0] $modlin\nkey/4.0\n\nKey:\n[sgr {1;94}]modulepath[sgr 0]"
 unsetenv_var MODULES_COLORS
 
 # one type to report in key, but no color defined for it, so no key to output
 setenv_var MODULES_COLORS ""
-testerr_cmd_re sh {avail --color=always key/4.0} "$modlin $mpre $modlin\nkey/4.0  "
+testerr_cmd_re sh {avail --color=always key/4.0} "$modlin $mpre $modlin\nkey/4.0"
 unsetenv_var MODULES_COLORS
 
 # no key if no element to report in it
-testerr_cmd_re sh {avail key/4.0} "$modlin $mpre $modlin\nkey/4.0  "
+testerr_cmd_re sh {avail key/4.0} "$modlin $mpre $modlin\nkey/4.0"
 
 # check mention of symbol or tag when color is not configured or disabled
 set tserr "$modlin $mpre $modlin
-key/2.0\\(foosym\\) <S>  
+key/2.0\\(foosym\\) <S>
 
 Key:
-\\(symbolic-version\\)  <module-tag>  <S>=sticky  "
+\\(symbolic-version\\)  <module-tag>  <S>=sticky"
 testerr_cmd_re sh {avail key/2.0} $tserr
 setenv_var MODULES_COLORS "F=45"
 testerr_cmd_re sh {avail --color=always key/2.0} $tserr
@@ -72,16 +72,16 @@ unsetenv_var MODULES_COLORS
 # check output of alias
 setenv_var MODULES_COLORS "al=94"
 testerr_cmd_re sh {avail --color=always key/3.0} "$modlin $mpre $modlin
-[sgr 94]key/3.0[sgr 0]  
+[sgr 94]key/3.0[sgr 0]
 
 Key:
-[sgr 94]module-alias[sgr 0]  "
+[sgr 94]module-alias[sgr 0]"
 setenv_var MODULES_COLORS ""
 set tserr "$modlin $mpre $modlin
-key/3.0\\(@\\)  
+key/3.0\\(@\\)
 
 Key:
-\\(@\\)=module-alias  "
+\\(@\\)=module-alias"
 testerr_cmd_re sh {avail --color=always key/3.0} $tserr
 unsetenv_var MODULES_COLORS
 testerr_cmd_re sh {avail key/3.0} $tserr
@@ -89,38 +89,38 @@ testerr_cmd_re sh {avail key/3.0} $tserr
 # default symbol
 setenv_var MODULES_COLORS "de=4:sy=95"
 testerr_cmd_re sh {avail --color=always key/1.0} "$modlin $mpre $modlin
-[sgr 4]key/1.0[sgr 0] <footag>  
+[sgr 4]key/1.0[sgr 0] <footag>
 
 Key:
-[sgr 4]default-version[sgr 0]  <module-tag>  "
+[sgr 4]default-version[sgr 0]  <module-tag>"
 setenv_var MODULES_COLORS "sy=95"
 testerr_cmd_re sh {avail --color=always key/1.0} "$modlin $mpre $modlin
-key/1.0\\([sgr 95]default[sgr 0]\\) <footag>  
+key/1.0\\([sgr 95]default[sgr 0]\\) <footag>
 
 Key:
-\\([sgr 95]symbolic-version[sgr 0]\\)  <module-tag>  "
+\\([sgr 95]symbolic-version[sgr 0]\\)  <module-tag>"
 setenv_var MODULES_COLORS ""
 testerr_cmd_re sh {avail --color=always key/1.0} "$modlin $mpre $modlin
-key/1.0\\(default\\) <footag>  
+key/1.0\\(default\\) <footag>
 
 Key:
-\\(symbolic-version\\)  <module-tag>  "
+\\(symbolic-version\\)  <module-tag>"
 unsetenv_var MODULES_COLORS
 
 # hidden module tag
 setenv_var MODULES_COLORS "H=2"
 setenv_var MODULES_TAG_ABBREV hidden=H:hidden-loaded=H
 testerr_cmd_re sh {avail --color=always key/5.0} "$modlin $mpre $modlin
-[sgr 2]key/5.0[sgr 0]  
+[sgr 2]key/5.0[sgr 0]
 
 Key:
-[sgr 2]hidden[sgr 22]  "
+[sgr 2]hidden[sgr 22]"
 setenv_var MODULES_COLORS ""
 testerr_cmd_re sh {avail --color=always key/5.0} "$modlin $mpre $modlin
-key/5.0 <H>  
+key/5.0 <H>
 
 Key:
-<module-tag>  <H>=hidden  "
+<module-tag>  <H>=hidden"
 unsetenv_var MODULES_COLORS
 unsetenv_var MODULES_TAG_ABBREV
 
@@ -128,24 +128,24 @@ unsetenv_var MODULES_TAG_ABBREV
 setenv_var MODULES_COLORS "de=4:sy=95:fT=46"
 setenv_var MODULES_TAG_ABBREV footag=fT
 testerr_cmd_re sh {avail --color=always key/1.0} "$modlin $mpre $modlin
-[sgr {4;46}]key/1.0[sgr 0]  
+[sgr {4;46}]key/1.0[sgr 0]
 
 Key:
-[sgr 4]default-version[sgr 0]  [sgr 46]footag[sgr 0]  "
+[sgr 4]default-version[sgr 0]  [sgr 46]footag[sgr 0]"
 setenv_var MODULES_TAG_COLOR_NAME fT
 testerr_cmd_re sh {avail --color=always key/1.0} "$modlin $mpre $modlin
-[sgr 4]key/1.0[sgr 0] <[sgr 46]fT[sgr 0]>  
+[sgr 4]key/1.0[sgr 0] <[sgr 46]fT[sgr 0]>
 
 Key:
-[sgr 4]default-version[sgr 0]  [sgr 46]footag[sgr 0]  <module-tag>  "
+[sgr 4]default-version[sgr 0]  [sgr 46]footag[sgr 0]  <module-tag>"
 unsetenv_var MODULES_TAG_ABBREV
 setenv_var MODULES_COLORS "de=4:footag=46"
 setenv_var MODULES_TAG_COLOR_NAME footag
 testerr_cmd_re sh {avail --color=always key/1.0} "$modlin $mpre $modlin
-[sgr 4]key/1.0[sgr 0] <[sgr 46]footag[sgr 0]>  
+[sgr 4]key/1.0[sgr 0] <[sgr 46]footag[sgr 0]>
 
 Key:
-[sgr 46]footag[sgr 0]  [sgr 4]default-version[sgr 0]  <module-tag>  "
+[sgr 46]footag[sgr 0]  [sgr 4]default-version[sgr 0]  <module-tag>"
 unsetenv_var MODULES_COLORS
 unsetenv_var MODULES_TAG_COLOR_NAME
 
@@ -167,18 +167,18 @@ testerr_cmd sh {list -j} $tserr
 # basic test with element in key to report
 setenv_var MODULES_COLORS "se=2:sy=95:S=46"
 testerr_cmd_re sh {list --color=always} "$cur_loaded
- 1\\) [sgr 46]key/2.0[sgr 0][sgr 2]\\([sgr 22][sgr 95]foosym[sgr 0][sgr 2]\\)[sgr 22]  
+ 1\\) [sgr 46]key/2.0[sgr 0][sgr 2]\\([sgr 22][sgr 95]foosym[sgr 0][sgr 2]\\)[sgr 22]
 
 Key:
-[sgr 2]\\([sgr 22][sgr 95]symbolic-version[sgr 0][sgr 2]\\)[sgr 22]  [sgr 46]sticky[sgr 0]  "
+[sgr 2]\\([sgr 22][sgr 95]symbolic-version[sgr 0][sgr 2]\\)[sgr 22]  [sgr 46]sticky[sgr 0]"
 unsetenv_var MODULES_COLORS
 
 # check mention of symbol or tag when color is not configured or disabled
 set tserr "$cur_loaded
- 1) key/2.0(foosym) <S>  
+ 1) key/2.0(foosym) <S>
 
 Key:
-(symbolic-version)  <module-tag>  <S>=sticky  "
+(symbolic-version)  <module-tag>  <S>=sticky"
 testerr_cmd sh {list} $tserr
 setenv_var MODULES_COLORS "F=45"
 testerr_cmd sh {list --color=always} $tserr
@@ -187,7 +187,7 @@ unsetenv_var MODULES_COLORS
 # no key if no element to report in it
 unsetenv_var __MODULES_LMTAG
 unsetenv_var __MODULES_LMALTNAME
-testerr_cmd sh {list} "$cur_loaded\n 1) key/2.0  "
+testerr_cmd sh {list} "$cur_loaded\n 1) key/2.0"
 
 # test default symbol
 setenv_loaded_module [list key/1.0] [list $mp/key/1.0]
@@ -195,22 +195,22 @@ setenv_var __MODULES_LMTAG key/1.0&footag
 setenv_var __MODULES_LMALTNAME key/1.0&key/default&key
 setenv_var MODULES_COLORS "de=4:sy=95"
 testerr_cmd_re sh {list --color=always} "$cur_loaded
- 1\\) [sgr 4]key/1.0[sgr 0] <footag>  
+ 1\\) [sgr 4]key/1.0[sgr 0] <footag>
 
 Key:
-[sgr 4]default-version[sgr 0]  <module-tag>  "
+[sgr 4]default-version[sgr 0]  <module-tag>"
 setenv_var MODULES_COLORS "sy=95"
 testerr_cmd_re sh {list --color=always} "$cur_loaded
- 1\\) key/1.0\\([sgr 95]default[sgr 0]\\) <footag>  
+ 1\\) key/1.0\\([sgr 95]default[sgr 0]\\) <footag>
 
 Key:
-\\([sgr 95]symbolic-version[sgr 0]\\)  <module-tag>  "
+\\([sgr 95]symbolic-version[sgr 0]\\)  <module-tag>"
 setenv_var MODULES_COLORS ""
 testerr_cmd sh {list --color=always} "$cur_loaded
- 1) key/1.0(default) <footag>  
+ 1) key/1.0(default) <footag>
 
 Key:
-(symbolic-version)  <module-tag>  "
+(symbolic-version)  <module-tag>"
 unsetenv_var MODULES_COLORS
 
 # hidden-loaded module tag
@@ -220,16 +220,16 @@ unsetenv_var __MODULES_LMALTNAME
 setenv_var MODULES_COLORS "H=2"
 setenv_var MODULES_TAG_ABBREV hidden-loaded=H:hidden=H
 testerr_cmd_re sh {list -a --color=always} "$cur_loaded
- 1\\) [sgr 2]key/5.0[sgr 0]  
+ 1\\) [sgr 2]key/5.0[sgr 0]
 
 Key:
-[sgr 2]hidden-loaded[sgr 22]  "
+[sgr 2]hidden-loaded[sgr 22]"
 setenv_var MODULES_COLORS ""
 testerr_cmd_re sh {list -o +hidden --color=always} "$cur_loaded
- 1\\) key/5.0 <H>  
+ 1\\) key/5.0 <H>
 
 Key:
-<module-tag>  <H>=hidden-loaded  "
+<module-tag>  <H>=hidden-loaded"
 unsetenv_var MODULES_COLORS
 unsetenv_var MODULES_TAG_ABBREV
 
@@ -240,24 +240,24 @@ setenv_var __MODULES_LMALTNAME key/1.0&key/default&key
 setenv_var MODULES_COLORS "de=4:sy=95:fT=46"
 setenv_var MODULES_TAG_ABBREV footag=fT
 testerr_cmd_re sh {list --color=always} "$cur_loaded
- 1\\) [sgr {4;46}]key/1.0[sgr 0]  
+ 1\\) [sgr {4;46}]key/1.0[sgr 0]
 
 Key:
-[sgr 4]default-version[sgr 0]  [sgr 46]footag[sgr 0]  "
+[sgr 4]default-version[sgr 0]  [sgr 46]footag[sgr 0]"
 setenv_var MODULES_TAG_COLOR_NAME fT
 testerr_cmd_re sh {list --color=always} "$cur_loaded
- 1\\) [sgr 4]key/1.0[sgr 0] <[sgr 46]fT[sgr 0]>  
+ 1\\) [sgr 4]key/1.0[sgr 0] <[sgr 46]fT[sgr 0]>
 
 Key:
-[sgr 4]default-version[sgr 0]  [sgr 46]footag[sgr 0]  <module-tag>  "
+[sgr 4]default-version[sgr 0]  [sgr 46]footag[sgr 0]  <module-tag>"
 unsetenv_var MODULES_TAG_ABBREV
 setenv_var MODULES_COLORS "de=4:footag=46"
 setenv_var MODULES_TAG_COLOR_NAME footag
 testerr_cmd_re sh {list --color=always} "$cur_loaded
- 1\\) [sgr 4]key/1.0[sgr 0] <[sgr 46]footag[sgr 0]>  
+ 1\\) [sgr 4]key/1.0[sgr 0] <[sgr 46]footag[sgr 0]>
 
 Key:
-[sgr 46]footag[sgr 0]  [sgr 4]default-version[sgr 0]  <module-tag>  "
+[sgr 46]footag[sgr 0]  [sgr 4]default-version[sgr 0]  <module-tag>"
 unsetenv_var MODULES_COLORS
 unsetenv_var MODULES_TAG_COLOR_NAME
 

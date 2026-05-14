@@ -26,11 +26,11 @@ set header_coll [msg_named_coll]
 set header_target_coll [msg_named_coll 0 $colltarget]
 set header_target_coll_re [escre $header_target_coll]
 set coll_list "$coll1\n$coll2\n$coll3\n$coll4f\n$coll6f\n$colld\ninfocmd\ninfocmdexp"
-set coll_list_idx " 1) $coll1   3) $coll3          5) $coll6f   7) infocmd     \n 2) $coll2   4) $coll4f   6) $colld        8) infocmdexp  "
+set coll_list_idx " 1) $coll1   3) $coll3          5) $coll6f   7) infocmd   \n 2) $coll2   4) $coll4f   6) $colld        8) infocmdexp"
 set lprops "\\s+\[0-9\/]{10} \[0-9:]{8}"
 set coll_list_long "$coll1$lprops\n$coll2$lprops\n$coll3$lprops\n$coll4f$lprops\n$coll6f$lprops\n$colld$lprops\ninfocmd$lprops\ninfocmdexp$lprops"
 set coll_target_list "$coll4\n$coll6"
-set coll_target_list_idx " 1) $coll4   2) $coll6  "
+set coll_target_list_idx " 1) $coll4   2) $coll6"
 set coll_target_list_long "$coll4$lprops\n$coll6$lprops"
 
 

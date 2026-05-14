@@ -90,13 +90,13 @@ DEBUG \\\[#1:load:look/1\\\] findModules: finding 'foo1\\*' in $mpre .*
 DEBUG \\\[#1:load:look/1\\\] findModules: found foo1\\S* foo1\\S*
 DEBUG \\\[#1:load:look/1\\\] findModules: create cache entry .*
 (.*)+
-foo1/1  foo1/2  
+foo1/1  foo1/2
 (.*)+
 DEBUG \\\[#1:load:look/1\\\] findModules: finding 'foo\\*' in $mpre .*
 DEBUG \\\[#1:load:look/1\\\] findModules: found foo\\S* foo\\S* foo\\S* foo\\S*
 DEBUG \\\[#1:load:look/1\\\] findModules: create cache entry .*
 (.*)+
-foo/1  foo/2  foo1/1  foo1/2  
+foo/1  foo/2  foo1/1  foo1/2
 (.*)+"
 testerr_cmd_re sh {load -D look/1} $tserr
 
@@ -105,12 +105,12 @@ DEBUG \\\[#1:load:look/2\\\] findModules: finding 'foo\\*' in $mpre .*
 DEBUG \\\[#1:load:look/2\\\] findModules: found foo\\S* foo\\S* foo\\S* foo\\S*
 DEBUG \\\[#1:load:look/2\\\] findModules: create cache entry .*
 (.*)+
-foo/1  foo/2  foo1/1  foo1/2  
+foo/1  foo/2  foo1/1  foo1/2
 (.*)+
 DEBUG \\\[#1:load:look/2\\\] findModules: finding 'foo1\\*' in $mpre .*
 DEBUG \\\[#1:load:look/2\\\] findModules: use cache entry .*
 (.*)+
-foo1/1  foo1/2  
+foo1/1  foo1/2
 (.*)+
   Get modules: {foo1/1 foo1/2} matching 'foo1' in.*
 (.*)+"
@@ -124,7 +124,7 @@ DEBUG \\\[#1:load:look/3\\\] findModules: create cache entry .*
 DEBUG \\\[#1:load:look/3\\\] findModules: finding 'f\\*' in $mpre .*
 DEBUG \\\[#1:load:look/3\\\] findModules: use cache entry .*
 (.*)+
-foo/1  foo/2  foo1/1  foo1/2  
+foo/1  foo/2  foo1/1  foo1/2
 (.*)+
   Get modules: {foo\\S* foo\\S* foo\\S* foo\\S*} matching 'f' in.*
 (.*)+"
@@ -135,7 +135,7 @@ DEBUG \\\[#1:load:look/4\\\] findModules: finding 'f\\*' in $mpre .*
 DEBUG \\\[#1:load:look/4\\\] findModules: found foo\\S* foo\\S* foo\\S* foo\\S*
 DEBUG \\\[#1:load:look/4\\\] findModules: create cache entry .*
 (.*)+
-foo/1  foo/2  foo1/1  foo1/2  
+foo/1  foo/2  foo1/1  foo1/2
 (.*)+
 DEBUG \\\[#1:load:look/4\\\] findModules: finding '\\*' in $mpre .*
 (.*)+
@@ -185,7 +185,7 @@ DEBUG \\\[#1:load:look/8\\\] findModules: create cache entry .*
 (.*)+
 DEBUG \\\[#1:load:look/8\\\] getModules: use cache entry .*
 (.*)+
-'sp cial/1'  
+'sp cial/1'
 (.*)+
   Get modules: {{sp cial/1}} matching '{sp cial}' in.*
 (.*)+"

@@ -40,10 +40,10 @@ testouterr_cmd sh savelist OK [msg_no_named_coll]
 
 testouterr_cmd sh {savelist stash} OK [msg_no_named_coll]
 
-set tserr "[msg_named_coll]\n 1) $last_stash  "
+set tserr "[msg_named_coll]\n 1) $last_stash"
 testouterr_cmd sh {savelist -a} OK $tserr
 
-set tserr "[msg_named_coll 1]\n 1) $last_stash  "
+set tserr "[msg_named_coll 1]\n 1) $last_stash"
 testouterr_cmd sh {savelist -a stash} OK $tserr
 
 
@@ -55,15 +55,15 @@ puts "module use --append $mp
 module load foo/1.0"
 close $fid
 
-set tserr "[msg_named_coll]\n 1) coll  "
+set tserr "[msg_named_coll]\n 1) coll"
 testouterr_cmd sh savelist OK $tserr
 
 testouterr_cmd sh {savelist stash} OK [msg_no_named_coll 1]
 
-set tserr "[msg_named_coll]\n 1) coll   2) $last_stash  "
+set tserr "[msg_named_coll]\n 1) coll   2) $last_stash"
 testouterr_cmd sh {savelist -a} OK $tserr
 
-set tserr "[msg_named_coll 1]\n 1) $last_stash  "
+set tserr "[msg_named_coll 1]\n 1) $last_stash"
 testouterr_cmd sh {savelist -a stash} OK $tserr
 
 
@@ -77,25 +77,25 @@ testouterr_cmd sh savelist OK [msg_no_named_coll 0 foo]
 
 testouterr_cmd sh {savelist stash} OK [msg_no_named_coll 0 foo]
 
-set tserr "[msg_named_coll]\n 1) coll   2) $last_stash   3) $last_last_stash  "
+set tserr "[msg_named_coll]\n 1) coll   2) $last_stash   3) $last_last_stash"
 testouterr_cmd sh {savelist -a} OK $tserr
 
-set tserr "[msg_named_coll 1]\n 1) $last_stash   2) $last_last_stash  "
+set tserr "[msg_named_coll 1]\n 1) $last_stash   2) $last_last_stash"
 testouterr_cmd sh {savelist -a stash} OK $tserr
 
 
 # unset target
 unsetenv_var MODULES_COLLECTION_TARGET
 
-set tserr "[msg_named_coll]\n 1) coll  "
+set tserr "[msg_named_coll]\n 1) coll"
 testouterr_cmd sh savelist OK $tserr
 
 testouterr_cmd sh {savelist stash} OK [msg_no_named_coll 1]
 
-set tserr "[msg_named_coll]\n 1) coll   2) $last_stash   3) $last_last_stash  "
+set tserr "[msg_named_coll]\n 1) coll   2) $last_stash   3) $last_last_stash"
 testouterr_cmd sh {savelist -a} OK $tserr
 
-set tserr "[msg_named_coll 1]\n 1) $last_stash   2) $last_last_stash  "
+set tserr "[msg_named_coll 1]\n 1) $last_stash   2) $last_last_stash"
 testouterr_cmd sh {savelist -a stash} OK $tserr
 
 

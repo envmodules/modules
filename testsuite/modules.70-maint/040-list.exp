@@ -30,7 +30,7 @@ set header $cur_loaded
 #
 
 set ts_csh "$header\n$module"
-set ts_csh_num "$header\n 1) $module  "
+set ts_csh_num "$header\n 1) $module"
 
 #
 #  Set up the environment pointing to the single module file being load
@@ -90,7 +90,7 @@ testouterr_cmd "csh" "-t list" "OK" "$ts_csh"
 setenv_loaded_module loc_rcv1/1.1 $modpath/loc_rcv1/.base
 setenv_var __MODULES_LMALTNAME loc_rcv1/1.1&loc_rcv1/foo
 
-testouterr_cmd sh list OK "$cur_loaded\n 1) loc_rcv1/1.1(foo)  \n\nKey:\n(symbolic-version)  "
+testouterr_cmd sh list OK "$cur_loaded\n 1) loc_rcv1/1.1(foo)\n\nKey:\n(symbolic-version)"
 
 unsetenv_var __MODULES_LMALTNAME
 
@@ -130,15 +130,15 @@ if {![info exists term_cols]} {
     send_user "\tskipping terminal width-specific tests, cannot set width\n"
 } else {
 
-testouterr_cmd sh list OK "$header\n 1) $module  "
+testouterr_cmd sh list OK "$header\n 1) $module"
 
 # test with slightly bigger width
 exec stty cols 17
-testouterr_cmd sh list OK "$header\n 1) $module  "
+testouterr_cmd sh list OK "$header\n 1) $module"
 
 # test with slightly smaller width
 exec stty cols 15
-testouterr_cmd sh list OK "$header\n 1) $module  "
+testouterr_cmd sh list OK "$header\n 1) $module"
 
 # restore terminal width
 exec stty cols $term_cols
@@ -158,50 +158,58 @@ foreach mod $loaded_mod_list {
 setenv_loaded_module $loaded_mod_list $loaded_file_list
 
 set tserr "$cur_loaded
-  1) bzip2/1.0.8-gcc-13.1.1-rfmtfef                  45) py-python-dateutil/2.8.2-gcc-13.1.1-lemasmo         89) py-send2trash/1.8.0-gcc-13.1.1-o77zxa4      133) glx/1.4-gcc-13.1.1-pelrczr                       
-  2) libmd/1.0.4-gcc-13.1.1-wlbjwvc                  46) libsodium/1.0.18-gcc-13.1.1-64q2mkx                 90) py-terminado/0.15.0-gcc-13.1.1-zu7aefo      134) pixman/0.42.2-gcc-13.1.1-rm72uqr                 
-  3) libbsd/0.11.7-gcc-13.1.1-3vw6p4u                47) libzmq/4.3.4-gcc-13.1.1-jmvpxdy                     91) py-notebook/6.4.12-gcc-13.1.1-i3dzkfr       135) cairo/1.16.0-gcc-13.1.1-u23zqfk                  
-  4) expat/2.5.0-gcc-13.1.1-hx3rbqf                  48) py-pycparser/2.21-gcc-13.1.1-kdlsxfq                92) py-sip/4.19.21-gcc-13.1.1-4ly4jkl           136) gobject-introspection/1.72.1-gcc-13.1.1-4bj2g2m  
-  5) ncurses/6.4-gcc-13.1.1-mwwshua                  49) py-cffi/1.15.1-gcc-13.1.1-hn4n72t                   93) assimp/5.2.5-gcc-13.1.1-bgn5aaq             137) icu4c/67.1-gcc-13.1.1-runwlkl                    
-  6) readline/8.2-gcc-13.1.1-2gng7tj                 50) py-greenlet/2.0.2-gcc-13.1.1-wr2hlvf                94) double-conversion/3.2.1-gcc-13.1.1-k44rqt5  138) harfbuzz/7.3.0-gcc-13.1.1-dnyj32k                
-  7) gdbm/1.23-gcc-13.1.1-ws52ulr                    51) py-gevent/1.5.0-gcc-13.1.1-wqurm3w                  95) font-util/1.4.0-gcc-13.1.1-xs62ukh          139) libjpeg-turbo/2.1.5-gcc-13.1.1-cidcwta           
-  8) libiconv/1.17-gcc-13.1.1-buqvpnc                52) py-pyzmq/25.0.2-gcc-13.1.1-fboajce                  96) libpng/1.6.39-gcc-13.1.1-s7qt3h4            140) libtiff/4.5.0-gcc-13.1.1-pdsybow                 
-  9) xz/5.4.1-gcc-13.1.1-7iagy3z                     53) py-tornado/6.2-gcc-13.1.1-4dqlzjj                   97) freetype/2.11.1-gcc-13.1.1-c5mcund          141) lcms/2.13.1-gcc-13.1.1-bixpayp                   
- 10) zlib/1.2.13-gcc-13.1.1-yawi3li                  54) py-jupyter-client/8.1.0-gcc-13.1.1-3uqtcfu          98) fontconfig/2.14.2-gcc-13.1.1-stcnirz        142) libmng/2.0.3-gcc-13.1.1-hmvk4un                  
- 11) libxml2/2.10.3-gcc-13.1.1-mkrze3k               55) py-nest-asyncio/1.5.6-gcc-13.1.1-sill5t7            99) pkgconf/1.9.5-gcc-13.1.1-bstyanj            143) util-macros/1.19.3-gcc-13.1.1-so2ifer            
- 12) pigz/2.7-gcc-13.1.1-zzxrt3w                     56) py-packaging/23.0-gcc-13.1.1-yw5iqll               100) elfutils/0.189-gcc-13.1.1-hoawipr           144) xkbdata/1.0.1-gcc-13.1.1-jrvfge7                 
- 13) zstd/1.5.5-gcc-13.1.1-vijq3k5                   57) py-psutil/5.9.4-gcc-13.1.1-uolflt3                 101) pcre2/10.42-gcc-13.1.1-euchpp4              145) libxkbcommon/1.4.0-gcc-13.1.1-fmd3id2            
- 14) tar/1.34-gcc-13.1.1-tlxxh5z                     58) py-ipykernel/6.22.0-gcc-13.1.1-nrs3fjt             102) berkeley-db/18.1.40-gcc-13.1.1-lu5ld3m      146) xcb-util/0.4.1-gcc-13.1.1-q6m6m3e                
- 15) gettext/0.21.1-gcc-13.1.1-hxbj7z6               59) py-jupyterlab-widgets/3.0.3-gcc-13.1.1-z5ebuqm     103) perl/5.36.0-gcc-13.1.1-bm3a4ef              147) xcb-util-image/0.4.1-gcc-13.1.1-356vzc2          
- 16) libffi/3.3-gcc-13.1.1-km5fnab                   60) py-widgetsnbextension/4.0.3-gcc-13.1.1-pujfw5h     104) glib/2.76.1-gcc-13.1.1-72snmjl              148) xcb-util-keysyms/0.4.1-gcc-13.1.1-jfm2mpe        
- 17) libxcrypt/4.4.33-gcc-13.1.1-6bni3md             61) py-ipywidgets/8.0.2-gcc-13.1.1-nl6ddfo             105) glproto/1.4.17-gcc-13.1.1-zowvdkj           149) xcb-util-renderutil/0.3.10-gcc-13.1.1-lzkerzt    
- 18) openssl/1.1.1t-gcc-13.1.1-5dbnq5f               62) py-jupyter-console/6.4.4-gcc-13.1.1-s5356pg        106) libunwind/1.6.2-gcc-13.1.1-eyzaoqj          150) xcb-util-wm/0.4.2-gcc-13.1.1-f2tozd5             
- 19) sqlite/3.40.1-gcc-13.1.1-xfie7mz                63) py-soupsieve/2.3.2.post1-gcc-13.1.1-vofrd5z        107) inputproto/2.3.2-gcc-13.1.1-4vc7odx         151) qt/5.15.9-gcc-13.1.1-g4kio4v                     
- 20) util-linux-uuid/2.38.1-gcc-13.1.1-tm27vnw       64) py-beautifulsoup4/4.11.1-gcc-13.1.1-2t7w76n        108) kbproto/1.0.7-gcc-13.1.1-rlqfbfj            152) py-pyqt5/5.13.1-gcc-13.1.1-ok35m3b               
- 21) python/3.10.10-gcc-13.1.1-m6so4xi               65) py-webencodings/0.5.1-gcc-13.1.1-ax7loza           109) libpthread-stubs/0.4-gcc-13.1.1-2mkjar4     153) py-qtpy/1.11.2-gcc-13.1.1-p2yra55                
- 22) py-traitlets/5.9.0-gcc-13.1.1-s2cqdw5           66) py-bleach/5.0.1-gcc-13.1.1-hysrgll                 110) xproto/7.0.31-gcc-13.1.1-knjrnpi            154) py-qtconsole/5.2.0-gcc-13.1.1-ekrftgg            
- 23) py-comm/0.1.3-gcc-13.1.1-osleaxc                67) py-defusedxml/0.7.1-gcc-13.1.1-4gwhjj4             111) libxau/1.0.8-gcc-13.1.1-gsxameq             155) py-jupyter/1.0.0-gcc-13.1.1-rhcbxvx              
- 24) py-debugpy/1.6.6-gcc-13.1.1-6cfq7f4             68) py-markupsafe/2.1.1-gcc-13.1.1-5ywrrt2             112) libxdmcp/1.1.4-gcc-13.1.1-zumdwqf           
- 25) py-backcall/0.2.0-gcc-13.1.1-2npgyqq            69) py-jinja2/3.1.2-gcc-13.1.1-s4ti7wu                 113) xcb-proto/1.15.2-gcc-13.1.1-5yjb433         
- 26) py-decorator/5.1.1-gcc-13.1.1-a22mcmu           70) py-jupyterlab-pygments/0.2.2-gcc-13.1.1-4yclus3    114) libxcb/1.14-gcc-13.1.1-o6ws53x              
- 27) py-parso/0.8.3-gcc-13.1.1-afbk3zx               71) libgpg-error/1.47-gcc-13.1.1-pugtw6b               115) xextproto/7.3.0-gcc-13.1.1-mlydc5m          
- 28) py-setuptools/67.6.0-gcc-13.1.1-h64mhap         72) libgcrypt/1.10.2-gcc-13.1.1-2bgxyks                116) xtrans/1.4.0-gcc-13.1.1-uymm7fb             
- 29) py-jedi/0.18.1-gcc-13.1.1-oqcewms               73) libxslt/1.1.33-gcc-13.1.1-qbhsycz                  117) libx11/1.8.4-gcc-13.1.1-32woeto             
- 30) py-matplotlib-inline/0.1.6-gcc-13.1.1-znyvri3   74) py-lxml/4.9.1-gcc-13.1.1-53vasmi                   118) libxext/1.3.3-gcc-13.1.1-l53ow7r            
- 31) py-ptyprocess/0.7.0-gcc-13.1.1-mfuu3qf          75) py-mistune/2.0.4-gcc-13.1.1-frmt2pz                119) libice/1.0.9-gcc-13.1.1-xtesrco             
- 32) py-pexpect/4.8.0-gcc-13.1.1-tt2lrts             76) py-fastjsonschema/2.16.3-gcc-13.1.1-l5tn6ts        120) libsm/1.2.3-gcc-13.1.1-rbamduj              
- 33) py-pickleshare/0.7.5-gcc-13.1.1-fvroijj         77) py-attrs/22.2.0-gcc-13.1.1-cv3dmjk                 121) libxt/1.1.5-gcc-13.1.1-zxuq4cg              
- 34) py-wcwidth/0.2.5-gcc-13.1.1-n6sqsus             78) py-pyrsistent/0.19.3-gcc-13.1.1-4djvk4z            122) binutils/2.40-gcc-13.1.1-oouonwp            
- 35) py-prompt-toolkit/3.0.31-gcc-13.1.1-hgqriq5     79) py-jsonschema/4.17.3-gcc-13.1.1-utgwib6            123) libpciaccess/0.17-gcc-13.1.1-mdgqh4i        
- 36) py-pygments/2.13.0-gcc-13.1.1-on5ro7f           80) py-nbformat/5.8.0-gcc-13.1.1-7lttupb               124) hwloc/2.9.1-gcc-13.1.1-wj2soi7              
- 37) py-six/1.16.0-gcc-13.1.1-d3dopor                81) py-nbclient/0.7.2-gcc-13.1.1-ickwa2h               125) libedit/3.1-20210216-gcc-13.1.1-4ygsvv6     
- 38) py-asttokens/2.0.8-gcc-13.1.1-tkxvwf4           82) py-pandocfilters/1.5.0-gcc-13.1.1-w4z722e          126) llvm/14.0.6-gcc-13.1.1-d4qlss2              
- 39) py-executing/1.1.0-gcc-13.1.1-4fwjrct           83) py-tinycss2/1.1.1-gcc-13.1.1-bkongt6               127) renderproto/0.11.1-gcc-13.1.1-n74iax3       
- 40) py-pure-eval/0.2.2-gcc-13.1.1-svkighk           84) py-nbconvert/7.0.0-gcc-13.1.1-dkdyupr              128) libxrender/0.9.10-gcc-13.1.1-vrzvhv2        
- 41) py-stack-data/0.5.0-gcc-13.1.1-ruzubdq          85) py-argon2-cffi-bindings/21.2.0-gcc-13.1.1-annnlwn  129) randrproto/1.5.0-gcc-13.1.1-gbywtld         
- 42) py-ipython/8.11.0-gcc-13.1.1-ja6lo45            86) py-argon2-cffi/21.3.0-gcc-13.1.1-stwhl4s           130) libxrandr/1.5.3-gcc-13.1.1-hoc7acf          
- 43) py-platformdirs/3.5.0-gcc-13.1.1-vtyr2zh        87) py-ipython-genutils/0.2.0-gcc-13.1.1-mdlog55       131) xrandr/1.5.0-gcc-13.1.1-3x6g7jz             
- 44) py-jupyter-core/5.3.0-gcc-13.1.1-eqpun7s        88) py-prometheus-client/0.14.1-gcc-13.1.1-tbri6ex     132) mesa/22.1.6-gcc-13.1.1-iky2s65              "
+  1) bzip2/1.0.8-gcc-13.1.1-rfmtfef                  53) py-tornado/6.2-gcc-13.1.1-4dqlzjj                  105) glproto/1.4.17-gcc-13.1.1-zowvdkj              
+  2) libmd/1.0.4-gcc-13.1.1-wlbjwvc                  54) py-jupyter-client/8.1.0-gcc-13.1.1-3uqtcfu         106) libunwind/1.6.2-gcc-13.1.1-eyzaoqj             
+  3) libbsd/0.11.7-gcc-13.1.1-3vw6p4u                55) py-nest-asyncio/1.5.6-gcc-13.1.1-sill5t7           107) inputproto/2.3.2-gcc-13.1.1-4vc7odx            
+  4) expat/2.5.0-gcc-13.1.1-hx3rbqf                  56) py-packaging/23.0-gcc-13.1.1-yw5iqll               108) kbproto/1.0.7-gcc-13.1.1-rlqfbfj               
+  5) ncurses/6.4-gcc-13.1.1-mwwshua                  57) py-psutil/5.9.4-gcc-13.1.1-uolflt3                 109) libpthread-stubs/0.4-gcc-13.1.1-2mkjar4        
+  6) readline/8.2-gcc-13.1.1-2gng7tj                 58) py-ipykernel/6.22.0-gcc-13.1.1-nrs3fjt             110) xproto/7.0.31-gcc-13.1.1-knjrnpi               
+  7) gdbm/1.23-gcc-13.1.1-ws52ulr                    59) py-jupyterlab-widgets/3.0.3-gcc-13.1.1-z5ebuqm     111) libxau/1.0.8-gcc-13.1.1-gsxameq                
+  8) libiconv/1.17-gcc-13.1.1-buqvpnc                60) py-widgetsnbextension/4.0.3-gcc-13.1.1-pujfw5h     112) libxdmcp/1.1.4-gcc-13.1.1-zumdwqf              
+  9) xz/5.4.1-gcc-13.1.1-7iagy3z                     61) py-ipywidgets/8.0.2-gcc-13.1.1-nl6ddfo             113) xcb-proto/1.15.2-gcc-13.1.1-5yjb433            
+ 10) zlib/1.2.13-gcc-13.1.1-yawi3li                  62) py-jupyter-console/6.4.4-gcc-13.1.1-s5356pg        114) libxcb/1.14-gcc-13.1.1-o6ws53x                 
+ 11) libxml2/2.10.3-gcc-13.1.1-mkrze3k               63) py-soupsieve/2.3.2.post1-gcc-13.1.1-vofrd5z        115) xextproto/7.3.0-gcc-13.1.1-mlydc5m             
+ 12) pigz/2.7-gcc-13.1.1-zzxrt3w                     64) py-beautifulsoup4/4.11.1-gcc-13.1.1-2t7w76n        116) xtrans/1.4.0-gcc-13.1.1-uymm7fb                
+ 13) zstd/1.5.5-gcc-13.1.1-vijq3k5                   65) py-webencodings/0.5.1-gcc-13.1.1-ax7loza           117) libx11/1.8.4-gcc-13.1.1-32woeto                
+ 14) tar/1.34-gcc-13.1.1-tlxxh5z                     66) py-bleach/5.0.1-gcc-13.1.1-hysrgll                 118) libxext/1.3.3-gcc-13.1.1-l53ow7r               
+ 15) gettext/0.21.1-gcc-13.1.1-hxbj7z6               67) py-defusedxml/0.7.1-gcc-13.1.1-4gwhjj4             119) libice/1.0.9-gcc-13.1.1-xtesrco                
+ 16) libffi/3.3-gcc-13.1.1-km5fnab                   68) py-markupsafe/2.1.1-gcc-13.1.1-5ywrrt2             120) libsm/1.2.3-gcc-13.1.1-rbamduj                 
+ 17) libxcrypt/4.4.33-gcc-13.1.1-6bni3md             69) py-jinja2/3.1.2-gcc-13.1.1-s4ti7wu                 121) libxt/1.1.5-gcc-13.1.1-zxuq4cg                 
+ 18) openssl/1.1.1t-gcc-13.1.1-5dbnq5f               70) py-jupyterlab-pygments/0.2.2-gcc-13.1.1-4yclus3    122) binutils/2.40-gcc-13.1.1-oouonwp               
+ 19) sqlite/3.40.1-gcc-13.1.1-xfie7mz                71) libgpg-error/1.47-gcc-13.1.1-pugtw6b               123) libpciaccess/0.17-gcc-13.1.1-mdgqh4i           
+ 20) util-linux-uuid/2.38.1-gcc-13.1.1-tm27vnw       72) libgcrypt/1.10.2-gcc-13.1.1-2bgxyks                124) hwloc/2.9.1-gcc-13.1.1-wj2soi7                 
+ 21) python/3.10.10-gcc-13.1.1-m6so4xi               73) libxslt/1.1.33-gcc-13.1.1-qbhsycz                  125) libedit/3.1-20210216-gcc-13.1.1-4ygsvv6        
+ 22) py-traitlets/5.9.0-gcc-13.1.1-s2cqdw5           74) py-lxml/4.9.1-gcc-13.1.1-53vasmi                   126) llvm/14.0.6-gcc-13.1.1-d4qlss2                 
+ 23) py-comm/0.1.3-gcc-13.1.1-osleaxc                75) py-mistune/2.0.4-gcc-13.1.1-frmt2pz                127) renderproto/0.11.1-gcc-13.1.1-n74iax3          
+ 24) py-debugpy/1.6.6-gcc-13.1.1-6cfq7f4             76) py-fastjsonschema/2.16.3-gcc-13.1.1-l5tn6ts        128) libxrender/0.9.10-gcc-13.1.1-vrzvhv2           
+ 25) py-backcall/0.2.0-gcc-13.1.1-2npgyqq            77) py-attrs/22.2.0-gcc-13.1.1-cv3dmjk                 129) randrproto/1.5.0-gcc-13.1.1-gbywtld            
+ 26) py-decorator/5.1.1-gcc-13.1.1-a22mcmu           78) py-pyrsistent/0.19.3-gcc-13.1.1-4djvk4z            130) libxrandr/1.5.3-gcc-13.1.1-hoc7acf             
+ 27) py-parso/0.8.3-gcc-13.1.1-afbk3zx               79) py-jsonschema/4.17.3-gcc-13.1.1-utgwib6            131) xrandr/1.5.0-gcc-13.1.1-3x6g7jz                
+ 28) py-setuptools/67.6.0-gcc-13.1.1-h64mhap         80) py-nbformat/5.8.0-gcc-13.1.1-7lttupb               132) mesa/22.1.6-gcc-13.1.1-iky2s65                 
+ 29) py-jedi/0.18.1-gcc-13.1.1-oqcewms               81) py-nbclient/0.7.2-gcc-13.1.1-ickwa2h               133) glx/1.4-gcc-13.1.1-pelrczr                     
+ 30) py-matplotlib-inline/0.1.6-gcc-13.1.1-znyvri3   82) py-pandocfilters/1.5.0-gcc-13.1.1-w4z722e          134) pixman/0.42.2-gcc-13.1.1-rm72uqr               
+ 31) py-ptyprocess/0.7.0-gcc-13.1.1-mfuu3qf          83) py-tinycss2/1.1.1-gcc-13.1.1-bkongt6               135) cairo/1.16.0-gcc-13.1.1-u23zqfk                
+ 32) py-pexpect/4.8.0-gcc-13.1.1-tt2lrts             84) py-nbconvert/7.0.0-gcc-13.1.1-dkdyupr              136) gobject-introspection/1.72.1-gcc-13.1.1-4bj2g2m
+ 33) py-pickleshare/0.7.5-gcc-13.1.1-fvroijj         85) py-argon2-cffi-bindings/21.2.0-gcc-13.1.1-annnlwn  137) icu4c/67.1-gcc-13.1.1-runwlkl                  
+ 34) py-wcwidth/0.2.5-gcc-13.1.1-n6sqsus             86) py-argon2-cffi/21.3.0-gcc-13.1.1-stwhl4s           138) harfbuzz/7.3.0-gcc-13.1.1-dnyj32k              
+ 35) py-prompt-toolkit/3.0.31-gcc-13.1.1-hgqriq5     87) py-ipython-genutils/0.2.0-gcc-13.1.1-mdlog55       139) libjpeg-turbo/2.1.5-gcc-13.1.1-cidcwta         
+ 36) py-pygments/2.13.0-gcc-13.1.1-on5ro7f           88) py-prometheus-client/0.14.1-gcc-13.1.1-tbri6ex     140) libtiff/4.5.0-gcc-13.1.1-pdsybow               
+ 37) py-six/1.16.0-gcc-13.1.1-d3dopor                89) py-send2trash/1.8.0-gcc-13.1.1-o77zxa4             141) lcms/2.13.1-gcc-13.1.1-bixpayp                 
+ 38) py-asttokens/2.0.8-gcc-13.1.1-tkxvwf4           90) py-terminado/0.15.0-gcc-13.1.1-zu7aefo             142) libmng/2.0.3-gcc-13.1.1-hmvk4un                
+ 39) py-executing/1.1.0-gcc-13.1.1-4fwjrct           91) py-notebook/6.4.12-gcc-13.1.1-i3dzkfr              143) util-macros/1.19.3-gcc-13.1.1-so2ifer          
+ 40) py-pure-eval/0.2.2-gcc-13.1.1-svkighk           92) py-sip/4.19.21-gcc-13.1.1-4ly4jkl                  144) xkbdata/1.0.1-gcc-13.1.1-jrvfge7               
+ 41) py-stack-data/0.5.0-gcc-13.1.1-ruzubdq          93) assimp/5.2.5-gcc-13.1.1-bgn5aaq                    145) libxkbcommon/1.4.0-gcc-13.1.1-fmd3id2          
+ 42) py-ipython/8.11.0-gcc-13.1.1-ja6lo45            94) double-conversion/3.2.1-gcc-13.1.1-k44rqt5         146) xcb-util/0.4.1-gcc-13.1.1-q6m6m3e              
+ 43) py-platformdirs/3.5.0-gcc-13.1.1-vtyr2zh        95) font-util/1.4.0-gcc-13.1.1-xs62ukh                 147) xcb-util-image/0.4.1-gcc-13.1.1-356vzc2        
+ 44) py-jupyter-core/5.3.0-gcc-13.1.1-eqpun7s        96) libpng/1.6.39-gcc-13.1.1-s7qt3h4                   148) xcb-util-keysyms/0.4.1-gcc-13.1.1-jfm2mpe      
+ 45) py-python-dateutil/2.8.2-gcc-13.1.1-lemasmo     97) freetype/2.11.1-gcc-13.1.1-c5mcund                 149) xcb-util-renderutil/0.3.10-gcc-13.1.1-lzkerzt  
+ 46) libsodium/1.0.18-gcc-13.1.1-64q2mkx             98) fontconfig/2.14.2-gcc-13.1.1-stcnirz               150) xcb-util-wm/0.4.2-gcc-13.1.1-f2tozd5           
+ 47) libzmq/4.3.4-gcc-13.1.1-jmvpxdy                 99) pkgconf/1.9.5-gcc-13.1.1-bstyanj                   151) qt/5.15.9-gcc-13.1.1-g4kio4v                   
+ 48) py-pycparser/2.21-gcc-13.1.1-kdlsxfq           100) elfutils/0.189-gcc-13.1.1-hoawipr                  152) py-pyqt5/5.13.1-gcc-13.1.1-ok35m3b             
+ 49) py-cffi/1.15.1-gcc-13.1.1-hn4n72t              101) pcre2/10.42-gcc-13.1.1-euchpp4                     153) py-qtpy/1.11.2-gcc-13.1.1-p2yra55              
+ 50) py-greenlet/2.0.2-gcc-13.1.1-wr2hlvf           102) berkeley-db/18.1.40-gcc-13.1.1-lu5ld3m             154) py-qtconsole/5.2.0-gcc-13.1.1-ekrftgg          
+ 51) py-gevent/1.5.0-gcc-13.1.1-wqurm3w             103) perl/5.36.0-gcc-13.1.1-bm3a4ef                     155) py-jupyter/1.0.0-gcc-13.1.1-rhcbxvx            
+ 52) py-pyzmq/25.0.2-gcc-13.1.1-fboajce             104) glib/2.76.1-gcc-13.1.1-72snmjl                     "
 
 testouterr_cmd sh {list -w 211} OK $tserr
 

@@ -42,12 +42,12 @@ testouterr_cmd sh stashlist OK [msg_no_stash_coll]
 
 create_stash_coll $stash_basic_content
 set last_stash [file tail [get_last_stash_coll]]
-set tserr "[msg_stash_coll]\n 0) $last_stash  "
+set tserr "[msg_stash_coll]\n 0) $last_stash"
 testouterr_cmd sh stashlist OK $tserr
 
 create_stash_coll $stash_basic_content
 set last_last_stash [file tail [get_last_stash_coll]]
-set tserr "[msg_stash_coll]\n 0) $last_last_stash   1) $last_stash  "
+set tserr "[msg_stash_coll]\n 0) $last_last_stash   1) $last_stash"
 testouterr_cmd sh stashlist OK $tserr
 
 delete_last_stash_coll
@@ -129,7 +129,7 @@ create_stash_coll $stash_basic_content
 set last_stash_file [get_last_stash_coll]
 set last_stash [file rootname [file tail $last_stash_file]]
 
-set tserr "[msg_stash_coll foo]\n 0) $last_stash  "
+set tserr "[msg_stash_coll foo]\n 0) $last_stash"
 testouterr_cmd sh stashlist OK $tserr
 
 create_stash_coll $stash_basic_content
@@ -166,7 +166,7 @@ create_stash_coll $stash_basic2_content
 set last_stash_file [get_last_stash_coll]
 set last_stash [file rootname [file tail $last_stash_file]]
 
-set tserr "[msg_stash_coll bar]\n 0) $last_stash  "
+set tserr "[msg_stash_coll bar]\n 0) $last_stash"
 testouterr_cmd sh stashlist OK $tserr
 
 delete_last_stash_coll

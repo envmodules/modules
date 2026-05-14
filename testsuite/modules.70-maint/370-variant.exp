@@ -36,15 +36,15 @@ setenv_var __MODULES_LMVARIANT variant/1.0&foo|val1|0|0
 setenv_loaded_module [list variant/1.0] [list $mp/variant/1.0]
 
 testouterr_cmd sh {list} OK "$cur_loaded
- 1) variant/1.0{foo=val1}  
+ 1) variant/1.0{foo=val1}
 
 Key:
-{variant=value}  "
+{variant=value}"
 
 skip_if_quick_mode
 
 testouterr_cmd sh {list -o header:idx:sym:tag:key} OK "$cur_loaded
- 1) variant/1.0  "
+ 1) variant/1.0"
 
 testouterr_cmd sh {list -t} OK "$cur_loaded
 variant/1.0"
@@ -56,10 +56,10 @@ setenv_var __MODULES_LMVARIANT variant/1.0&foo|val1|0|0&bar|val2|0|0
 setenv_loaded_module [list variant/1.0] [list $mp/variant/1.0]
 
 set tserr "$cur_loaded
- 1) variant/1.0{bar=val2:foo=val1}  
+ 1) variant/1.0{bar=val2:foo=val1}
 
 Key:
-{variant=value}  "
+{variant=value}"
 testouterr_cmd sh {list} OK $tserr
 testouterr_cmd sh {ml} OK $tserr
 
@@ -72,10 +72,10 @@ setenv_var __MODULES_LMVARIANT variant/1.0&foo|val1|0|0&bar|val2|0|0:variant/2.0
 setenv_loaded_module [list variant/1.0 variant/2.0] [list $mp/variant/1.0 $mp/variant/2.0]
 
 testouterr_cmd sh {list} OK "$cur_loaded
- 1) variant/1.0{bar=val2:foo=val1}   2) variant/2.0{baz=val3}  
+ 1) variant/1.0{bar=val2:foo=val1}   2) variant/2.0{baz=val3}
 
 Key:
-{variant=value}  "
+{variant=value}"
 
 testouterr_cmd sh {list -j} OK "{\"variant/1.0\": { \"name\": \"variant/1.0\", \"type\": \"modulefile\", \"variants\": { \"bar\": \"val2\", \"foo\": \"val1\" }, \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/1.0\", \"via\": \"\"},
 \"variant/2.0\": { \"name\": \"variant/2.0\", \"type\": \"modulefile\", \"variants\": { \"baz\": \"val3\" }, \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/2.0\", \"via\": \"\"}}"
@@ -83,10 +83,10 @@ testouterr_cmd sh {list -j} OK "{\"variant/1.0\": { \"name\": \"variant/1.0\", \
 # loaded modules with also symbols defined
 setenv_var __MODULES_LMALTNAME variant/1.0&variant/foo
 testouterr_cmd sh {list} OK "$cur_loaded
- 1) variant/1.0{bar=val2:foo=val1}(foo)   2) variant/2.0{baz=val3}  
+ 1) variant/1.0{bar=val2:foo=val1}(foo)   2) variant/2.0{baz=val3}
 
 Key:
-{variant=value}  (symbolic-version)  "
+{variant=value}  (symbolic-version)"
 
 testouterr_cmd sh {list -j} OK "{\"variant/1.0\": { \"name\": \"variant/1.0\", \"type\": \"modulefile\", \"variants\": { \"bar\": \"val2\", \"foo\": \"val1\" }, \"symbols\": \[ \"foo\" \], \"tags\": \[\], \"pathname\": \"$mp/variant/1.0\", \"via\": \"\"},
 \"variant/2.0\": { \"name\": \"variant/2.0\", \"type\": \"modulefile\", \"variants\": { \"baz\": \"val3\" }, \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/2.0\", \"via\": \"\"}}"
@@ -95,10 +95,10 @@ unsetenv_var __MODULES_LMALTNAME
 # duplicate variant definition
 setenv_var __MODULES_LMVARIANT variant/1.0&foo|val1&foo|val3|0|0&bar|val2|0|0:variant/2.0&baz|val3|0|0
 testouterr_cmd sh {list} OK "$cur_loaded
- 1) variant/1.0{bar=val2:foo=val3}   2) variant/2.0{baz=val3}  
+ 1) variant/1.0{bar=val2:foo=val3}   2) variant/2.0{baz=val3}
 
 Key:
-{variant=value}  "
+{variant=value}"
 
 testouterr_cmd sh {list -j} OK "{\"variant/1.0\": { \"name\": \"variant/1.0\", \"type\": \"modulefile\", \"variants\": { \"bar\": \"val2\", \"foo\": \"val3\" }, \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/1.0\", \"via\": \"\"},
 \"variant/2.0\": { \"name\": \"variant/2.0\", \"type\": \"modulefile\", \"variants\": { \"baz\": \"val3\" }, \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/2.0\", \"via\": \"\"}}"
@@ -106,73 +106,73 @@ testouterr_cmd sh {list -j} OK "{\"variant/1.0\": { \"name\": \"variant/1.0\", \
 # badly defined loaded variant
 setenv_var __MODULES_LMVARIANT variant/1.0
 testouterr_cmd sh {list} OK "$cur_loaded
- 1) variant/1.0   2) variant/2.0  "
+ 1) variant/1.0   2) variant/2.0"
 setenv_var __MODULES_LMVARIANT variant/1.0&foo
 testouterr_cmd sh {list} OK "$cur_loaded
- 1) variant/1.0{foo=}   2) variant/2.0  
+ 1) variant/1.0{foo=}   2) variant/2.0
 
 Key:
-{variant=value}  "
+{variant=value}"
 setenv_var __MODULES_LMVARIANT variant/1.0&foo|val
 testouterr_cmd sh {list} OK "$cur_loaded
- 1) variant/1.0{foo=val}   2) variant/2.0  
+ 1) variant/1.0{foo=val}   2) variant/2.0
 
 Key:
-{variant=value}  "
+{variant=value}"
 setenv_var __MODULES_LMVARIANT variant/1.0&foo|val|str
 testouterr_cmd sh {list} OK "$cur_loaded
- 1) variant/1.0{foo=val}   2) variant/2.0  
+ 1) variant/1.0{foo=val}   2) variant/2.0
 
 Key:
-{variant=value}  "
+{variant=value}"
 
 # colored output
 setenv_var MODULES_COLORS "se=2:va=33"
 setenv_var __MODULES_LMVARIANT variant/1.0&foo|val1|0|0&bar|val2|0|0:variant/2.0&baz|val3|0|0
 
 testouterr_cmd_re sh {list --color=always} OK "$cur_loaded
- 1\\) variant/1.0[sgr 2]{[sgr 22][sgr 33]bar=[sgr 0][sgr 33]val2[sgr 0][sgr 2]:[sgr 22][sgr 33]foo=[sgr 0][sgr 33]val1[sgr 0][sgr 2]}[sgr 22]   2\\) variant/2.0[sgr 2]{[sgr 22][sgr 33]baz=[sgr 0][sgr 33]val3[sgr 0][sgr 2]}[sgr 22]  
+ 1\\) variant/1.0[sgr 2]{[sgr 22][sgr 33]bar=[sgr 0][sgr 33]val2[sgr 0][sgr 2]:[sgr 22][sgr 33]foo=[sgr 0][sgr 33]val1[sgr 0][sgr 2]}[sgr 22]   2\\) variant/2.0[sgr 2]{[sgr 22][sgr 33]baz=[sgr 0][sgr 33]val3[sgr 0][sgr 2]}[sgr 22]
 
 Key:
-[sgr 2]{[sgr 22][sgr 33]variant=value[sgr 0][sgr 2]}[sgr 22]  "
+[sgr 2]{[sgr 22][sgr 33]variant=value[sgr 0][sgr 2]}[sgr 22]"
 
 # boolean variant set
 setenv_loaded_module [list variant/1.0] [list $mp/variant/1.0]
 setenv_var __MODULES_LMVARIANT variant/1.0&foo|1|1|0
 testouterr_cmd sh {list} OK "$cur_loaded
- 1) variant/1.0{+foo}  
+ 1) variant/1.0{+foo}
 
 Key:
-{+variant}={variant=on}  {variant=value}  "
+{+variant}={variant=on}  {variant=value}"
 testouterr_cmd sh {list -j} OK "{\"variant/1.0\": { \"name\": \"variant/1.0\", \"type\": \"modulefile\", \"variants\": { \"foo\": true }, \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/1.0\", \"via\": \"\"}}"
 setenv_var __MODULES_LMVARIANT variant/1.0&foo|0|1|0
 testouterr_cmd sh {list} OK "$cur_loaded
- 1) variant/1.0{-foo}  
+ 1) variant/1.0{-foo}
 
 Key:
-{-variant}={variant=off}  {variant=value}  "
+{-variant}={variant=off}  {variant=value}"
 testouterr_cmd sh {list -j} OK "{\"variant/1.0\": { \"name\": \"variant/1.0\", \"type\": \"modulefile\", \"variants\": { \"foo\": false }, \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/1.0\", \"via\": \"\"}}"
 # bad persistency information for boolean variant
 setenv_var __MODULES_LMVARIANT variant/1.0&foo|1|1
 testouterr_cmd sh {list} OK "$cur_loaded
- 1) variant/1.0{+foo}  
+ 1) variant/1.0{+foo}
 
 Key:
-{+variant}={variant=on}  {variant=value}  "
+{+variant}={variant=on}  {variant=value}"
 testouterr_cmd sh {list -j} OK "{\"variant/1.0\": { \"name\": \"variant/1.0\", \"type\": \"modulefile\", \"variants\": { \"foo\": true }, \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/1.0\", \"via\": \"\"}}"
 setenv_var __MODULES_LMVARIANT variant/1.0&foo||1|0
 testouterr_cmd sh {list} OK "$cur_loaded
- 1) variant/1.0{-foo}  
+ 1) variant/1.0{-foo}
 
 Key:
-{-variant}={variant=off}  {variant=value}  "
+{-variant}={variant=off}  {variant=value}"
 testouterr_cmd sh {list -j} OK "{\"variant/1.0\": { \"name\": \"variant/1.0\", \"type\": \"modulefile\", \"variants\": { \"foo\": false }, \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/1.0\", \"via\": \"\"}}"
 setenv_var __MODULES_LMVARIANT variant/1.0&foo|str|1|0
 testouterr_cmd sh {list} OK "$cur_loaded
- 1) variant/1.0{-foo}  
+ 1) variant/1.0{-foo}
 
 Key:
-{-variant}={variant=off}  {variant=value}  "
+{-variant}={variant=off}  {variant=value}"
 testouterr_cmd sh {list -j} OK "{\"variant/1.0\": { \"name\": \"variant/1.0\", \"type\": \"modulefile\", \"variants\": { \"foo\": false }, \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/1.0\", \"via\": \"\"}}"
 setenv_var __MODULES_LMVARIANT variant/1.0&foo|1||0
 testouterr_cmd sh {list -j} OK "{\"variant/1.0\": { \"name\": \"variant/1.0\", \"type\": \"modulefile\", \"variants\": { \"foo\": \"1\" }, \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/1.0\", \"via\": \"\"}}"
@@ -183,22 +183,22 @@ testouterr_cmd sh {list -j} OK "{\"variant/1.0\": { \"name\": \"variant/1.0\", \
 setenv_var MODULES_COLORS "se=2:va=33"
 setenv_var __MODULES_LMVARIANT variant/1.0&foo|1|1|0
 testouterr_cmd_re sh {list --color=always} OK "$cur_loaded
- 1\\) variant/1.0[sgr 2]{[sgr 22][sgr 33]\\+foo[sgr 0][sgr 2]}[sgr 22]  
+ 1\\) variant/1.0[sgr 2]{[sgr 22][sgr 33]\\+foo[sgr 0][sgr 2]}[sgr 22]
 
 Key:
-[sgr 2]{[sgr 22][sgr 33]\\+variant[sgr 0][sgr 2]}[sgr 22]=[sgr 2]{[sgr 22][sgr 33]variant=on[sgr 0][sgr 2]}[sgr 22]  [sgr 2]{[sgr 22][sgr 33]variant=value[sgr 0][sgr 2]}[sgr 22]  "
+[sgr 2]{[sgr 22][sgr 33]\\+variant[sgr 0][sgr 2]}[sgr 22]=[sgr 2]{[sgr 22][sgr 33]variant=on[sgr 0][sgr 2]}[sgr 22]  [sgr 2]{[sgr 22][sgr 33]variant=value[sgr 0][sgr 2]}[sgr 22]"
 setenv_var __MODULES_LMVARIANT variant/1.0&foo|0|1|0
 testouterr_cmd_re sh {list --color=always} OK "$cur_loaded
- 1\\) variant/1.0[sgr 2]{[sgr 22][sgr 33]-foo[sgr 0][sgr 2]}[sgr 22]  
+ 1\\) variant/1.0[sgr 2]{[sgr 22][sgr 33]-foo[sgr 0][sgr 2]}[sgr 22]
 
 Key:
-[sgr 2]{[sgr 22][sgr 33]-variant[sgr 0][sgr 2]}[sgr 22]=[sgr 2]{[sgr 22][sgr 33]variant=off[sgr 0][sgr 2]}[sgr 22]  [sgr 2]{[sgr 22][sgr 33]variant=value[sgr 0][sgr 2]}[sgr 22]  "
+[sgr 2]{[sgr 22][sgr 33]-variant[sgr 0][sgr 2]}[sgr 22]=[sgr 2]{[sgr 22][sgr 33]variant=off[sgr 0][sgr 2]}[sgr 22]  [sgr 2]{[sgr 22][sgr 33]variant=value[sgr 0][sgr 2]}[sgr 22]"
 setenv_var __MODULES_LMVARIANT variant/1.0&foo|0|1|0&bar|val|0
 testouterr_cmd_re sh {list --color=always} OK "$cur_loaded
- 1\\) variant/1.0[sgr 2]{[sgr 22][sgr 33]bar=[sgr 0][sgr 33]val[sgr 0][sgr 2]:[sgr 22][sgr 33]-foo[sgr 0][sgr 2]}[sgr 22]  
+ 1\\) variant/1.0[sgr 2]{[sgr 22][sgr 33]bar=[sgr 0][sgr 33]val[sgr 0][sgr 2]:[sgr 22][sgr 33]-foo[sgr 0][sgr 2]}[sgr 22]
 
 Key:
-[sgr 2]{[sgr 22][sgr 33]-variant[sgr 0][sgr 2]}[sgr 22]=[sgr 2]{[sgr 22][sgr 33]variant=off[sgr 0][sgr 2]}[sgr 22]  [sgr 2]{[sgr 22][sgr 33]variant=value[sgr 0][sgr 2]}[sgr 22]  "
+[sgr 2]{[sgr 22][sgr 33]-variant[sgr 0][sgr 2]}[sgr 22]=[sgr 2]{[sgr 22][sgr 33]variant=off[sgr 0][sgr 2]}[sgr 22]  [sgr 2]{[sgr 22][sgr 33]variant=value[sgr 0][sgr 2]}[sgr 22]"
 
 # color output with default variant
 setenv_var MODULES_COLORS "se=2:va=33:de=4:aL=100:L=90"
@@ -206,10 +206,10 @@ setenv_var __MODULES_LMVARIANT variant/1.0&foo|val1|0|1
 
 # valued variant value is default, module is loaded, key is reported
 set tserr "$cur_loaded
- 1\\) variant/1.0[sgr 2]{[sgr 22][sgr 33]foo=[sgr 0][sgr 33][sgr 4]val1[sgr 0][sgr 0][sgr 2]}[sgr 22]  
+ 1\\) variant/1.0[sgr 2]{[sgr 22][sgr 33]foo=[sgr 0][sgr 33][sgr 4]val1[sgr 0][sgr 0][sgr 2]}[sgr 22]
 
 Key:
-[sgr 4]default-version[sgr 0]  [sgr 2]{[sgr 22][sgr 33]variant=value[sgr 0][sgr 2]}[sgr 22]  "
+[sgr 4]default-version[sgr 0]  [sgr 2]{[sgr 22][sgr 33]variant=value[sgr 0][sgr 2]}[sgr 22]"
 testouterr_cmd_re sh {list --color=always} OK $tserr
 # valued variant value is default automatically set, module is loaded, key is reported
 setenv_var __MODULES_LMVARIANT variant/1.0&foo|val1|0|2
@@ -218,21 +218,21 @@ testouterr_cmd_re sh {list --color=always} OK $tserr
 setenv_var __MODULES_LMVARIANT variant/1.0&foo|val1|0|1
 setenv_var __MODULES_LMTAG variant/1.0&auto-loaded
 set tserr "$cur_loaded
- 1\\) [sgr 100]variant/1.0[sgr 0][sgr 2]{[sgr 22][sgr 33]foo=[sgr 0][sgr 33][sgr 4]val1[sgr 0][sgr 0][sgr 2]}[sgr 22]  
+ 1\\) [sgr 100]variant/1.0[sgr 0][sgr 2]{[sgr 22][sgr 33]foo=[sgr 0][sgr 33][sgr 4]val1[sgr 0][sgr 0][sgr 2]}[sgr 22]
 
 Key:
-[sgr 4]default-version[sgr 0]  [sgr 100]auto-loaded[sgr 0]  [sgr 2]{[sgr 22][sgr 33]variant=value[sgr 0][sgr 2]}[sgr 22]  "
+[sgr 4]default-version[sgr 0]  [sgr 100]auto-loaded[sgr 0]  [sgr 2]{[sgr 22][sgr 33]variant=value[sgr 0][sgr 2]}[sgr 22]"
 testouterr_cmd_re sh {list --color=always} OK $tserr
 # valued variant value containing space is default, module is loaded, no key reported
 setenv_var __MODULES_LMVARIANT {variant/1.0&foo|val1 |0|1}
 unsetenv_var __MODULES_LMTAG
 set tserr "$cur_loaded
- 1\\) variant/1.0[sgr 2]{[sgr 22][sgr 33]foo=[sgr 0][sgr 33][sgr 4]val1 [sgr 0][sgr 0][sgr 2]}[sgr 22]  "
+ 1\\) variant/1.0[sgr 2]{[sgr 22][sgr 33]foo=[sgr 0][sgr 33][sgr 4]val1 [sgr 0][sgr 0][sgr 2]}[sgr 22]"
 testouterr_cmd_re sh {list --color=always -o header:idx:variant:sym:tag} OK $tserr
 # valued variant value is not default, module is loaded, no key reported
 setenv_var __MODULES_LMVARIANT {variant/1.0&foo|val1|0|0}
 set tserr "$cur_loaded
- 1\\) variant/1.0[sgr 2]{[sgr 22][sgr 33]foo=[sgr 0][sgr 33]val1[sgr 0][sgr 2]}[sgr 22]  "
+ 1\\) variant/1.0[sgr 2]{[sgr 22][sgr 33]foo=[sgr 0][sgr 33]val1[sgr 0][sgr 2]}[sgr 22]"
 testouterr_cmd_re sh {list --color=always -o header:idx:variant:sym:tag} OK $tserr
 
 # shortcut variant value is default, module is loaded, key is reported
@@ -243,19 +243,19 @@ unsetenv_var __MODULES_LMTAG
 # boolean variant value is default, module is loaded, key is reported
 setenv_var __MODULES_LMVARIANT {variant/1.0&foo|1|1|1}
 set tserr "$cur_loaded
- 1\\) variant/1.0[sgr 2]{[sgr 22][sgr 33][sgr 4]\\+foo[sgr 0][sgr 0][sgr 2]}[sgr 22]  
+ 1\\) variant/1.0[sgr 2]{[sgr 22][sgr 33][sgr 4]\\+foo[sgr 0][sgr 0][sgr 2]}[sgr 22]
 
 Key:
-[sgr 4]default-version[sgr 0]  [sgr 2]{[sgr 22][sgr 33]\\+variant[sgr 0][sgr 2]}[sgr 22]=[sgr 2]{[sgr 22][sgr 33]variant=on[sgr 0][sgr 2]}[sgr 22]  [sgr 2]{[sgr 22][sgr 33]variant=value[sgr 0][sgr 2]}[sgr 22]  "
+[sgr 4]default-version[sgr 0]  [sgr 2]{[sgr 22][sgr 33]\\+variant[sgr 0][sgr 2]}[sgr 22]=[sgr 2]{[sgr 22][sgr 33]variant=on[sgr 0][sgr 2]}[sgr 22]  [sgr 2]{[sgr 22][sgr 33]variant=value[sgr 0][sgr 2]}[sgr 22]"
 testouterr_cmd_re sh {list --color=always} OK $tserr
 # boolean variant value is default, module is auto-loaded, key is reported
 setenv_var __MODULES_LMVARIANT {variant/1.0&foo|0|1|2}
 setenv_var __MODULES_LMTAG variant/1.0&auto-loaded
 set tserr "$cur_loaded
- 1\\) [sgr 100]variant/1.0[sgr 0][sgr 2]{[sgr 22][sgr 33][sgr 4]-foo[sgr 0][sgr 0][sgr 2]}[sgr 22]  
+ 1\\) [sgr 100]variant/1.0[sgr 0][sgr 2]{[sgr 22][sgr 33][sgr 4]-foo[sgr 0][sgr 0][sgr 2]}[sgr 22]
 
 Key:
-[sgr 4]default-version[sgr 0]  [sgr 100]auto-loaded[sgr 0]  [sgr 2]{[sgr 22][sgr 33]-variant[sgr 0][sgr 2]}[sgr 22]=[sgr 2]{[sgr 22][sgr 33]variant=off[sgr 0][sgr 2]}[sgr 22]  [sgr 2]{[sgr 22][sgr 33]variant=value[sgr 0][sgr 2]}[sgr 22]  "
+[sgr 4]default-version[sgr 0]  [sgr 100]auto-loaded[sgr 0]  [sgr 2]{[sgr 22][sgr 33]-variant[sgr 0][sgr 2]}[sgr 22]=[sgr 2]{[sgr 22][sgr 33]variant=off[sgr 0][sgr 2]}[sgr 22]  [sgr 2]{[sgr 22][sgr 33]variant=value[sgr 0][sgr 2]}[sgr 22]"
 testouterr_cmd_re sh {list --color=always} OK $tserr
 unsetenv_var __MODULES_LMTAG
 
@@ -270,10 +270,10 @@ setenv_var TESTSUITE_VARIANT 13
 setenv_var __MODULES_LMVARIANT variant/1.0&bar|val1|0|0&foo|val1|0|1
 
 set tserr "$cur_matchingloaded
- 1) variant/1.0{bar=val1:foo=val1}  
+ 1) variant/1.0{bar=val1:foo=val1}
 
 Key:
-{variant=value}  "
+{variant=value}"
 testouterr_cmd sh {list variant foo=val1} OK $tserr
 testouterr_cmd sh {list variant foo=val1 bar=val1} OK $tserr
 testouterr_cmd sh {list variant foo=val2} OK $no_matchingloaded
@@ -281,41 +281,41 @@ testouterr_cmd sh {list variant foo=val2 bar=val1} OK $no_matchingloaded
 testouterr_cmd sh {list variant baz=val1} OK $no_matchingloaded
 
 set tserr "$cur_matchingloaded
- 1\\) [sgr 1]variant[sgr 22]/1.0[sgr 2]{[sgr 22][sgr 33]bar=[sgr 0][sgr 33]val1[sgr 0][sgr 2]:[sgr 22][sgr 33][sgr 1]foo[sgr 22]=[sgr 0][sgr 33][sgr 4][sgr 1]val1[sgr 22][sgr 0][sgr 0][sgr 2]}[sgr 22]  
+ 1\\) [sgr 1]variant[sgr 22]/1.0[sgr 2]{[sgr 22][sgr 33]bar=[sgr 0][sgr 33]val1[sgr 0][sgr 2]:[sgr 22][sgr 33][sgr 1]foo[sgr 22]=[sgr 0][sgr 33][sgr 4][sgr 1]val1[sgr 22][sgr 0][sgr 0][sgr 2]}[sgr 22]
 
 Key:
-[sgr 4]default-version[sgr 0]  [sgr 2]{[sgr 22][sgr 33]variant=value[sgr 0][sgr 2]}[sgr 22]  "
+[sgr 4]default-version[sgr 0]  [sgr 2]{[sgr 22][sgr 33]variant=value[sgr 0][sgr 2]}[sgr 22]"
 testouterr_cmd_re sh {list --color=always variant foo=val1} OK $tserr
 # no module name and version, only variant specified
 set tserr "$cur_matchingloaded
- 1\\) variant/1.0[sgr 2]{[sgr 22][sgr 33]bar=[sgr 0][sgr 33]val1[sgr 0][sgr 2]:[sgr 22][sgr 33][sgr 1]foo[sgr 22]=[sgr 0][sgr 33][sgr 4][sgr 1]val1[sgr 22][sgr 0][sgr 0][sgr 2]}[sgr 22]  
+ 1\\) variant/1.0[sgr 2]{[sgr 22][sgr 33]bar=[sgr 0][sgr 33]val1[sgr 0][sgr 2]:[sgr 22][sgr 33][sgr 1]foo[sgr 22]=[sgr 0][sgr 33][sgr 4][sgr 1]val1[sgr 22][sgr 0][sgr 0][sgr 2]}[sgr 22]
 
 Key:
-[sgr 4]default-version[sgr 0]  [sgr 2]{[sgr 22][sgr 33]variant=value[sgr 0][sgr 2]}[sgr 22]  "
+[sgr 4]default-version[sgr 0]  [sgr 2]{[sgr 22][sgr 33]variant=value[sgr 0][sgr 2]}[sgr 22]"
 testouterr_cmd_re sh {list --color=always foo=val1} OK $tserr
 
 # shortcut variant
 setenv_var MODULES_VARIANT_SHORTCUT foo=%
 
 set tserr "$cur_matchingloaded
- 1) variant/1.0{bar=val1:%val1}  
+ 1) variant/1.0{bar=val1:%val1}
 
 Key:
-{%value}={foo=value}  {variant=value}  "
+{%value}={foo=value}  {variant=value}"
 testouterr_cmd sh {list variant foo=val1} OK $tserr
 testouterr_cmd sh {list variant %val1} OK $tserr
 set tserr "$cur_matchingloaded
- 1\\) [sgr 1]variant[sgr 22]/1.0[sgr 2]{[sgr 22][sgr 33]bar=[sgr 0][sgr 33]val1[sgr 0][sgr 2]:[sgr 22][sgr 33][sgr 1]%[sgr 22][sgr 0][sgr 33][sgr 4][sgr 1]val1[sgr 22][sgr 0][sgr 0][sgr 2]}[sgr 22]  
+ 1\\) [sgr 1]variant[sgr 22]/1.0[sgr 2]{[sgr 22][sgr 33]bar=[sgr 0][sgr 33]val1[sgr 0][sgr 2]:[sgr 22][sgr 33][sgr 1]%[sgr 22][sgr 0][sgr 33][sgr 4][sgr 1]val1[sgr 22][sgr 0][sgr 0][sgr 2]}[sgr 22]
 
 Key:
-[sgr 4]default-version[sgr 0]  [sgr 2]{[sgr 22][sgr 33]%value[sgr 0][sgr 2]}[sgr 22]=[sgr 2]{[sgr 22][sgr 33]foo=value[sgr 0][sgr 2]}[sgr 22]  [sgr 2]{[sgr 22][sgr 33]variant=value[sgr 0][sgr 2]}[sgr 22]  "
+[sgr 4]default-version[sgr 0]  [sgr 2]{[sgr 22][sgr 33]%value[sgr 0][sgr 2]}[sgr 22]=[sgr 2]{[sgr 22][sgr 33]foo=value[sgr 0][sgr 2]}[sgr 22]  [sgr 2]{[sgr 22][sgr 33]variant=value[sgr 0][sgr 2]}[sgr 22]"
 testouterr_cmd_re sh {list --color=always variant %val1} OK $tserr
 # no module name and version, only variant specified
 set tserr "$cur_matchingloaded
- 1\\) variant/1.0[sgr 2]{[sgr 22][sgr 33]bar=[sgr 0][sgr 33]val1[sgr 0][sgr 2]:[sgr 22][sgr 33][sgr 1]%[sgr 22][sgr 0][sgr 33][sgr 4][sgr 1]val1[sgr 22][sgr 0][sgr 0][sgr 2]}[sgr 22]  
+ 1\\) variant/1.0[sgr 2]{[sgr 22][sgr 33]bar=[sgr 0][sgr 33]val1[sgr 0][sgr 2]:[sgr 22][sgr 33][sgr 1]%[sgr 22][sgr 0][sgr 33][sgr 4][sgr 1]val1[sgr 22][sgr 0][sgr 0][sgr 2]}[sgr 22]
 
 Key:
-[sgr 4]default-version[sgr 0]  [sgr 2]{[sgr 22][sgr 33]%value[sgr 0][sgr 2]}[sgr 22]=[sgr 2]{[sgr 22][sgr 33]foo=value[sgr 0][sgr 2]}[sgr 22]  [sgr 2]{[sgr 22][sgr 33]variant=value[sgr 0][sgr 2]}[sgr 22]  "
+[sgr 4]default-version[sgr 0]  [sgr 2]{[sgr 22][sgr 33]%value[sgr 0][sgr 2]}[sgr 22]=[sgr 2]{[sgr 22][sgr 33]foo=value[sgr 0][sgr 2]}[sgr 22]  [sgr 2]{[sgr 22][sgr 33]variant=value[sgr 0][sgr 2]}[sgr 22]"
 testouterr_cmd_re sh {list --color=always %val1} OK $tserr
 unsetenv_var MODULES_VARIANT_SHORTCUT
 
@@ -324,23 +324,23 @@ setenv_var TESTSUITE_VARIANT bool24
 setenv_var __MODULES_LMVARIANT variant/1.0&bar|0|1|0&foo|1|1|1
 
 set tserr "$cur_matchingloaded
- 1) variant/1.0{-bar:+foo}  
+ 1) variant/1.0{-bar:+foo}
 
 Key:
-{+variant}={variant=on}  {-variant}={variant=off}  {variant=value}  "
+{+variant}={variant=on}  {-variant}={variant=off}  {variant=value}"
 testouterr_cmd sh {list variant foo=on} OK $tserr
 set tserr "$cur_matchingloaded
- 1\\) [sgr 1]variant[sgr 22]/1.0[sgr 2]{[sgr 22][sgr 33][sgr 1]-bar[sgr 22][sgr 0][sgr 2]:[sgr 22][sgr 33][sgr 4][sgr 1]\\\+foo[sgr 22][sgr 0][sgr 0][sgr 2]}[sgr 22]  
+ 1\\) [sgr 1]variant[sgr 22]/1.0[sgr 2]{[sgr 22][sgr 33][sgr 1]-bar[sgr 22][sgr 0][sgr 2]:[sgr 22][sgr 33][sgr 4][sgr 1]\\\+foo[sgr 22][sgr 0][sgr 0][sgr 2]}[sgr 22]
 
 Key:
-[sgr 4]default-version[sgr 0]  [sgr 2]{[sgr 22][sgr 33]\\\+variant[sgr 0][sgr 2]}[sgr 22]=[sgr 2]{[sgr 22][sgr 33]variant=on[sgr 0][sgr 2]}[sgr 22]  [sgr 2]{[sgr 22][sgr 33]-variant[sgr 0][sgr 2]}[sgr 22]=[sgr 2]{[sgr 22][sgr 33]variant=off[sgr 0][sgr 2]}[sgr 22]  [sgr 2]{[sgr 22][sgr 33]variant=value[sgr 0][sgr 2]}[sgr 22]  "
+[sgr 4]default-version[sgr 0]  [sgr 2]{[sgr 22][sgr 33]\\\+variant[sgr 0][sgr 2]}[sgr 22]=[sgr 2]{[sgr 22][sgr 33]variant=on[sgr 0][sgr 2]}[sgr 22]  [sgr 2]{[sgr 22][sgr 33]-variant[sgr 0][sgr 2]}[sgr 22]=[sgr 2]{[sgr 22][sgr 33]variant=off[sgr 0][sgr 2]}[sgr 22]  [sgr 2]{[sgr 22][sgr 33]variant=value[sgr 0][sgr 2]}[sgr 22]"
 testouterr_cmd_re sh {list -w 210 --color=always variant -bar +foo} OK $tserr
 # no module name and version, only variant specified
 set tserr "$cur_matchingloaded
- 1\\) variant/1.0[sgr 2]{[sgr 22][sgr 33][sgr 1]-bar[sgr 22][sgr 0][sgr 2]:[sgr 22][sgr 33][sgr 4][sgr 1]\\\+foo[sgr 22][sgr 0][sgr 0][sgr 2]}[sgr 22]  
+ 1\\) variant/1.0[sgr 2]{[sgr 22][sgr 33][sgr 1]-bar[sgr 22][sgr 0][sgr 2]:[sgr 22][sgr 33][sgr 4][sgr 1]\\\+foo[sgr 22][sgr 0][sgr 0][sgr 2]}[sgr 22]
 
 Key:
-[sgr 4]default-version[sgr 0]  [sgr 2]{[sgr 22][sgr 33]\\\+variant[sgr 0][sgr 2]}[sgr 22]=[sgr 2]{[sgr 22][sgr 33]variant=on[sgr 0][sgr 2]}[sgr 22]  [sgr 2]{[sgr 22][sgr 33]-variant[sgr 0][sgr 2]}[sgr 22]=[sgr 2]{[sgr 22][sgr 33]variant=off[sgr 0][sgr 2]}[sgr 22]  [sgr 2]{[sgr 22][sgr 33]variant=value[sgr 0][sgr 2]}[sgr 22]  "
+[sgr 4]default-version[sgr 0]  [sgr 2]{[sgr 22][sgr 33]\\\+variant[sgr 0][sgr 2]}[sgr 22]=[sgr 2]{[sgr 22][sgr 33]variant=on[sgr 0][sgr 2]}[sgr 22]  [sgr 2]{[sgr 22][sgr 33]-variant[sgr 0][sgr 2]}[sgr 22]=[sgr 2]{[sgr 22][sgr 33]variant=off[sgr 0][sgr 2]}[sgr 22]  [sgr 2]{[sgr 22][sgr 33]variant=value[sgr 0][sgr 2]}[sgr 22]"
 testouterr_cmd_re sh {list -w 210 --color=always -bar +foo} OK $tserr
 
 # free value variant
@@ -348,24 +348,24 @@ setenv_var TESTSUITE_VARIANT free3
 setenv_var __MODULES_LMVARIANT variant/1.0&foo|val1|0|0
 
 set tserr "$cur_matchingloaded
- 1) variant/1.0{foo=val1}  
+ 1) variant/1.0{foo=val1}
 
 Key:
-{variant=value}  "
+{variant=value}"
 testouterr_cmd sh {list variant foo=val1} OK $tserr
 testouterr_cmd sh {list variant foo=on} OK $no_matchingloaded
 set tserr "$cur_matchingloaded
- 1\\) [sgr 1]variant[sgr 22]/1.0[sgr 2]{[sgr 22][sgr 33][sgr 1]foo[sgr 22]=[sgr 0][sgr 33][sgr 1]val1[sgr 22][sgr 0][sgr 2]}[sgr 22]  
+ 1\\) [sgr 1]variant[sgr 22]/1.0[sgr 2]{[sgr 22][sgr 33][sgr 1]foo[sgr 22]=[sgr 0][sgr 33][sgr 1]val1[sgr 22][sgr 0][sgr 2]}[sgr 22]
 
 Key:
-[sgr 2]{[sgr 22][sgr 33]variant=value[sgr 0][sgr 2]}[sgr 22]  "
+[sgr 2]{[sgr 22][sgr 33]variant=value[sgr 0][sgr 2]}[sgr 22]"
 testouterr_cmd_re sh {list --color=always variant foo=val1} OK $tserr
 # no module name and version, only variant specified
 set tserr "$cur_matchingloaded
- 1\\) variant/1.0[sgr 2]{[sgr 22][sgr 33][sgr 1]foo[sgr 22]=[sgr 0][sgr 33][sgr 1]val1[sgr 22][sgr 0][sgr 2]}[sgr 22]  
+ 1\\) variant/1.0[sgr 2]{[sgr 22][sgr 33][sgr 1]foo[sgr 22]=[sgr 0][sgr 33][sgr 1]val1[sgr 22][sgr 0][sgr 2]}[sgr 22]
 
 Key:
-[sgr 2]{[sgr 22][sgr 33]variant=value[sgr 0][sgr 2]}[sgr 22]  "
+[sgr 2]{[sgr 22][sgr 33]variant=value[sgr 0][sgr 2]}[sgr 22]"
 testouterr_cmd_re sh {list --color=always foo=val1} OK $tserr
 
 unsetenv_var __MODULES_LMVARIANT
@@ -384,14 +384,14 @@ setenv_var MODULES_SPIDER_TERSE_OUTPUT {modulepath:alias:dirwsym:sym:tag:variant
 
 # variant not reported
 testouterr_cmd_re sh {avail variant/1.0} OK "$modlin $mpre $modlin
-variant/1.0  "
+variant/1.0"
 
 # specified variants taken into account (module returned if match)
 setenv_var MODULES_ADVANCED_VERSION_SPEC 1
-set tserr "$modlin $mpre $modlin\nvariant/1.0  "
+set tserr "$modlin $mpre $modlin\nvariant/1.0"
 testouterr_cmd_re sh {avail variant/1.0 foo=val1 baz=2} OK {}
 setenv_var TESTSUITE_VARIANT 1
-set tserr "$modlin $mpre $modlin\nvariant/6.0{bar=1,2,3:foo=val1,val2,val3}  "
+set tserr "$modlin $mpre $modlin\nvariant/6.0{bar=1,2,3:foo=val1,val2,val3}"
 testouterr_cmd_re sh {avail variant@6.0 foo=val1 baz=2} OK {}
 testouterr_cmd_re sh {spider variant@6.0 foo=val1 baz=2} OK {}
 testouterr_cmd_re sh {avail variant@6.0 foo=val4 bar=1} OK {}
@@ -407,7 +407,7 @@ testouterr_cmd_re sh {avail variant@6.0 foo=val1 bar=4 bar=1} OK {}
 testouterr_cmd_re sh {avail variant@6.0 foo=val1 bar=1} OK $tserr
 testouterr_cmd_re sh {avail variant@6.0 foo=val1} OK $tserr
 setenv_var MODULES_AVAIL_OUTPUT {modulepath:alias:dirwsym:sym:tag}
-set tserr "$modlin $mpre $modlin\nvariant/6.0  "
+set tserr "$modlin $mpre $modlin\nvariant/6.0"
 testouterr_cmd_re sh {avail variant@6.0 bar=2} OK $tserr
 setenv_var MODULES_AVAIL_OUTPUT {modulepath:alias:dirwsym:sym:tag:variantifspec}
 # no module name/version, but variant specified
@@ -423,12 +423,12 @@ testouterr_cmd sh {spider -t foo=val3 bar=3} OK $tserr
 
 # shortcut variant specification
 setenv_var MODULES_VARIANT_SHORTCUT foo=%
-set tserr "$modlin $mpre $modlin\nvariant/6.0{bar=1,2,3:%val1,val2,val3}  "
+set tserr "$modlin $mpre $modlin\nvariant/6.0{bar=1,2,3:%val1,val2,val3}"
 testouterr_cmd_re sh {avail variant@6.0 %val4} OK {}
 testouterr_cmd_re sh {avail variant@6.0 %val1 bar=2} OK $tserr
 setenv_var MODULES_AVAIL_OUTPUT {modulepath:alias:dirwsym:sym:tag}
 setenv_var MODULES_SPIDER_OUTPUT {modulepath:alias:dirwsym:sym:tag}
-set tserr "$modlin $mpre $modlin\nvariant/6.0  "
+set tserr "$modlin $mpre $modlin\nvariant/6.0"
 testouterr_cmd_re sh {avail variant@6.0 %val2} OK $tserr
 testouterr_cmd_re sh {spider variant@6.0 %val2} OK $tserr
 setenv_var MODULES_AVAIL_OUTPUT {modulepath:alias:dirwsym:sym:tag:variantifspec}
@@ -447,32 +447,32 @@ unsetenv_var MODULES_VARIANT_SHORTCUT
 # boolean variant specification
 testouterr_cmd_re sh {avail variant@6.0 +foo -bar} OK {}
 setenv_var TESTSUITE_VARIANT bool1
-set tserr "$modlin $mpre $modlin\nvariant/6.0{bar=on,off:foo=on,off}  "
+set tserr "$modlin $mpre $modlin\nvariant/6.0{bar=on,off:foo=on,off}"
 testouterr_cmd_re sh {avail variant@6.0 +foo -bar} OK $tserr
 testouterr_cmd_re sh {avail variant@6.0 +foo} OK $tserr
 testouterr_cmd_re sh {spider variant@6.0 +foo} OK $tserr
 setenv_var MODULES_AVAIL_OUTPUT {modulepath:alias:dirwsym:sym:tag}
 setenv_var MODULES_SPIDER_OUTPUT {modulepath:alias:dirwsym:sym:tag}
-set tserr "$modlin $mpre $modlin\nvariant/6.0  "
+set tserr "$modlin $mpre $modlin\nvariant/6.0"
 testouterr_cmd_re sh {avail variant@6.0 ~bar} OK $tserr
 testouterr_cmd_re sh {spider variant@6.0 ~bar} OK $tserr
 setenv_var MODULES_AVAIL_OUTPUT {modulepath:alias:dirwsym:sym:tag:variantifspec}
 setenv_var MODULES_SPIDER_OUTPUT {modulepath:alias:dirwsym:sym:tag:variantifspec}
 # no module name/version, but variant specified
 if {$install_availindepth eq {n}} {
-    set tserr "$modlin $mpre $modlin\nvariant/  "
+    set tserr "$modlin $mpre $modlin\nvariant/"
 } else {
-    set tserr "$modlin $mpre $modlin\nvariant/6.0{bar=on,off:foo=on,off}  "
+    set tserr "$modlin $mpre $modlin\nvariant/6.0{bar=on,off:foo=on,off}"
 }
 testouterr_cmd_re sh {avail ~bar} OK $tserr
 unsetenv_var TESTSUITE_VARIANT
 
 # free value variant
 setenv_var TESTSUITE_VARIANT free3
-set tserr "$modlin $mpre $modlin\nvariant/6.0{foo=\\*}  "
+set tserr "$modlin $mpre $modlin\nvariant/6.0{foo=\\*}"
 testouterr_cmd_re sh {avail variant/6.0 foo=val1} OK $tserr
 setenv_var MODULES_AVAIL_OUTPUT {modulepath:alias:dirwsym:sym:tag}
-set tserr "$modlin $mpre $modlin\nvariant/6.0  "
+set tserr "$modlin $mpre $modlin\nvariant/6.0"
 testouterr_cmd_re sh {avail variant/6.0 foo=no} OK $tserr
 setenv_var MODULES_AVAIL_OUTPUT {modulepath:alias:dirwsym:sym:tag:variantifspec}
 # no module name/version, but variant specified
@@ -486,7 +486,7 @@ unsetenv_var TESTSUITE_VARIANT
 
 # when advanced_version_spec is disabled, variant spec are considered as modulefile spec
 setenv_var MODULES_ADVANCED_VERSION_SPEC 0
-set tserr "$modlin $mpre $modlin\nvar=val  variant/6.0  "
+set tserr "$modlin $mpre $modlin\nvar=val  variant/6.0"
 testouterr_cmd_re sh {avail variant/6.0 var=val} OK $tserr
 
 

@@ -32,7 +32,7 @@ testouterr_cmd sh {list foo} OK $tserr
 
 setenv_loaded_module [list foo/1.0] [list $mp/foo/1.0]
 
-set tserr "$cur_matchingloaded\n 1) foo/1.0  "
+set tserr "$cur_matchingloaded\n 1) foo/1.0"
 testouterr_cmd sh {list foo} OK $tserr
 
 set tserr $no_matchingloaded
@@ -43,23 +43,23 @@ skip_if_quick_mode
 set tserr $no_matchingloaded
 testouterr_cmd sh {list qux} OK $tserr
 
-set tserr "$cur_matchingloaded\n 1) foo/1.0  "
+set tserr "$cur_matchingloaded\n 1) foo/1.0"
 testouterr_cmd sh {list foo bar} OK $tserr
 testouterr_cmd sh {list bar qux foo} OK $tserr
 
 
 setenv_loaded_module [list foo/1.0 bar/1.0] [list $mp/foo/1.0 $mp/bar/1.0]
 
-set tserr "$cur_matchingloaded\n 1) foo/1.0  "
+set tserr "$cur_matchingloaded\n 1) foo/1.0"
 testouterr_cmd sh {list foo} OK $tserr
 
-set tserr "$cur_matchingloaded\n 1) bar/1.0  "
+set tserr "$cur_matchingloaded\n 1) bar/1.0"
 testouterr_cmd sh {list bar} OK $tserr
 
 set tserr $no_matchingloaded
 testouterr_cmd sh {list qux} OK $tserr
 
-set tserr "$cur_matchingloaded\n 1) foo/1.0   2) bar/1.0  "
+set tserr "$cur_matchingloaded\n 1) foo/1.0   2) bar/1.0"
 testouterr_cmd sh {list foo bar} OK $tserr
 testouterr_cmd sh {list bar qux foo} OK $tserr
 
@@ -67,7 +67,7 @@ testouterr_cmd sh {list bar qux foo} OK $tserr
 # search match & icase tests
 setenv_var MODULES_SEARCH_MATCH starts_with
 
-set tserr "$cur_matchingloaded\n 1) foo/1.0  "
+set tserr "$cur_matchingloaded\n 1) foo/1.0"
 testouterr_cmd sh {list fo} OK $tserr
 testouterr_cmd sh {list foo/} OK $tserr
 testouterr_cmd sh {list foo//} OK $tserr
@@ -87,7 +87,7 @@ testouterr_cmd sh {list -i oO} OK $tserr
 
 setenv_var MODULES_SEARCH_MATCH contains
 
-set tserr "$cur_matchingloaded\n 1) foo/1.0  "
+set tserr "$cur_matchingloaded\n 1) foo/1.0"
 testouterr_cmd sh {list fo} OK $tserr
 testouterr_cmd sh {list -i foo/} OK $tserr
 testouterr_cmd sh {list oo/} OK $tserr
@@ -104,13 +104,13 @@ unsetenv_var MODULES_SEARCH_MATCH
 
 
 # glob match
-set tserr "$cur_matchingloaded\n 1) foo/1.0  "
+set tserr "$cur_matchingloaded\n 1) foo/1.0"
 testouterr_cmd sh {list -S *o/} OK $tserr
 testouterr_cmd sh {list -S ?o} OK $tserr
 testouterr_cmd sh {list -i -S f?O} OK $tserr
 testouterr_cmd sh {list -C oo?} OK $tserr
 
-set tserr "$cur_matchingloaded\n 1) foo/1.0   2) bar/1.0  "
+set tserr "$cur_matchingloaded\n 1) foo/1.0   2) bar/1.0"
 testouterr_cmd sh {list */1} OK $tserr
 testouterr_cmd sh {list *} OK $tserr
 testouterr_cmd sh {list ?} OK $tserr
@@ -119,33 +119,33 @@ testouterr_cmd sh {list ?} OK $tserr
 # icase/extended_default mix
 setenv_var MODULES_ICASE search
 setenv_var MODULES_EXTENDED_DEFAULT 1
-set tserr "$cur_matchingloaded\n 1) foo/1.0  "
+set tserr "$cur_matchingloaded\n 1) foo/1.0"
 testouterr_cmd sh {list fOo} OK $tserr
 testouterr_cmd sh {list foo/1} OK $tserr
 
 setenv_var MODULES_ICASE never
 set tserr $no_matchingloaded
 testouterr_cmd sh {list fOo} OK $tserr
-set tserr "$cur_matchingloaded\n 1) foo/1.0  "
+set tserr "$cur_matchingloaded\n 1) foo/1.0"
 testouterr_cmd sh {list foo/1} OK $tserr
 
 setenv_var MODULES_EXTENDED_DEFAULT 0
 setenv_var MODULES_ICASE search
-set tserr "$cur_matchingloaded\n 1) foo/1.0  "
+set tserr "$cur_matchingloaded\n 1) foo/1.0"
 testouterr_cmd sh {list fOo} OK $tserr
 testouterr_cmd sh {list foo/1} OK $tserr
 
 setenv_var MODULES_ICASE never
 set tserr $no_matchingloaded
 testouterr_cmd sh {list fOo} OK $tserr
-set tserr "$cur_matchingloaded\n 1) foo/1.0  "
+set tserr "$cur_matchingloaded\n 1) foo/1.0"
 testouterr_cmd sh {list foo/1} OK $tserr
 
 unsetenv_var MODULES_ICASE
 
 
 # ml
-set tserr "$cur_matchingloaded\n 1) foo/1.0  "
+set tserr "$cur_matchingloaded\n 1) foo/1.0"
 testouterr_cmd sh {ml list foo} OK $tserr
 testouterr_cmd sh {ml list -S *o/} OK $tserr
 testouterr_cmd sh {ml list -S ?o} OK $tserr
@@ -154,24 +154,24 @@ testouterr_cmd sh {ml list -C oo} OK $tserr
 
 # module alias/symbolic version
 setenv_path_var __MODULES_LMALTNAME foo/1.0&al|aliasmod&al|vers/1.0:bar/1.0&bar/sym
-set tserr "$cur_matchingloaded\n 1) foo/1.0  "
+set tserr "$cur_matchingloaded\n 1) foo/1.0"
 testouterr_cmd sh {list alias} OK $tserr
 if {$install_icase eq {never}} {
 testouterr_cmd sh {list aliasMOD} OK $no_matchingloaded
 } else {
 testouterr_cmd sh {list aliasMOD} OK $tserr
 }
-set tserr "$cur_matchingloaded\n 1) bar/1.0(sym)  \n\nKey:\n(symbolic-version)  "
+set tserr "$cur_matchingloaded\n 1) bar/1.0(sym)\n\nKey:\n(symbolic-version)"
 testouterr_cmd sh {list *sym} OK $tserr
 
 
 # advanced version spec
 setenv_var MODULES_ADVANCED_VERSION_SPEC 1
-set tserr "$cur_matchingloaded\n 1) foo/1.0  "
+set tserr "$cur_matchingloaded\n 1) foo/1.0"
 testouterr_cmd sh {list foo@1} OK $tserr
 testouterr_cmd sh {list foo@:1} OK $tserr
 testouterr_cmd sh {list foo@1,2} OK $tserr
-set tserr "$cur_matchingloaded\n 1) foo/1.0   2) bar/1.0(sym)  \n\nKey:\n(symbolic-version)  "
+set tserr "$cur_matchingloaded\n 1) foo/1.0   2) bar/1.0(sym)\n\nKey:\n(symbolic-version)"
 testouterr_cmd sh {list foo@:1 bar@1:} OK $tserr
 testouterr_cmd sh {list vers@1.0,2: bar@1:} OK $tserr
 
@@ -182,17 +182,17 @@ setenv_path_var __MODULES_LMALTNAME variant/6.0&al|aliasmod
 setenv_path_var __MODULES_LMVARIANT variant/6.0&foo|val1|0|0
 setenv_loaded_module [list foo/1.0 bar/1.0 variant/6.0] [list $mp/foo/1.0 $mp/bar/1.0 $mp/variant/6.0]
 
-set tserr "$cur_matchingloaded\n 1) variant/6.0{foo=val1}  \n\nKey:\n{variant=value}  "
+set tserr "$cur_matchingloaded\n 1) variant/6.0{foo=val1}\n\nKey:\n{variant=value}"
 testouterr_cmd sh {list variant@6} OK $tserr
 testouterr_cmd sh {list variant@6 foo=val1} OK $tserr
 set tserr "$no_matchingloaded"
 testouterr_cmd sh {list variant@6 foo=val2} OK $tserr
-set tserr "$cur_matchingloaded\n 1) bar/1.0   2) variant/6.0{foo=val1}  \n\nKey:\n{variant=value}  "
+set tserr "$cur_matchingloaded\n 1) bar/1.0   2) variant/6.0{foo=val1}\n\nKey:\n{variant=value}"
 testouterr_cmd sh {list variant@6 foo=val1 bar @1} OK $tserr
 
 setenv_var TESTSUITE_VARIANT list2
 setenv_path_var __MODULES_LMVARIANT variant/6.0&foo|1|1|0
-set tserr "$cur_matchingloaded\n 1) variant/6.0{+foo}  \n\nKey:\n{+variant}={variant=on}  {variant=value}  "
+set tserr "$cur_matchingloaded\n 1) variant/6.0{+foo}\n\nKey:\n{+variant}={variant=on}  {variant=value}"
 testouterr_cmd sh {list variant@6} OK $tserr
 testouterr_cmd sh {list variant@6 +foo} OK $tserr
 set tserr "$no_matchingloaded"

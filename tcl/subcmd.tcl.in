@@ -927,7 +927,6 @@ proc cmdModuleSavelist {show_oneperline show_mtime search_match args} {
       }
       set display_list {}
       set len_list {}
-      set max_len 0
       set one_per_line [expr {$show_mtime || $show_oneperline}]
       set show_idx [expr {!$one_per_line}]
       # prepare query to highlight
@@ -948,15 +947,12 @@ proc cmdModuleSavelist {show_oneperline show_mtime search_match args} {
             } else {
                lappend display_list $collsgr
                lappend len_list [set len [string length $coll]]
-               if {$len > $max_len} {
-                  set max_len $len
-               }
             }
          }
       }
 
       displayElementList noheader {} {} $one_per_line $show_idx $start_idx\
-         $display_list $len_list $max_len
+         $display_list $len_list
    }
 }
 

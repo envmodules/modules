@@ -36,9 +36,9 @@ set version3 "1.0"
 set symbol3 "foo"
 
 set key_al "Key:
-\\(@\\)=module-alias  "
+\\(@\\)=module-alias"
 set key_sym "Key:
-\\(symbolic-version\\)  "
+\\(symbolic-version\\)"
 
 #
 #  Check this only for the /bin/csh
@@ -51,11 +51,11 @@ set ts_csh "$header$module/$version"
 #  The tests
 #
 
-testouterr_cmd_re "csh" "avail $module/$version" "OK" "$ts_csh\\s+"
-testouterr_cmd_re "csh" "avail $module" "OK" "$ts_csh\\s+"
+testouterr_cmd_re "csh" "avail $module/$version" "OK" "$ts_csh"
+testouterr_cmd_re "csh" "avail $module" "OK" "$ts_csh"
 
 # command nickname tests
-testouterr_cmd_re "csh" "av $module" "OK" "$ts_csh\\s+"
+testouterr_cmd_re "csh" "av $module" "OK" "$ts_csh"
 
 skip_if_quick_mode
 
@@ -64,14 +64,14 @@ skip_if_quick_mode
 #
 
 set ts_csh "$header$module2/$alias2\\(@\\)"
-testouterr_cmd_re "csh" "avail $module2/$alias2" "OK" "$ts_csh\\s+\n\n$key_al"
+testouterr_cmd_re "csh" "avail $module2/$alias2" "OK" "$ts_csh\n\n$key_al"
 
 #
 #  Test avail on a symbolic version
 #
 
 set ts_csh "$header$module3/$version3\\($symbol3\\)"
-testouterr_cmd_re "csh" "avail $module3/$symbol3" "OK" "$ts_csh\\s+\n\n$key_sym"
+testouterr_cmd_re "csh" "avail $module3/$symbol3" "OK" "$ts_csh\n\n$key_sym"
 
 #
 # test when loaded environment is inconsistent

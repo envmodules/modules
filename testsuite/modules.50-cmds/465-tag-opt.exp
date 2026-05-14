@@ -561,11 +561,11 @@ setenv_path_var __MODULES_LMEXTRATAG $mod&foo&bar
 setenv_path_var __MODULES_LMTAG $mod&foo&bar
 
 setenv_var MODULES_ADVANCED_VERSION_SPEC 1
-set tserr {tag/8.0 <bar:foo:L>  }
+set tserr {tag/8.0 <bar:foo:L>}
 testouterr_cmd sh "avail -o tag tag@7.2:8.2" OK $tserr
 unsetenv_var MODULES_ADVANCED_VERSION_SPEC
 
-set tserr {tag/8.0 <bar:foo>  }
+set tserr {tag/8.0 <bar:foo>}
 testouterr_cmd sh "list -o tag" OK $tserr
 
 testouterr_cmd sh {refresh} OK {}

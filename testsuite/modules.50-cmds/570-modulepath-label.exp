@@ -34,7 +34,7 @@ setenv_var MODULES_SEARCH_MATCH starts_with
 setenv_var TESTSUITE_MODULEPATH_LABEL rel1
 
 set tserr "$modlin My label $modlin
-label/1.0  "
+label/1.0"
 testouterr_cmd_re sh {avail label} OK $tserr
 
 set tserr "$modlin My label $modlin
@@ -69,7 +69,7 @@ testerr_cmd sh {search -j label} $tserr
 # different relative path
 setenv_var TESTSUITE_MODULEPATH_LABEL rel2
 set tserr "$modlin My label $modlin
-label/1.0  "
+label/1.0"
 testouterr_cmd_re sh {avail label} OK $tserr
 
 setenv_var TESTSUITE_MODULEPATH_LABEL rel3
@@ -84,7 +84,7 @@ testouterr_cmd_re sh {avail label} OK $tserr
 # empty module path
 setenv_var TESTSUITE_MODULEPATH_LABEL empty1
 set tserr "$modlin $modpathre.4 $modlin
-label/1.0  "
+label/1.0"
 testouterr_cmd_re sh {avail label} OK $tserr
 
 # erroneous call
@@ -95,7 +95,7 @@ testouterr_cmd_re sh {avail label} OK $tserr
 # very long label
 setenv_var TESTSUITE_MODULEPATH_LABEL long1
 set tserr "$modlin very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very long label $modlin
-label/1.0  "
+label/1.0"
 testouterr_cmd_re sh {avail label} OK $tserr
 
 
@@ -103,17 +103,17 @@ testouterr_cmd_re sh {avail label} OK $tserr
 setenv_var TESTSUITE_MODULEPATH_LABEL otherpath1
 setenv_path_var MODULEPATH $mp:$modpath.3
 set tserr "$modlin $mpre $modlin
-foo/1.0  
+foo/1.0
 
 $modlin Other label $modlin
-foo/1.0  "
+foo/1.0"
 testouterr_cmd_re sh {avail foo/1.0} OK $tserr
 setenv_path_var MODULEPATH $modpath.3:$mp
 set tserr "$modlin $modpathre.3 $modlin
-foo/1.0  
+foo/1.0
 
 $modlin $mpre $modlin
-foo/1.0  "
+foo/1.0"
 testouterr_cmd_re sh {avail foo/1.0} OK $tserr
 setenv_path_var MODULEPATH $mp
 
@@ -122,17 +122,17 @@ setenv_path_var MODULEPATH $mp
 setenv_var MODULERCFILE $env(TESTSUITEDIR)/etc/modulerc.label
 setenv_var TESTSUITE_MODULEPATH_LABEL rc1
 set tserr "$modlin global/user modulerc $modlin
-label/alias  
+label/alias
 
 $modlin My label $modlin
-label/1.0  "
+label/1.0"
 testouterr_cmd_re sh {avail -o modulepath:alias label} OK $tserr
 setenv_var TESTSUITE_MODULEPATH_LABEL rc2
 set tserr "$modlin global/user modulerc $modlin
-label/alias  
+label/alias
 
 $modlin $mpre $modlin
-label/1.0  "
+label/1.0"
 testouterr_cmd_re sh {avail -o modulepath:alias label} OK $tserr
 setenv_var TESTSUITE_MODULEPATH_LABEL rc3
 testouterr_cmd_re sh {avail -o modulepath:alias label} OK $tserr
@@ -142,7 +142,7 @@ setenv_var MODULERCFILE $ORIG_MODULERCFILE
 # duplicate definitions
 setenv_var TESTSUITE_MODULEPATH_LABEL dup1
 set tserr "$modlin Other label $modlin
-label/1.0  "
+label/1.0"
 testouterr_cmd_re sh {avail label} OK $tserr
 setenv_var TESTSUITE_MODULEPATH_LABEL dup2
 testouterr_cmd_re sh {avail label} OK $tserr
@@ -152,17 +152,17 @@ testouterr_cmd_re sh {avail label} OK $tserr
 setenv_var MODULERCFILE $env(TESTSUITEDIR)/etc/modulerc.label
 setenv_var TESTSUITE_MODULEPATH_LABEL dup3
 set tserr "$modlin Modulepath rc label $modlin
-label/1.0  "
+label/1.0"
 testouterr_cmd_re sh {avail label/1.0} OK $tserr
 setenv_var TESTSUITE_MODULEPATH_LABEL dup4
 set tserr "$modlin Module rc label $modlin
-label/1.0  "
+label/1.0"
 testouterr_cmd_re sh {avail label/1.0} OK $tserr
 setenv_var TESTSUITE_MODULEPATH_LABEL dup5
 testouterr_cmd_re sh {avail label/1.0} OK $tserr
 setenv_var MODULES_ADVANCED_VERSION_SPEC 1
 set tserr "$modlin Modulefile label $modlin
-label/1.0  "
+label/1.0"
 testouterr_cmd_re sh {avail label/1.0 envvar:XTFOO} OK $tserr
 unsetenv_var MODULES_ADVANCED_VERSION_SPEC
 setenv_var MODULERCFILE $ORIG_MODULERCFILE

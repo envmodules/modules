@@ -29,13 +29,13 @@ testouterr_cmd sh {savelist foo} OK $tserr
 # set HOME to location containing collections
 setenv_var HOME $homewithcoll
 
-set tserr "[msg_named_coll 1]\n 1) infocmd   2) infocmdexp  "
+set tserr "[msg_named_coll 1]\n 1) infocmd   2) infocmdexp"
 testouterr_cmd sh {savelist infocmd} OK $tserr
 
 set tserr [msg_no_named_coll 1]
 testouterr_cmd sh {savelist bar} OK $tserr
 
-set tserr "[msg_named_coll 1]\n 1) coll1   2) infocmdexp  "
+set tserr "[msg_named_coll 1]\n 1) coll1   2) infocmdexp"
 testouterr_cmd sh {savelist infocmde coll1} OK $tserr
 testouterr_cmd sh {savelist infocmde bar coll1} OK $tserr
 
@@ -45,7 +45,7 @@ skip_if_quick_mode
 # search match & icase tests
 setenv_var MODULES_SEARCH_MATCH starts_with
 
-set tserr "[msg_named_coll 1]\n 1) infocmd   2) infocmdexp  "
+set tserr "[msg_named_coll 1]\n 1) infocmd   2) infocmdexp"
 testouterr_cmd sh {savelist inf} OK $tserr
 testouterr_cmd sh {savelist -S info} OK $tserr
 
@@ -67,7 +67,7 @@ testouterr_cmd sh {savelist -i cMd} OK $tserr
 
 setenv_var MODULES_SEARCH_MATCH contains
 
-set tserr "[msg_named_coll 1]\n 1) infocmd   2) infocmdexp  "
+set tserr "[msg_named_coll 1]\n 1) infocmd   2) infocmdexp"
 testouterr_cmd sh {savelist info} OK $tserr
 testouterr_cmd sh {savelist -i info} OK $tserr
 testouterr_cmd sh {savelist ocm} OK $tserr
@@ -80,35 +80,35 @@ testouterr_cmd sh {savelist --starts-with -i cMd} OK $tserr
 unsetenv_var MODULES_SEARCH_MATCH
 
 # --all tests
-set tserr "[msg_named_coll 1]\n 1) infocmd   2) infocmdexp  "
+set tserr "[msg_named_coll 1]\n 1) infocmd   2) infocmdexp"
 testouterr_cmd sh {savelist -a info} OK $tserr
 setenv_var MODULES_COLLECTION_TARGET target
 set tserr "No matching named collection (for target \"target\")."
 testouterr_cmd sh {savelist info} OK $tserr
 set tserr "[msg_named_coll]
- 1) $coll1   3) $coll3          5) $coll6f   7) infocmd     
- 2) $coll2   4) $coll4f   6) $colld        8) infocmdexp  "
+ 1) $coll1   3) $coll3          5) $coll6f   7) infocmd   
+ 2) $coll2   4) $coll4f   6) $colld        8) infocmdexp"
 testouterr_cmd sh {savelist -w 80 --all} OK $tserr
-set tserr "[msg_named_coll 1]\n 1) infocmd   2) infocmdexp  "
+set tserr "[msg_named_coll 1]\n 1) infocmd   2) infocmdexp"
 testouterr_cmd sh {savelist -a info} OK $tserr
 unsetenv_var MODULES_COLLECTION_TARGET
 
 # glob match
-set tserr "[msg_named_coll 1]\n 1) infocmd   2) infocmdexp  "
+set tserr "[msg_named_coll 1]\n 1) infocmd   2) infocmdexp"
 testouterr_cmd sh {savelist -S *cmd} OK $tserr
 testouterr_cmd sh {savelist -S ?nfo} OK $tserr
 testouterr_cmd sh {savelist -i -S i?fO} OK $tserr
 testouterr_cmd sh {savelist -C ocm?} OK $tserr
 
 set tserr "[msg_named_coll 1]
- 1) $coll1   3) $coll3          5) $coll6f   7) infocmd     
- 2) $coll2   4) $coll4f   6) $colld        8) infocmdexp  "
+ 1) $coll1   3) $coll3          5) $coll6f   7) infocmd   
+ 2) $coll2   4) $coll4f   6) $colld        8) infocmdexp"
 testouterr_cmd sh {savelist -w 80 *} OK $tserr
 testouterr_cmd sh {savelist -w 80 ?} OK $tserr
 
 
 # ml
-set tserr "[msg_named_coll 1]\n 1) infocmd   2) infocmdexp  "
+set tserr "[msg_named_coll 1]\n 1) infocmd   2) infocmdexp"
 testouterr_cmd sh {ml savelist info} OK $tserr
 if {$install_icase eq {search}} {
     testouterr_cmd sh {ml savelist INFO} OK $tserr
@@ -122,10 +122,10 @@ set tserr [msg_no_named_coll 1]
 testouterr_cmd sh {ml savelist foo} OK $tserr
 setenv_var MODULES_COLLECTION_TARGET target
 set tserr "[msg_named_coll]
- 1) $coll1   3) $coll3          5) $coll6f   7) infocmd     
- 2) $coll2   4) $coll4f   6) $colld        8) infocmdexp  "
+ 1) $coll1   3) $coll3          5) $coll6f   7) infocmd   
+ 2) $coll2   4) $coll4f   6) $colld        8) infocmdexp"
 testouterr_cmd sh {ml savelist -w 80 --all} OK $tserr
-set tserr "[msg_named_coll 1]\n 1) infocmd   2) infocmdexp  "
+set tserr "[msg_named_coll 1]\n 1) infocmd   2) infocmdexp"
 testouterr_cmd sh {ml savelist -a info} OK $tserr
 unsetenv_var MODULES_COLLECTION_TARGET
 

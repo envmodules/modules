@@ -70,6 +70,9 @@ Modules 5.7.0 (not yet released)
   :mconfig:`non_exportable_tags` is changed with :subcmd:`config` sub-command,
   it sets the :envvar:`MODULES_NON_EXPORTABLE_TAGS` environment variable. (fix
   issue #608)
+* Improve the performance of the module’s column output by removing the costly
+  optimization that attempts to fit more columns within the available screen
+  width. (fix issue #622)
 
 
 .. _5.6 release notes:

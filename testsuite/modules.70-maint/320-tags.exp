@@ -109,10 +109,10 @@ testouterr_cmd sh {unload tag/4.0} $ans {}
 setenv_loaded_module [list tag/4.0 tag/2.0 tag/5.0] [list $mp/tag/4.0 $mp/tag/1.0 $mp/tag/5.0]
 setenv_var __MODULES_LMTAG tag/4.0&nearly-forbidden&othertag:tag/2.0&forbidden:tag/5.0&hidden-loaded
 testouterr_cmd sh {list} OK "$cur_loaded
- 1) tag/4.0 <nF:othertag>   2) tag/2.0 <F>  
+ 1) tag/4.0 <nF:othertag>   2) tag/2.0 <F>
 
 Key:
-<module-tag>  <nF>=nearly-forbidden  <F>=forbidden  "
+<module-tag>  <nF>=nearly-forbidden  <F>=forbidden"
 
 # terse mode just output modulename and header
 testouterr_cmd sh {list -t} OK "$cur_loaded
@@ -134,10 +134,10 @@ skip_if_quick_mode
 
 # display hidden entries
 testouterr_cmd sh {list -a} OK "$cur_loaded
- 1) tag/4.0 <nF:othertag>   2) tag/2.0 <F>   3) tag/5.0 <H>  
+ 1) tag/4.0 <nF:othertag>   2) tag/2.0 <F>   3) tag/5.0 <H>
 
 Key:
-<module-tag>  <H>=hidden-loaded  <nF>=nearly-forbidden  <F>=forbidden  "
+<module-tag>  <H>=hidden-loaded  <nF>=nearly-forbidden  <F>=forbidden"
 
 set tserr "{\"tag/4.0\": { \"name\": \"tag/4.0\", \"type\": \"modulefile\", \"variants\": {}, \"symbols\": \[\], \"tags\": \[ \"nearly-forbidden\", \"othertag\" \], \"pathname\": \"$mp/tag/4.0\", \"via\": \"\"},
 \"tag/2.0\": { \"name\": \"tag/2.0\", \"type\": \"modulefile\", \"variants\": {}, \"symbols\": \[\], \"tags\": \[ \"forbidden\" \], \"pathname\": \"$mp/tag/1.0\", \"via\": \"\"},
@@ -177,10 +177,10 @@ setenv_loaded_module [list foo/2.0 impreq/load impreq/prereq] [list $mp/foo/2.0 
 setenv_var __MODULES_LMPREREQ impreq/load&foo:impreq/prereq&impreq/load
 
 testouterr_cmd sh {list} OK "$cur_loaded
- 1) foo/2.0 <aL>   2) impreq/load <aL>   3) impreq/prereq  
+ 1) foo/2.0 <aL>   2) impreq/load <aL>   3) impreq/prereq
 
 Key:
-<module-tag>  <aL>=auto-loaded  "
+<module-tag>  <aL>=auto-loaded"
 
 set tserr "{\"foo/2.0\": { \"name\": \"foo/2.0\", \"type\": \"modulefile\", \"variants\": {}, \"symbols\": \[\], \"tags\": \[ \"auto-loaded\" \], \"pathname\": \"$mp/foo/2.0\", \"via\": \"\"},
 \"impreq/load\": { \"name\": \"impreq/load\", \"type\": \"modulefile\", \"variants\": {}, \"symbols\": \[\], \"tags\": \[ \"auto-loaded\" \], \"pathname\": \"$mp/impreq/load\", \"via\": \"\"},
@@ -188,10 +188,10 @@ set tserr "{\"foo/2.0\": { \"name\": \"foo/2.0\", \"type\": \"modulefile\", \"va
 testouterr_cmd sh {list -j} OK $tserr
 
 set tserr "$modlin $mpre $modlin
-foo/2.0 <aL>  
+foo/2.0 <aL>
 
 Key:
-<module-tag>  <aL>=auto-loaded  "
+<module-tag>  <aL>=auto-loaded"
 testouterr_cmd_re sh {avail foo/2.0} OK $tserr
 
 set tserr "$modlin $mpre $modlin
@@ -199,10 +199,10 @@ impreq/load <aL>  .*"
 testouterr_cmd_re sh {avail impreq/load} OK $tserr
 
 set tserr "$modlin $mpre $modlin
-impreq/prereq <L>  
+impreq/prereq <L>
 
 Key:
-<module-tag>  <L>=loaded  "
+<module-tag>  <L>=loaded"
 testouterr_cmd_re sh {avail impreq/prereq} OK $tserr
 
 # set an additional tag
@@ -218,10 +218,10 @@ if {![info exists term_cols]} {
 } else {
 
 testouterr_cmd sh {list} OK "$cur_loaded
- 1) foo/2.0 <aL:othertag>   2) impreq/load <aL>   3) impreq/prereq  
+ 1) foo/2.0 <aL:othertag>   2) impreq/load <aL>   3) impreq/prereq
 
 Key:
-<module-tag>  <aL>=auto-loaded  "
+<module-tag>  <aL>=auto-loaded"
 
 # restore terminal width
 exec stty cols $term_cols
@@ -234,10 +234,10 @@ set tserr "{\"foo/2.0\": { \"name\": \"foo/2.0\", \"type\": \"modulefile\", \"va
 testouterr_cmd sh {list -j} OK $tserr
 
 set tserr "$modlin $mpre $modlin
-foo/2.0 <aL:othertag>  
+foo/2.0 <aL:othertag>
 
 Key:
-<module-tag>  <aL>=auto-loaded  "
+<module-tag>  <aL>=auto-loaded"
 testouterr_cmd_re sh {avail foo/2.0} OK $tserr
 
 unsetenv_loaded_module

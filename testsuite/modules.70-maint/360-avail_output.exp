@@ -44,7 +44,7 @@ setenv_var TESTSUITE_AVAIL_OUTPUT_FOO_SYM 1
 # -o/--output options test
 #
 
-set tserr_avail_foo "foo/1.0\\(bar\\)  "
+set tserr_avail_foo "foo/1.0\\(bar\\)"
 set tserr_avail_terse_foo "foo/1.0\\(bar\\)"
 testouterr_cmd_re sh {avail -o sym foo/1.0} OK $tserr_avail_foo
 
@@ -180,7 +180,7 @@ unsetenv_var TESTSUITE_OUTPUT_INMODFILE
 setenv_var MODULES_AVAIL_OUTPUT modulepath
 setenv_var MODULES_AVAIL_TERSE_OUTPUT modulepath
 
-testouterr_cmd_re sh {avail foo/1.0} OK "$modlin $mpre $modlin\nfoo/1.0  "
+testouterr_cmd_re sh {avail foo/1.0} OK "$modlin $mpre $modlin\nfoo/1.0"
 testouterr_cmd_re sh {avail -t foo/1.0} OK "$mpre:\nfoo/1.0"
 
 # no impact on -l/-j
@@ -195,7 +195,7 @@ testouterr_cmd sh {avail -j foo/1.0} OK $tserr_avail_json
 setenv_var MODULES_AVAIL_OUTPUT foo
 setenv_var MODULES_AVAIL_TERSE_OUTPUT foo
 
-testouterr_cmd_re sh {avail foo/1.0} OK "$modlin $mpre $modlin\n$tserr_avail_foo\n\nKey:\n\\(symbolic-version\\)  "
+testouterr_cmd_re sh {avail foo/1.0} OK "$modlin $mpre $modlin\n$tserr_avail_foo\n\nKey:\n\\(symbolic-version\\)"
 testouterr_cmd_re sh {avail -t foo/1.0} OK $mpre:\n$tserr_avail_terse_foo
 testouterr_cmd_re sh {avail -o sym foo/1.0} OK $tserr_avail_foo
 testouterr_cmd_re sh {avail -t --output=sym foo/1.0} OK $tserr_avail_terse_foo
@@ -206,10 +206,10 @@ testouterr_cmd sh {avail -o foo foo/1.0} ERR $tserr_invalid_o_val
 # key test
 #
 
-testouterr_cmd_re sh {avail -o modulepath:key:sym foo/1.0} OK "$modlin $mpre $modlin\n$tserr_avail_foo\n\nKey:\n\\(symbolic-version\\)  "
-testouterr_cmd_re sh {avail -t --output=modulepath:sym:key foo/1.0} OK "$mpre:\n$tserr_avail_terse_foo\n\nKey:\n\\(symbolic-version\\)  "
+testouterr_cmd_re sh {avail -o modulepath:key:sym foo/1.0} OK "$modlin $mpre $modlin\n$tserr_avail_foo\n\nKey:\n\\(symbolic-version\\)"
+testouterr_cmd_re sh {avail -t --output=modulepath:sym:key foo/1.0} OK "$mpre:\n$tserr_avail_terse_foo\n\nKey:\n\\(symbolic-version\\)"
 setenv_var MODULES_AVAIL_OUTPUT modulepath:key:sym
-testouterr_cmd_re sh {avail foo/1.0} OK "$modlin $mpre $modlin\n$tserr_avail_foo\n\nKey:\n\\(symbolic-version\\)  "
+testouterr_cmd_re sh {avail foo/1.0} OK "$modlin $mpre $modlin\n$tserr_avail_foo\n\nKey:\n\\(symbolic-version\\)"
 unsetenv_var MODULES_AVAIL_OUTPUT
 
 
@@ -217,10 +217,10 @@ unsetenv_var MODULES_AVAIL_OUTPUT
 # sym test
 #
 
-testouterr_cmd_re sh {avail -o modulepath:key foo/1.0} OK "$modlin $mpre $modlin\nfoo/1.0  "
+testouterr_cmd_re sh {avail -o modulepath:key foo/1.0} OK "$modlin $mpre $modlin\nfoo/1.0"
 testouterr_cmd_re sh {avail -t --output=modulepath:key foo/1.0} OK "$mpre:\nfoo/1.0"
 setenv_var MODULES_AVAIL_OUTPUT modulepath
-testouterr_cmd_re sh {avail foo/1.0} OK "$modlin $mpre $modlin\nfoo/1.0  "
+testouterr_cmd_re sh {avail foo/1.0} OK "$modlin $mpre $modlin\nfoo/1.0"
 unsetenv_var MODULES_AVAIL_OUTPUT
 
 
@@ -228,25 +228,25 @@ unsetenv_var MODULES_AVAIL_OUTPUT
 # indesym test
 #
 
-set tserr_avail_foo "foo/1.0\\(bar\\)  "
-testouterr_cmd_re sh {avail -o modulepath:key:indesym foo/1.0} OK "$modlin $mpre $modlin\nfoo/1.0  "
-testouterr_cmd_re sh {avail -o modulepath:key:sym:indesym foo/1.0} OK "$modlin $mpre $modlin\nfoo/1.0  "
-testouterr_cmd_re sh {avail -w 120 -o modulepath:key:indesym foo} OK "$modlin $mpre $modlin\nfoo/0.2  foo/0.err  foo/0.load  foo/0.prereq  foo/1.0  foo/2.0  foo/bar  foo/sym  "
-testouterr_cmd_re sh {avail -w 120 -o modulepath:key:indesym foo/bar} OK "$modlin $mpre $modlin\nfoo/bar  "
-testouterr_cmd_re sh {avail -w 120 -o modulepath:key:indesym:sym foo/bar} OK "$modlin $mpre $modlin\nfoo/bar  "
+set tserr_avail_foo "foo/1.0\\(bar\\)"
+testouterr_cmd_re sh {avail -o modulepath:key:indesym foo/1.0} OK "$modlin $mpre $modlin\nfoo/1.0"
+testouterr_cmd_re sh {avail -o modulepath:key:sym:indesym foo/1.0} OK "$modlin $mpre $modlin\nfoo/1.0"
+testouterr_cmd_re sh {avail -w 120 -o modulepath:key:indesym foo} OK "$modlin $mpre $modlin\nfoo/0.2  foo/0.err  foo/0.load  foo/0.prereq  foo/1.0  foo/2.0  foo/bar  foo/sym"
+testouterr_cmd_re sh {avail -w 120 -o modulepath:key:indesym foo/bar} OK "$modlin $mpre $modlin\nfoo/bar"
+testouterr_cmd_re sh {avail -w 120 -o modulepath:key:indesym:sym foo/bar} OK "$modlin $mpre $modlin\nfoo/bar"
 setenv_var MODULES_AVAIL_TERSE_OUTPUT key:indesym
 testouterr_cmd sh {avail -t foo/bar} OK "foo/bar"
 testouterr_cmd sh {avail -t foo/1.0} OK "foo/1.0"
 unsetenv_var MODULES_AVAIL_TERSE_OUTPUT
 setenv_path_var MODULEPATH $modpath.2
-testouterr_cmd_re sh {avail -w 120 -o modulepath:key:dirwsym:indesym hide3/sub2} OK "$modlin $modpathre.2 $modlin\nhide3/sub2/4.0  hide3/sub2/5.0  hide3/sub2/default  hide3/sub2/new  hide3/sub2/sym  "
-testouterr_cmd_re sh {avail -w 120 -o modulepath:key:indesym hide3/sub2} OK "$modlin $modpathre.2 $modlin\nhide3/sub2/4.0  hide3/sub2/5.0  hide3/sub2/default  hide3/sub2/new  hide3/sub2/sym  "
-testouterr_cmd_re sh {avail -w 120 -o modulepath:key:dirwsym:indesym hide3/sym} OK "$modlin $modpathre.2 $modlin\nhide3/sym  "
-testouterr_cmd_re sh {avail -w 120 -o modulepath:key:indesym hide3/sym} OK "$modlin $modpathre.2 $modlin\nhide3/sym  "
-testouterr_cmd_re sh {avail -w 120 -o modulepath:key:indesym hide3/sub2/default} OK "$modlin $modpathre.2 $modlin\nhide3/sub2/default  "
-testouterr_cmd_re sh {avail -w 120 -o modulepath:key:indesym hide3/sub2/4.0} OK "$modlin $modpathre.2 $modlin\nhide3/sub2/4.0  "
-testouterr_cmd_re sh {avail -w 120 -o modulepath:key:sym:indesym hide3/sub2/default} OK "$modlin $modpathre.2 $modlin\nhide3/sub2/default  "
-testouterr_cmd_re sh {avail -w 120 -o modulepath:key:indesym:sym hide3/sub2/4.0} OK "$modlin $modpathre.2 $modlin\nhide3/sub2/4.0  "
+testouterr_cmd_re sh {avail -w 120 -o modulepath:key:dirwsym:indesym hide3/sub2} OK "$modlin $modpathre.2 $modlin\nhide3/sub2/4.0  hide3/sub2/5.0  hide3/sub2/default  hide3/sub2/new  hide3/sub2/sym"
+testouterr_cmd_re sh {avail -w 120 -o modulepath:key:indesym hide3/sub2} OK "$modlin $modpathre.2 $modlin\nhide3/sub2/4.0  hide3/sub2/5.0  hide3/sub2/default  hide3/sub2/new  hide3/sub2/sym"
+testouterr_cmd_re sh {avail -w 120 -o modulepath:key:dirwsym:indesym hide3/sym} OK "$modlin $modpathre.2 $modlin\nhide3/sym"
+testouterr_cmd_re sh {avail -w 120 -o modulepath:key:indesym hide3/sym} OK "$modlin $modpathre.2 $modlin\nhide3/sym"
+testouterr_cmd_re sh {avail -w 120 -o modulepath:key:indesym hide3/sub2/default} OK "$modlin $modpathre.2 $modlin\nhide3/sub2/default"
+testouterr_cmd_re sh {avail -w 120 -o modulepath:key:indesym hide3/sub2/4.0} OK "$modlin $modpathre.2 $modlin\nhide3/sub2/4.0"
+testouterr_cmd_re sh {avail -w 120 -o modulepath:key:sym:indesym hide3/sub2/default} OK "$modlin $modpathre.2 $modlin\nhide3/sub2/default"
+testouterr_cmd_re sh {avail -w 120 -o modulepath:key:indesym:sym hide3/sub2/4.0} OK "$modlin $modpathre.2 $modlin\nhide3/sub2/4.0"
 setenv_var MODULES_AVAIL_TERSE_OUTPUT key:indesym:dirwsym
 testouterr_cmd sh {avail -t hide3/sym} OK "hide3/sym"
 testouterr_cmd sh {avail -t -o key:indesym hide3/sym} OK "hide3/sym"
@@ -261,10 +261,10 @@ setenv_path_var MODULEPATH $mp
 #
 
 setenv_var TESTSUITE_AVAIL_OUTPUT_FOO_TAG 1
-testouterr_cmd_re sh {avail -o modulepath:key:tag foo/1.0} OK "$modlin $mpre $modlin\nfoo/1.0 <baz>  \n\nKey:\n<module-tag>  "
+testouterr_cmd_re sh {avail -o modulepath:key:tag foo/1.0} OK "$modlin $mpre $modlin\nfoo/1.0 <baz>\n\nKey:\n<module-tag>"
 testouterr_cmd_re sh {avail -t --output=tag:modulepath foo/1.0} OK "$mpre:\nfoo/1.0 <baz>"
 setenv_var MODULES_AVAIL_OUTPUT modulepath:tag:sym:key
-testouterr_cmd_re sh {avail foo/1.0} OK "$modlin $mpre $modlin\nfoo/1.0\\(bar\\) <baz>  \n\nKey:\n\\(symbolic-version\\)  <module-tag>  "
+testouterr_cmd_re sh {avail foo/1.0} OK "$modlin $mpre $modlin\nfoo/1.0\\(bar\\) <baz>\n\nKey:\n\\(symbolic-version\\)  <module-tag>"
 unsetenv_var MODULES_AVAIL_OUTPUT
 unsetenv_var TESTSUITE_AVAIL_OUTPUT_FOO_TAG
 
@@ -281,7 +281,7 @@ testouterr_cmd_re sh {avail -t --output=tag:modulepath hide2} OK "$mpre:\nhide2/
 testouterr_cmd_re sh {avail -t --output=tag:modulepath hide2/1.1} OK {}
 testouterr_cmd_re sh {avail -o tag:modulepath hide2/1.1} OK {}
 setenv_var MODULES_AVAIL_OUTPUT modulepath:alias
-testouterr_cmd_re sh {avail hide2} OK "$modlin $mpre $modlin\nhide2/1.0  hide2/1.1  hide2/1.5  "
+testouterr_cmd_re sh {avail hide2} OK "$modlin $mpre $modlin\nhide2/1.0  hide2/1.1  hide2/1.5"
 unsetenv_var MODULES_AVAIL_OUTPUT
 setenv_var MODULES_AVAIL_TERSE_OUTPUT modulepath:alias
 testouterr_cmd_re sh {avail -t hide2} OK "$mpre:\nhide2/1.0\nhide2/1.1\nhide2/1.5"
@@ -293,8 +293,8 @@ unsetenv_var MODULES_AVAIL_TERSE_OUTPUT
 # dirwsym test
 #
 
-testouterr_cmd_re sh {avail -o modulepath hide3/sub2} OK "$modlin $mpre $modlin\nhide3/sub2/4.0  hide3/sub2/5.0  "
-testouterr_cmd_re sh {avail --output=sym:modulepath hide3/sub2} OK "$modlin $mpre $modlin\nhide3/sub2/4.0\\(default:sym\\)  hide3/sub2/5.0\\(new\\)  "
+testouterr_cmd_re sh {avail -o modulepath hide3/sub2} OK "$modlin $mpre $modlin\nhide3/sub2/4.0  hide3/sub2/5.0"
+testouterr_cmd_re sh {avail --output=sym:modulepath hide3/sub2} OK "$modlin $mpre $modlin\nhide3/sub2/4.0\\(default:sym\\)  hide3/sub2/5.0\\(new\\)"
 testouterr_cmd_re sh {avail -t -o modulepath:dirwsym hide3/sub2} OK "$mpre:\nhide3/sub2/\nhide3/sub2/4.0\nhide3/sub2/5.0"
 testouterr_cmd_re sh {avail -t --output=modulepath:sym:dirwsym hide3/sub2} OK "$mpre:\nhide3/sub2/\\(sym\\)\nhide3/sub2/4.0\\(default:sym\\)\nhide3/sub2/5.0\\(new\\)"
 setenv_var MODULES_AVAIL_TERSE_OUTPUT modulepath:dirwsym:sym
@@ -316,13 +316,14 @@ if {![info exists term_cols]} {
 } elseif {[catch {exec stty cols $test_cols}] || [getTtyCols] ne $test_cols} {
     send_user "\tskipping terminal width-specific tests, cannot set width\n"
 } else {
-    testouterr_cmd sh {avail -o sym:tag} OK "cross/1.0             dcross/dir2/1.0(craft)   lcross/1   lcross/11          vcross/4.0  
-cross/3.0(bef)        dvcross/4.0              lcross/2   loc_dv10/1.1       vcross/6.0  
-cross/4.0             dvcross/dir1/1.0(bef)    lcross/4   loc_dv10/1.2       
-cross/6.0             dvcross/dir1/2.0         lcross/5   novercross         
-dcross/4.0            dvcross/dir2/1.0(craft)  lcross/6   othcross/1.0(bef)  
-dcross/dir1/1.0(bef)  fodcross/2.7.13          lcross/7   vcross/1.0         
-dcross/dir1/2.0       fodcross/2.7.13/sub-13   lcross/10  vcross/3.0(bef)    "
+    testouterr_cmd sh {avail -o sym:tag} OK "cross/1.0               dvcross/4.0              lcross/4      novercross       
+cross/3.0(bef)          dvcross/dir1/1.0(bef)    lcross/5      othcross/1.0(bef)
+cross/4.0               dvcross/dir1/2.0         lcross/6      vcross/1.0       
+cross/6.0               dvcross/dir2/1.0(craft)  lcross/7      vcross/3.0(bef)  
+dcross/4.0              fodcross/2.7.13          lcross/10     vcross/4.0       
+dcross/dir1/1.0(bef)    fodcross/2.7.13/sub-13   lcross/11     vcross/6.0       
+dcross/dir1/2.0         lcross/1                 loc_dv10/1.1  
+dcross/dir2/1.0(craft)  lcross/2                 loc_dv10/1.2  "
 
     testouterr_cmd sh {avail -t -o sym:tag} OK "cross/1.0
 cross/3.0(bef)
@@ -363,7 +364,7 @@ vcross/6.0"
 setenv_path_var MODULEPATH $modpath.2:$modpath.3
 setenv_var MODULES_AVAIL_OUTPUT sym:tag
 setenv_var MODULES_AVAIL_TERSE_OUTPUT sym:tag
-testouterr_cmd sh {avail foo/0} OK "foo/0.1  foo/0.2(sym) <tag>  foo/0.err  foo/0.load  foo/0.prereq  "
+testouterr_cmd sh {avail foo/0} OK "foo/0.1  foo/0.2(sym) <tag>  foo/0.err  foo/0.load  foo/0.prereq"
 testouterr_cmd sh {avail -t foo/0} OK "foo/0.1
 foo/0.2(sym) <tag>
 foo/0.err
@@ -371,7 +372,7 @@ foo/0.load
 foo/0.prereq"
 
 setenv_path_var MODULEPATH $modpath.3:$modpath.2
-testouterr_cmd sh {avail foo/0} OK "foo/0.1  foo/0.2(sym) <tag>  foo/0.err  foo/0.load  foo/0.prereq  "
+testouterr_cmd sh {avail foo/0} OK "foo/0.1  foo/0.2(sym) <tag>  foo/0.err  foo/0.load  foo/0.prereq"
 testouterr_cmd sh {avail -t foo/0} OK "foo/0.1
 foo/0.2(sym) <tag>
 foo/0.err
@@ -388,81 +389,81 @@ setenv_var TESTSUITE_SPIDER_MODPATH2 use_modpath3
 setenv_path_var MODULEPATH $modpath.spider1
 setenv_var MODULES_AVAIL_OUTPUT sym:tag:modulepath:via
 testouterr_cmd_re sh {avail mod} OK "$modlin $modpathre.spider1 $modlin
-moda/1  moda/2  "
+moda/1  moda/2"
 
 # no modulepath label set, no using module loaded
 setenv_path_var MODULEPATH $modpath.spider2:$modpath.spider1
 testouterr_cmd_re sh {avail mod} OK "$modlin $modpathre.spider2 $modlin
-modb/1  modb/2  
+modb/1  modb/2
 
 $modlin $modpathre.spider1 $modlin
-moda/1  moda/2  "
+moda/1  moda/2"
 
 # modulepath label set, no using module loaded
 setenv_var TESTSUITE_VIA modulepath_label1
 testouterr_cmd_re sh {avail mod} OK "$modlin My label spider2 $modlin
-modb/1  modb/2  
+modb/1  modb/2
 
 $modlin My label spider1 $modlin
-moda/1  moda/2  "
+moda/1  moda/2"
 
 # no modulepath label set, using module loaded
 unsetenv_var TESTSUITE_VIA
 setenv_loaded_module [list moda/1] [list $modpath.spider1/moda/1]
 setenv_var __MODULES_LMUSE moda/1&$modpath.spider2
 testouterr_cmd_re sh {avail mod} OK "$modlin $modpathre.spider2 \\(via moda/1\\) $modlin
-modb/1  modb/2  
+modb/1  modb/2
 
 $modlin $modpathre.spider1 $modlin
-moda/1 <L>  moda/2  "
+moda/1 <L>  moda/2"
 
 # no modulepath label set, using module loaded, used path was there before
 setenv_var __MODULES_SHARE_MODULEPATH $modpath.spider2:2
 testouterr_cmd_re sh {avail mod} OK "$modlin $modpathre.spider2 $modlin
-modb/1  modb/2  
+modb/1  modb/2
 
 $modlin $modpathre.spider1 $modlin
-moda/1 <L>  moda/2  "
+moda/1 <L>  moda/2"
 unsetenv_var __MODULES_SHARE_MODULEPATH
 
 # modulepath label set, using module loaded
 setenv_var TESTSUITE_VIA modulepath_label1
 testouterr_cmd_re sh {avail mod} OK "$modlin My label spider2 \\(via moda/1\\) $modlin
-modb/1  modb/2  
+modb/1  modb/2
 
 $modlin My label spider1 $modlin
-moda/1 <L>  moda/2  "
+moda/1 <L>  moda/2"
 
 # modulepath label set, using module loaded, used path was there before
 setenv_var __MODULES_SHARE_MODULEPATH $modpath.spider2:2
 testouterr_cmd_re sh {avail mod} OK "$modlin My label spider2 $modlin
-modb/1  modb/2  
+modb/1  modb/2
 
 $modlin My label spider1 $modlin
-moda/1 <L>  moda/2  "
+moda/1 <L>  moda/2"
 unsetenv_var __MODULES_SHARE_MODULEPATH
 
 # no modulepath label set, using module loaded, but added modulepath unused
 unsetenv_var TESTSUITE_VIA
 setenv_path_var MODULEPATH $modpath.spider1
 testouterr_cmd_re sh {avail mod} OK "$modlin $modpathre.spider1 $modlin
-moda/1 <L>  moda/2  "
+moda/1 <L>  moda/2"
 
 # modulepath label set, using module loaded, but added modulepath unused
 setenv_var TESTSUITE_VIA modulepath_label1
 testouterr_cmd_re sh {avail mod} OK "$modlin My label spider1 $modlin
-moda/1 <L>  moda/2  "
+moda/1 <L>  moda/2"
 
 # no modulepath label set, using module loaded, but primary modulepath unused
 unsetenv_var TESTSUITE_VIA
 setenv_path_var MODULEPATH $modpath.spider2
 testouterr_cmd_re sh {avail mod} OK "$modlin $modpathre.spider2 \\(via moda/1\\) $modlin
-modb/1  modb/2  "
+modb/1  modb/2"
 
 # modulepath label set, using module loaded, but primary modulepath unused
 setenv_var TESTSUITE_VIA modulepath_label1
 testouterr_cmd_re sh {avail mod} OK "$modlin My label spider2 \\(via moda/1\\) $modlin
-modb/1  modb/2  "
+modb/1  modb/2"
 
 # several loaded modules using same modulepath
 unsetenv_var TESTSUITE_VIA
@@ -470,10 +471,10 @@ setenv_path_var MODULEPATH $modpath.spider2:$modpath.spider1
 setenv_loaded_module [list moda/1 moda/2] [list $modpath.spider1/moda/1 $modpath.spider1/moda/2]
 setenv_var __MODULES_LMUSE moda/1&$modpath.spider2:moda/2&$modpath.spider2
 set tserr "$modlin $modpathre.spider2 \\(via moda/1\\) $modlin
-modb/1  modb/2  
+modb/1  modb/2
 
 $modlin $modpathre.spider1 $modlin
-moda/1 <L>  moda/2 <L>  "
+moda/1 <L>  moda/2 <L>"
 testouterr_cmd_re sh {avail mod} OK $tserr
 
 setenv_var __MODULES_SHARE_MODULEPATH $modpath.spider2:2
@@ -481,10 +482,10 @@ testouterr_cmd_re sh {avail mod} OK $tserr
 
 setenv_var __MODULES_SHARE_MODULEPATH $modpath.spider2:3
 set tserr "$modlin $modpathre.spider2 $modlin
-modb/1  modb/2  
+modb/1  modb/2
 
 $modlin $modpathre.spider1 $modlin
-moda/1 <L>  moda/2 <L>  "
+moda/1 <L>  moda/2 <L>"
 testouterr_cmd_re sh {avail mod} OK $tserr
 unsetenv_var __MODULES_SHARE_MODULEPATH
 
@@ -510,7 +511,7 @@ unsetenv_var TESTSUITE_VIA
 setenv_loaded_module [list moda/1] [list $modpath.spider1/moda/1]
 setenv_var __MODULES_LMUSE moda/1&$modpath.spider2
 setenv_var MODULES_AVAIL_OUTPUT sym:tag:via
-testouterr_cmd sh {avail mod} OK "moda/1 <L>  moda/2  modb/1  modb/2  "
+testouterr_cmd sh {avail mod} OK "moda/1 <L>  moda/2  modb/1  modb/2"
 
 # via not supported on terse output mode
 setenv_var MODULES_AVAIL_TERSE_OUTPUT sym:tag:modulepath:via
@@ -530,10 +531,10 @@ setenv_loaded_module [list foo/0.2] [list $modpath.2/foo/0.2]
 setenv_var __MODULES_LMUSE foo/0.2&$modpath.3
 setenv_path_var MODULEPATH $modpath.3:$modpath.2
 testouterr_cmd_re sh {avail foo/0} OK "$modlin $modpathre.3 \\(via foo/0.2\\) $modlin
-foo/0.2\\(sym\\) <tag>  foo/0.err  foo/0.load  foo/0.prereq  
+foo/0.2\\(sym\\) <tag>  foo/0.err  foo/0.load  foo/0.prereq
 
 $modlin $modpathre.2 $modlin
-foo/0.1  foo/0.2\\(sym\\) <L:tag>  "
+foo/0.1  foo/0.2\\(sym\\) <L:tag>"
 
 
 # variable reference in modulepath
@@ -545,23 +546,23 @@ setenv_var MODULEPATH $modpath.spider\$FOO_VAR_REF:$modpath.4
 
 setenv_var FOO_VAR_REF 3
 set tserr "$modlin $modpathre.spider3 \\(via modulepath/1\\) $modlin
-modc/1  modc/2  
+modc/1  modc/2
 
 $modlin $modpathre.4 $modlin
-modulepath-opt/1  modulepath-opt/2  modulepath/1 <L>  modulepath/2  "
+modulepath-opt/1  modulepath-opt/2  modulepath/1 <L>  modulepath/2"
 testouterr_cmd_re sh {avail mod} OK $tserr
 
 setenv_var FOO_VAR_REF 2
 set tserr "$modlin $modpathre.spider2 \\(via modulepath/1\\) $modlin
-modb/1  modb/2  
+modb/1  modb/2
 
 $modlin $modpathre.4 $modlin
-modulepath-opt/1  modulepath-opt/2  modulepath/1 <L>  modulepath/2  "
+modulepath-opt/1  modulepath-opt/2  modulepath/1 <L>  modulepath/2"
 testouterr_cmd_re sh {avail mod} OK $tserr
 
 unsetenv_var FOO_VAR_REF
 set tserr "$modlin $modpathre.4 $modlin
-modulepath-opt/1  modulepath-opt/2  modulepath/1 <L>  modulepath/2  "
+modulepath-opt/1  modulepath-opt/2  modulepath/1 <L>  modulepath/2"
 testouterr_cmd_re sh {avail mod} OK $tserr
 
 
@@ -570,17 +571,17 @@ setenv_var TESTSUITE_USE_MODULEPATH use_rel_path
 setenv_var __MODULES_LMUSE modulepath/1&$modpath.spider3
 setenv_var MODULEPATH $modpath.spider3:$modpath.4
 set tserr "$modlin $modpathre.spider3 \\(via modulepath/1\\) $modlin
-modc/1  modc/2  
+modc/1  modc/2
 
 $modlin $modpathre.4 $modlin
-modulepath-opt/1  modulepath-opt/2  modulepath/1 <L>  modulepath/2  "
+modulepath-opt/1  modulepath-opt/2  modulepath/1 <L>  modulepath/2"
 testouterr_cmd_re sh {avail mod} OK $tserr
 
 setenv_var TESTSUITE_USE_MODULEPATH prepend_rel_path
 setenv_var __MODULES_LMUSE modulepath/1&../../../testsuite/modulefiles.spider3
 setenv_var MODULEPATH ../../../testsuite/modulefiles.spider3:$modpath.4
 set tserr "$modlin $modpathre.4 $modlin
-modulepath-opt/1  modulepath-opt/2  modulepath/1 <L>  modulepath/2  "
+modulepath-opt/1  modulepath-opt/2  modulepath/1 <L>  modulepath/2"
 testouterr_cmd_re sh {avail mod} OK $tserr
 
 
@@ -614,11 +615,11 @@ setenv_var TESTSUITE_PROVIDE multiple
 setenv_var MODULES_AVAIL_OUTPUT sym:tag:alias
 setenv_var MODULES_AVAIL_TERSE_OUTPUT sym:tag:alias
 
-testouterr_cmd sh {avail foo} OK {foo/1.0  foo/2.0  foo/9.0  }
-testouterr_cmd sh {avail foo/1} OK {foo/1.0  }
+testouterr_cmd sh {avail foo} OK {foo/1.0  foo/2.0  foo/9.0}
+testouterr_cmd sh {avail foo/1} OK {foo/1.0}
 testouterr_cmd sh {avail quux} OK {}
-testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3  }
-testouterr_cmd sh {avail provide} OK {provide/1  provide/2  provide/3  }
+testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3}
+testouterr_cmd sh {avail provide} OK {provide/1  provide/2  provide/3}
 
 setenv_var MODULES_AVAIL_TERSE_OUTPUT sym:tag:alias
 
@@ -634,7 +635,7 @@ setenv_var MODULES_AVAIL_OUTPUT sym:tag:alias:variant
 testouterr_cmd sh {avail -t foo} OK "foo/1.0\nfoo/2.0\nfoo/9.0"
 testouterr_cmd sh {avail -t foo/1} OK "foo/1.0"
 testouterr_cmd sh {avail -t quux} OK {}
-testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3  }
+testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3}
 testouterr_cmd sh {avail -t provide} OK "provide/1\nprovide/2\nprovide/3"
 
 # Extra Match Search enabled with extra specifier set, but it does not trigger provided-alias insertion
@@ -643,16 +644,16 @@ setenv_var MODULES_AVAIL_OUTPUT sym:tag:alias
 testouterr_cmd sh {avail -t foo not:tag:loaded} OK "foo/1.0\nfoo/2.0\nfoo/9.0"
 testouterr_cmd sh {avail -t foo/1 not:tag:loaded} OK "foo/1.0"
 testouterr_cmd sh {avail -t quux not:tag:loaded} OK {}
-testouterr_cmd sh {avail * not:tag:loaded} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3  }
+testouterr_cmd sh {avail * not:tag:loaded} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3}
 testouterr_cmd sh {avail -t provide not:tag:loaded} OK "provide/1\nprovide/2\nprovide/3"
 
 setenv_var MODULES_AVAIL_OUTPUT sym:tag:alias:provided-alias
 
-testouterr_cmd sh {avail foo} OK {foo/1(@)  foo/1.0  foo/2.0  foo/9.0  }
-testouterr_cmd sh {avail foo/1} OK {foo/1(@)  foo/1.0  }
-testouterr_cmd sh {avail quux} OK {quux/1(@)  }
-testouterr_cmd sh {avail} OK {bar/1  bar/2  baz/1(@)  foo/1(@)  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3  quux/1(@)  qux/1(@)  }
-testouterr_cmd sh {avail provide} OK {provide/1  provide/2  provide/3  }
+testouterr_cmd sh {avail foo} OK {foo/1(@)  foo/1.0  foo/2.0  foo/9.0}
+testouterr_cmd sh {avail foo/1} OK {foo/1(@)  foo/1.0}
+testouterr_cmd sh {avail quux} OK {quux/1(@)}
+testouterr_cmd sh {avail} OK {bar/1  bar/2  baz/1(@)  foo/1(@)  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3  quux/1(@)  qux/1(@)}
+testouterr_cmd sh {avail provide} OK {provide/1  provide/2  provide/3}
 
 setenv_var MODULES_AVAIL_TERSE_OUTPUT sym:tag:alias:provided-alias
 
@@ -667,123 +668,123 @@ setenv_var MODULES_AVAIL_TERSE_OUTPUT sym:tag:alias:variant
 setenv_var TESTSUITE_PROVIDE duplicate_with_family
 
 setenv_var MODULES_AVAIL_OUTPUT sym:tag:provided-alias
-testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3  }
-testouterr_cmd sh {avail foo} OK {foo/1.0  foo/2.0  foo/9.0  }
+testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3}
+testouterr_cmd sh {avail foo} OK {foo/1.0  foo/2.0  foo/9.0}
 
 setenv_var TESTSUITE_PROVIDE duplicate_with_ext_family
 
 setenv_var MODULES_AVAIL_OUTPUT sym:tag:provided-alias
-testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3  }
-testouterr_cmd sh {avail foo} OK {foo/1.0  foo/2.0  foo/9.0  }
+testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3}
+testouterr_cmd sh {avail foo} OK {foo/1.0  foo/2.0  foo/9.0}
 
 setenv_var MODULES_AVAIL_OUTPUT sym:tag:alias
-testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3  }
-testouterr_cmd sh {avail foo} OK {foo/1.0  foo/2.0  foo/9.0  }
+testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3}
+testouterr_cmd sh {avail foo} OK {foo/1.0  foo/2.0  foo/9.0}
 
 setenv_var MODULES_AVAIL_OUTPUT sym:tag
-testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3  }
-testouterr_cmd sh {avail foo} OK {foo/1.0  foo/2.0  foo/9.0  }
+testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3}
+testouterr_cmd sh {avail foo} OK {foo/1.0  foo/2.0  foo/9.0}
 
 setenv_var TESTSUITE_PROVIDE duplicate_with_family3
 
 setenv_var MODULES_AVAIL_OUTPUT sym:tag:provided-alias
-testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3  quux(@)  }
-testouterr_cmd sh {avail quux} OK {quux(@)  }
+testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3  quux(@)}
+testouterr_cmd sh {avail quux} OK {quux(@)}
 
 setenv_var TESTSUITE_PROVIDE duplicate_with_ext_family2
 
 setenv_var MODULES_AVAIL_OUTPUT sym:tag:provided-alias
-testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3  quux(@)  }
-testouterr_cmd sh {avail quux} OK {quux(@)  }
+testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3  quux(@)}
+testouterr_cmd sh {avail quux} OK {quux(@)}
 
 setenv_var MODULES_AVAIL_OUTPUT sym:tag:alias
-testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3  }
+testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3}
 testouterr_cmd sh {avail quux} OK {}
 
 setenv_var MODULES_AVAIL_OUTPUT sym:tag
-testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3  }
+testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3}
 testouterr_cmd sh {avail quux} OK {}
 
 
 setenv_var TESTSUITE_PROVIDE duplicate_with_alias
 
-testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3  }
-testouterr_cmd sh {avail foo} OK {foo/1.0  foo/2.0  foo/9.0  }
+testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3}
+testouterr_cmd sh {avail foo} OK {foo/1.0  foo/2.0  foo/9.0}
 
 setenv_var TESTSUITE_PROVIDE duplicate_with_ext_same_alias
 
 setenv_var MODULES_AVAIL_OUTPUT sym:tag:provided-alias
-testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3  }
-testouterr_cmd sh {avail foo} OK {foo/1.0  foo/2.0  foo/9.0  }
+testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3}
+testouterr_cmd sh {avail foo} OK {foo/1.0  foo/2.0  foo/9.0}
 
 setenv_var MODULES_AVAIL_OUTPUT sym:tag
-testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3  }
-testouterr_cmd sh {avail foo} OK {foo/1.0  foo/2.0  foo/9.0  }
+testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3}
+testouterr_cmd sh {avail foo} OK {foo/1.0  foo/2.0  foo/9.0}
 
 setenv_var MODULES_AVAIL_OUTPUT sym:tag:alias
-testouterr_cmd sh {avail} OK {bar/1  bar/2  foo(@)  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3  }
-testouterr_cmd sh {avail foo} OK {foo(@)  foo/1.0  foo/2.0  foo/9.0  }
+testouterr_cmd sh {avail} OK {bar/1  bar/2  foo(@)  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3}
+testouterr_cmd sh {avail foo} OK {foo(@)  foo/1.0  foo/2.0  foo/9.0}
 
 setenv_var TESTSUITE_PROVIDE duplicate_with_ext_diff_alias
 
 setenv_var MODULES_AVAIL_OUTPUT sym:tag:provided-alias
-testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3  }
-testouterr_cmd sh {avail foo} OK {foo/1.0  foo/2.0  foo/9.0  }
+testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3}
+testouterr_cmd sh {avail foo} OK {foo/1.0  foo/2.0  foo/9.0}
 
 setenv_var TESTSUITE_PROVIDE duplicate_with_alias3
 
-testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3  quux(@)  }
-testouterr_cmd sh {avail quux} OK {quux(@)  }
+testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3  quux(@)}
+testouterr_cmd sh {avail quux} OK {quux(@)}
 
 setenv_var TESTSUITE_PROVIDE duplicate_with_ext_same_alias2
 
 setenv_var MODULES_AVAIL_OUTPUT sym:tag:provided-alias
-testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3  quux(@)  }
-testouterr_cmd sh {avail quux} OK {quux(@)  }
+testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3  quux(@)}
+testouterr_cmd sh {avail quux} OK {quux(@)}
 
 setenv_var MODULES_AVAIL_OUTPUT sym:tag:alias
-testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3  quux(@)  }
-testouterr_cmd sh {avail quux} OK {quux(@)  }
+testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3  quux(@)}
+testouterr_cmd sh {avail quux} OK {quux(@)}
 
 setenv_var MODULES_AVAIL_OUTPUT sym:tag
-testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3  }
+testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3}
 testouterr_cmd sh {avail quux} OK {}
 
 setenv_var TESTSUITE_PROVIDE duplicate_with_ext_diff_alias2
 setenv_var MODULES_AVAIL_OUTPUT sym:tag:provided-alias
 
-testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3  quux(@)  }
-testouterr_cmd sh {avail quux} OK {quux(@)  }
+testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3  quux(@)}
+testouterr_cmd sh {avail quux} OK {quux(@)}
 
 
 setenv_var TESTSUITE_PROVIDE duplicate_with_version
 
 setenv_var MODULES_AVAIL_OUTPUT sym:tag:provided-alias
-testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3  provide/foo(@)  }
-testouterr_cmd sh {avail provide} OK {provide/1  provide/2  provide/3  provide/foo(@)  }
+testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3  provide/foo(@)}
+testouterr_cmd sh {avail provide} OK {provide/1  provide/2  provide/3  provide/foo(@)}
 
 setenv_var MODULES_AVAIL_OUTPUT sym:tag
-testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3  }
-testouterr_cmd sh {avail provide} OK {provide/1  provide/2  provide/3  }
+testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3}
+testouterr_cmd sh {avail provide} OK {provide/1  provide/2  provide/3}
 
 setenv_var TESTSUITE_PROVIDE duplicate_with_ext_diff_version
 
 setenv_var MODULES_AVAIL_OUTPUT sym:tag:provided-alias
-testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2(foo)  provide/3  }
-testouterr_cmd sh {avail provide} OK {provide/1  provide/2(foo)  provide/3  }
+testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2(foo)  provide/3}
+testouterr_cmd sh {avail provide} OK {provide/1  provide/2(foo)  provide/3}
 
 setenv_var MODULES_AVAIL_OUTPUT sym:tag
-testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2(foo)  provide/3  }
-testouterr_cmd sh {avail provide} OK {provide/1  provide/2(foo)  provide/3  }
+testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2(foo)  provide/3}
+testouterr_cmd sh {avail provide} OK {provide/1  provide/2(foo)  provide/3}
 
 
 setenv_var MODULES_AVAIL_OUTPUT sym:tag:provided-alias
 
 setenv_var TESTSUITE_PROVIDE multiple_and_forbidden
 
-testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1 <F>  provide/2  provide/3  }
-testouterr_cmd sh {avail provide} OK {provide/1 <F>  provide/2  provide/3  }
-testouterr_cmd sh {avail provide/1} OK {provide/1 <F>  }
+testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1 <F>  provide/2  provide/3}
+testouterr_cmd sh {avail provide} OK {provide/1 <F>  provide/2  provide/3}
+testouterr_cmd sh {avail provide/1} OK {provide/1 <F>}
 testouterr_cmd sh {avail unk} OK {}
 testouterr_cmd sh {avail quux/1} OK {}
 
@@ -795,36 +796,36 @@ testouterr_cmd sh {avail quux/1 envvar:FOO} OK {}
 
 setenv_var TESTSUITE_PROVIDE multiple_and_alias_forbidden
 
-testouterr_cmd sh {avail} OK {bar/1  bar/2  baz/1(@)  foo/1(@)  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3  quux/1(@) <F>  qux/1(@)  }
-testouterr_cmd sh {avail provide} OK {provide/1  provide/2  provide/3  }
-testouterr_cmd sh {avail provide/1} OK {provide/1  }
+testouterr_cmd sh {avail} OK {bar/1  bar/2  baz/1(@)  foo/1(@)  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3  quux/1(@) <F>  qux/1(@)}
+testouterr_cmd sh {avail provide} OK {provide/1  provide/2  provide/3}
+testouterr_cmd sh {avail provide/1} OK {provide/1}
 testouterr_cmd sh {avail unk} OK {}
-testouterr_cmd sh {avail quux/1} OK {quux/1(@) <F>  }
+testouterr_cmd sh {avail quux/1} OK {quux/1(@) <F>}
 
-testouterr_cmd sh {avail envvar:FOO} OK {provide/1  }
-testouterr_cmd sh {avail provide envvar:FOO} OK {provide/1  }
+testouterr_cmd sh {avail envvar:FOO} OK {provide/1}
+testouterr_cmd sh {avail provide envvar:FOO} OK {provide/1}
 testouterr_cmd sh {avail unk envvar:FOO} OK {}
 testouterr_cmd sh {avail quux/1 envvar:FOO} OK {}
 
 
 setenv_var TESTSUITE_PROVIDE multiple_and_family_forbidden
 
-testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3  quux(@) <F>  }
-testouterr_cmd sh {avail provide/1} OK {provide/1  }
+testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3  quux(@) <F>}
+testouterr_cmd sh {avail provide/1} OK {provide/1}
 testouterr_cmd sh {avail unk} OK {}
-testouterr_cmd sh {avail quux} OK {quux(@) <F>  }
+testouterr_cmd sh {avail quux} OK {quux(@) <F>}
 
-testouterr_cmd sh {avail envvar:FOO} OK {provide/1  }
-testouterr_cmd sh {avail provide envvar:FOO} OK {provide/1  }
+testouterr_cmd sh {avail envvar:FOO} OK {provide/1}
+testouterr_cmd sh {avail provide envvar:FOO} OK {provide/1}
 testouterr_cmd sh {avail unk envvar:FOO} OK {}
 testouterr_cmd sh {avail quux envvar:FOO} OK {}
 
 
 setenv_var TESTSUITE_PROVIDE multiple_and_expired
 
-testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1 <F>  provide/2  provide/3  }
-testouterr_cmd sh {avail provide} OK {provide/1 <F>  provide/2  provide/3  }
-testouterr_cmd sh {avail provide/1} OK {provide/1 <F>  }
+testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1 <F>  provide/2  provide/3}
+testouterr_cmd sh {avail provide} OK {provide/1 <F>  provide/2  provide/3}
+testouterr_cmd sh {avail provide/1} OK {provide/1 <F>}
 testouterr_cmd sh {avail unk} OK {}
 testouterr_cmd sh {avail quux/1} OK {}
 
@@ -836,38 +837,38 @@ testouterr_cmd sh {avail quux envvar:FOO} OK {}
 
 setenv_var TESTSUITE_PROVIDE multiple_and_alias_expired
 
-testouterr_cmd sh {avail} OK {bar/1  bar/2  baz/1(@)  foo/1(@)  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3  quux/1(@) <F>  qux/1(@)  }
-testouterr_cmd sh {avail provide} OK {provide/1  provide/2  provide/3  }
-testouterr_cmd sh {avail provide/1} OK {provide/1  }
+testouterr_cmd sh {avail} OK {bar/1  bar/2  baz/1(@)  foo/1(@)  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3  quux/1(@) <F>  qux/1(@)}
+testouterr_cmd sh {avail provide} OK {provide/1  provide/2  provide/3}
+testouterr_cmd sh {avail provide/1} OK {provide/1}
 testouterr_cmd sh {avail unk} OK {}
-testouterr_cmd sh {avail quux/1} OK {quux/1(@) <F>  }
+testouterr_cmd sh {avail quux/1} OK {quux/1(@) <F>}
 
-testouterr_cmd sh {avail envvar:FOO} OK {provide/1  }
-testouterr_cmd sh {avail provide envvar:FOO} OK {provide/1  }
+testouterr_cmd sh {avail envvar:FOO} OK {provide/1}
+testouterr_cmd sh {avail provide envvar:FOO} OK {provide/1}
 testouterr_cmd sh {avail unk envvar:FOO} OK {}
 testouterr_cmd sh {avail quux/1 envvar:FOO} OK {}
 
 
 setenv_var TESTSUITE_PROVIDE multiple_and_family_expired
 
-testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3  quux(@) <F>  }
-testouterr_cmd sh {avail provide/1} OK {provide/1  }
+testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3  quux(@) <F>}
+testouterr_cmd sh {avail provide/1} OK {provide/1}
 testouterr_cmd sh {avail unk} OK {}
-testouterr_cmd sh {avail quux} OK {quux(@) <F>  }
+testouterr_cmd sh {avail quux} OK {quux(@) <F>}
 
-testouterr_cmd sh {avail envvar:FOO} OK {provide/1  }
-testouterr_cmd sh {avail provide envvar:FOO} OK {provide/1  }
+testouterr_cmd sh {avail envvar:FOO} OK {provide/1}
+testouterr_cmd sh {avail provide envvar:FOO} OK {provide/1}
 testouterr_cmd sh {avail unk envvar:FOO} OK {}
 testouterr_cmd sh {avail quux envvar:FOO} OK {}
 
 
 setenv_var TESTSUITE_PROVIDE multiple_and_hidden
 
-testouterr_cmd sh {avail} OK {bar/1  bar/2  baz/1(@)  foo/1(@)  foo/1.0  foo/2.0  foo/9.0  provide/2  provide/3  quux/1(@)  qux/1(@)  }
-testouterr_cmd sh {avail provide} OK {provide/2  provide/3  }
-testouterr_cmd sh {avail provide/1} OK {provide/1 <H>  }
+testouterr_cmd sh {avail} OK {bar/1  bar/2  baz/1(@)  foo/1(@)  foo/1.0  foo/2.0  foo/9.0  provide/2  provide/3  quux/1(@)  qux/1(@)}
+testouterr_cmd sh {avail provide} OK {provide/2  provide/3}
+testouterr_cmd sh {avail provide/1} OK {provide/1 <H>}
 testouterr_cmd sh {avail unk} OK {}
-testouterr_cmd sh {avail quux/1} OK {quux/1(@)  }
+testouterr_cmd sh {avail quux/1} OK {quux/1(@)}
 
 testouterr_cmd sh {avail envvar:FOO} OK {}
 testouterr_cmd sh {avail provide envvar:FOO} OK {}
@@ -877,46 +878,46 @@ testouterr_cmd sh {avail quux envvar:FOO} OK {}
 
 setenv_var TESTSUITE_PROVIDE multiple_and_alias_hidden
 
-testouterr_cmd sh {avail} OK {bar/1  bar/2  baz/1(@)  foo/1(@)  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3  qux/1(@)  }
-testouterr_cmd sh {avail provide} OK {provide/1  provide/2  provide/3  }
-testouterr_cmd sh {avail provide/1} OK {provide/1  }
+testouterr_cmd sh {avail} OK {bar/1  bar/2  baz/1(@)  foo/1(@)  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3  qux/1(@)}
+testouterr_cmd sh {avail provide} OK {provide/1  provide/2  provide/3}
+testouterr_cmd sh {avail provide/1} OK {provide/1}
 testouterr_cmd sh {avail unk} OK {}
-testouterr_cmd sh {avail quux/1} OK {quux/1(@) <H>  }
+testouterr_cmd sh {avail quux/1} OK {quux/1(@) <H>}
 
-testouterr_cmd sh {avail envvar:FOO} OK {provide/1  }
-testouterr_cmd sh {avail provide envvar:FOO} OK {provide/1  }
+testouterr_cmd sh {avail envvar:FOO} OK {provide/1}
+testouterr_cmd sh {avail provide envvar:FOO} OK {provide/1}
 testouterr_cmd sh {avail unk envvar:FOO} OK {}
 testouterr_cmd sh {avail quux/1 envvar:FOO} OK {}
 
 
 setenv_var TESTSUITE_PROVIDE multiple_and_family_hidden
 
-testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3  }
-testouterr_cmd sh {avail provide/1} OK {provide/1  }
+testouterr_cmd sh {avail} OK {bar/1  bar/2  foo/1.0  foo/2.0  foo/9.0  provide/1  provide/2  provide/3}
+testouterr_cmd sh {avail provide/1} OK {provide/1}
 testouterr_cmd sh {avail unk} OK {}
-testouterr_cmd sh {avail quux} OK {quux(@) <H>  }
+testouterr_cmd sh {avail quux} OK {quux(@) <H>}
 
-testouterr_cmd sh {avail envvar:FOO} OK {provide/1  }
-testouterr_cmd sh {avail provide envvar:FOO} OK {provide/1  }
+testouterr_cmd sh {avail envvar:FOO} OK {provide/1}
+testouterr_cmd sh {avail provide envvar:FOO} OK {provide/1}
 testouterr_cmd sh {avail unk envvar:FOO} OK {}
 testouterr_cmd sh {avail quux envvar:FOO} OK {}
 
 
 setenv_var MODULES_AVAIL_OUTPUT sym:tag:provided-alias
 setenv_var TESTSUITE_PROVIDE explicit_default
-testouterr_cmd sh {avail provide} OK {provide/0(default:@)  provide/1  provide/2  provide/3  }
+testouterr_cmd sh {avail provide} OK {provide/0(default:@)  provide/1  provide/2  provide/3}
 
 setenv_var TESTSUITE_PROVIDE explicit_default_and_forbidden
-testouterr_cmd sh {avail provide} OK {provide/1 <F>  provide/2  provide/3  }
+testouterr_cmd sh {avail provide} OK {provide/1 <F>  provide/2  provide/3}
 
 setenv_var TESTSUITE_PROVIDE explicit_default_and_alias_forbidden
-testouterr_cmd sh {avail provide} OK {provide/0(default:@) <F>  provide/1  provide/2  provide/3  }
+testouterr_cmd sh {avail provide} OK {provide/0(default:@) <F>  provide/1  provide/2  provide/3}
 
 setenv_var TESTSUITE_PROVIDE explicit_default_and_hidden
-testouterr_cmd sh {avail provide} OK {provide/0(default:@)  provide/2  provide/3  }
+testouterr_cmd sh {avail provide} OK {provide/0(default:@)  provide/2  provide/3}
 
 setenv_var TESTSUITE_PROVIDE explicit_default_and_alias_hidden
-testouterr_cmd sh {avail provide} OK {provide/1  provide/2  provide/3  }
+testouterr_cmd sh {avail provide} OK {provide/1  provide/2  provide/3}
 
 
 file delete $mp/foo
@@ -943,8 +944,8 @@ set mp $modpath.3
 set mpre [regsub -all "\(\[.+?\]\)" $mp {\\\1}]
 setenv_path_var MODULEPATH $mp
 
-testouterr_cmd sh {avail -o alias:sym foo@1:} OK "foo/2.0  "
-set tserr "foo/1.0(bar)  foo/2.0  "
+testouterr_cmd sh {avail -o alias:sym foo@1:} OK "foo/2.0"
+set tserr "foo/1.0(bar)  foo/2.0"
 testouterr_cmd sh {avail -o alias:hidden:sym foo@1:} OK $tserr
 testouterr_cmd sh {avail --all -o alias:hidden:sym foo@1:} OK $tserr
 
@@ -975,7 +976,7 @@ testouterr_cmd sh {avail -o +variant --terse variant/1.0} OK $mp:\nvariant/1.0{f
 testouterr_cmd sh {avail --output=+variant --terse variant/1.0} OK $mp:\nvariant/1.0{foo=val1}
 testouterr_cmd sh {avail -o -modulepath --terse variant/1.0} OK variant/1.0
 testouterr_cmd sh {avail --output=-modulepath:sym:tag --terse foo/0.2} OK foo/0.2
-testouterr_cmd sh {avail --output=-modulepath:sym:tag foo/0.2} OK {foo/0.2  }
+testouterr_cmd sh {avail --output=-modulepath:sym:tag foo/0.2} OK {foo/0.2}
 
 testouterr_cmd sh {avail --output=-sym: foo/0.2} ERR $tserr_invalid_output_val
 testouterr_cmd sh {avail --output=+foo: foo/0.2} ERR $tserr_invalid_output_val
@@ -985,10 +986,10 @@ testouterr_cmd sh {ml avail --output=+foo: foo/0.2} ERR $tserr_invalid_output_va
 testouterr_cmd sh {ml avail -o -bar foo/0.2} ERR $tserr_invalid_o_val
 
 set tserr "$modlin $mpre $modlin
-foo/0.2\\(sym\\) <tag>  
+foo/0.2\\(sym\\) <tag>
 
 Key:
-\\(symbolic-version\\)  <module-tag>  "
+\\(symbolic-version\\)  <module-tag>"
 testouterr_cmd_re sh {avail -o +tag:sym foo/0.2} OK $tserr
 
 setenv_var MODULES_AVAIL_OUTPUT sym:tag
@@ -996,7 +997,7 @@ setenv_var MODULES_AVAIL_TERSE_OUTPUT sym:tag
 
 testouterr_cmd sh {avail --output=+variant --terse variant/1.0} OK variant/1.0{foo=val1}
 testouterr_cmd sh {avail --output=+variant --terse foo/0.2} OK {foo/0.2(sym) <tag>}
-testouterr_cmd sh {avail -o -modulepath:sym:tag foo/0.2} OK {foo/0.2  }
+testouterr_cmd sh {avail -o -modulepath:sym:tag foo/0.2} OK {foo/0.2}
 
 
 #
