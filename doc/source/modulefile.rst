@@ -2100,6 +2100,8 @@ or terse reporting of these sub-commands: :mconfig:`avail_output`,
 :mconfig:`list_terse_output`, :mconfig:`spider_output`,
 :mconfig:`spider_terse_output`.
 
+.. _advanced_module_version_specifiers:
+
 Advanced module version specifiers
 ----------------------------------
 

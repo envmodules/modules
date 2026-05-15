@@ -18,4 +18,5 @@ Introduction
 .. include:: envml.rst
 .. include:: MIGRATING.rst
 .. include:: NEWS.rst
+.. include:: user_guide.rst
 .. include:: changes.rst
