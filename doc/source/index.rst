@@ -184,6 +184,7 @@ or (at your option) any later version (`GPL-2.0-or-later`).
       INSTALL-win
       MIGRATING
       NEWS
+      user_guide
       FAQ
       changes
       other-implementations
