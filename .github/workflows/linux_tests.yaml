@@ -11,7 +11,16 @@ jobs:
   tcl86-nolibtclenvmodules:
     runs-on: ubuntu-22.04
     env:
-      CONFIGURE_OPTS: --with-tclsh=tclsh8.6 --disable-libtclenvmodules --prefix=/tmp/modules --with-pager=more --with-pager-opts=-X --with-initconf-in=initdir --enable-quarantine-support --disable-set-binpath --disable-set-manpath
+      CONFIGURE_OPTS: |
+        --with-tclsh=tclsh8.6
+        --disable-libtclenvmodules
+        --prefix=/tmp/mo ules
+        --with-pager=more
+        --with-pager-opts=-X
+        --with-initconf-in=initdir
+        --enable-quarantine-support
+        --disable-set-binpath
+        --disable-set-manpath
       COVERAGE: y
       EXTRA_SCRIPT_PRETEST: make install-testmodulerc install-testetcrc install-testmodspath-empty install-testmoguicmd
       EXTRA_SCRIPT_POSTTEST: make uninstall-testconfig
@@ -31,7 +40,8 @@ jobs:
           sudo apt-get install -y xvfb x11-xserver-utils
       - name: Build Modules
         run: |
-          ./configure $CONFIGURE_OPTS
+          mapfile -t opts <<< "$CONFIGURE_OPTS"
+          ./configure "${opts[@]}"
           make
       - name: Test Modules build
         run: |
@@ -68,7 +78,27 @@ jobs:
   tcl85-nolibtclenvmodules:
     runs-on: ubuntu-22.04
     env:
-      CONFIGURE_OPTS: --with-tclsh=tclsh8.5 --prefix=/tmp/modules --disable-libtclenvmodules --with-tcl=/usr/local/lib --enable-versioning --with-loadedmodules=null:dot --without-pager --disable-avail-indepth --disable-spider-indepth --with-terminal-background=light --with-unload-match-order=returnfirst --disable-implicit-default --with-search-match=contains --with-locked-configs=extra_siteconfig --disable-auto-handling --disable-extended-default --disable-advanced-version-spec --disable-color --with-icase=never --with-tcl-linter=nagelfar135/nagelfar.tcl
+      CONFIGURE_OPTS: |
+        --with-tclsh=tclsh8.5
+        --prefix=/tmp/modules
+        --disable-libtclenvmodules
+        --with-tcl=/usr/local/lib
+        --enable-versioning
+        --with-loadedmodules=null:dot
+        --without-pager
+        --disable-avail-indepth
+        --disable-spider-indepth
+        --with-terminal-background=light
+        --with-unload-match-order=returnfirst
+        --disable-implicit-default
+        --with-search-match=contains
+        --with-locked-configs=extra_siteconfig
+        --disable-auto-handling
+        --disable-extended-default
+        --disable-advanced-version-spec
+        --disable-color
+        --with-icase=never
+        --with-tcl-linter=nagelfar135/nagelfar.tcl
       COVERAGE: y
       EXTRA_SCRIPT_PRETEST: make install-testinitrc install-testsiteconfig
       EXTRA_SCRIPT_POSTTEST: make uninstall-testconfig
@@ -95,7 +125,8 @@ jobs:
           sudo make install
       - name: Build Modules
         run: |
-          ./configure $CONFIGURE_OPTS
+          mapfile -t opts <<< "$CONFIGURE_OPTS"
+          ./configure "${opts[@]}"
           make
       - name: Test Modules build
         run: |
@@ -132,7 +163,23 @@ jobs:
   tcl85-2:
     runs-on: ubuntu-22.04
     env:
-      CONFIGURE_OPTS: --with-tclsh=tclsh8.5 --prefix=/tmp/modules --with-tcl=/usr/local/lib --enable-quarantine-support --enable-silent-shell-debug-support --enable-modulespath --with-pager=more --with-dark-background-colors=hi --with-locked-configs=implicit_default --enable-wa-277 --enable-advanced-version-spec --disable-ml --disable-implicit-requirement --enable-set-shell-startup --enable-path-entry-reorder --disable-compressed-changelog
+      CONFIGURE_OPTS: |
+        --with-tclsh=tclsh8.5
+        --prefix=/tmp/modules
+        --with-tcl=/usr/local/lib
+        --enable-quarantine-support
+        --enable-silent-shell-debug-support
+        --enable-modulespath
+        --with-pager=more
+        --with-dark-background-colors=hi
+        --with-locked-configs=implicit_default
+        --enable-wa-277
+        --enable-advanced-version-spec
+        --disable-ml
+        --disable-implicit-requirement
+        --enable-set-shell-startup
+        --enable-path-entry-reorder
+        --disable-compressed-changelog
       COVERAGE: y
       EXTRA_SCRIPT_PRETEST: make install-testinitrc-1 install-testetcrc install-testmodspath
       EXTRA_SCRIPT_POSTTEST: make uninstall-testconfig
@@ -159,7 +206,8 @@ jobs:
           sudo make install
       - name: Build Modules
         run: |
-          ./configure $CONFIGURE_OPTS
+          mapfile -t opts <<< "$CONFIGURE_OPTS"
+          ./configure "${opts[@]}"
           make
       - name: Test Modules build
         run: |
@@ -196,7 +244,12 @@ jobs:
   tcl86:
     runs-on: ubuntu-22.04
     env:
-      CONFIGURE_OPTS: --with-tclsh=tclsh8.6 --prefix=/tmp/modules --libdir=/tmp/modules/lib64 --enable-multilib-support --enable-new-features
+      CONFIGURE_OPTS: |
+        --with-tclsh=tclsh8.6
+        --prefix=/tmp/modules
+        --libdir=/tmp/modules/lib64
+        --enable-multilib-support
+        --enable-new-features
       COVERAGE: y
       COVERAGE_OLDTCL: y
       COVERAGE_MULTILIB: y
@@ -219,7 +272,8 @@ jobs:
           sudo apt-get install -y gcc autoconf tcl8.6-dev
       - name: Build Modules
         run: |
-          ./configure $CONFIGURE_OPTS
+          mapfile -t opts <<< "$CONFIGURE_OPTS"
+          ./configure "${opts[@]}"
           make
       - name: Test Modules build
         shell: 'script -q -e -c "bash {0}"'
@@ -258,7 +312,10 @@ jobs:
   tcl85:
     runs-on: ubuntu-22.04
     env:
-      CONFIGURE_OPTS: --with-tclsh=tclsh8.5 --prefix=/tmp/modules --with-tcl=/usr/local/lib
+      CONFIGURE_OPTS: |
+        --with-tclsh=tclsh8.5
+        --prefix=/tmp/modules
+        --with-tcl=/usr/local/lib
       COVERAGE: y
       EXTRA_SCRIPT_PRETEST: make install-testsiteconfig-1 && export TESTSUITE_ENABLE_SITECONFIG=1
       EXTRA_SCRIPT_POSTTEST: unset TESTSUITE_ENABLE_SITECONFIG
@@ -285,7 +342,8 @@ jobs:
           sudo make install
       - name: Build Modules
         run: |
-          ./configure $CONFIGURE_OPTS
+          mapfile -t opts <<< "$CONFIGURE_OPTS"
+          ./configure "${opts[@]}"
           make
       - name: Test Modules build
         shell: 'script -q -e -c "bash {0}"'
@@ -322,13 +380,34 @@ jobs:
           retention-days: 5
 
   tcl91:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     env:
-      CONFIGURE_OPTS: --with-tclsh=tclsh9.1 --prefix=/tmp/modules --with-tcl=/usr/local/lib
+      CONFIGURE_OPTS: |
+        --with-tclsh=/usr/local/bin/tclsh9.1
+        --prefix=/tmp/modules
+        --with-tcl=/usr/local/lib
+        --enable-append-manpath
+        --enable-append-binpath
+        --with-bin-search-path=/usr/bin:/bin
+        --enable-silent-shell-debug-support
+        --enable-windows-support
+        --with-loadedmodules=null:dot
+        --enable-quarantine-support
+        --with-quarantine-vars=LD_LIBRARY_PATH
+        --enable-new-features
+        --with-dark-background-colors=hi=1:se=2:er=91:wa=93:mp=1;94:di=94:al=96:sy=95
+        --enable-foo
+        FOO=bar
+      EXTRA_SCRIPT_PRETEST: make install-testmodspath-wild
+      EXTRA_SCRIPT_POSTTEST: unset TESTSUITE_ENABLE_SITECONFIG
+      TESTSUITE_ENABLE_MODULECACHE: 1
+      EXTRATEST_SOURCESH: y
     steps:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
+          # change dir to launch tests from path containing specific chars
+          path: modules-1.2.3+branch_name-91-g6dd3db49
       - name: Install system packages
         run: |
           # add microsoft repository for powershell
@@ -347,20 +426,28 @@ jobs:
           make -j
           sudo make install
       - name: Build Modules
+        working-directory: modules-1.2.3+branch_name-91-g6dd3db49
         run: |
-          ./configure $CONFIGURE_OPTS
+          mapfile -t opts <<< "$CONFIGURE_OPTS"
+          ./configure "${opts[@]}"
           make
       - name: Test Modules build
+        working-directory: modules-1.2.3+branch_name-91-g6dd3db49
         run: |
+          eval $EXTRA_SCRIPT_PRETEST
           make test-deps
           script/mt
+          eval $EXTRA_SCRIPT_POSTTEST
       - name: Install Modules
+        working-directory: modules-1.2.3+branch_name-91-g6dd3db49
         run: |
           make install
       - name: Test Modules installation
+        working-directory: modules-1.2.3+branch_name-91-g6dd3db49
         run: |
           script/mt install
       - name: Uninstall Modules
+        working-directory: modules-1.2.3+branch_name-91-g6dd3db49
         run: |
           make uninstall
       - uses: actions/upload-artifact@v7
@@ -368,14 +455,17 @@ jobs:
         with:
           name: testsuite-logs-${{ github.job }}
           path: |
-            modules.log
-            install.log
+            modules-1.2.3+branch_name-91-g6dd3db49/modules.log
+            modules-1.2.3+branch_name-91-g6dd3db49/install.log
           retention-days: 5
 
   tcl90:
     runs-on: ubuntu-22.04
     env:
-      CONFIGURE_OPTS: --with-tclsh=tclsh9.0 --prefix=/tmp/modules --with-tcl=/usr/local/lib
+      CONFIGURE_OPTS: |
+        --with-tclsh=tclsh9.0
+        --prefix=/tmp/modules
+        --with-tcl=/usr/local/lib
       COVERAGE: y
     steps:
       - uses: actions/checkout@v6
@@ -400,7 +490,8 @@ jobs:
           sudo make install
       - name: Build Modules
         run: |
-          ./configure $CONFIGURE_OPTS
+          mapfile -t opts <<< "$CONFIGURE_OPTS"
+          ./configure "${opts[@]}"
           make
       - name: Test Modules build
         run: |
@@ -430,4 +521,123 @@ jobs:
           path: |
             modules.log
             install.log
+          retention-days: 5
+
+  el8:
+    runs-on: ubuntu-latest
+    container:
+      image: rockylinux:8
+    env:
+      CONFIGURE_OPTS: |
+        --with-loadedmodules=null:dot
+        --enable-quarantine-support
+        --with-quarantine-vars=LD_LIBRARY_PATH LD_PRELOAD
+        --with-bashcompletiondir=/usr/share/bash-completion/completions
+        --with-fishcompletiondir=/usr/share/fish/vendor_completions.d
+        --with-zshcompletiondir=/usr/share/zsh/site-functions
+    steps:
+      - name: Install system packages
+        run: |
+          sed -i 's|enabled=0|enabled=1|' /etc/yum.repos.d/Rocky-PowerTools.repo
+          # specific update of libarchive is required for CMake on EL8.3
+          yum update -y libarchive
+          # need to pre-install correct module implementation to avoid fetching
+          # another one from EPEL (as dependency for R-core) on recent RockyLinux 8
+          yum install -y environment-modules
+          # need git in PATH for actions/checkout to get git repo instead of github export
+          dnf install -y git
+          yum install -y epel-release
+          yum install -y tcsh zsh ksh tcl perl python36 gzip ruby cmake R-core make curl perl python3-sphinx git dejagnu man-db rpm-build bzip2 autoconf gcc tcl-devel emacs
+          yum install -y which xorg-x11-server-utils xorg-x11-server-Xvfb
+          yum install -y fish
+      - name: Fix git safe directory
+        run: |
+          # avoid "detected dubious ownership in repository" error
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Build Modules
+        run: |
+          mapfile -t opts <<< "$CONFIGURE_OPTS"
+          ./configure "${opts[@]}"
+          make
+      # also enable a display on this test case to validate x-resource behavior
+      - name: Test Modules build
+        run: |
+          make test-deps
+          xvfb-run script/mt
+      - name: Install Modules
+        run: |
+          make install
+      - name: Test Modules installation
+        run: |
+          xvfb-run script/mt install
+      - name: Uninstall Modules
+        run: |
+          make uninstall
+      - name: Build RPM & SRPM packages
+        run: |
+          xvfb-run make srpm rpm
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: testsuite-logs-${{ github.job }}
+          path: |
+            /__w/modules/modules/modules.log
+            /__w/modules/modules/install.log
+          retention-days: 5
+
+  el9:
+    runs-on: ubuntu-latest
+    container:
+      image: almalinux:9
+    env:
+      CONFIGURE_OPTS: |
+        --with-bashcompletiondir=/usr/share/bash-completion/completions
+        --with-fishcompletiondir=/usr/share/fish/vendor_completions.d
+        --with-zshcompletiondir=/usr/share/zsh/site-functions
+    steps:
+      - name: Install system packages
+        run: |
+          # need git in PATH for actions/checkout to get git repo instead of github export
+          dnf install -y git
+          dnf install -y dnf-plugins-core epel-release
+          dnf config-manager --set-enabled crb
+          dnf install -y tcsh zsh ksh fish tcl perl python3 gzip ruby cmake R-core make perl python3-sphinx git dejagnu man-db rpm-build bzip2 autoconf gcc tcl-devel procps-ng emacs
+      - name: Fix git safe directory
+        run: |
+          # avoid "detected dubious ownership in repository" error
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Build Modules
+        run: |
+          mapfile -t opts <<< "$CONFIGURE_OPTS"
+          ./configure "${opts[@]}"
+          make
+      - name: Test Modules build
+        run: |
+          make test-deps
+          script/mt
+      - name: Install Modules
+        run: |
+          make install
+      - name: Test Modules installation
+        run: |
+          script/mt install
+      - name: Uninstall Modules
+        run: |
+          make uninstall
+      - name: Build RPM & SRPM packages
+        run: |
+          make srpm rpm
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: testsuite-logs-${{ github.job }}
+          path: |
+            /__w/modules/modules/modules.log
+            /__w/modules/modules/install.log
           retention-days: 5

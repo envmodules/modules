@@ -155,7 +155,7 @@ foreach shell $othlang_list {
          testall_cmd_re "$shell" "append-path,FOO,\\\$foo:source,$modfile" "" "$foo:\\\\\\\$foo" 0
       }
       python {
-         testall_cmd_re "$shell" "append-path,FOO,\\\$foo:source,$modfile" "" "(<string>:3: SyntaxWarning: invalid escape sequence '\\\\\\$'\\n)?$foo:\\\\\\\$foo" 0
+         testall_cmd_re "$shell" "append-path,FOO,\\\$foo:source,$modfile" "" "(<string>:3: SyntaxWarning: invalid escape sequence '\\\\\\$'\\n|<string>:3: SyntaxWarning: \"\\\\\\$\" is an invalid escape sequence.*\\n)?$foo:\\\\\\\$foo" 0
       }
       default {
          testall_cmd_re "$shell" "append-path,FOO,\\\$foo:source,$modfile" "" "$foo:\\\$foo" 0

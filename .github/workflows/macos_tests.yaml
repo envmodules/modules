@@ -1,0 +1,59 @@
+name: macos-tests
+
+on:
+  push:
+    branches-ignore:
+      - c-main
+      - c-3.2
+  pull_request:
+
+jobs:
+  macos:
+    runs-on: macos-15
+    env:
+      CONFIGURE_OPTS: --prefix=/tmp/modules --with-loadedmodules=null:dot --with-tcl=/opt/homebrew/lib --with-tclsh=/opt/homebrew/bin/tclsh
+      COVERAGE: y
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Install system packages
+        run: |
+          brew update
+          brew install autoconf md5sha1sum expect dejagnu grep fish r tcl-tk gzip powershell sphinx-doc
+      - name: Build Modules
+        run: |
+          # handle CONFIGURE_OPTS differently than on linux tests as bash version here
+          # does not support "mapfile" builtin. as a result, CONFIGURE_OPTS cannot contain
+          # here whitespace or shell specific characters like ';'
+          ./configure $CONFIGURE_OPTS
+          make
+      - name: Test Modules build
+        run: |
+          make test-deps
+          script/mt
+      - name: Install Modules
+        run: |
+          make install
+      - name: Test Modules installation
+        run: |
+          script/mt install
+          for f in tcl/*.tcl; do
+            script/nglfar2ccov $f
+          done
+          cd lib
+          gcov envmodules
+      - name: Uninstall Modules
+        run: |
+          make uninstall
+      - uses: codecov/codecov-action@v6
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: testsuite-logs-${{ github.job }}
+          path: |
+            modules.log
+            install.log
+          retention-days: 5
