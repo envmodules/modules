@@ -410,14 +410,22 @@ if {[info exists tclextlib_file]} {
 # test tcl ext lib procedures against a failed closedir call
 if {[info exists closedirlib_file] && [file exists $closedirlib_file]} {
     setenv_var TESTSUITE_ENABLE_SITECONFIG_TCLEXTLIBFAILEDCLOSEDIR 1
-    setenv_var LD_PRELOAD $closedirlib_file
+    if {$tcl_platform(os) ne "Darwin"} {
+        setenv_var LD_PRELOAD $closedirlib_file
+    } else {
+        setenv_var DYLD_INSERT_LIBRARIES $closedirlib_file
+    }
     set ans [list]
-    lappend ans "$error_msgs: couldn't close directory \"$modpathre\": Success"
+    lappend ans "$error_msgs: couldn't close directory \"$modpathre\": .*"
     lappend ans $vers_reportre
     testouterr_cmd_re sh -V OK [join $ans \n]
 
     unsetenv_var TESTSUITE_ENABLE_SITECONFIG_TCLEXTLIBFAILEDCLOSEDIR
-    unsetenv_var LD_PRELOAD
+    if {$tcl_platform(os) ne "Darwin"} {
+        unsetenv_var LD_PRELOAD
+    } else {
+        unsetenv_var DYLD_INSERT_LIBRARIES
+    }
 } elseif {$verbose} {
     send_user "\tSkip tcl ext lib erroneous procedure calls as closedir test lib is not available\n"
 }
@@ -425,18 +433,31 @@ if {[info exists closedirlib_file] && [file exists $closedirlib_file]} {
 # test tcl ext lib procedures against a failed getpwuid call
 if {[info exists getpwuidlib_file] && [file exists $getpwuidlib_file]} {
     setenv_var TESTSUITE_ENABLE_SITECONFIG_TCLEXTLIBFAILEDGETPWUID 1
-    setenv_var LD_PRELOAD $getpwuidlib_file
+    if {$tcl_platform(os) ne "Darwin"} {
+        setenv_var LD_PRELOAD $getpwuidlib_file
+    } else {
+        setenv_var DYLD_INSERT_LIBRARIES $getpwuidlib_file
+    }
     set ans [list]
     lappend ans "$error_msgs: couldn't find name for user id \"$userid\": .*"
+    if {$tcl_platform(os) eq "Darwin"} {
+        lappend ans "$error_msgs: couldn't find name for user id \"$userid\": .*"
+    }
     lappend ans $vers_reportre
     testouterr_cmd_re sh -V OK [join $ans \n]
 
     unsetenv_var TESTSUITE_ENABLE_SITECONFIG_TCLEXTLIBFAILEDGETPWUID
-    unsetenv_var LD_PRELOAD
+    if {$tcl_platform(os) ne "Darwin"} {
+        unsetenv_var LD_PRELOAD
+    } else {
+        unsetenv_var DYLD_INSERT_LIBRARIES
+    }
 } elseif {$verbose} {
     send_user "\tSkip tcl ext lib erroneous procedure calls as getpwuid test lib is not available\n"
 }
 
+# getgroups syscall is not used on Darwin
+if {$tcl_platform(os) ne "Darwin"} {
 # test tcl ext lib procedures against a failed getgroups call
 if {[info exists getgroupslib_file] && [file exists $getgroupslib_file]} {
     setenv_var TESTSUITE_ENABLE_SITECONFIG_TCLEXTLIBFAILEDGETGROUPS 1
@@ -481,18 +502,27 @@ if {[info exists dupgetgroupslib_file] && [file exists $dupgetgroupslib_file]} {
 } elseif {$verbose} {
     send_user "\tSkip tcl ext lib erroneous procedure calls as dupgetgroups test lib is not available\n"
 }
+}
 
 # test tcl ext lib procedures against a failed time call
 if {[info exists timelib_file] && [file exists $timelib_file]} {
     setenv_var TESTSUITE_ENABLE_SITECONFIG_TCLEXTLIBFAILEDTIME 1
-    setenv_var LD_PRELOAD $timelib_file
+    if {$tcl_platform(os) ne "Darwin"} {
+        setenv_var LD_PRELOAD $timelib_file
+    } else {
+        setenv_var DYLD_INSERT_LIBRARIES $timelib_file
+    }
     set ans [list]
     lappend ans "$error_msgs: couldn't get Epoch time: .*"
     lappend ans $vers_reportre
     testouterr_cmd_re sh -V OK [join $ans \n]
 
     unsetenv_var TESTSUITE_ENABLE_SITECONFIG_TCLEXTLIBFAILEDTIME
-    unsetenv_var LD_PRELOAD
+    if {$tcl_platform(os) ne "Darwin"} {
+        unsetenv_var LD_PRELOAD
+    } else {
+        unsetenv_var DYLD_INSERT_LIBRARIES
+    }
 } elseif {$verbose} {
     send_user "\tSkip tcl ext lib erroneous procedure calls as time test lib is not available\n"
 }
@@ -508,14 +538,22 @@ unsetenv_var TESTSUITE_ENABLE_SITECONFIG_PARSEDATETIMEARG_NOARG
 # test tcl ext lib procedures against a failed mktime call
 if {[info exists mktimelib_file] && [file exists $mktimelib_file]} {
     setenv_var TESTSUITE_ENABLE_SITECONFIG_TCLEXTLIBFAILEDMKTIME 1
-    setenv_var LD_PRELOAD $mktimelib_file
+    if {$tcl_platform(os) ne "Darwin"} {
+        setenv_var LD_PRELOAD $mktimelib_file
+    } else {
+        setenv_var DYLD_INSERT_LIBRARIES $mktimelib_file
+    }
     set ans [list]
     lappend ans "$error_msgs: couldn't convert to Epoch time: .*"
     lappend ans $vers_reportre
     testouterr_cmd_re sh -V OK [join $ans \n]
 
     unsetenv_var TESTSUITE_ENABLE_SITECONFIG_TCLEXTLIBFAILEDMKTIME
-    unsetenv_var LD_PRELOAD
+    if {$tcl_platform(os) ne "Darwin"} {
+        unsetenv_var LD_PRELOAD
+    } else {
+        unsetenv_var DYLD_INSERT_LIBRARIES
+    }
 } elseif {$verbose} {
     send_user "\tSkip tcl ext lib erroneous procedure calls as mktime test lib is not available\n"
 }

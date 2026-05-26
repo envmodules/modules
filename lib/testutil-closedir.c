@@ -1,7 +1,7 @@
 /*************************************************************************
  *
  * TESTUTIL-CLOSEDIR.C, Superseded closedir function for test purpose
- * Copyright (C) 2019-2021 Xavier Delaruelle
+ * Copyright (C) 2019-2026 Xavier Delaruelle
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,9 +20,30 @@
 
 #include <dirent.h>
 
+#if defined (__APPLE__)
+
+int my_closedir(DIR *dirp)
+{
+   return -1;
+}
+
+/* Code injection with DYLD interposing */
+__attribute__((used))
+static struct {
+   const void *replacement;
+   const void *replacee;
+} interposers[]
+__attribute__((section("__DATA,__interpose"))) = {
+   { (const void *)my_closedir, (const void *)closedir }
+};
+
+#else
+
 int closedir(DIR *dirp)
 {
-    return -1;
+   return -1;
 }
+
+#endif
 
 /* vim:set tabstop=3 shiftwidth=3 expandtab autoindent: */

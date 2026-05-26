@@ -13,6 +13,8 @@ jobs:
     env:
       CONFIGURE_OPTS: --prefix=/tmp/modules --with-loadedmodules=null:dot --with-tcl=/opt/homebrew/lib --with-tclsh=/opt/homebrew/bin/tclsh
       COVERAGE: y
+      EXTRA_SCRIPT_PRETEST: make install-testsiteconfig-1 && export TESTSUITE_ENABLE_SITECONFIG=1
+      EXTRA_SCRIPT_POSTTEST: unset TESTSUITE_ENABLE_SITECONFIG
     steps:
       - uses: actions/checkout@v6
         with:
@@ -30,8 +32,15 @@ jobs:
           make
       - name: Test Modules build
         run: |
+          # specific compiling to enable DYLD library insertion
+          for f in lib/testutil-*.c; do
+            n=$(basename "$f" .c)
+            clang -dynamiclib -arch arm64 -arch arm64e -o lib/lib${n}.dylib lib/${n}.c
+          done
+          eval $EXTRA_SCRIPT_PRETEST
           make test-deps
           script/mt
+          eval $EXTRA_SCRIPT_POSTTEST
       - name: Install Modules
         run: |
           make install

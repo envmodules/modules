@@ -145,6 +145,11 @@ if {[info exists env(TESTSUITE_ENABLE_SITECONFIG_TCLEXTLIBFAILEDGETPWUID)]} {
     if {[catch {initStateUsername} errMsg]} {
         reportError $errMsg
     }
+    if {$tcl_platform(os) eq "Darwin"} {
+        if {[catch {[initStateUsergroups]} errMsg]} {
+            reportError $errMsg
+        }
+    }
 }
 
 # test tcl ext lib procedures against a failed getgroups call

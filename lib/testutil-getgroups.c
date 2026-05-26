@@ -1,7 +1,7 @@
 /*************************************************************************
  *
  * TESTUTIL-GETGROUPS.C, Superseded getgroups function for test purpose
- * Copyright (C) 2020-2021 Xavier Delaruelle
+ * Copyright (C) 2020-2026 Xavier Delaruelle
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 
 int getgroups(int size, gid_t list[])
 {
-    return -1;
+   return -1;
 }
 
 /* vim:set tabstop=3 shiftwidth=3 expandtab autoindent: */

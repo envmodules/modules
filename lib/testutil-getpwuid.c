@@ -1,7 +1,7 @@
 /*************************************************************************
  *
  * TESTUTIL-GETPWUID.C, Superseded getpwuid function for test purpose
- * Copyright (C) 2020-2021 Xavier Delaruelle
+ * Copyright (C) 2020-2026 Xavier Delaruelle
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,9 +21,30 @@
 #include <stddef.h>
 #include <pwd.h>
 
+#if defined (__APPLE__)
+
+struct passwd *my_getpwuid(uid_t uid)
+{
+   return NULL;
+}
+
+/* Code injection with DYLD interposing */
+__attribute__((used))
+static struct {
+   const void *replacement;
+   const void *replacee;
+} interposers[]
+__attribute__((section("__DATA,__interpose"))) = {
+   { (const void *)my_getpwuid, (const void *)getpwuid }
+};
+
+#else
+
 struct passwd *getpwuid(uid_t uid)
 {
-    return NULL;
+   return NULL;
 }
+
+#endif
 
 /* vim:set tabstop=3 shiftwidth=3 expandtab autoindent: */
