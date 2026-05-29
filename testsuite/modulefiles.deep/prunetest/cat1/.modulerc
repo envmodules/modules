@@ -1,0 +1,2 @@
+#%Module1.0
+module-alias prunetest/shortcut prunetest/cat2/pkg1/1.0
