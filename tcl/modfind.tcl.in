@@ -2009,6 +2009,20 @@ proc getLoadedUse {mod} {
    }
 }
 
+proc getViaListModuleForModulepath {modpath} {
+   set via_list {}
+   while {[string length [set via [getViaModuleForModulepath $modpath]]]} {
+      lappend via_list $via
+      set new_modpath [getViaModuleModulepath $via]
+      # stop if via is enabling its own modulepath
+      if {$modpath eq $new_modpath} {
+         break
+      }
+      set modpath $new_modpath
+   }
+   return [lreverse $via_list]
+}
+
 proc getViaModuleForModulepath {modpath} {
    lassign [getAllLoadedModuleUsingModulepath $modpath] via
    if {![string length $via] && $modpath ni [getModulePathList]} {
@@ -2026,6 +2040,23 @@ proc getModuleUsingModulepath {modpath} {
       if {$modpath in $::g_loadedModuleUse($mod)} {
          return $mod
       }
+   }
+}
+
+proc setViaModuleModulepath {mod modpath} {
+   # global array only used during spider, no need to integrate into push/pop
+   # restore mechanisms
+   set ::g_viaModuleModulepath($mod) $modpath
+}
+
+proc getViaModuleModulepath {mod} {
+   # get modulepath of via module if loaded
+   if {[isModuleLoaded $mod]} {
+      return [getModulepathFromLoadedOrLoadingModule $mod]
+   }
+   # otherwise return via modulepath collected during spider processing
+   if {[info exists ::g_viaModuleModulepath($mod)]} {
+      return $::g_viaModuleModulepath($mod)
    }
 }
 

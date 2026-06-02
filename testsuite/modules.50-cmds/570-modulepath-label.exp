@@ -55,7 +55,7 @@ label/1.0                                                   \[0-9\/]{10} \[0-9:]
 testouterr_cmd_re sh {avail -l label} OK $tserr
 
 set tserr "{\"My label\": {
-\"label/1.0\": { \"name\": \"label/1.0\", \"type\": \"modulefile\", \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$modpath.4/label/1.0\", \"via\": \"\"}
+\"label/1.0\": { \"name\": \"label/1.0\", \"type\": \"modulefile\", \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$modpath.4/label/1.0\", \"via\": \[\]}
 }}"
 testouterr_cmd sh {avail -j label} OK $tserr
 

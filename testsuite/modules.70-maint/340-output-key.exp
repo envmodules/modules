@@ -161,7 +161,7 @@ setenv_var __MODULES_LMALTNAME key/2.0&key/foosym&al|key/3.0
 testerr_cmd sh {list -t} "$cur_loaded\nkey/2.0"
 set header "- Package $modlin.- Versions $modlin.- Last mod. $modlin\n$cur_loaded\n"
 testerr_cmd_re sh {list -l} "${header}key/2.0\\s+foosym\\s+\[0-9:\/ ]*"
-set tserr "{\"key/2.0\": { \"name\": \"key/2.0\", \"type\": \"modulefile\", \"variants\": {}, \"symbols\": \[ \"foosym\" \], \"tags\": \[ \"sticky\" \], \"pathname\": \"$mp/key/2.0\", \"via\": \"\"}}"
+set tserr "{\"key/2.0\": { \"name\": \"key/2.0\", \"type\": \"modulefile\", \"variants\": {}, \"symbols\": \[ \"foosym\" \], \"tags\": \[ \"sticky\" \], \"pathname\": \"$mp/key/2.0\", \"via\": \[\]}}"
 testerr_cmd sh {list -j} $tserr
 
 # basic test with element in key to report

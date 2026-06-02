@@ -107,7 +107,7 @@ testouterr_cmd_re sh {spider -t foo/1.0} OK "$mpre:\nfoo/1.0"
 set tserr_spider_long "- Package/Alias $modlin.- Versions $modlin.- Last mod. $modlin\n$mpre:\nfoo/1.0\\s+bar\\s+\[0-9:\/ ]*"
 testouterr_cmd_re sh {spider -l foo/1.0} OK $tserr_spider_long
 set tserr_spider_json "{\"$mp\": {
-\"foo/1.0\": { \"name\": \"foo/1.0\", \"type\": \"modulefile\", \"symbols\": \[ \"bar\" \], \"tags\": \[\], \"pathname\": \"$mp/foo/1.0\", \"via\": \"\"}
+\"foo/1.0\": { \"name\": \"foo/1.0\", \"type\": \"modulefile\", \"symbols\": \[ \"bar\" \], \"tags\": \[\], \"pathname\": \"$mp/foo/1.0\", \"via\": \[\]}
 }}"
 testouterr_cmd sh {spider -j foo/1.0} OK $tserr_spider_json
 
@@ -314,7 +314,7 @@ moda/1  moda/2
 $modlin $modpathre.spider2 \\(via moda/1\\) $modlin
 modb/1  modb/2
 
-$modlin $modpathre.spider3 \\(via modb/1\\) $modlin
+$modlin $modpathre.spider3 \\(via moda/1 > modb/1\\) $modlin
 modc/1  modc/2"
 
 # no modulepath label set, no using module loaded
@@ -349,7 +349,7 @@ modb/1  modb/2
 $modlin $modpathre.spider1 $modlin
 moda/1 <L>  moda/2
 
-$modlin $modpathre.spider3 \\(via modb/1\\) $modlin
+$modlin $modpathre.spider3 \\(via moda/1 > modb/1\\) $modlin
 modc/1  modc/2"
 
 # no modulepath label set, using module loaded, used path was there before
@@ -372,7 +372,7 @@ modb/1  modb/2
 $modlin My label spider1 $modlin
 moda/1 <L>  moda/2
 
-$modlin $modpathre.spider3 \\(via modb/1\\) $modlin
+$modlin $modpathre.spider3 \\(via moda/1 > modb/1\\) $modlin
 modc/1  modc/2"
 
 # modulepath label set, using module loaded, used path was there before
@@ -396,7 +396,7 @@ moda/1 <L>  moda/2
 $modlin $modpathre.spider2 \\(via moda/1\\) $modlin
 modb/1  modb/2
 
-$modlin $modpathre.spider3 \\(via modb/1\\) $modlin
+$modlin $modpathre.spider3 \\(via moda/1 > modb/1\\) $modlin
 modc/1  modc/2"
 
 # modulepath label set, using module loaded, but added modulepath unused
@@ -407,7 +407,7 @@ moda/1 <L>  moda/2
 $modlin My label spider2 \\(via moda/1\\) $modlin
 modb/1  modb/2
 
-$modlin $modpathre.spider3 \\(via modb/1\\) $modlin
+$modlin $modpathre.spider3 \\(via moda/1 > modb/1\\) $modlin
 modc/1  modc/2"
 
 # no modulepath label set, using module loaded, but primary modulepath unused
@@ -416,7 +416,7 @@ setenv_path_var MODULEPATH $modpath.spider2
 testouterr_cmd_re sh {spider mod} OK "$modlin $modpathre.spider2 \\(via moda/1\\) $modlin
 modb/1  modb/2
 
-$modlin $modpathre.spider3 \\(via modb/1\\) $modlin
+$modlin $modpathre.spider3 \\(via moda/1 > modb/1\\) $modlin
 modc/1  modc/2"
 
 # modulepath label set, using module loaded, but primary modulepath unused
@@ -424,7 +424,7 @@ setenv_var TESTSUITE_VIA modulepath_label1
 testouterr_cmd_re sh {spider mod} OK "$modlin My label spider2 \\(via moda/1\\) $modlin
 modb/1  modb/2
 
-$modlin $modpathre.spider3 \\(via modb/1\\) $modlin
+$modlin $modpathre.spider3 \\(via moda/1 > modb/1\\) $modlin
 modc/1  modc/2"
 
 # several loaded modules using same modulepath
@@ -438,7 +438,7 @@ modb/1  modb/2
 $modlin $modpathre.spider1 $modlin
 moda/1 <L>  moda/2 <L>
 
-$modlin $modpathre.spider3 \\(via modb/1\\) $modlin
+$modlin $modpathre.spider3 \\(via moda/1 > modb/1\\) $modlin
 modc/1  modc/2"
 testouterr_cmd_re sh {spider mod} OK $tserr
 
@@ -468,7 +468,7 @@ modb/1  modb/2
 $modlin $modpathre.spider1 $modlin
 moda/1  moda/2
 
-$modlin $modpathre.spider3 \\(via modb/1\\) $modlin
+$modlin $modpathre.spider3 \\(via foo/1 > modb/1\\) $modlin
 modc/1  modc/2"
 
 # no modulepath reported but via set
@@ -531,7 +531,7 @@ modb/1  modb/2
 $modlin $modpathre.4 $modlin
 modulepath-opt/1  modulepath-opt/2  modulepath/1 <L>  modulepath/2
 
-$modlin $modpathre.spider3 \\(via modb/1\\) $modlin
+$modlin $modpathre.spider3 \\(via modulepath/1 > modb/1\\) $modlin
 modc/1  modc/2"
 setenv_var TESTSUITE_USE_MODULEPATH use_with_var_ref_and_setenv
 testouterr_cmd_re sh {spider mod} OK $tserr
@@ -560,7 +560,7 @@ modulepath-opt/1  modulepath-opt/2  modulepath/1  modulepath/2
 $modlin $modpathre.spider2 \\(via modulepath/1\\) $modlin
 modb/1  modb/2
 
-$modlin $modpathre.spider3 \\(via modb/1\\) $modlin
+$modlin $modpathre.spider3 \\(via modulepath/1 > modb/1\\) $modlin
 modc/1  modc/2"
 setenv_var TESTSUITE_USE_MODULEPATH use_with_var_ref_and_setenv
 testouterr_cmd_re sh {spider mod} OK $tserr

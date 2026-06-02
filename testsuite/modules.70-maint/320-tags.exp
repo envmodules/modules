@@ -126,8 +126,8 @@ tag/4.0\\s+\[0-9\/]{10} \[0-9:]{8}
 tag/2.0\\s+\[0-9\/]{10} \[0-9:]{8}"
 testouterr_cmd_re sh {list -l} OK $tserr
 
-set tserr "{\"tag/4.0\": { \"name\": \"tag/4.0\", \"type\": \"modulefile\", \"variants\": {}, \"symbols\": \[\], \"tags\": \[ \"nearly-forbidden\", \"othertag\" \], \"pathname\": \"$mp/tag/4.0\", \"via\": \"\"},
-\"tag/2.0\": { \"name\": \"tag/2.0\", \"type\": \"modulefile\", \"variants\": {}, \"symbols\": \[\], \"tags\": \[ \"forbidden\" \], \"pathname\": \"$mp/tag/1.0\", \"via\": \"\"}}"
+set tserr "{\"tag/4.0\": { \"name\": \"tag/4.0\", \"type\": \"modulefile\", \"variants\": {}, \"symbols\": \[\], \"tags\": \[ \"nearly-forbidden\", \"othertag\" \], \"pathname\": \"$mp/tag/4.0\", \"via\": \[\]},
+\"tag/2.0\": { \"name\": \"tag/2.0\", \"type\": \"modulefile\", \"variants\": {}, \"symbols\": \[\], \"tags\": \[ \"forbidden\" \], \"pathname\": \"$mp/tag/1.0\", \"via\": \[\]}}"
 testouterr_cmd sh {list -j} OK $tserr
 
 skip_if_quick_mode
@@ -139,9 +139,9 @@ testouterr_cmd sh {list -a} OK "$cur_loaded
 Key:
 <module-tag>  <H>=hidden-loaded  <nF>=nearly-forbidden  <F>=forbidden"
 
-set tserr "{\"tag/4.0\": { \"name\": \"tag/4.0\", \"type\": \"modulefile\", \"variants\": {}, \"symbols\": \[\], \"tags\": \[ \"nearly-forbidden\", \"othertag\" \], \"pathname\": \"$mp/tag/4.0\", \"via\": \"\"},
-\"tag/2.0\": { \"name\": \"tag/2.0\", \"type\": \"modulefile\", \"variants\": {}, \"symbols\": \[\], \"tags\": \[ \"forbidden\" \], \"pathname\": \"$mp/tag/1.0\", \"via\": \"\"},
-\"tag/5.0\": { \"name\": \"tag/5.0\", \"type\": \"modulefile\", \"variants\": {}, \"symbols\": \[\], \"tags\": \[ \"hidden-loaded\" \], \"pathname\": \"$mp/tag/5.0\", \"via\": \"\"}}"
+set tserr "{\"tag/4.0\": { \"name\": \"tag/4.0\", \"type\": \"modulefile\", \"variants\": {}, \"symbols\": \[\], \"tags\": \[ \"nearly-forbidden\", \"othertag\" \], \"pathname\": \"$mp/tag/4.0\", \"via\": \[\]},
+\"tag/2.0\": { \"name\": \"tag/2.0\", \"type\": \"modulefile\", \"variants\": {}, \"symbols\": \[\], \"tags\": \[ \"forbidden\" \], \"pathname\": \"$mp/tag/1.0\", \"via\": \[\]},
+\"tag/5.0\": { \"name\": \"tag/5.0\", \"type\": \"modulefile\", \"variants\": {}, \"symbols\": \[\], \"tags\": \[ \"hidden-loaded\" \], \"pathname\": \"$mp/tag/5.0\", \"via\": \[\]}}"
 testouterr_cmd sh {list -j --all} OK $tserr
 
 unsetenv_loaded_module
@@ -182,9 +182,9 @@ testouterr_cmd sh {list} OK "$cur_loaded
 Key:
 <module-tag>  <aL>=auto-loaded"
 
-set tserr "{\"foo/2.0\": { \"name\": \"foo/2.0\", \"type\": \"modulefile\", \"variants\": {}, \"symbols\": \[\], \"tags\": \[ \"auto-loaded\" \], \"pathname\": \"$mp/foo/2.0\", \"via\": \"\"},
-\"impreq/load\": { \"name\": \"impreq/load\", \"type\": \"modulefile\", \"variants\": {}, \"symbols\": \[\], \"tags\": \[ \"auto-loaded\" \], \"pathname\": \"$mp/impreq/load\", \"via\": \"\"},
-\"impreq/prereq\": { \"name\": \"impreq/prereq\", \"type\": \"modulefile\", \"variants\": {}, \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/impreq/prereq\", \"via\": \"\"}}"
+set tserr "{\"foo/2.0\": { \"name\": \"foo/2.0\", \"type\": \"modulefile\", \"variants\": {}, \"symbols\": \[\], \"tags\": \[ \"auto-loaded\" \], \"pathname\": \"$mp/foo/2.0\", \"via\": \[\]},
+\"impreq/load\": { \"name\": \"impreq/load\", \"type\": \"modulefile\", \"variants\": {}, \"symbols\": \[\], \"tags\": \[ \"auto-loaded\" \], \"pathname\": \"$mp/impreq/load\", \"via\": \[\]},
+\"impreq/prereq\": { \"name\": \"impreq/prereq\", \"type\": \"modulefile\", \"variants\": {}, \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/impreq/prereq\", \"via\": \[\]}}"
 testouterr_cmd sh {list -j} OK $tserr
 
 set tserr "$modlin $mpre $modlin
@@ -228,9 +228,9 @@ exec stty cols $term_cols
 
 }
 
-set tserr "{\"foo/2.0\": { \"name\": \"foo/2.0\", \"type\": \"modulefile\", \"variants\": {}, \"symbols\": \[\], \"tags\": \[ \"auto-loaded\", \"othertag\" \], \"pathname\": \"$mp/foo/2.0\", \"via\": \"\"},
-\"impreq/load\": { \"name\": \"impreq/load\", \"type\": \"modulefile\", \"variants\": {}, \"symbols\": \[\], \"tags\": \[ \"auto-loaded\" \], \"pathname\": \"$mp/impreq/load\", \"via\": \"\"},
-\"impreq/prereq\": { \"name\": \"impreq/prereq\", \"type\": \"modulefile\", \"variants\": {}, \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/impreq/prereq\", \"via\": \"\"}}"
+set tserr "{\"foo/2.0\": { \"name\": \"foo/2.0\", \"type\": \"modulefile\", \"variants\": {}, \"symbols\": \[\], \"tags\": \[ \"auto-loaded\", \"othertag\" \], \"pathname\": \"$mp/foo/2.0\", \"via\": \[\]},
+\"impreq/load\": { \"name\": \"impreq/load\", \"type\": \"modulefile\", \"variants\": {}, \"symbols\": \[\], \"tags\": \[ \"auto-loaded\" \], \"pathname\": \"$mp/impreq/load\", \"via\": \[\]},
+\"impreq/prereq\": { \"name\": \"impreq/prereq\", \"type\": \"modulefile\", \"variants\": {}, \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/impreq/prereq\", \"via\": \[\]}}"
 testouterr_cmd sh {list -j} OK $tserr
 
 set tserr "$modlin $mpre $modlin

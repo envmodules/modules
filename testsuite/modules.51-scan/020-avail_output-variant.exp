@@ -377,18 +377,18 @@ testouterr_cmd sh {avail -t --no-indepth variant/} OK $tserr
 setenv_var TESTSUITE_VARIANT 13
 
 set tserr "{\"$mp\": {
-\"variant/1.0\": { \"name\": \"variant/1.0\", \"type\": \"modulefile\", \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/1.0\", \"via\": \"\"},
-\"variant/2.0\": { \"name\": \"variant/2.0\", \"type\": \"modulefile\", \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/2.0\", \"via\": \"\"},
-\"variant/2.1/2/1\": { \"name\": \"variant/2.1/2/1\", \"type\": \"modulefile\", \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/2.1/2/1\", \"via\": \"\"},
-\"variant/3.0\": { \"name\": \"variant/3.0\", \"type\": \"modulefile\", \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/3.0\", \"via\": \"\"},
-\"variant/4.0\": { \"name\": \"variant/4.0\", \"type\": \"modulefile\", \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/4.0\", \"via\": \"\"},
-\"variant/5.0\": { \"name\": \"variant/5.0\", \"type\": \"modulefile\", \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/5.0\", \"via\": \"\"},
-\"variant/5.1\": { \"name\": \"variant/5.1\", \"type\": \"modulefile\", \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/5.1\", \"via\": \"\"},
-\"variant/6.0\": { \"name\": \"variant/6.0\", \"type\": \"modulefile\", \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/6.0\", \"via\": \"\"},
-\"variant/7.0\": { \"name\": \"variant/7.0\", \"type\": \"modulefile\", \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/7.0\", \"via\": \"\"},
-\"variant/7.1\": { \"name\": \"variant/7.1\", \"type\": \"modulefile\", \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/7.1\", \"via\": \"\"},
-\"variant/8.0\": { \"name\": \"variant/8.0\", \"type\": \"modulefile\", \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/8.0\", \"via\": \"\"},
-\"variant/w s\": { \"name\": \"variant/w s\", \"type\": \"modulefile\", \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/w s\", \"via\": \"\"}
+\"variant/1.0\": { \"name\": \"variant/1.0\", \"type\": \"modulefile\", \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/1.0\", \"via\": \[\]},
+\"variant/2.0\": { \"name\": \"variant/2.0\", \"type\": \"modulefile\", \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/2.0\", \"via\": \[\]},
+\"variant/2.1/2/1\": { \"name\": \"variant/2.1/2/1\", \"type\": \"modulefile\", \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/2.1/2/1\", \"via\": \[\]},
+\"variant/3.0\": { \"name\": \"variant/3.0\", \"type\": \"modulefile\", \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/3.0\", \"via\": \[\]},
+\"variant/4.0\": { \"name\": \"variant/4.0\", \"type\": \"modulefile\", \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/4.0\", \"via\": \[\]},
+\"variant/5.0\": { \"name\": \"variant/5.0\", \"type\": \"modulefile\", \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/5.0\", \"via\": \[\]},
+\"variant/5.1\": { \"name\": \"variant/5.1\", \"type\": \"modulefile\", \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/5.1\", \"via\": \[\]},
+\"variant/6.0\": { \"name\": \"variant/6.0\", \"type\": \"modulefile\", \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/6.0\", \"via\": \[\]},
+\"variant/7.0\": { \"name\": \"variant/7.0\", \"type\": \"modulefile\", \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/7.0\", \"via\": \[\]},
+\"variant/7.1\": { \"name\": \"variant/7.1\", \"type\": \"modulefile\", \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/7.1\", \"via\": \[\]},
+\"variant/8.0\": { \"name\": \"variant/8.0\", \"type\": \"modulefile\", \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/8.0\", \"via\": \[\]},
+\"variant/w s\": { \"name\": \"variant/w s\", \"type\": \"modulefile\", \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/w s\", \"via\": \[\]}
 }}"
 testouterr_cmd sh {avail -j variant} OK $tserr
 

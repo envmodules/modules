@@ -151,7 +151,7 @@ testouterr_cmd sh {list -t} OK $cur_loaded\nfoo/1.0
 # no impact on -l/-j
 set tserr_list_long "- Package $modlin.- Versions $modlin.- Last mod. $modlin\n$cur_loaded\nfoo/1.0\\s+bar\\s+\[0-9:\/ ]*"
 testouterr_cmd_re sh {list -l} OK $tserr_list_long
-set tserr_list_json "{\"foo/1.0\": { \"name\": \"foo/1.0\", \"type\": \"modulefile\", \"variants\": {}, \"symbols\": \[ \"bar\" \], \"tags\": \[\], \"pathname\": \"$mp/foo/1.0\", \"via\": \"\"}}"
+set tserr_list_json "{\"foo/1.0\": { \"name\": \"foo/1.0\", \"type\": \"modulefile\", \"variants\": {}, \"symbols\": \[ \"bar\" \], \"tags\": \[\], \"pathname\": \"$mp/foo/1.0\", \"via\": \[\]}}"
 testouterr_cmd sh {list -j} OK $tserr_list_json
 
 # invalid value set (ignored)

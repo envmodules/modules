@@ -707,4 +707,8 @@ if {[info exists env(TESTSUITE_ENABLE_SITECONFIG_COMPUTEOUTPUTGRID)]} {
     report [compute_output_grid 80 {} 3]
 }
 
+if {[info exists env(TESTSUITE_ENABLE_SITECONFIG_GETVIAMODULEMODULEPATH)]} {
+    report [string length [getViaModuleModulepath unk]]
+}
+
 }

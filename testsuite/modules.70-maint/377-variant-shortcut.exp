@@ -337,9 +337,9 @@ Key:
 
 # json output
 setenv_var __MODULES_LMVARIANT variant/1.0&foo|val1|0|1&bar|val3|0|0
-testouterr_cmd sh {list -j} OK "{\"variant/1.0\": { \"name\": \"variant/1.0\", \"type\": \"modulefile\", \"variants\": { \"bar\": \"val3\", \"foo\": \"val1\" }, \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/1.0\", \"via\": \"\"}}"
+testouterr_cmd sh {list -j} OK "{\"variant/1.0\": { \"name\": \"variant/1.0\", \"type\": \"modulefile\", \"variants\": { \"bar\": \"val3\", \"foo\": \"val1\" }, \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/1.0\", \"via\": \[\]}}"
 setenv_var __MODULES_LMVARIANT variant/1.0&foo|val1|0|1&bar|1|1|0
-testouterr_cmd sh {list -j} OK "{\"variant/1.0\": { \"name\": \"variant/1.0\", \"type\": \"modulefile\", \"variants\": { \"bar\": true, \"foo\": \"val1\" }, \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/1.0\", \"via\": \"\"}}"
+testouterr_cmd sh {list -j} OK "{\"variant/1.0\": { \"name\": \"variant/1.0\", \"type\": \"modulefile\", \"variants\": { \"bar\": true, \"foo\": \"val1\" }, \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/1.0\", \"via\": \[\]}}"
 
 # colored output
 setenv_var MODULES_COLORS "se=2:va=33"

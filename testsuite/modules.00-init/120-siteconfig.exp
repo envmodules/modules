@@ -715,7 +715,7 @@ lappend ans {      invoked from within}
 lappend ans {  "displaySeparatorLine $header $sgrkey $extra"}
 lappend ans {      (procedure "displayElementList" line 19)}
 lappend ans {      invoked from within}
-lappend ans {  "displayElementList $header $hsgrkey $hstyle $one_per_line $show_idx 1 $display_list $len_list $via"}
+lappend ans {  "displayElementList $header $hsgrkey $hstyle $one_per_line $show_idx 1 $display_list $len_list $via_list"}
 lappend ans {      (procedure "reportModules" line 151)}
 lappend ans {      invoked from within}
 lappend ans {  "reportModules $args $dir mp $hstyle $show_mtime 0 $one_per_line $theader_cols hidden-loaded"}
@@ -821,6 +821,13 @@ lappend ans {0 0 \{0\}}
 lappend ans $vers_reportre
 testouterr_cmd_re sh -V OK [join $ans \n]
 unsetenv_var TESTSUITE_ENABLE_SITECONFIG_COMPUTEOUTPUTGRID
+
+setenv_var TESTSUITE_ENABLE_SITECONFIG_GETVIAMODULEMODULEPATH 1
+set ans [list]
+lappend ans 0
+lappend ans $vers_reportre
+testouterr_cmd_re sh -V OK [join $ans \n]
+unsetenv_var TESTSUITE_ENABLE_SITECONFIG_GETVIAMODULEMODULEPATH
 
 } elseif {$verbose} {
     send_user "\tSkip tests relying on an excepted siteconfig file installed\n"

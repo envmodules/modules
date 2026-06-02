@@ -80,6 +80,10 @@ Modules 5.7.0 (not yet released)
   :mfcmd:`depends-on`, mfcmd:`always-load` and :mfcmd:`prereq-all` modulefile
   commands. It especially fixes module specification containing the definition
   of variants. (fixes issue #626)
+* Report the full *via* path for modules on :subcmd:`avail` and
+  :subcmd:`spider` sub-commands rather the last part of this via information.
+  JSON output is updated to report the ``via`` key as an array rather as a
+  string. (fix issue #586)
 
 
 .. _5.6 release notes:

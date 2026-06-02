@@ -49,7 +49,7 @@ testouterr_cmd sh {list -o header:idx:sym:tag:key} OK "$cur_loaded
 testouterr_cmd sh {list -t} OK "$cur_loaded
 variant/1.0"
 
-testouterr_cmd sh {list -j} OK "{\"variant/1.0\": { \"name\": \"variant/1.0\", \"type\": \"modulefile\", \"variants\": { \"foo\": \"val1\" }, \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/1.0\", \"via\": \"\"}}"
+testouterr_cmd sh {list -j} OK "{\"variant/1.0\": { \"name\": \"variant/1.0\", \"type\": \"modulefile\", \"variants\": { \"foo\": \"val1\" }, \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/1.0\", \"via\": \[\]}}"
 
 # multiple variants set on module
 setenv_var __MODULES_LMVARIANT variant/1.0&foo|val1|0|0&bar|val2|0|0
@@ -63,7 +63,7 @@ Key:
 testouterr_cmd sh {list} OK $tserr
 testouterr_cmd sh {ml} OK $tserr
 
-set tserr "{\"variant/1.0\": { \"name\": \"variant/1.0\", \"type\": \"modulefile\", \"variants\": { \"bar\": \"val2\", \"foo\": \"val1\" }, \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/1.0\", \"via\": \"\"}}"
+set tserr "{\"variant/1.0\": { \"name\": \"variant/1.0\", \"type\": \"modulefile\", \"variants\": { \"bar\": \"val2\", \"foo\": \"val1\" }, \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/1.0\", \"via\": \[\]}}"
 testouterr_cmd sh {list -j} OK $tserr
 testouterr_cmd sh {ml -j} OK $tserr
 
@@ -77,8 +77,8 @@ testouterr_cmd sh {list} OK "$cur_loaded
 Key:
 {variant=value}"
 
-testouterr_cmd sh {list -j} OK "{\"variant/1.0\": { \"name\": \"variant/1.0\", \"type\": \"modulefile\", \"variants\": { \"bar\": \"val2\", \"foo\": \"val1\" }, \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/1.0\", \"via\": \"\"},
-\"variant/2.0\": { \"name\": \"variant/2.0\", \"type\": \"modulefile\", \"variants\": { \"baz\": \"val3\" }, \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/2.0\", \"via\": \"\"}}"
+testouterr_cmd sh {list -j} OK "{\"variant/1.0\": { \"name\": \"variant/1.0\", \"type\": \"modulefile\", \"variants\": { \"bar\": \"val2\", \"foo\": \"val1\" }, \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/1.0\", \"via\": \[\]},
+\"variant/2.0\": { \"name\": \"variant/2.0\", \"type\": \"modulefile\", \"variants\": { \"baz\": \"val3\" }, \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/2.0\", \"via\": \[\]}}"
 
 # loaded modules with also symbols defined
 setenv_var __MODULES_LMALTNAME variant/1.0&variant/foo
@@ -88,8 +88,8 @@ testouterr_cmd sh {list} OK "$cur_loaded
 Key:
 {variant=value}  (symbolic-version)"
 
-testouterr_cmd sh {list -j} OK "{\"variant/1.0\": { \"name\": \"variant/1.0\", \"type\": \"modulefile\", \"variants\": { \"bar\": \"val2\", \"foo\": \"val1\" }, \"symbols\": \[ \"foo\" \], \"tags\": \[\], \"pathname\": \"$mp/variant/1.0\", \"via\": \"\"},
-\"variant/2.0\": { \"name\": \"variant/2.0\", \"type\": \"modulefile\", \"variants\": { \"baz\": \"val3\" }, \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/2.0\", \"via\": \"\"}}"
+testouterr_cmd sh {list -j} OK "{\"variant/1.0\": { \"name\": \"variant/1.0\", \"type\": \"modulefile\", \"variants\": { \"bar\": \"val2\", \"foo\": \"val1\" }, \"symbols\": \[ \"foo\" \], \"tags\": \[\], \"pathname\": \"$mp/variant/1.0\", \"via\": \[\]},
+\"variant/2.0\": { \"name\": \"variant/2.0\", \"type\": \"modulefile\", \"variants\": { \"baz\": \"val3\" }, \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/2.0\", \"via\": \[\]}}"
 unsetenv_var __MODULES_LMALTNAME
 
 # duplicate variant definition
@@ -100,8 +100,8 @@ testouterr_cmd sh {list} OK "$cur_loaded
 Key:
 {variant=value}"
 
-testouterr_cmd sh {list -j} OK "{\"variant/1.0\": { \"name\": \"variant/1.0\", \"type\": \"modulefile\", \"variants\": { \"bar\": \"val2\", \"foo\": \"val3\" }, \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/1.0\", \"via\": \"\"},
-\"variant/2.0\": { \"name\": \"variant/2.0\", \"type\": \"modulefile\", \"variants\": { \"baz\": \"val3\" }, \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/2.0\", \"via\": \"\"}}"
+testouterr_cmd sh {list -j} OK "{\"variant/1.0\": { \"name\": \"variant/1.0\", \"type\": \"modulefile\", \"variants\": { \"bar\": \"val2\", \"foo\": \"val3\" }, \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/1.0\", \"via\": \[\]},
+\"variant/2.0\": { \"name\": \"variant/2.0\", \"type\": \"modulefile\", \"variants\": { \"baz\": \"val3\" }, \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/2.0\", \"via\": \[\]}}"
 
 # badly defined loaded variant
 setenv_var __MODULES_LMVARIANT variant/1.0
@@ -144,14 +144,14 @@ testouterr_cmd sh {list} OK "$cur_loaded
 
 Key:
 {+variant}={variant=on}  {variant=value}"
-testouterr_cmd sh {list -j} OK "{\"variant/1.0\": { \"name\": \"variant/1.0\", \"type\": \"modulefile\", \"variants\": { \"foo\": true }, \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/1.0\", \"via\": \"\"}}"
+testouterr_cmd sh {list -j} OK "{\"variant/1.0\": { \"name\": \"variant/1.0\", \"type\": \"modulefile\", \"variants\": { \"foo\": true }, \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/1.0\", \"via\": \[\]}}"
 setenv_var __MODULES_LMVARIANT variant/1.0&foo|0|1|0
 testouterr_cmd sh {list} OK "$cur_loaded
  1) variant/1.0{-foo}
 
 Key:
 {-variant}={variant=off}  {variant=value}"
-testouterr_cmd sh {list -j} OK "{\"variant/1.0\": { \"name\": \"variant/1.0\", \"type\": \"modulefile\", \"variants\": { \"foo\": false }, \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/1.0\", \"via\": \"\"}}"
+testouterr_cmd sh {list -j} OK "{\"variant/1.0\": { \"name\": \"variant/1.0\", \"type\": \"modulefile\", \"variants\": { \"foo\": false }, \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/1.0\", \"via\": \[\]}}"
 # bad persistency information for boolean variant
 setenv_var __MODULES_LMVARIANT variant/1.0&foo|1|1
 testouterr_cmd sh {list} OK "$cur_loaded
@@ -159,25 +159,25 @@ testouterr_cmd sh {list} OK "$cur_loaded
 
 Key:
 {+variant}={variant=on}  {variant=value}"
-testouterr_cmd sh {list -j} OK "{\"variant/1.0\": { \"name\": \"variant/1.0\", \"type\": \"modulefile\", \"variants\": { \"foo\": true }, \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/1.0\", \"via\": \"\"}}"
+testouterr_cmd sh {list -j} OK "{\"variant/1.0\": { \"name\": \"variant/1.0\", \"type\": \"modulefile\", \"variants\": { \"foo\": true }, \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/1.0\", \"via\": \[\]}}"
 setenv_var __MODULES_LMVARIANT variant/1.0&foo||1|0
 testouterr_cmd sh {list} OK "$cur_loaded
  1) variant/1.0{-foo}
 
 Key:
 {-variant}={variant=off}  {variant=value}"
-testouterr_cmd sh {list -j} OK "{\"variant/1.0\": { \"name\": \"variant/1.0\", \"type\": \"modulefile\", \"variants\": { \"foo\": false }, \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/1.0\", \"via\": \"\"}}"
+testouterr_cmd sh {list -j} OK "{\"variant/1.0\": { \"name\": \"variant/1.0\", \"type\": \"modulefile\", \"variants\": { \"foo\": false }, \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/1.0\", \"via\": \[\]}}"
 setenv_var __MODULES_LMVARIANT variant/1.0&foo|str|1|0
 testouterr_cmd sh {list} OK "$cur_loaded
  1) variant/1.0{-foo}
 
 Key:
 {-variant}={variant=off}  {variant=value}"
-testouterr_cmd sh {list -j} OK "{\"variant/1.0\": { \"name\": \"variant/1.0\", \"type\": \"modulefile\", \"variants\": { \"foo\": false }, \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/1.0\", \"via\": \"\"}}"
+testouterr_cmd sh {list -j} OK "{\"variant/1.0\": { \"name\": \"variant/1.0\", \"type\": \"modulefile\", \"variants\": { \"foo\": false }, \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/1.0\", \"via\": \[\]}}"
 setenv_var __MODULES_LMVARIANT variant/1.0&foo|1||0
-testouterr_cmd sh {list -j} OK "{\"variant/1.0\": { \"name\": \"variant/1.0\", \"type\": \"modulefile\", \"variants\": { \"foo\": \"1\" }, \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/1.0\", \"via\": \"\"}}"
+testouterr_cmd sh {list -j} OK "{\"variant/1.0\": { \"name\": \"variant/1.0\", \"type\": \"modulefile\", \"variants\": { \"foo\": \"1\" }, \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/1.0\", \"via\": \[\]}}"
 setenv_var __MODULES_LMVARIANT variant/1.0&foo|0|str|0
-testouterr_cmd sh {list -j} OK "{\"variant/1.0\": { \"name\": \"variant/1.0\", \"type\": \"modulefile\", \"variants\": { \"foo\": \"0\" }, \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/1.0\", \"via\": \"\"}}"
+testouterr_cmd sh {list -j} OK "{\"variant/1.0\": { \"name\": \"variant/1.0\", \"type\": \"modulefile\", \"variants\": { \"foo\": \"0\" }, \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/variant/1.0\", \"via\": \[\]}}"
 
 # color output with boolean variant
 setenv_var MODULES_COLORS "se=2:va=33"
