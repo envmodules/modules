@@ -31,5 +31,17 @@ if {[info exists env(TESTSUITE_SOURCE_CACHE)]} {
             source ../path/to/unk
             setenv VAR bar
         }
+        arg1 {
+            source -encoding utf-8 [file dirname $ModulesCurrentModulefile]/source_file
+        }
+        bad_arg1 {
+            source -encoding [file dirname $ModulesCurrentModulefile]/source_file
+        }
+        bad_arg2 {
+            source -foo bar [file dirname $ModulesCurrentModulefile]/source_file
+        }
+        bad_arg3 {
+            source -encoding utf-8 -foo bar [file dirname $ModulesCurrentModulefile]/source_file
+        }
     }
 }

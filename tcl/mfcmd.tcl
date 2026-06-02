@@ -2278,7 +2278,23 @@ proc unique-name-conflict {} {
    conflict {*}$root_name_list
 }
 
-proc sourceModfileCmd {itrp filename} {
+proc sourceModfileCmd {itrp args} {
+   # argument parsing: catch encoding arg but ignore it
+   switch -- [llength $args] {
+      1 {}
+      3 {
+         set option [lindex $args 0]
+         if {$option ne {-encoding}} {
+            knerror "Invalid option '$option'"
+         }
+      }
+      default {
+         knerror {wrong # args: should be "source ?-encoding? ?encodingName?\
+            fileName"}
+      }
+   }
+   set filename [lindex $args end]
+
    if {![info exists ::source_cache($filename)]} {
       set ::source_cache($filename) [readFile $filename]
    }

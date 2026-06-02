@@ -290,6 +290,30 @@ testouterr_cmd_re bash {load source/1.0} $ans_load $ts_load
 
 }
 
+
+# check argument management
+setenv_var MODULES_SOURCE_CACHE 1
+setenv_var TESTSUITE_SOURCE_CACHE arg1
+set ans [list]
+lappend ans [list set VAR bar]
+lappend ans [list set _LMFILES_ $mp/source/1.0]
+lappend ans [list set LOADEDMODULES source/1.0]
+testouterr_cmd bash {load source/1.0} $ans {}
+
+setenv_var TESTSUITE_SOURCE_CACHE bad_arg1
+set line_num [expr {[cmpversion $tclsh_version 8.6] == -1 ? 2 : 38}]
+set tserr [escre [msg_load source/1.0 [msg_moderr {wrong # args: should be "source ?-encoding? ?encodingName? fileName"} {source<EXM>} $mp/source/1.0 $line_num]]]
+testouterr_cmd_re bash {load source/1.0} ERR $tserr
+set line_num [expr {[cmpversion $tclsh_version 8.6] == -1 ? 2 : 41}]
+set tserr [escre [msg_load source/1.0 [msg_moderr {Invalid option '-foo'} {source<EXM>} $mp/source/1.0 $line_num]]]
+setenv_var TESTSUITE_SOURCE_CACHE bad_arg2
+testouterr_cmd_re bash {load source/1.0} ERR $tserr
+setenv_var TESTSUITE_SOURCE_CACHE bad_arg3
+set line_num [expr {[cmpversion $tclsh_version 8.6] == -1 ? 2 : 44}]
+set tserr [escre [msg_load source/1.0 [msg_moderr {wrong # args: should be "source ?-encoding? ?encodingName? fileName"} {source<EXM>} $mp/source/1.0 $line_num]]]
+testouterr_cmd_re bash {load source/1.0} ERR $tserr
+
+
 # cannot test access if cannot change file permission
 if {!$is_file_perms_editable} {
     send_user "\tskipping access tests as file permissions cannot be changed\n"

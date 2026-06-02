@@ -73,6 +73,9 @@ Modules 5.7.0 (not yet released)
 * Improve the performance of the module’s column output by removing the costly
   optimization that attempts to fit more columns within the available screen
   width. (fix issue #622)
+* Fix superseding definition of ``source`` Tcl command when
+  :mconfig:`source_cache` configuration option is enabled to support
+  ``-encoding`` option. (fix issue #627)
 
 
 .. _5.6 release notes:
