@@ -138,27 +138,27 @@ proc provide-sc {args} {
 
 proc prereq-sc {args} {
    lassign [parsePrereqCommandArgs prereq {*}$args] tag_list modulepath_list\
-      optional opt_list args
+      optional opt_list modspec_list
 
-   foreach modspec [parseModuleSpecification 0 0 0 0 {*}$args] {
+   foreach modspec $modspec_list {
       recordScanModuleElt $modspec prereq prereq-any depends-on-any require
    }
 }
 
 proc prereq-all-sc {args} {
    lassign [parsePrereqCommandArgs prereq-all {*}$args] tag_list\
-      modulepath_list optional opt_list args
+      modulepath_list optional opt_list modspec_list
 
-   foreach modspec [parseModuleSpecification 0 0 0 0 {*}$args] {
+   foreach modspec $modspec_list {
       recordScanModuleElt $modspec prereq-all depends-on require
    }
 }
 
 proc always-load-sc {args} {
    lassign [parsePrereqCommandArgs always-load {*}$args] tag_list\
-      modulepath_list optional opt_list args
+      modulepath_list optional opt_list modspec_list
 
-   foreach modspec [parseModuleSpecification 0 0 0 0 {*}$args] {
+   foreach modspec $modspec_list {
       recordScanModuleElt $modspec always-load require
    }
 }

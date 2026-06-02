@@ -76,6 +76,10 @@ Modules 5.7.0 (not yet released)
 * Fix superseding definition of ``source`` Tcl command when
   :mconfig:`source_cache` configuration option is enabled to support
   ``-encoding`` option. (fix issue #627)
+* Correctly parse the module specifications passed as argument on
+  :mfcmd:`depends-on`, mfcmd:`always-load` and :mfcmd:`prereq-all` modulefile
+  commands. It especially fixes module specification containing the definition
+  of variants. (fixes issue #626)
 
 
 .. _5.6 release notes:

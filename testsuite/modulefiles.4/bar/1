@@ -71,3 +71,10 @@ if {[info exists env(TESTSUITE_PROVIDE)]} {
         }
     }
 }
+if {[info exists env(TESTSUITE_LCOMPAT)]} {
+    switch -- $env(TESTSUITE_LCOMPAT) {
+        depon_spec1 - allo_spec1 - prall_spec1 {
+            variant foo val1 val2 val3
+        }
+    }
+}

@@ -281,6 +281,22 @@ set tserr "$modlin $mpre $modlin
 testouterr_cmd_re sh "whatis $mod" OK $tserr
 
 
+setenv_var TESTSUITE_LCOMPAT allo_spec1
+setenv_var MODULES_ADVANCED_VERSION_SPEC 1
+set mp $modpath.4
+setenv_path_var MODULEPATH $mp
+set mod lcompat/1.12
+
+set ans [list]
+lappend ans [list set __MODULES_LMVARIANT bar/1&foo|val1|0|0]
+lappend ans [list set __MODULES_LMPREREQ $mod&bar/1\ foo=val1]
+lappend ans [list set _LMFILES_ $mp/bar/1:$mp/$mod]
+lappend ans [list set LOADEDMODULES bar/1:$mod]
+lappend ans [list set __MODULES_LMTAG bar/1&keep-loaded&auto-loaded]
+set tserr [msg_top_load $mod {} bar/1{foo=val1} {}]
+testouterr_cmd sh "load --auto $mod" $ans $tserr
+
+
 #
 #  Cleanup
 #

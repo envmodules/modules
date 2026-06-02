@@ -10,5 +10,14 @@ if {[info exists env(TESTSUITE_LCOMPAT)]} {
         haveDynamicMPATH2 {
             haveDynamicMPATH foo bar
         }
+        depon_spec1 {
+            depends-on bar/1 foo=val1
+        }
+        allo_spec1 {
+            always-load bar/1 foo=val1
+        }
+        prall_spec1 {
+            prereq-all bar/1 foo=val1
+        }
     }
 }

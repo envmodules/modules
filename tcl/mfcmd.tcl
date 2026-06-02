@@ -1152,6 +1152,10 @@ proc parsePrereqCommandArgs {cmd args} {
    } elseif {[set mispopt [lsearch -inline -glob $prereq_list --*]] ne {}} {
       knerror "Misplaced option '$mispopt'"
    }
+
+   # parse module version specification
+   set prereq_list [parseModuleSpecification 0 0 0 0 {*}$prereq_list]
+
    return [list $tag_list $modulepath_list $optional $opt_list $prereq_list]
 }
 
@@ -1161,9 +1165,6 @@ proc prereqAnyModfileCmd {tryload auto args} {
 
    set currentModule [currentState modulename]
    set curmodnamevr [currentState modulenamevr]
-
-   # parse module version specification
-   set args [parseModuleSpecification 0 0 0 0 {*}$args]
 
    # register prereq list (sets of optional prereq are registered as list)
    # unless record inhibited for current iterp context
