@@ -79,7 +79,7 @@ complete       {complete       complete-un    reportCmd      nop            nop 
 conflict       {conflict       nop            reportCmd      nop            nop            nop            nop          conflict-sc }
 depends-on     {prereqAllModfileCmd  nop      reportCmd      nop            nop            nop            nop          prereq-all-sc}
 depends-on-any {prereqAnyModfileCmd  nop      reportCmd      nop            nop            nop            nop          prereq-sc   }
-extensions     {provide        nop            reportCmd      nop            nop            nop            nop          provide-sc  }
+extensions     {extensions     nop            reportCmd      nop            nop            nop            nop          extensions-sc}
 family         {family         family-un      reportCmd      nop            nop            nop            nop          family-sc   }
 haveDynamicMPATH {nop          nop            nop            nop            nop            nop            nop          nop         }
 hide-modulefile {hide-modulefile hide-modulefile hide-modulefile hide-modulefile hide-modulefile hide-modulefile nop   nop         }

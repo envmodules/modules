@@ -127,6 +127,19 @@ proc family-sc {name} {
    recordScanModuleElt $name family provided-alias
 }
 
+proc extensions-sc {args} {
+   if {![llength $args]} {
+      knerror {No module specified in argument}
+   }
+   set elt_list [list provide]
+   if {![getConf info_extension]} {
+      lappend elt_list provided-alias
+   }
+   foreach alias $args {
+      recordScanModuleElt $alias {*}$elt_list
+   }
+}
+
 proc provide-sc {args} {
    if {![llength $args]} {
       knerror {No module specified in argument}

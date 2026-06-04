@@ -106,6 +106,7 @@ array set g_config_defs [list\
    ignored_dirs {{} {CVS RCS SCCS .svn .git .SYNC .sos} 0 o}\
    implicit_requirement {MODULES_IMPLICIT_REQUIREMENT @implicitrequirement@ 0\
       b {0 1}}\
+   info_extension {MODULES_INFO_EXTENSION 0 0 b {0 1}}\
    list_output {MODULES_LIST_OUTPUT {@listoutput@} 0 l {header idx variant\
       alias indesym sym tag hidden key} {} {} eltlist}\
    list_terse_output {MODULES_LIST_TERSE_OUTPUT {@listterseoutput@} 0 l\

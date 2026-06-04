@@ -2388,6 +2388,17 @@ proc module-warn {args} {
    }
 }
 
+proc extensions {args} {
+   if {![llength $args]} {
+      knerror {No module specified in argument}
+   }
+   # skip alias definition for extensions cmd if info_extension is enabled
+   if {[getConf info_extension]} {
+      return
+   }
+   provide {*}$args
+}
+
 proc provide {args} {
    if {![llength $args]} {
       knerror {No module specified in argument}
