@@ -1721,6 +1721,8 @@ installation.
 | :mconfig:`implicit_requirement`   | ``1``                                        | :instopt:`--enable-implicit-requirement`,    |              |           |
 |                                   |                                              | :envvar:`MODULES_IMPLICIT_REQUIREMENT`       |              |           |
 +-----------------------------------+----------------------------------------------+----------------------------------------------+--------------+-----------+
+| :mconfig:`info_extension`         | ``0``                                        | :envvar:`MODULES_INFO_EXTENSION`,            |              |           |
++-----------------------------------+----------------------------------------------+----------------------------------------------+--------------+-----------+
 | :mconfig:`list_output`            | ``header:idx:variant:sym:tag:key``           | :instopt:`--with-list-output`,               |              |           |
 |                                   |                                              | :envvar:`MODULES_LIST_OUTPUT`,               |              |           |
 |                                   |                                              | :option:`--output`                           |              |           |

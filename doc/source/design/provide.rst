@@ -57,4 +57,17 @@ wins.
 *FUTURE*: keep all target definitions to be able to report all of them if
 asked.
 
+info_extension configuration option
+-----------------------------------
+
+The :mconfig:`info_extension` configuration option is added to control if
+defined extensions should be considered with an information purpose only.
+
+When this option is enabled, the module alias is not generated to avoid having
+conflict between 2 modules defining the same extension.
+
+This configuration option only affects extensions defined with the
+:mfcmd:`extensions` modulefile command. When enabled it behaves like the
+:mfcmd:`extensions` modulefile command implemented by Lmod.
+
 .. vim:set tabstop=2 shiftwidth=2 expandtab autoindent:

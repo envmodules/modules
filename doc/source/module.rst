@@ -1235,6 +1235,19 @@ Module Sub-Commands
 
      .. versionadded:: 4.7
 
+ .. mconfig:: info_extension
+
+  Consider module :mfcmd:`extensions` having a pure informational purpose: no
+  module alias is associated to them.
+
+  Default is ``0``. The :envvar:`MODULES_INFO_EXTENSION` environment variable
+  is defined by :subcmd:`config` sub-command when changing this configuration
+  option from its default value.
+
+  .. only:: html or latex
+
+     .. versionadded:: 5.7
+
  .. mconfig:: list_output
 
   Content to report in addition to module names on :subcmd:`list` sub-command
