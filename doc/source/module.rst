@@ -5135,6 +5135,20 @@ ENVIRONMENT
 
     .. versionadded:: 4.7
 
+.. envvar:: MODULES_INFO_EXTENSION
+
+ Consider (if set to ``1``) that module extensions have a pure informational
+ purpose and no module alias are associated to them. Extensions defined with
+ :mfcmd:`provide` modulefile command are not affected by this mechanism.
+
+ This environment variable value supersedes the default value set in the
+ :mconfig:`info_extension` configuration option. It can be defined with the
+ :subcmd:`config` sub-command.
+
+ .. only:: html or latex
+
+    .. versionadded:: 5.7
+
 .. envvar:: MODULES_LIST_OUTPUT
 
  A colon separated list of the elements to report in addition to module names
