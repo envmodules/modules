@@ -84,6 +84,12 @@ Modules 5.7.0 (not yet released)
   :subcmd:`spider` sub-commands rather the last part of this via information.
   JSON output is updated to report the ``via`` key as an array rather as a
   string. (fix issue #586)
+* Introduce the :mconfig:`info_extension` configure option to consider that
+  module extensions have a pure informational purpose and no module alias is
+  associated to them. Extensions defined with :mfcmd:`provide` modulefile
+  command are not affected by this mechanism. When :mconfig:`info_extension`
+  is changed with :subcmd:`config` sub-command, it sets the
+  :envvar:`MODULES_INFO_EXTENSION` environment variable. (fix issue #585)
 
 
 .. _5.6 release notes:
