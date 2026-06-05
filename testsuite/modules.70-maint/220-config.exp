@@ -84,6 +84,7 @@ array set configdfl [list\
     ignored_dirs              {CVS RCS SCCS .svn .git .SYNC .sos}\
     implicit_default          [expr {$install_implicitdefault eq {y}}]\
     implicit_requirement      [expr {$install_implicitrequirement eq {y}}]\
+    info_extension            0\
     list_output               $install_listoutput\
     list_terse_output         $install_listterseoutput\
     locked_configs            $install_lockedconfigs\
@@ -153,6 +154,7 @@ array set configvar [list\
     ignore_user_rc            MODULES_IGNORE_USER_RC\
     implicit_default          MODULES_IMPLICIT_DEFAULT\
     implicit_requirement      MODULES_IMPLICIT_REQUIREMENT\
+    info_extension            MODULES_INFO_EXTENSION\
     list_output               MODULES_LIST_OUTPUT\
     list_terse_output         MODULES_LIST_TERSE_OUTPUT\
     logged_events             MODULES_LOGGED_EVENTS\
@@ -213,6 +215,7 @@ array set configvalid [list\
     ignore_user_rc            {0 1}\
     implicit_default          {0 1}\
     implicit_requirement      {0 1}\
+    info_extension            {0 1}\
     list_output               {header idx variant alias indesym sym tag hidden key}\
     list_terse_output         {header idx variant alias indesym sym tag hidden key}\
     logged_events             {auto_eval requested_eval requested_cmd}\
