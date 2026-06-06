@@ -133,6 +133,26 @@ set tserr "$modlin $mpre $modlin
 testouterr_cmd_re sh "whatis $mod" OK $tserr
 
 
+# info_extension tests
+set mp $modpath.4
+setenv_var MODULEPATH $mp
+
+setenv_var TESTSUITE_PROVIDE extensions
+
+setenv_var MODULES_INFO_EXTENSION 0
+set ans [list]
+lappend ans [list set __MODULES_LMALTNAME provide/1&al|foo/1&al|bar/1&al|baz/1&al|qux/1&al|quux/1]
+lappend ans [list set _LMFILES_ $mp/provide/1]
+lappend ans [list set LOADEDMODULES provide/1]
+testouterr_cmd bash {load provide/1} $ans {}
+
+setenv_var MODULES_INFO_EXTENSION 1
+set ans [list]
+lappend ans [list set _LMFILES_ $mp/provide/1]
+lappend ans [list set LOADEDMODULES provide/1]
+testouterr_cmd bash {load provide/1} $ans {}
+
+
 #
 #  Cleanup
 #

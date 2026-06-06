@@ -52,6 +52,12 @@ lappend ans [list set _LMFILES_ $mp/provide/1]
 lappend ans [list set LOADEDMODULES provide/1]
 testouterr_cmd bash {load provide/1} $ans {}
 
+# info_extension tests
+setenv_var MODULES_INFO_EXTENSION 1
+testouterr_cmd bash {load provide/1} $ans {}
+
+setenv_var MODULES_INFO_EXTENSION 0
+
 skip_if_quick_mode
 
 

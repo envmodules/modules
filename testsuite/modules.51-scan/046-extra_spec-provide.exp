@@ -104,6 +104,24 @@ testouterr_cmd sh {avail -t provided-alias:foo} OK $tserr
 
 
 #
+# info_extension tests
+#
+
+setenv_var MODULES_INFO_EXTENSION 1
+
+setenv_var TESTSUITE_PROVIDE multiple
+
+set tserr provide/1
+testouterr_cmd sh {avail -t provide provide:foo/1} OK $tserr
+testouterr_cmd sh {avail -t provide provided-alias:qux/1} OK $tserr
+
+setenv_var TESTSUITE_PROVIDE extensions
+
+testouterr_cmd sh {avail -t provide provide:foo/1} OK $tserr
+testouterr_cmd sh {avail -t provide provided-alias:qux/1} OK {}
+
+
+#
 #  Cleanup
 #
 
