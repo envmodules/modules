@@ -1642,6 +1642,9 @@ proc unload-path {cmd mode dflbhv args} {
       allow_dup idx_val ign_refcount val_set_is_delim glob_match bhv var\
       path_list
 
+   # indicate env var name to configured traces
+   setState current_envvar $var
+
    switch -- $bhv {
       noop {
          return [list $bhv $var]
@@ -1791,6 +1794,9 @@ proc add-path {cmd mode dflbhv args} {
          allow_dup idx_val ign_refcount val_set_is_delim glob_match bhv var\
          path_list
    }
+
+   # indicate env var name to configured traces
+   setState current_envvar $var
 
    # clean any previously defined pushenv stack
    unset-env [getPushenvVarName $var] 1
@@ -2060,6 +2066,46 @@ proc getModulesEnvVarGlobList {{loaded_ctx 0}} {
       lappend envvar_glob_list MODULE* __MODULES_* *_module*
    }
    return $envvar_glob_list
+}
+
+# trace procedure to apply same env change procedure to linked env vars
+proc mirrorEnvVarChange {cmd_str code result op} {
+   # skip mirror processing if initial command failed
+   if {$code} {
+      return
+   }
+   set envvar [getState current_envvar]
+   if {[info exists ::g_linkedEnvvars($envvar)]} {
+      # collect all direct and indirect linked env vars, avoiding cycle loop
+      set linked_envvar_list $::g_linkedEnvvars($envvar)
+      for {set i 0} {$i < [llength $linked_envvar_list]} {incr i} {
+         set linked_envvar [lindex $linked_envvar_list $i]
+         if {[info exists ::g_linkedEnvvars($linked_envvar)]} {
+            lappendNoDup linked_envvar_list\
+               {*}$::g_linkedEnvvars($linked_envvar)
+         }
+      }
+
+      if {![isTopEvaluation]} {
+         set interp_eval_cmd [list interp eval [getCurrentModfileInterpName]]
+      }
+
+      # apply same env var change command on linked env vars
+      # no other trace hook will be triggered as we are processing this one
+      foreach linked_envvar $linked_envvar_list {
+         if {$linked_envvar eq $envvar} {
+            continue
+         }
+         set linked_cmd_str [replaceFirstInStr $cmd_str $envvar\
+            $linked_envvar]
+         # adapt execution if called from modulefile interp
+         if {[info exists interp_eval_cmd]} {
+            set linked_cmd_str [list {*}$interp_eval_cmd $linked_cmd_str]
+         }
+         # execute in same context than initial command
+         uplevel 1 $linked_cmd_str
+      }
+   }
 }
 
 # ;;; Local Variables:

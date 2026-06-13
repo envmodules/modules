@@ -403,6 +403,15 @@ proc getCallingProcName {} {
    }
 }
 
+proc replaceFirstInStr {str old new} {
+   set start_idx [string first $old $str]
+   if {$start_idx == -1} {
+      return $str
+   }
+   set end_idx [expr {$start_idx + [string length $old] - 1}]
+   return [string replace $str $start_idx $end_idx $new]
+}
+
 # ;;; Local Variables:
 # ;;; Mode: tcl-mode
 # ;;; tcl-indent-level: 3

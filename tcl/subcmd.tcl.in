@@ -2314,6 +2314,11 @@ proc cmdModuleResurface {cmd args} {
          # already defined. remove-path: to ensure paths are removed whatever
          # their reference counter value
          lappend optlist --ignore-refcount
+
+         # sync environment variable changes if some links are defined
+         if {[llength [getState linked_envvars]]} {
+            trace add execution $cmd leave mirrorEnvVarChange
+         }
       }
    }
 

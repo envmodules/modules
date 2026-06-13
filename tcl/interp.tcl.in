@@ -64,6 +64,9 @@ proc initModfileModeAliases {mode auto aliasesVN aliasesPassArgVN\
       if {[getConf source_cache]} {
          lappend ::g_modfileBaseAliases source sourceModfileCmd
       }
+      if {[llength [getState linked_envvars]]} {
+         lappend ::g_modfileBaseAliases mirrorEnvVarChange mirrorEnvVarChange
+      }
 
       # list of alias commands whose target procedure is adapted according to
       # the evaluation mode
@@ -154,7 +157,12 @@ x-resource     {x-resource     x-resource     reportCmd      nop            nop 
       # in display mode (except for source-sh and unique-name-conflict)
       } elseif {$mode eq {display} && $alias ni {source-sh\
          unique-name-conflict}} {
-         set traces($alias) reportCmdTrace
+         lappend traces($alias) reportCmdTrace
+      }
+      # mirror environment variable changes if some links are defined
+      if {[llength [getState linked_envvars]] && $alias in {append-path\
+         prepend-path pushenv remove-path setenv unsetenv}} {
+         lappend traces($alias) mirrorEnvVarChange
       }
    }
 }
@@ -761,8 +769,9 @@ proc initInterpCommands {itrp fresh aliasesVN aliasesPassArgVN tracesVN\
    }
 
    foreach alias [array names traces] {
-      interp eval $itrp [list trace add execution $alias leave\
-         $traces($alias)]
+      foreach trace_proc $traces($alias) {
+         interp eval $itrp [list trace add execution $alias leave $trace_proc]
+      }
    }
 }
 

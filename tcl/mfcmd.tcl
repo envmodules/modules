@@ -578,6 +578,9 @@ proc parseSetenvCommandArgs {mode dflbhv args} {
 proc setenv {args} {
    lassign [parseSetenvCommandArgs load set {*}$args] bhv var val
 
+   # indicate env var name to configured traces
+   setState current_envvar $var
+
    if {$bhv eq {set}} {
       # clean any previously defined reference counter array
       unset-env [getModshareVarName $var] 1
@@ -595,6 +598,9 @@ proc setenv {args} {
 # undo setenv in unload mode
 proc setenv-un {args} {
    lassign [parseSetenvCommandArgs unload unset {*}$args] bhv var val
+
+   # indicate env var name to configured traces
+   setState current_envvar $var
 
    # clean any existing reference counter array
    unset-env [getModshareVarName $var] 1
@@ -615,6 +621,9 @@ proc setenv-un {args} {
 # undefined for later use during the modulefile evaluation
 proc setenv-wh {args} {
    lassign [parseSetenvCommandArgs load set {*}$args] bhv var val
+
+   # indicate env var name to configured traces
+   setState current_envvar $var
 
    setEnvVarIfUndefined $var {}
    return {}
@@ -728,6 +737,9 @@ proc parseUnsetenvCommandArgs {mode dflbhv args} {
 proc unsetenv {args} {
    lassign [parseUnsetenvCommandArgs load unset {*}$args] bhv var val
 
+   # indicate env var name to configured traces
+   setState current_envvar $var
+
    # clean any existing reference counter array
    unset-env [getModshareVarName $var] 1
 
@@ -743,6 +755,9 @@ proc unsetenv {args} {
 # undo unsetenv in unload mode
 proc unsetenv-un {args} {
    lassign [parseUnsetenvCommandArgs unload noop {*}$args] bhv var val
+
+   # indicate env var name to configured traces
+   setState current_envvar $var
 
    switch -- $bhv {
       set {
@@ -768,6 +783,9 @@ proc unsetenv-un {args} {
 # undefined for later use during the modulefile evaluation
 proc unsetenv-wh {args} {
    lassign [parseUnsetenvCommandArgs load noop {*}$args] bhv var val
+
+   # indicate env var name to configured traces
+   setState current_envvar $var
 
    setEnvVarIfUndefined $var {}
    return {}
@@ -943,6 +961,9 @@ proc edit-path-wh {cmd args} {
    # get variable name
    lassign [parsePathCommandArgs $cmd load noop {*}$args] separator allow_dup\
       idx_val ign_refcount val_set_is_delim glob_match bhv var path_list
+
+   # indicate env var name to configured traces
+   setState current_envvar $var
 
    setEnvVarIfUndefined $var {}
 
@@ -2202,6 +2223,9 @@ proc pushenv {var val} {
    # know what element to remove from stack when unloading
    prepend-path $pushvar [currentState modulename]&$val
 
+   # indicate env var name to configured traces
+   setState current_envvar $var
+
    return {}
 }
 
@@ -2246,11 +2270,17 @@ proc pushenv-un {var val} {
       unset-env $var 0 $val
    }
 
+   # indicate env var name to configured traces
+   setState current_envvar $var
+
    return {}
 }
 
 # optimized pushenv for whatis mode (same approach than setenv-wh)
 proc pushenv-wh {var val} {
+   # indicate env var name to configured traces
+   setState current_envvar $var
+
    setEnvVarIfUndefined $var {}
    return {}
 }

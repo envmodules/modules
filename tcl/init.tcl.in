@@ -22,7 +22,7 @@
 
 # Runtime state properties (default value, proc to call to initialize state
 # value?)
-##nagelfar ignore +37 Found constant
+##nagelfar ignore +38 Found constant
 array set g_state_defs [list\
    autoinit {0}\
    cache_mcookie_version {5.3}\
@@ -39,6 +39,7 @@ array set g_state_defs [list\
    is_stderr_tty {<undef> initStateIsStderrTty}\
    is_win {<undef> initStateIsWin}\
    kernelversion {<undef> {runCommand uname -v}}\
+   linked_envvars {<undef> initStateLinkedEnvvars}\
    logfd {{} initStateLogfd}\
    logging {<undef> initStateLogging}\
    lsb_codename {<undef> {runCommand lsb_release -s -c}}\
@@ -70,7 +71,7 @@ array set g_state_defs [list\
 # value, is configuration lockable to default value, value kind, valid value
 # list?, internal value representation?, proc to call to initialize option
 # value, valid value list kind
-##nagelfar ignore #81 Too long line
+##nagelfar ignore #102 Too long line
 array set g_config_defs [list\
    contact {MODULECONTACT root@localhost 0 s}\
    abort_on_error {MODULES_ABORT_ON_ERROR {@abortonerror@} 0 l {load ml\
@@ -107,6 +108,8 @@ array set g_config_defs [list\
    implicit_requirement {MODULES_IMPLICIT_REQUIREMENT @implicitrequirement@ 0\
       b {0 1}}\
    info_extension {MODULES_INFO_EXTENSION 0 0 b {0 1}}\
+   linked_envvars {MODULES_LINKED_ENVVARS {} 0 l {} {}\
+      initConfLinkedEnvvars}\
    list_output {MODULES_LIST_OUTPUT {@listoutput@} 0 l {header idx variant\
       alias indesym sym tag hidden key} {} {} eltlist}\
    list_terse_output {MODULES_LIST_TERSE_OUTPUT {@listterseoutput@} 0 l\
@@ -502,6 +505,11 @@ proc initStateReportfd {} {
    return $reportfd
 }
 
+proc initStateLinkedEnvvars {} {
+   getConf linked_envvars
+   return [array get ::g_linkedEnvvars]
+}
+
 # Determine if logging need to be started
 proc initStateLogging {} {
    set logger_not_empty [string length [lindex [getConf logger] 0]]
@@ -806,6 +814,27 @@ proc initConfTagColorName {envvar value validvallist intvallist} {
    # set table for efficient search
    foreach tag [split $value :] {
       set ::g_tagColorName($tag) 1
+   }
+
+   return $value
+}
+
+# Initialize env variable link array
+proc initConfLinkedEnvvars {envvar value validvallist intvallist} {
+   # overridden value coming from environment
+   if {[isEnvVarDefined $envvar]} {
+      set value $::env($envvar)
+   }
+
+   # set array to get full value for one env var if set through multiple args
+   foreach link_arg [split $value :] {
+      set linked_envvar_list [lassign [split $link_arg &] src_envvar]
+      if {![string length $src_envvar] || ![llength $linked_envvar_list] ||\
+         {} in $linked_envvar_list || $src_envvar in $linked_envvar_list} {
+         reportWarning "Ignore invalid link defined in $envvar ($link_arg)"
+      } else {
+         lappendNoDup ::g_linkedEnvvars($src_envvar) {*}$linked_envvar_list
+      }
    }
 
    return $value

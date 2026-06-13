@@ -47,6 +47,9 @@ proc variant-sc {itrp args} {
 proc setenv-sc {args} {
    lassign [parseSetenvCommandArgs load set {*}$args] bhv var val
 
+   # indicate env var name to configured traces
+   setState current_envvar $var
+
    recordScanModuleElt $var setenv envvar
 
    setEnvVarIfUndefined $var {}
@@ -56,6 +59,9 @@ proc setenv-sc {args} {
 proc edit-path-sc {cmd args} {
    lassign [parsePathCommandArgs $cmd load noop {*}$args] separator allow_dup\
       idx_val ign_refcount val_set_is_delim glob_match bhv var path_list
+
+   # indicate env var name to configured traces
+   setState current_envvar $var
 
    recordScanModuleElt $var $cmd envvar
 
@@ -71,12 +77,18 @@ proc edit-path-sc {cmd args} {
 proc pushenv-sc {var val} {
    recordScanModuleElt $var pushenv envvar
 
+   # indicate env var name to configured traces
+   setState current_envvar $var
+
    setEnvVarIfUndefined $var {}
    return {}
 }
 
 proc unsetenv-sc {args} {
    lassign [parseUnsetenvCommandArgs load noop {*}$args] bhv var val
+
+   # indicate env var name to configured traces
+   setState current_envvar $var
 
    recordScanModuleElt $var unsetenv envvar
 
