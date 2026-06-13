@@ -1196,6 +1196,10 @@ the *modulefile* is being loaded.
  configuration option is activated, the *modulefile* is considered a
  dependency by the loaded modulefiles stored in the added modulepaths.
 
+ If a link is defined for variable through the :mconfig:`linked_envvars`
+ configuration option, the same :mfcmd:`prepend-path` command is applied to
+ all associated environment variables.
+
  .. only:: html or latex
 
     .. versionchanged:: 4.1
@@ -1359,6 +1363,10 @@ the *modulefile* is being loaded.
  which is named by prefixing *variable* by :envvar:`__MODULES_PUSHENV_\
  <__MODULES_PUSHENV_\<VAR\>>`.
 
+ If a link is defined for variable through the :mconfig:`linked_envvars`
+ configuration option, the same :mfcmd:`pushenv` command is applied to all
+ associated environment variables.
+
  .. only:: html or latex
 
     .. versionadded:: 5.1
@@ -1448,6 +1456,10 @@ the *modulefile* is being loaded.
 
  An error is raised if *value* equals *delimiter* character.
 
+ If a link is defined for variable through the :mconfig:`linked_envvars`
+ configuration option, the same :mfcmd:`remove-path` command is applied to
+ all associated environment variables.
+
  .. only:: html or latex
 
     .. versionchanged:: 4.1
@@ -1536,6 +1548,10 @@ the *modulefile* is being loaded.
  when *modulefile* is loaded only if not yet defined.
 
  Any newline character in *value* is chopped if using *csh* or *tcsh* shells.
+
+ If a link is defined for variable through the :mconfig:`linked_envvars`
+ configuration option, the same :mfcmd:`setenv` command is applied to all
+ associated environment variables.
 
  .. only:: html or latex
 
@@ -1660,6 +1676,10 @@ the *modulefile* is being loaded.
  *modulefile* is unloaded. If the ``--unset-on-unload`` option is set,
  environment *variable* is also unset when *modulefile* is unloaded. These
  behaviors are applied even if an optional *value* is defined.
+
+ If a link is defined for variable through the :mconfig:`linked_envvars`
+ configuration option, the same :mfcmd:`unsetenv` command is applied to all
+ associated environment variables.
 
  .. only:: html or latex
 

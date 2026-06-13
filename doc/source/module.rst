@@ -1248,6 +1248,21 @@ Module Sub-Commands
 
      .. versionadded:: 5.7
 
+ .. mconfig:: linked_envvars
+
+  Define links between environment variables to apply same value modification
+  to each linked variables.
+
+  This configuration option is set to an empty value by default. The
+  :envvar:`MODULES_LINKED_ENVVARS` environment variable is defined by
+  :subcmd:`config` sub-command when changing this configuration option from
+  its default value. See :envvar:`MODULES_LINKED_ENVVARS` description for
+  details
+
+  .. only:: html or latex
+
+     .. versionadded:: 5.7
+
  .. mconfig:: list_output
 
   Content to report in addition to module names on :subcmd:`list` sub-command

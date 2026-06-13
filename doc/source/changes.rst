@@ -1290,7 +1290,8 @@ The following Modules configuration option has been introduced on Modules 5.
 |            | :mconfig:`spider_indepth`, :mconfig:`require_via`               |
 +------------+-----------------------------------------------------------------+
 | 5.7        | :mconfig:`path_entry_reorder`, :mconfig:`paginate`,             |
-|            | :mconfig:`non_exportable_tags`, :mconfig:`info_extension`       |
+|            | :mconfig:`non_exportable_tags`, :mconfig:`info_extension`,      |
+|            | :mconfig:`linked_envvars`                                       |
 +------------+-----------------------------------------------------------------+
 
 :mconfig:`auto_handling`
