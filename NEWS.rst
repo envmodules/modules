@@ -90,6 +90,7 @@ Modules 5.7.0 (not yet released)
   command are not affected by this mechanism. When :mconfig:`info_extension`
   is changed with :subcmd:`config` sub-command, it sets the
   :envvar:`MODULES_INFO_EXTENSION` environment variable. (fix issue #585)
+* Doc: add :ref:`linked-envvars` design notes.
 
 
 .. _5.6 release notes:
