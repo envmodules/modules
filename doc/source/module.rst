@@ -5164,6 +5164,32 @@ ENVIRONMENT
 
     .. versionadded:: 5.7
 
+.. envvar:: MODULES_LINKED_ENVVARS
+
+ A colon-separated list of environment variable link sets. Each link set is a
+ group of environment variable names separated by the ampersand character.
+ When an environment variable modification command is applied to the first
+ variable in a link set, the same command is automatically applied to all
+ other variables in that set.
+
+ This link mechanism applies to all environment variable management modulefile
+ commands and module sub-commands (:mfcmd:`append-path`,
+ :mfcmd:`prepend-path`, :mfcmd:`pushenv`, :mfcmd:`remove-path`,
+ :mfcmd:`setenv` and :mfcmd:`unsetenv`).
+
+ For example, if the configuration option is set to ``FOO&BAR&BAZ:BAR&QUX``, a
+ :mfcmd:`prepend-path` command applied to ``FOO`` will also be applied to
+ ``BAR``, ``BAZ``, and ``QUX``. Linking is not reflexive: a command applied to
+ ``QUX`` is not propagated to any other environment variable in the link set.
+
+ This environment variable value supersedes the default value set in the
+ :mconfig:`linked_envvars` configuration option. It can be defined with the
+ :subcmd:`config` sub-command.
+
+ .. only:: html or latex
+
+    .. versionadded:: 5.7
+
 .. envvar:: MODULES_LIST_OUTPUT
 
  A colon separated list of the elements to report in addition to module names
