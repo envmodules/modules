@@ -93,7 +93,7 @@ if {[info exists insmodrcdata] && [info exists exmodrcdata] && $exmodrcdata eq $
 }
 
 set custom {module restore unk}
-set custom [escre [msg_moderr {Collection unk cannot be found} $custom $modrc 54 {  }]]
+set custom [escre [msg_moderr {Collection unk cannot be found} $custom $modrc 57 {  }]]
 
 set tserr_modrc_exinstalled [msg_load null]
 set tserr_initrc_exinstalled "[msg_load mj]\nload m1\nload m2\n\n[msg_top_load m2 {} m1 {}]\n\nunload m2\n[msg_unload m2]\nunload m1\n[msg_unload {m1 <aL>}]\n[msg_unload mj]\nload m1\n[msg_load {m1 <aL>}]\nload m3\n[msg_load m3]\n[msg_load {'space yc/4'}]\n$err_path'unk'\n$custom"
@@ -1608,6 +1608,48 @@ if {!$insmodspath && $initrc_exinstalled && !$install_setshellstartup && $modrc 
     unsetenv_path_var BAR
     unsetenv_path_var FOO
 
+
+    # test impact of linked envvars configuration
+    setenv_var MODULES_LINKED_ENVVARS FOO&BAR
+    setenv_var TESTSUITE_INITRC linked_envvars1
+
+    set ans [list]
+    lappend ans [list ERR]
+    lappend ans [list [set "func_$shell"]]
+    if {$install_versioning eq "y"} {
+        lappend ans [list set LOADEDMODULES "m1:m3:space yc/4"]
+        lappend ans [list set _LMFILES_ "$modpath.deps/m1:$modpath.deps/m3:$modpath wspace/space yc/4"]
+        lappend ans [list set MODULESHOME $moduleshome]
+        lappend ans [list set MODULE_VERSION "(.*)"]
+        lappend ans [list set __MODULES_LMTAG m1&auto-loaded]
+        lappend ans [list set MODULES_CMD $modulecmd_path]
+        lappend ans [list set __MODULES_LMPREREQ m3&m1]
+        lappend ans [list set MODULE_VERSION_STACK "(.*)"]
+        lappend ans [list set MODULEPATH "$modpath wspace:$modpath.deps"]
+        lappend ans [list set __MODULES_LMINIT $lminit_initrc_exinstalled]
+        lappend ans [list set FOO value]
+        lappend ans [list set BAR value]
+        if {$change_path} {
+            lappend ans [list set PATH $updatedpath]
+        }
+        lappend ans [list unset __MODULES_AUTOINIT_INPROGRESS]
+    } else {
+        lappend ans [list set FOO value]
+        lappend ans [list set MODULES_CMD $modulecmd_path]
+        lappend ans [list set BAR value]
+        lappend ans [list unset __MODULES_AUTOINIT_INPROGRESS]
+        lappend ans [list set MODULESHOME $moduleshome]
+        lappend ans [list set __MODULES_LMPREREQ m3&m1]
+        lappend ans [list set _LMFILES_ "$modpath.deps/m1:$modpath.deps/m3:$modpath wspace/space yc/4"]
+        lappend ans [list set LOADEDMODULES "m1:m3:space yc/4"]
+        lappend ans [list set __MODULES_LMINIT $lminit_initrc_exinstalled]
+        lappend ans [list set __MODULES_LMTAG m1&auto-loaded]
+        lappend ans [list set MODULEPATH "$modpath wspace:$modpath.deps"]
+    }
+    testouterr_cmd_re sh autoinit $ans $tserr_initrc_exinstalled
+    unsetenv_var MODULES_LINKED_ENVVARS
+
+
     # test impact of use of module sub-commands that cannot be used in an initrc script
     setenv_var TESTSUITE_INITRC subcmd1
 
@@ -1692,7 +1734,7 @@ if {!$insmodspath && $initrc_exinstalled && !$install_setshellstartup && $modrc 
         lappend ans [list set MODULEPATH "$modpath wspace:$modpath.deps"]
     }
     set custom {module restore unk}
-    set custom [escre [msg_moderr {Collection unk cannot be found} $custom $modrc 54 {  }]]
+    set custom [escre [msg_moderr {Collection unk cannot be found} $custom $modrc 57 {  }]]
     set tserr "[msg_load mj]\nload m1\nload m2\n\n[msg_top_load m2 {} m1 {}]\n\nunload m2\n[msg_unload m2]\nunload m1\n[msg_unload {m1 <aL>}]\n[msg_unload mj]\nload m1\n[msg_load {m1 <aL>}]\nload m3\n[msg_load m3]\n[msg_load {'space yc/4'}]\n$err_path'unk'\n$custom"
     testouterr_cmd_re bash autoinit $ans $tserr
 
@@ -1730,7 +1772,7 @@ if {!$insmodspath && $initrc_exinstalled && !$install_setshellstartup && $modrc 
         lappend ans [list set MODULEPATH "$modpath wspace:$modpath.deps"]
     }
     set custom {module restore unk}
-    set custom [escre [msg_moderr {Collection unk cannot be found} $custom $modrc 54 {  }]]
+    set custom [escre [msg_moderr {Collection unk cannot be found} $custom $modrc 57 {  }]]
     set tserr "[msg_load mj]\nload m1\nload m2\n\n[msg_top_load m2 {} m1 {}]\n\nunload m2\n[msg_unload m2]\nunload m1\n[msg_unload {m1 <aL>}]\n[msg_unload mj]\nload m1\n[msg_load {m1 <aL>}]\nload m3\n[msg_load m3]\n[msg_load {'space yc/4'}]\n$err_path'unk'\n$custom"
     testouterr_cmd_re bash autoinit $ans $tserr
 
@@ -1771,7 +1813,7 @@ if {!$insmodspath && $initrc_exinstalled && !$install_setshellstartup && $modrc 
     lappend ans [list set MODULES_SET_SHELL_STARTUP 1]
     lappend ans [list unset __MODULES_AUTOINIT_INPROGRESS]
     set custom {module restore unk}
-    set custom [escre [msg_moderr {Collection unk cannot be found} $custom $modrc 54 {  }]]
+    set custom [escre [msg_moderr {Collection unk cannot be found} $custom $modrc 57 {  }]]
     set tserr "[msg_load mj]\nload m1\nload m2\n\n[msg_top_load m2 {} m1 {}]\n\nunload m2\n[msg_unload m2]\nunload m1\n[msg_unload {m1 <aL>}]\n[msg_unload mj]\nload m1\n[msg_load {m1 <aL>}]\nload m3\n[msg_load m3]\n[msg_load {'space yc/4'}]\n[msg_load {refresh/5.0 <bar>}]\n$err_path'unk'\n$custom"
     testouterr_cmd_re bash autoinit $ans $tserr
 
@@ -1815,7 +1857,7 @@ if {!$insmodspath && $initrc_exinstalled && !$install_setshellstartup && $modrc 
         lappend ans [list set MODULEPATH "$modpath.3:$modpath wspace:$modpath.deps"]
     }
     set custom {module restore unk}
-    set custom [escre [msg_moderr {Collection unk cannot be found} $custom $modrc 54 {  }]]
+    set custom [escre [msg_moderr {Collection unk cannot be found} $custom $modrc 57 {  }]]
     set tserr "[msg_load mj]\nload m1\nload m2\n\n[msg_top_load m2 {} m1 {}]\n\nunload m2\n[msg_unload m2]\nunload m1\n[msg_unload {m1 <aL>}]\n[msg_unload mj]\nload m1\n[msg_load {m1 <aL>}]\nload m3\n[msg_load m3]\n[msg_load {'space yc/4'}]\n[msg_load {foo/0.2 <tag>}]\n\n[msg_top_load {foo/0.load <foo>} {} foo/1.0 {}]\n\n$err_path'unk'\n$custom"
     testouterr_cmd_re bash autoinit $ans $tserr
 
@@ -1864,7 +1906,7 @@ if {!$insmodspath && $initrc_exinstalled && !$install_setshellstartup && $modrc 
         lappend ans [list set MODULEPATH "$modpath.3:$modpath wspace:$modpath.deps"]
     }
     set custom {module restore unk}
-    set custom [escre [msg_moderr {Collection unk cannot be found} $custom $modrc 54 {  }]]
+    set custom [escre [msg_moderr {Collection unk cannot be found} $custom $modrc 57 {  }]]
     set tserr "[msg_load mj]\nload m1\nload m2\n\n[msg_top_load m2 {} m1 {}]\n\nunload m2\n[msg_unload m2]\nunload m1\n[msg_unload {m1 <aL>}]\n[msg_unload mj]\nload m1\n[msg_load {m1 <aL>}]\nload m3\n[msg_load m3]\n[msg_load {'space yc/4'}]\n[msg_load {variant/1.0{bar=val1:\+foo}}]\n$err_path'unk'\n$custom"
     testouterr_cmd_re bash autoinit $ans $tserr
 
@@ -1897,7 +1939,7 @@ if {!$insmodspath && $initrc_exinstalled && !$install_setshellstartup && $modrc 
         lappend ans [list set MODULE_VERSION "(.*)"]
     }
     set custom {module restore unk}
-    set custom [escre [msg_moderr {Collection unk cannot be found} $custom $modrc 54 {  }]]
+    set custom [escre [msg_moderr {Collection unk cannot be found} $custom $modrc 57 {  }]]
     set tserr "[msg_load mj]\nload m1\nload m2\n\n[msg_top_load m2 {} m1 {}]\n\nunload m2\n[msg_unload m2]\nunload m1\n[msg_unload {m1 <aL>}]\n[msg_unload mj]\nload m1\n[msg_load {m1 <aL>}]\nload m3\n[msg_load m3]\n[msg_load {'space yc/4'}]\n[msg_unload {'space yc/4'}]\nunload m3\n[msg_unload m3]\nunload m1\n[msg_unload {m1 <aL>}]\n$err_path'unk'\n$custom"
     testouterr_cmd_re bash autoinit $ans $tserr
 

@@ -607,7 +607,7 @@ setenv_var TESTSUITE_ENABLE_SITECONFIG_UNKINTERRDURINGMODEVAL 1
 set ans [msg_moderr {invalid command name "foo"} {foo} $modpath/setenv/1.0 30 {} {} {} {    (procedure "getModshareVarName" line 2)
     invoked from within
 "getModshareVarName $var"
-    (procedure "setenv" line 6)
+    (procedure "setenv" line 9)
     invoked from within
 "setenv testsuite "yes""}]
 testouterr_cmd sh {load setenv/1.0} ERR [msg_load setenv/1.0 $ans]

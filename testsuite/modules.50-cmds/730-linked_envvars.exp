@@ -1,0 +1,1003 @@
+##############################################################################
+#   Modules Revision 3.0
+#   Providing a flexible user environment
+#
+#   File:		modules.50-cmds/%M%
+#   Revision:		%I%
+#   First Edition:	2026/06/14
+#   Last Mod.:		%U%, %G%
+#
+#   Authors:		Xavier Delaruelle, xavier.delaruelle@cea.fr
+#
+#   Description:	Testuite testsequence
+#   Command:		load, unload, display, help, show, test,
+#                   refresh, whatis
+#   Modulefiles:    link, source-sh
+#   Sub-Command:
+#
+#   Comment:	%C{
+#         Test linked_envvars mechanism
+#		}C%
+#
+##############################################################################
+
+set mp $modpath.4
+set mpre $modpathre.4
+setenv_var MODULEPATH $mp
+
+setenv_var MODULES_PATH_ENTRY_REORDER 0
+
+
+# basic link setup
+setenv_var MODULES_LINKED_ENVVARS FOO&BAR
+
+setenv_var TESTSUITE_LINKED_ENVVARS append1
+set ans [list]
+lappend ans [list set FOO value]
+lappend ans [list set BAR value]
+lappend ans [list set _LMFILES_ $mp/link/1]
+lappend ans [list set LOADEDMODULES link/1]
+testouterr_cmd bash {load link/1} $ans {}
+
+setenv_var TESTSUITE_LINKED_ENVVARS prepend1
+testouterr_cmd bash {load link/1} $ans {}
+
+setenv_var TESTSUITE_LINKED_ENVVARS setenv1
+testouterr_cmd bash {load link/1} $ans {}
+
+setenv_var TESTSUITE_LINKED_ENVVARS remove1
+set ans [list]
+lappend ans [list unset FOO]
+lappend ans [list unset BAR]
+lappend ans [list set _LMFILES_ $mp/link/1]
+lappend ans [list set LOADEDMODULES link/1]
+testouterr_cmd bash {load link/1} $ans {}
+
+setenv_var TESTSUITE_LINKED_ENVVARS unsetenv1
+testouterr_cmd bash {load link/1} $ans {}
+
+setenv_var TESTSUITE_LINKED_ENVVARS pushenv1
+set ans [list]
+lappend ans [list set FOO value]
+lappend ans [list set BAR value]
+lappend ans [list set _LMFILES_ $mp/link/1]
+lappend ans [list set LOADEDMODULES link/1]
+lappend ans [list set __MODULES_PUSHENV_FOO link/1&value]
+lappend ans [list set __MODULES_PUSHENV_BAR link/1&value]
+testouterr_cmd bash {load link/1} $ans {}
+
+set ans [list]
+lappend ans [list set FOO value]
+lappend ans [list set BAR value]
+testouterr_cmd bash {append-path FOO value} $ans {}
+testouterr_cmd bash {prepend-path FOO value} $ans {}
+
+set ans [list]
+lappend ans [list unset FOO]
+lappend ans [list unset BAR]
+testouterr_cmd bash {remove-path FOO value} $ans {}
+
+skip_if_quick_mode
+
+
+# multi var link and recurvise link, var not identically initialized
+setenv_var MODULES_LINKED_ENVVARS FOO&BAR&BAZ:BAR&QUX
+setenv_var FOO val1
+setenv_var BAR val2
+setenv_var QUX val3
+
+setenv_var TESTSUITE_LINKED_ENVVARS append1
+set ans [list]
+lappend ans [list set FOO val1:value]
+lappend ans [list set BAZ value]
+lappend ans [list set BAR val2:value]
+lappend ans [list set _LMFILES_ $mp/link/1]
+lappend ans [list set LOADEDMODULES link/1]
+lappend ans [list set QUX val3:value]
+testouterr_cmd bash {load link/1} $ans {}
+
+setenv_var TESTSUITE_LINKED_ENVVARS prepend1
+set ans [list]
+lappend ans [list set FOO value:val1]
+lappend ans [list set BAZ value]
+lappend ans [list set BAR value:val2]
+lappend ans [list set _LMFILES_ $mp/link/1]
+lappend ans [list set LOADEDMODULES link/1]
+lappend ans [list set QUX value:val3]
+testouterr_cmd bash {load link/1} $ans {}
+
+setenv_var TESTSUITE_LINKED_ENVVARS setenv1
+set ans [list]
+lappend ans [list set FOO value]
+lappend ans [list set BAZ value]
+lappend ans [list set BAR value]
+lappend ans [list set _LMFILES_ $mp/link/1]
+lappend ans [list set LOADEDMODULES link/1]
+lappend ans [list set QUX value]
+testouterr_cmd bash {load link/1} $ans {}
+
+setenv_var TESTSUITE_LINKED_ENVVARS remove1
+set ans [list]
+lappend ans [list set FOO val1]
+lappend ans [list unset BAZ]
+lappend ans [list set BAR val2]
+lappend ans [list set _LMFILES_ $mp/link/1]
+lappend ans [list set LOADEDMODULES link/1]
+lappend ans [list set QUX val3]
+testouterr_cmd bash {load link/1} $ans {}
+
+setenv_var TESTSUITE_LINKED_ENVVARS unsetenv1
+set ans [list]
+lappend ans [list unset FOO]
+lappend ans [list unset BAZ]
+lappend ans [list unset BAR]
+lappend ans [list set _LMFILES_ $mp/link/1]
+lappend ans [list set LOADEDMODULES link/1]
+lappend ans [list unset QUX]
+testouterr_cmd bash {load link/1} $ans {}
+
+setenv_var TESTSUITE_LINKED_ENVVARS pushenv1
+set ans [list]
+lappend ans [list set __MODULES_PUSHENV_QUX link/1&value:&val3]
+lappend ans [list set FOO value]
+lappend ans [list set BAZ value]
+lappend ans [list set BAR value]
+lappend ans [list set _LMFILES_ $mp/link/1]
+lappend ans [list set LOADEDMODULES link/1]
+lappend ans [list set QUX value]
+lappend ans [list set __MODULES_PUSHENV_FOO link/1&value:&val1]
+lappend ans [list set __MODULES_PUSHENV_BAZ link/1&value]
+lappend ans [list set __MODULES_PUSHENV_BAR link/1&value:&val2]
+testouterr_cmd bash {load link/1} $ans {}
+
+set ans [list]
+lappend ans [list set FOO val1:value]
+lappend ans [list set BAZ value]
+lappend ans [list set BAR val2:value]
+lappend ans [list set QUX val3:value]
+testouterr_cmd bash {append-path FOO value} $ans {}
+
+set ans [list]
+lappend ans [list set FOO value:val1]
+lappend ans [list set BAZ value]
+lappend ans [list set BAR value:val2]
+lappend ans [list set QUX value:val3]
+testouterr_cmd bash {prepend-path FOO value} $ans {}
+
+set ans [list]
+lappend ans [list set FOO val1]
+lappend ans [list unset BAZ]
+lappend ans [list set BAR val2]
+lappend ans [list set QUX val3]
+testouterr_cmd bash {remove-path FOO value} $ans {}
+
+
+# test when options are used on modulefile commands
+setenv_var MODULES_LINKED_ENVVARS FOO&BAR&BAZ:BAR&QUX
+setenv_var FOO val1
+setenv_var BAR val2
+setenv_var QUX value
+
+setenv_var TESTSUITE_LINKED_ENVVARS append2
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO val1:2]
+lappend ans [list set FOO {val1 value}]
+lappend ans [list set BAZ {value val1}]
+lappend ans [list set BAR {val2 value val1}]
+lappend ans [list set _LMFILES_ $mp/link/1]
+lappend ans [list set LOADEDMODULES link/1]
+lappend ans [list set __MODULES_SHARE_QUX value:2]
+lappend ans [list set QUX {value val1}]
+testouterr_cmd bash {load link/1} $ans {}
+
+setenv_var TESTSUITE_LINKED_ENVVARS prepend2
+set ans [list]
+lappend ans [list set FOO {value val1}]
+lappend ans [list set BAZ value]
+lappend ans [list set BAR {value val2}]
+lappend ans [list set _LMFILES_ $mp/link/1]
+lappend ans [list set LOADEDMODULES link/1]
+lappend ans [list set __MODULES_SHARE_QUX value:2]
+lappend ans [list set QUX {value value}]
+testouterr_cmd bash {load link/1} $ans {}
+
+setenv_var TESTSUITE_LINKED_ENVVARS setenv2
+set ans [list]
+lappend ans [list set BAZ value]
+lappend ans [list set _LMFILES_ $mp/link/1]
+lappend ans [list set LOADEDMODULES link/1]
+testouterr_cmd bash {load link/1} $ans {}
+
+setenv_var TESTSUITE_LINKED_ENVVARS remove2
+set ans [list]
+lappend ans [list set FOO val1]
+lappend ans [list unset BAZ]
+lappend ans [list unset BAR]
+lappend ans [list set _LMFILES_ $mp/link/1]
+lappend ans [list set LOADEDMODULES link/1]
+lappend ans [list unset QUX]
+testouterr_cmd bash {load link/1} $ans {}
+
+setenv_var TESTSUITE_LINKED_ENVVARS unsetenv2
+set ans [list]
+lappend ans [list unset FOO]
+lappend ans [list unset BAZ]
+lappend ans [list unset BAR]
+lappend ans [list set _LMFILES_ $mp/link/1]
+lappend ans [list set LOADEDMODULES link/1]
+lappend ans [list unset QUX]
+testouterr_cmd bash {load link/1} $ans {}
+
+# no specific option currently available on pushenv
+setenv_var TESTSUITE_LINKED_ENVVARS pushenv2
+set ans [list]
+lappend ans [list set __MODULES_PUSHENV_QUX link/1&value:&value]
+lappend ans [list set FOO value]
+lappend ans [list set BAZ value]
+lappend ans [list set BAR value]
+lappend ans [list set _LMFILES_ $mp/link/1]
+lappend ans [list set LOADEDMODULES link/1]
+lappend ans [list set QUX value]
+lappend ans [list set __MODULES_PUSHENV_FOO link/1&value:&val1]
+lappend ans [list set __MODULES_PUSHENV_BAZ link/1&value]
+lappend ans [list set __MODULES_PUSHENV_BAR link/1&value:&val2]
+testouterr_cmd bash {load link/1} $ans {}
+
+set ans [list]
+lappend ans [list set FOO {val1,value}]
+lappend ans [list set BAZ {value,val1}]
+lappend ans [list set BAR {val2,value,val1}]
+lappend ans [list set QUX {value,val1}]
+testouterr_cmd bash {append-path -d , FOO value val1} $ans {}
+
+set ans [list]
+lappend ans [list set FOO {value,val1}]
+lappend ans [list set BAZ value]
+lappend ans [list set BAR {value,val2}]
+lappend ans [list set __MODULES_SHARE_QUX value:2]
+lappend ans [list set QUX {value,value}]
+testouterr_cmd bash {prepend-path -d , --duplicates FOO value} $ans {}
+
+set ans [list]
+lappend ans [list set FOO val1]
+lappend ans [list unset BAZ]
+lappend ans [list unset BAR]
+lappend ans [list unset QUX]
+testouterr_cmd bash {remove-path -d , FOO value val2} $ans {}
+
+
+# test other evaluation modes
+setenv_var MODULES_LINKED_ENVVARS FOO&BAR&BAZ:BAR&QUX
+setenv_var FOO val1
+setenv_var BAR val2
+setenv_var QUX value
+
+# help mode
+setenv_var TESTSUITE_LINKED_ENVVARS append1
+set tserr "$modlin
+Module Specific Help for $mpre/link/1:
+
+BAR: val2:value
+QUX: value
+link/1
+$modlin"
+testouterr_cmd_re bash {help link/1} OK $tserr
+
+setenv_var TESTSUITE_LINKED_ENVVARS prepend1
+set tserr "$modlin
+Module Specific Help for $mpre/link/1:
+
+BAR: value:val2
+QUX: value
+link/1
+$modlin"
+testouterr_cmd_re bash {help link/1} OK $tserr
+
+setenv_var TESTSUITE_LINKED_ENVVARS setenv1
+set tserr "$modlin
+Module Specific Help for $mpre/link/1:
+
+BAR: value
+QUX: value
+link/1
+$modlin"
+testouterr_cmd_re bash {help link/1} OK $tserr
+
+setenv_var TESTSUITE_LINKED_ENVVARS remove1
+set tserr "$modlin
+Module Specific Help for $mpre/link/1:
+
+BAR: val2
+QUX: 
+link/1
+$modlin"
+testouterr_cmd_re bash {help link/1} OK $tserr
+
+setenv_var TESTSUITE_LINKED_ENVVARS unsetenv1
+set tserr "$modlin
+Module Specific Help for $mpre/link/1:
+
+BAR: 
+QUX: 
+link/1
+$modlin"
+testouterr_cmd_re bash {help link/1} OK $tserr
+
+setenv_var TESTSUITE_LINKED_ENVVARS pushenv1
+set tserr "$modlin
+Module Specific Help for $mpre/link/1:
+
+BAR: value
+QUX: value
+link/1
+$modlin"
+testouterr_cmd_re bash {help link/1} OK $tserr
+
+
+# test mode
+setenv_var TESTSUITE_LINKED_ENVVARS append1
+set tserr "$modlin
+Module Specific Test for $mpre/link/1:
+
+BAR: val2:value
+QUX: value
+Test result: PASS
+$modlin"
+testouterr_cmd_re bash {test link/1} OK $tserr
+
+setenv_var TESTSUITE_LINKED_ENVVARS prepend1
+set tserr "$modlin
+Module Specific Test for $mpre/link/1:
+
+BAR: value:val2
+QUX: value
+Test result: PASS
+$modlin"
+testouterr_cmd_re bash {test link/1} OK $tserr
+
+setenv_var TESTSUITE_LINKED_ENVVARS setenv1
+set tserr "$modlin
+Module Specific Test for $mpre/link/1:
+
+BAR: value
+QUX: value
+Test result: PASS
+$modlin"
+testouterr_cmd_re bash {test link/1} OK $tserr
+
+setenv_var TESTSUITE_LINKED_ENVVARS remove1
+set tserr "$modlin
+Module Specific Test for $mpre/link/1:
+
+BAR: val2
+QUX: 
+Test result: PASS
+$modlin"
+testouterr_cmd_re bash {test link/1} OK $tserr
+
+setenv_var TESTSUITE_LINKED_ENVVARS unsetenv1
+set tserr "$modlin
+Module Specific Test for $mpre/link/1:
+
+BAR: 
+QUX: 
+Test result: PASS
+$modlin"
+testouterr_cmd_re bash {test link/1} OK $tserr
+
+setenv_var TESTSUITE_LINKED_ENVVARS pushenv1
+set tserr "$modlin
+Module Specific Test for $mpre/link/1:
+
+BAR: value
+QUX: value
+Test result: PASS
+$modlin"
+testouterr_cmd_re bash {test link/1} OK $tserr
+
+
+# display mode
+setenv_var TESTSUITE_LINKED_ENVVARS append1
+set tserr "$modlin
+$mpre/link/1:
+
+module-whatis\tlink/1
+module-help\tlink/1
+append-path\tFOO value
+append-path\tBAR value
+append-path\tBAZ value
+append-path\tQUX value
+BAR: val2:value
+QUX: value
+$modlin"
+testouterr_cmd_re bash {display link/1} OK $tserr
+
+setenv_var TESTSUITE_LINKED_ENVVARS prepend1
+set tserr "$modlin
+$mpre/link/1:
+
+module-whatis\tlink/1
+module-help\tlink/1
+prepend-path\tFOO value
+prepend-path\tBAR value
+prepend-path\tBAZ value
+prepend-path\tQUX value
+BAR: value:val2
+QUX: value
+$modlin"
+testouterr_cmd_re bash {display link/1} OK $tserr
+
+setenv_var TESTSUITE_LINKED_ENVVARS setenv1
+set tserr "$modlin
+$mpre/link/1:
+
+module-whatis\tlink/1
+module-help\tlink/1
+setenv\t\tFOO value
+setenv\t\tBAR value
+setenv\t\tBAZ value
+setenv\t\tQUX value
+BAR: value
+QUX: value
+$modlin"
+testouterr_cmd_re bash {display link/1} OK $tserr
+
+setenv_var TESTSUITE_LINKED_ENVVARS remove1
+set tserr "$modlin
+$mpre/link/1:
+
+module-whatis\tlink/1
+module-help\tlink/1
+remove-path\tFOO value
+remove-path\tBAR value
+remove-path\tBAZ value
+remove-path\tQUX value
+BAR: val2
+QUX: 
+$modlin"
+testouterr_cmd_re bash {display link/1} OK $tserr
+
+setenv_var TESTSUITE_LINKED_ENVVARS unsetenv1
+set tserr "$modlin
+$mpre/link/1:
+
+module-whatis\tlink/1
+module-help\tlink/1
+unsetenv\tFOO
+unsetenv\tBAR
+unsetenv\tBAZ
+unsetenv\tQUX
+BAR: 
+QUX: 
+$modlin"
+testouterr_cmd_re bash {display link/1} OK $tserr
+
+setenv_var TESTSUITE_LINKED_ENVVARS pushenv1
+set tserr "$modlin
+$mpre/link/1:
+
+module-whatis\tlink/1
+module-help\tlink/1
+pushenv\t\tFOO value
+pushenv\t\tBAR value
+pushenv\t\tBAZ value
+pushenv\t\tQUX value
+BAR: value
+QUX: value
+$modlin"
+testouterr_cmd_re bash {display link/1} OK $tserr
+
+
+# display mode with options on commands
+setenv_var TESTSUITE_LINKED_ENVVARS append2
+set tserr "$modlin
+$mpre/link/1:
+
+module-whatis\tlink/1
+module-help\tlink/1
+append-path\t-d { } FOO value val1
+append-path\t-d { } BAR value val1
+append-path\t-d { } BAZ value val1
+append-path\t-d { } QUX value val1
+$modlin"
+testouterr_cmd_re bash {display link/1} OK $tserr
+
+setenv_var TESTSUITE_LINKED_ENVVARS prepend2
+set tserr "$modlin
+$mpre/link/1:
+
+module-whatis\tlink/1
+module-help\tlink/1
+prepend-path\t-d { } --duplicates FOO value
+prepend-path\t-d { } --duplicates BAR value
+prepend-path\t-d { } --duplicates BAZ value
+prepend-path\t-d { } --duplicates QUX value
+$modlin"
+testouterr_cmd_re bash {display link/1} OK $tserr
+
+setenv_var TESTSUITE_LINKED_ENVVARS setenv2
+set tserr "$modlin
+$mpre/link/1:
+
+module-whatis\tlink/1
+module-help\tlink/1
+setenv\t\t--set-if-undef FOO value
+setenv\t\t--set-if-undef BAR value
+setenv\t\t--set-if-undef BAZ value
+setenv\t\t--set-if-undef QUX value
+$modlin"
+testouterr_cmd_re bash {display link/1} OK $tserr
+
+setenv_var TESTSUITE_LINKED_ENVVARS remove2
+set tserr "$modlin
+$mpre/link/1:
+
+module-whatis\tlink/1
+module-help\tlink/1
+remove-path\t-d { } FOO value val2 --append-on-unload val1
+remove-path\t-d { } BAR value val2 --append-on-unload val1
+remove-path\t-d { } BAZ value val2 --append-on-unload val1
+remove-path\t-d { } QUX value val2 --append-on-unload val1
+$modlin"
+testouterr_cmd_re bash {display link/1} OK $tserr
+
+setenv_var TESTSUITE_LINKED_ENVVARS unsetenv2
+set tserr "$modlin
+$mpre/link/1:
+
+module-whatis\tlink/1
+module-help\tlink/1
+unsetenv\t--unset-on-unload FOO value
+unsetenv\t--unset-on-unload BAR value
+unsetenv\t--unset-on-unload BAZ value
+unsetenv\t--unset-on-unload QUX value
+$modlin"
+testouterr_cmd_re bash {display link/1} OK $tserr
+
+setenv_var TESTSUITE_LINKED_ENVVARS pushenv2
+set tserr "$modlin
+$mpre/link/1:
+
+module-whatis\tlink/1
+module-help\tlink/1
+pushenv\t\tFOO value
+pushenv\t\tBAR value
+pushenv\t\tBAZ value
+pushenv\t\tQUX value
+$modlin"
+testouterr_cmd_re bash {display link/1} OK $tserr
+
+
+# whatis mode
+setenv_var TESTSUITE_LINKED_ENVVARS append1
+set tserr "$modlin $mpre $modlin
+\\s*link/1: link/1
+\\s*link/1: BAR: val2
+\\s*link/1: QUX: value"
+testouterr_cmd_re bash {whatis link/1} OK $tserr
+
+setenv_var TESTSUITE_LINKED_ENVVARS prepend1
+testouterr_cmd_re bash {whatis link/1} OK $tserr
+
+setenv_var TESTSUITE_LINKED_ENVVARS setenv1
+testouterr_cmd_re bash {whatis link/1} OK $tserr
+
+setenv_var TESTSUITE_LINKED_ENVVARS remove1
+testouterr_cmd_re bash {whatis link/1} OK $tserr
+
+setenv_var TESTSUITE_LINKED_ENVVARS unsetenv1
+testouterr_cmd_re bash {whatis link/1} OK $tserr
+
+setenv_var TESTSUITE_LINKED_ENVVARS pushenv1
+testouterr_cmd_re bash {whatis link/1} OK $tserr
+
+
+# scan mode
+setenv_var TESTSUITE_LINKED_ENVVARS append1
+testouterr_cmd_re bash {avail -t -o  link/1 envvar:FOO envvar:BAR envvar:BAZ envvar:QUX} OK link/1
+
+setenv_var TESTSUITE_LINKED_ENVVARS prepend1
+testouterr_cmd_re bash {avail -t -o  link/1 envvar:FOO envvar:BAR envvar:BAZ envvar:QUX} OK link/1
+
+setenv_var TESTSUITE_LINKED_ENVVARS setenv1
+testouterr_cmd_re bash {avail -t -o  link/1 envvar:FOO envvar:BAR envvar:BAZ envvar:QUX} OK link/1
+
+setenv_var TESTSUITE_LINKED_ENVVARS remove1
+testouterr_cmd_re bash {avail -t -o  link/1 envvar:FOO envvar:BAR envvar:BAZ envvar:QUX} OK link/1
+
+setenv_var TESTSUITE_LINKED_ENVVARS unsetenv1
+testouterr_cmd_re bash {avail -t -o  link/1 envvar:FOO envvar:BAR envvar:BAZ envvar:QUX} OK link/1
+
+setenv_var TESTSUITE_LINKED_ENVVARS pushenv1
+testouterr_cmd_re bash {avail -t -o  link/1 envvar:FOO envvar:BAR envvar:BAZ envvar:QUX} OK link/1
+
+
+# unload mode
+setenv_loaded_module [list link/1] [list $mp/link/1]
+setenv_var FOO val1:value
+setenv_var BAR val2:value
+setenv_var BAZ value
+setenv_var QUX value
+setenv_var __MODULES_SHARE_QUX value:2
+
+setenv_var TESTSUITE_LINKED_ENVVARS append1
+set ans [list]
+lappend ans [list set FOO val1]
+lappend ans [list unset BAZ]
+lappend ans [list set BAR val2]
+lappend ans [list unset _LMFILES_]
+lappend ans [list unset LOADEDMODULES]
+lappend ans [list unset __MODULES_SHARE_QUX]
+lappend ans [list set QUX value]
+testouterr_cmd bash {unload link/1} $ans {}
+
+setenv_var TESTSUITE_LINKED_ENVVARS prepend1
+setenv_var FOO value:val1
+setenv_var BAR value:val2
+testouterr_cmd bash {unload link/1} $ans {}
+
+setenv_var FOO value
+setenv_var BAR value
+setenv_var BAZ value
+setenv_var QUX value
+unsetenv_var __MODULES_SHARE_QUX
+setenv_var TESTSUITE_LINKED_ENVVARS setenv1
+
+setenv_var TESTSUITE_LINKED_ENVVARS remove1
+setenv_var FOO val1
+setenv_var BAR val2
+unsetenv_var BAZ
+unsetenv_var QUX
+set ans [list]
+lappend ans [list unset _LMFILES_]
+lappend ans [list unset LOADEDMODULES]
+testouterr_cmd bash {unload link/1} $ans {}
+
+setenv_var TESTSUITE_LINKED_ENVVARS unsetenv1
+unsetenv_var FOO
+unsetenv_var BAR
+unsetenv_var BAZ
+unsetenv_var QUX
+set ans [list]
+lappend ans [list unset _LMFILES_]
+lappend ans [list unset LOADEDMODULES]
+testouterr_cmd bash {unload link/1} $ans {}
+
+setenv_var TESTSUITE_LINKED_ENVVARS pushenv1
+setenv_var FOO value
+setenv_var BAR value
+setenv_var BAZ value
+setenv_var QUX value
+setenv_var __MODULES_PUSHENV_FOO link/1&value:&val1
+setenv_var __MODULES_PUSHENV_BAZ link/1&value
+setenv_var __MODULES_PUSHENV_BAR link/1&value:&val2
+setenv_var __MODULES_PUSHENV_QUX link/1&value:&value
+set ans [list]
+lappend ans [list unset __MODULES_PUSHENV_QUX]
+lappend ans [list set FOO val1]
+lappend ans [list unset BAZ]
+lappend ans [list set BAR val2]
+lappend ans [list unset _LMFILES_]
+lappend ans [list unset LOADEDMODULES]
+lappend ans [list unset __MODULES_PUSHENV_FOO]
+lappend ans [list unset __MODULES_PUSHENV_BAZ]
+lappend ans [list unset __MODULES_PUSHENV_BAR]
+testouterr_cmd bash {unload link/1} $ans {}
+
+
+unsetenv_loaded_module
+unsetenv_var FOO
+unsetenv_var BAR
+unsetenv_var BAZ
+unsetenv_var QUX
+unsetenv_var __MODULES_PUSHENV_FOO
+unsetenv_var __MODULES_PUSHENV_BAZ
+unsetenv_var __MODULES_PUSHENV_BAR
+unsetenv_var __MODULES_PUSHENV_QUX
+
+
+# recursive link (2 hops)
+setenv_var MODULES_LINKED_ENVVARS FOO&BAR&BAZ:BAR&QUX:QUX&FOOBAR
+setenv_var TESTSUITE_LINKED_ENVVARS append1
+set ans [list]
+lappend ans [list set FOO value]
+lappend ans [list set FOOBAR value]
+lappend ans [list set BAZ value]
+lappend ans [list set BAR value]
+lappend ans [list set _LMFILES_ $mp/link/1]
+lappend ans [list set LOADEDMODULES link/1]
+lappend ans [list set QUX value]
+testouterr_cmd bash {load link/1} $ans {}
+
+setenv_var MODULES_LINKED_ENVVARS FOO&BAR&QUX:BAR&BAZ&FOOBAR
+testouterr_cmd bash {load link/1} $ans {}
+
+
+# modification through Tcl regular variable commands
+setenv_var MODULES_LINKED_ENVVARS FOO&BAR&BAZ:BAR&QUX:QUX&FOOBAR
+setenv_var TESTSUITE_LINKED_ENVVARS set1
+set ans [list]
+lappend ans [list set _LMFILES_ $mp/link/1]
+lappend ans [list set LOADEDMODULES link/1]
+testouterr_cmd bash {load link/1} $ans {}
+
+setenv_var FOO value
+setenv_var TESTSUITE_LINKED_ENVVARS unset1
+testouterr_cmd bash {load link/1} $ans {}
+
+
+# reference to local variable
+setenv_var MODULES_LINKED_ENVVARS FOO&BAR
+unsetenv_var FOO
+
+setenv_var TESTSUITE_LINKED_ENVVARS append3
+set ans [list]
+lappend ans [list set FOO value]
+lappend ans [list set BAR value]
+lappend ans [list set _LMFILES_ $mp/link/1]
+lappend ans [list set LOADEDMODULES link/1]
+testouterr_cmd bash {load link/1} $ans {}
+
+setenv_var TESTSUITE_LINKED_ENVVARS prepend3
+testouterr_cmd bash {load link/1} $ans {}
+
+setenv_var TESTSUITE_LINKED_ENVVARS remove3
+set ans [list]
+lappend ans [list unset FOO]
+lappend ans [list unset BAR]
+lappend ans [list set _LMFILES_ $mp/link/1]
+lappend ans [list set LOADEDMODULES link/1]
+testouterr_cmd bash {load link/1} $ans {}
+
+setenv_var TESTSUITE_LINKED_ENVVARS setenv3
+set ans [list]
+lappend ans [list set FOO value]
+lappend ans [list set BAR value]
+lappend ans [list set _LMFILES_ $mp/link/1]
+lappend ans [list set LOADEDMODULES link/1]
+testouterr_cmd bash {load link/1} $ans {}
+
+setenv_var TESTSUITE_LINKED_ENVVARS unsetenv3
+set ans [list]
+lappend ans [list unset FOO]
+lappend ans [list unset BAR]
+lappend ans [list set _LMFILES_ $mp/link/1]
+lappend ans [list set LOADEDMODULES link/1]
+testouterr_cmd bash {load link/1} $ans {}
+
+setenv_var TESTSUITE_LINKED_ENVVARS pushenv3
+set ans [list]
+lappend ans [list set FOO value]
+lappend ans [list set BAR value]
+lappend ans [list set _LMFILES_ $mp/link/1]
+lappend ans [list set LOADEDMODULES link/1]
+lappend ans [list set __MODULES_PUSHENV_FOO link/1&value]
+lappend ans [list set __MODULES_PUSHENV_BAR link/1&value]
+testouterr_cmd bash {load link/1} $ans {}
+
+
+# no reflexive link defined and change linked variable
+setenv_var MODULES_LINKED_ENVVARS FOO&BAR&BAZ:BAR&QUX
+setenv_var TESTSUITE_LINKED_ENVVARS setenv4
+set ans [list]
+lappend ans [list set BAZ value]
+lappend ans [list set _LMFILES_ $mp/link/1]
+lappend ans [list set LOADEDMODULES link/1]
+lappend ans [list set QUX value]
+testouterr_cmd bash {load link/1} $ans {}
+
+
+# variable that starts with same prefix than linked var
+setenv_var MODULES_LINKED_ENVVARS FOO&BAR
+setenv_var TESTSUITE_LINKED_ENVVARS setenv5
+set ans [list]
+lappend ans [list set FOOFOO value]
+lappend ans [list set _LMFILES_ $mp/link/1]
+lappend ans [list set LOADEDMODULES link/1]
+testouterr_cmd bash {load link/1} $ans {}
+
+setenv_var TESTSUITE_LINKED_ENVVARS unsetenv5
+set ans [list]
+lappend ans [list unset FOOFOO]
+lappend ans [list set _LMFILES_ $mp/link/1]
+lappend ans [list set LOADEDMODULES link/1]
+testouterr_cmd bash {load link/1} $ans {}
+
+
+# multiple env var modification commands in modulefile
+setenv_var MODULES_LINKED_ENVVARS FOO&BAR&BAZ:BAR&QUX
+setenv_var TESTSUITE_LINKED_ENVVARS append6
+set ans [list]
+lappend ans [list set FOO value]
+lappend ans [list set BAZ value]
+lappend ans [list set BAR value:val]
+lappend ans [list set _LMFILES_ $mp/link/1]
+lappend ans [list set LOADEDMODULES link/1]
+lappend ans [list set QUX value:val]
+testouterr_cmd bash {load link/1} $ans {}
+
+
+# link Modules-internal env vars
+setenv_var MODULES_LINKED_ENVVARS __MODULES_SHARE_FOO&BAR
+setenv_var FOO value
+
+setenv_var TESTSUITE_LINKED_ENVVARS append1
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO value:2]
+lappend ans [list set FOO value]
+lappend ans [list set _LMFILES_ $mp/link/1]
+lappend ans [list set LOADEDMODULES link/1]
+testouterr_cmd bash {load link/1} $ans {}
+
+setenv_var MODULES_LINKED_ENVVARS __MODULES_PUSHENV_FOO&BAR
+setenv_var TESTSUITE_LINKED_ENVVARS pushenv1
+set ans [list]
+lappend ans [list set FOO value]
+lappend ans [list set _LMFILES_ $mp/link/1]
+lappend ans [list set LOADEDMODULES link/1]
+lappend ans [list set __MODULES_PUSHENV_FOO link/1&value:&value]
+testouterr_cmd bash {load link/1} $ans {}
+
+
+# reflexive links
+setenv_var MODULES_LINKED_ENVVARS FOO&BAR:BAR&FOO
+setenv_var TESTSUITE_LINKED_ENVVARS append6
+unsetenv_path_var FOO
+unsetenv_path_var BAR
+unsetenv_path_var QUX
+set ans [list]
+lappend ans [list set FOO value:val]
+lappend ans [list set BAR value:val]
+lappend ans [list set _LMFILES_ $mp/link/1]
+lappend ans [list set LOADEDMODULES link/1]
+testouterr_cmd bash {load link/1} $ans {}
+
+setenv_var MODULES_LINKED_ENVVARS FOO&QUX:QUX&BAR:BAR&QUX:QUX&FOO
+set ans [list]
+lappend ans [list set FOO value:val]
+lappend ans [list set BAR value:val]
+lappend ans [list set _LMFILES_ $mp/link/1]
+lappend ans [list set LOADEDMODULES link/1]
+lappend ans [list set QUX value:val]
+testouterr_cmd bash {load link/1} $ans {}
+
+
+# check other traces are still working
+setenv_var TESTSUITE_LINKED_ENVVARS append1
+setenv_var MODULES_LINKED_ENVVARS FOO&BAR
+set ans [list]
+lappend ans [list set FOO value]
+lappend ans [list set BAR value]
+lappend ans [list set _LMFILES_ $mp/link/1]
+lappend ans [list set LOADEDMODULES link/1]
+set tserr {.*
+DEBUG \[#1:load:link/1\] evaluateModulefile: append-path FOO value
+.*
+DEBUG \[#1:load:link/1\] evaluateModulefile: append-path BAR value
+.*}
+testouterr_cmd_re bash {load -DD link/1} $ans $tserr
+
+set tserr {.*
+TIMER append-path FOO value \(.* ms\)
+.*
+TIMER append-path BAR value \(.* ms\)
+.*}
+testouterr_cmd_re bash {load --timer -D link/1} $ans $tserr
+
+
+# bad configuration value
+setenv_var TESTSUITE_LINKED_ENVVARS append1
+setenv_var MODULES_LINKED_ENVVARS FOO&:
+set ans [list]
+lappend ans [list set FOO value]
+lappend ans [list set _LMFILES_ $mp/link/1]
+lappend ans [list set LOADEDMODULES link/1]
+set tserr "$warn_msgs: Ignore invalid link defined in MODULES_LINKED_ENVVARS (FOO&)
+$warn_msgs: Ignore invalid link defined in MODULES_LINKED_ENVVARS ()"
+testouterr_cmd bash {load link/1} $ans $tserr
+
+setenv_var MODULES_LINKED_ENVVARS &FOO:
+set tserr "$warn_msgs: Ignore invalid link defined in MODULES_LINKED_ENVVARS (&FOO)
+$warn_msgs: Ignore invalid link defined in MODULES_LINKED_ENVVARS ()"
+testouterr_cmd bash {load link/1} $ans $tserr
+
+setenv_var MODULES_LINKED_ENVVARS FOO:
+set tserr "$warn_msgs: Ignore invalid link defined in MODULES_LINKED_ENVVARS (FOO)
+$warn_msgs: Ignore invalid link defined in MODULES_LINKED_ENVVARS ()"
+testouterr_cmd bash {load link/1} $ans $tserr
+
+setenv_var MODULES_LINKED_ENVVARS FOO&BAR&BAR
+set ans [list]
+lappend ans [list set FOO value]
+lappend ans [list set BAR value]
+lappend ans [list set _LMFILES_ $mp/link/1]
+lappend ans [list set LOADEDMODULES link/1]
+testouterr_cmd_re bash {load link/1} $ans {}
+
+setenv_var MODULES_LINKED_ENVVARS FOO&BAR:FOO&BAR
+testouterr_cmd_re bash {load link/1} $ans {}
+
+setenv_var MODULES_LINKED_ENVVARS FOO&FOO
+set ans [list]
+lappend ans [list set FOO value]
+lappend ans [list set _LMFILES_ $mp/link/1]
+lappend ans [list set LOADEDMODULES link/1]
+set tserr "$warn_msgs: Ignore invalid link defined in MODULES_LINKED_ENVVARS (FOO&FOO)"
+testouterr_cmd bash {load link/1} $ans $tserr
+
+setenv_var MODULES_LINKED_ENVVARS {}
+testouterr_cmd bash {load link/1} $ans {}
+
+setenv_var MODULES_LINKED_ENVVARS :
+set tserr "$warn_msgs: Ignore invalid link defined in MODULES_LINKED_ENVVARS ()
+$warn_msgs: Ignore invalid link defined in MODULES_LINKED_ENVVARS ()"
+testouterr_cmd bash {load link/1} $ans $tserr
+
+
+# error raised
+setenv_var MODULES_LINKED_ENVVARS FOO&BAR
+setenv_var TESTSUITE_LINKED_ENVVARS append_err1
+set tserr [escre [msg_load link/1 [msg_moderr {invalid option '--bad' for append-path} {append-path --bad FOO value<EXM>} $mp/link/1 2]]]
+testouterr_cmd_re bash {load link/1} ERR $tserr
+
+
+# test on source-sh
+setenv_var MODULES_LINKED_ENVVARS FOOSP&BAR
+set mp $modpath.2
+set mpre $modpathre.2
+setenv_var MODULEPATH $mp
+setenv_var TESTSUITE_SHTOMOD_NOPATH 1
+setenv_var TESTSUITE_SHTOMOD_NOALIAS 1
+setenv_var TESTSUITE_SHTOMOD_NOFUNC 1
+setenv_var TESTSUITE_SHTOMOD_NOCD 1
+setenv_var TESTSUITE_SHTOMOD_NOCOMP 1
+setenv_var FOO value
+
+set ans [list]
+lappend ans [list set BAR {value }]
+lappend ans [list set FOOCB va\{ue]
+lappend ans [list set _LMFILES_ $mp/source-sh/1]
+lappend ans [list set LOADEDMODULES source-sh/1]
+lappend ans [list set FOOWC va\*ue]
+lappend ans [list set FOOEM {}]
+lappend ans [list set __MODULES_LMSOURCESH {source-sh/1&bash testsuite/example/sh-to-mod.sh|setenv FOOCB va\{ue|setenv FOOEM {}|setenv FOOSP {value }|setenv FOOWC va*ue}]
+lappend ans [list set FOOSP {value }]
+testouterr_cmd sh {load source-sh/1} $ans {}
+
+set tserr "$modlin
+$mpre/source-sh/1:
+
+setenv\t\tFOOCB va\{ue
+setenv\t\tFOOEM {}
+setenv\t\tFOOSP {value }
+setenv\t\tBAR {value }
+setenv\t\tFOOWC va\\*ue
+module-whatis\tsource-sh/1
+$modlin"
+testouterr_cmd_re sh {display source-sh/1} OK $tserr
+
+setenv_loaded_module [list source-sh/1] [list $mp/source-sh/1]
+setenv_var FOOCB val\{ue
+setenv_var FOOEM {}
+setenv_var FOOSP {value }
+setenv_var BAR {value }
+setenv_var FOOWC va*ue
+setenv_var __MODULES_LMSOURCESH "source-sh/1&bash testsuite/example/sh-to-mod.sh|setenv FOOCB va{ue|setenv FOOEM {}|setenv FOOSP {value }|setenv FOOWC va*ue"
+
+set ans [list]
+lappend ans [list unset BAR]
+lappend ans [list unset FOOCB]
+lappend ans [list unset _LMFILES_]
+lappend ans [list unset LOADEDMODULES]
+lappend ans [list unset FOOWC]
+lappend ans [list unset FOOEM]
+lappend ans [list unset __MODULES_LMSOURCESH]
+lappend ans [list unset FOOSP]
+testouterr_cmd sh {unload source-sh/1} $ans {}
+
+
+#
+#  Cleanup
+#
+
+reset_test_env

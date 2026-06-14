@@ -1,0 +1,105 @@
+#%Module
+if {[info exists env(TESTSUITE_LINKED_ENVVARS)]} {
+    module-whatis [module-info name]
+    module-help [module-info name]
+    proc ModulesTest {} { return 1 }
+    switch -- $env(TESTSUITE_LINKED_ENVVARS) {
+        append1 {
+            append-path FOO value
+        }
+        prepend1 {
+            prepend-path FOO value
+        }
+        remove1 {
+            remove-path FOO value
+        }
+        setenv1 {
+            setenv FOO value
+        }
+        unsetenv1 {
+            unsetenv FOO
+        }
+        pushenv1 {
+            pushenv FOO value
+        }
+        append2 {
+            append-path -d { } FOO value val1
+        }
+        prepend2 {
+            prepend-path -d { } --duplicates FOO value
+        }
+        remove2 {
+            remove-path -d { } FOO value val2 --append-on-unload val1
+        }
+        setenv2 {
+            setenv --set-if-undef FOO value
+        }
+        unsetenv2 {
+            unsetenv --unset-on-unload FOO value
+        }
+        pushenv2 {
+            # no specific option currently available on pushenv
+            pushenv FOO value
+        }
+        set1 {
+            set ::env(FOO) value
+        }
+        unset1 {
+            unset -nocomplain ::env(FOO)
+        }
+        append3 {
+            set var value
+            append-path FOO $var
+        }
+        prepend3 {
+            set var value
+            prepend-path FOO $var
+        }
+        remove3 {
+            set var value
+            remove-path FOO $var
+        }
+        setenv3 {
+            set var value
+            setenv FOO $var
+        }
+        unsetenv3 {
+            set var value
+            unsetenv FOO $var
+        }
+        pushenv3 {
+            set var value
+            pushenv FOO $var
+        }
+        setenv4 {
+            setenv QUX value
+            setenv BAZ value
+        }
+        setenv5 {
+            setenv FOOFOO value
+        }
+        unsetenv5 {
+            unsetenv FOOFOO value
+        }
+        append6 {
+            append-path FOO value
+            append-path BAR val
+        }
+        append_err1 {
+            append-path --bad FOO value
+        }
+    }
+    if {$env(TESTSUITE_LINKED_ENVVARS) in {append1 prepend1 remove1 setenv1\
+        unsetenv1 pushenv1}} {
+        switch -- [module-info mode] {
+            help - test - display {
+                puts stderr "BAR: [getenv --return-value BAR]"
+                puts stderr "QUX: [getenv --return-value QUX]"
+            }
+            whatis {
+                module-whatis "BAR: [getenv --return-value BAR]"
+                module-whatis "QUX: [getenv --return-value QUX]"
+            }
+        }
+    }
+}
