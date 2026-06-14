@@ -95,8 +95,9 @@ setenv_var MODULES_PAGINATE 1
 unsetenv_var MODULES_LOGGED_EVENTS
 unsetenv_var MODULES_LOGGER
 
-# clean any protected variable configuration
+# clean any environment variable-specific configuration
 unsetenv_var MODULES_PROTECTED_ENVVARS
+unsetenv_var MODULES_LINKED_ENVVARS
 
 # clean any output redirection configuration
 unsetenv_var MODULES_REDIRECT_OUTPUT

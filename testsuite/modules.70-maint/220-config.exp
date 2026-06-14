@@ -85,6 +85,7 @@ array set configdfl [list\
     implicit_default          [expr {$install_implicitdefault eq {y}}]\
     implicit_requirement      [expr {$install_implicitrequirement eq {y}}]\
     info_extension            0\
+    linked_envvars            {}\
     list_output               $install_listoutput\
     list_terse_output         $install_listterseoutput\
     locked_configs            $install_lockedconfigs\
@@ -155,6 +156,7 @@ array set configvar [list\
     implicit_default          MODULES_IMPLICIT_DEFAULT\
     implicit_requirement      MODULES_IMPLICIT_REQUIREMENT\
     info_extension            MODULES_INFO_EXTENSION\
+    linked_envvars            MODULES_LINKED_ENVVARS\
     list_output               MODULES_LIST_OUTPUT\
     list_terse_output         MODULES_LIST_TERSE_OUTPUT\
     logged_events             MODULES_LOGGED_EVENTS\
@@ -273,6 +275,7 @@ array set configkind [list\
     avail_output              l\
     avail_terse_output        l\
     colors                    l\
+    linked_envvars            l\
     list_output               l\
     list_terse_output         l\
     logged_events             l\
@@ -419,6 +422,8 @@ foreach param [array names configvar] {
         set val foo=%
     } elseif {$param eq {pager}} {
         set val $configdfl(pager)
+    } elseif {$param eq {linked_envvars}} {
+        set val FOO&BAR
     } elseif {[info exists configvalid($param)]} {
         if {$configvalid($param) eq {integer}} {
             set val 5
