@@ -93,6 +93,48 @@ the configuration option is changed from its default value using the
 environment variable is defined accordingly. See
 :envvar:`MODULES_PATH_ENTRY_REORDER` for details.
 
+.. _Linked environment variables:
+
+Linked environment variables
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+A new configuration option, :mconfig:`linked_envvars`, can be used to
+automatically mirror environment variable changes onto other environment
+variables.
+
+When a modulefile modifies an environment variable using commands such as
+:mfcmd:`setenv`, :mfcmd:`unsetenv`, :mfcmd:`prepend-path`,
+:mfcmd:`append-path`, :mfcmd:`remove-path` or :mfcmd:`pushenv`, the same
+operation is also applied to all variables linked through the
+:mconfig:`linked_envvars` configuration option.
+
+For example, with the following configuration:
+
+.. parsed-literal::
+
+    :ps:`$` module config linked_envvars "CPATH&INCLUDE_PATH"
+
+loading a module that prepends a directory to ``CPATH``:
+
+.. parsed-literal::
+
+    :sgrcm:`prepend-path` CPATH /opt/pkg/include
+
+will also prepend the same directory to ``INCLUDE_PATH``.
+
+Links are directional. In the previous example, changes made to ``CPATH`` are
+also applied to ``INCLUDE_PATH``, but changes made directly to
+``INCLUDE_PATH`` are not applied back to ``CPATH`` unless an explicit reverse
+link is configured.
+
+When enabling this feature, note that existing values are not synchronized
+when the link is established. Only subsequent modifications performed through
+modulefile environment variable commands are propagated to linked variables.
+
+The output of ``module display`` also includes the environment variable
+changes applied to linked environment variables, making these propagated
+updates visible before a module is loaded.
+
 
 v5.6
 ----
