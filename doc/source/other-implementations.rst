@@ -71,6 +71,7 @@ table highlights features that are unique to each implementation.
        * :ref:`Specific modulepath for requirements`
        * :ref:`Logging activity`
        * :ref:`envml<envml(1)>` launcher
+       * :ref:`Linked environment variables`
 
 .. _Lua modulefile support: https://lmod.readthedocs.io/en/latest/050_lua_modulefiles.html
 .. _Inactive modules: https://lmod.readthedocs.io/en/latest/010_user.html#module-hierarchy
