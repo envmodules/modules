@@ -96,6 +96,7 @@ unsetenv_var MODULES_LOGGED_EVENTS
 unsetenv_var MODULES_LOGGER
 
 # clean any environment variable-specific configuration
+setenv_var MODULES_INIT_ENVVARS {}
 unsetenv_var MODULES_PROTECTED_ENVVARS
 unsetenv_var MODULES_LINKED_ENVVARS
 

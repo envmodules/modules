@@ -32,6 +32,7 @@ unsetenv_var MODULES_MCOOKIE_VERSION_CHECK
 # cache buffer size may be set if cache files have been prebuilt
 unsetenv_var MODULES_CACHE_BUFFER_BYTES
 unsetenv_var MODULES_STICKY_PURGE
+unsetenv_var MODULES_INIT_ENVVARS
 unsetenv_var MODULES_ABORT_ON_ERROR
 unsetenv_var MODULES_SOURCE_CACHE
 unsetenv_var MODULES_HIDE_AUTO_LOADED
@@ -84,6 +85,7 @@ array set configdfl [list\
     ignored_dirs              {CVS RCS SCCS .svn .git .SYNC .sos}\
     implicit_default          [expr {$install_implicitdefault eq {y}}]\
     implicit_requirement      [expr {$install_implicitrequirement eq {y}}]\
+    init_envvars              $install_initenvvars\
     info_extension            0\
     linked_envvars            {}\
     list_output               $install_listoutput\
@@ -155,6 +157,7 @@ array set configvar [list\
     ignore_user_rc            MODULES_IGNORE_USER_RC\
     implicit_default          MODULES_IMPLICIT_DEFAULT\
     implicit_requirement      MODULES_IMPLICIT_REQUIREMENT\
+    init_envvars              MODULES_INIT_ENVVARS\
     info_extension            MODULES_INFO_EXTENSION\
     linked_envvars            MODULES_LINKED_ENVVARS\
     list_output               MODULES_LIST_OUTPUT\
@@ -275,6 +278,7 @@ array set configkind [list\
     avail_output              l\
     avail_terse_output        l\
     colors                    l\
+    init_envvars              l\
     linked_envvars            l\
     list_output               l\
     list_terse_output         l\
@@ -422,6 +426,8 @@ foreach param [array names configvar] {
         set val foo=%
     } elseif {$param eq {pager}} {
         set val $configdfl(pager)
+    } elseif {$param eq {init_envvars}} {
+        set val FOO=val
     } elseif {$param eq {linked_envvars}} {
         set val FOO&BAR
     } elseif {[info exists configvalid($param)]} {
