@@ -120,6 +120,8 @@ set install_editor "@editor@"
 
 set install_pathentryreorder "@pathentryreorder@"
 
+set install_initenvvars "@initenvvars@"
+
 set install_bashcompletiondir "@bashcompletiondir@"
 set install_fishcompletiondir "@fishcompletiondir@"
 set install_zshcompletiondir "@zshcompletiondir@"

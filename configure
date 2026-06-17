@@ -41,7 +41,7 @@ listterseoutput editor variantshortcut bashcompletiondir fishcompletiondir \
 zshcompletiondir tcllinter tcllinteropts nagelfardatadir nagelfaraddons \
 stickypurge uniquenameloaded abortonerror sourcecache logger loggeropts \
 loggedevents conflictunload spideroutput spiderterseoutput spiderindepth \
-emacsdatadir emacsaddons requirevia compressedchangelog paginate"
+emacsdatadir emacsaddons requirevia compressedchangelog paginate initenvvars"
 libarglist=()
 
 # flags to know if argument has been specified on command-line
@@ -131,6 +131,7 @@ modulefilesdir=
 moduleshome=
 modulepath=
 windowssupport=n
+initenvvars=
 nearlyforbiddendays=14
 tagabbrev='auto-loaded=aL:loaded=L:hidden=H:hidden-loaded=H:forbidden=F:nearly-forbidden=nF:sticky=S:super-sticky=sS:keep-loaded=kL:warning=W'
 tagcolorname=
@@ -389,6 +390,11 @@ Optional Packages:
                           (\`search'), on all sub-commands and modulefile Tcl
                           commands (\`always') or disable case insensitive
                           match (\`never') [$icase]
+  --with-init-envvars=LIST
+                          initial value to set listed environment variables to
+                          when they are firstly defined (elements have
+                          \`VAR=value' syntax and are separated by \`:' in
+                          LIST) [$initenvvars]
   --with-initconf-in=VALUE
                           location where to install Modules initialization
                           configuration files. Either \`initdir' or \`etcdir'
@@ -867,6 +873,8 @@ for arg in "$@"; do
    --with-terminal-background=*|--without-terminal-background)
       allowedval=" dark light " ;
       check_and_get_package_value "termbg" "$arg" "$allowedval" ;;
+   --with-init-envvars=*|--without-init-envvars)
+      initenvvars=$(get_package_value "$arg" "") ;;
    --with-locked-configs=*|--disable-locked-configs)
       lockedconfigs=$(get_package_value "$arg" "") ;
       allowedval=" extra_siteconfig implicit_default logged_events logger " ;

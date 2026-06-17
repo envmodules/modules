@@ -462,6 +462,7 @@ sed -e 's|@prefix@|$(prefix)|g' \
 	-e 's|@searchmatch@|$(searchmatch)|g' \
 	-e 's|@wa277@|$(setwa277)|g' \
 	-e 's|@pathentryreorder@|$(setpathentryreorder)|g' \
+	-e 's|@initenvvars@|$(initenvvars)|g' \
 	-e 's|@icase@|$(icase)|g' \
 	-e 's|@nearlyforbiddendays@|$(nearlyforbiddendays)|g' \
 	-e 's|@tagabbrev@|$(tagabbrev)|g' \

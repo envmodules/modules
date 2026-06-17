@@ -108,7 +108,7 @@ array set g_config_defs [list\
    implicit_requirement {MODULES_IMPLICIT_REQUIREMENT @implicitrequirement@ 0\
       b {0 1}}\
    info_extension {MODULES_INFO_EXTENSION 0 0 b {0 1}}\
-   init_envvars {MODULES_INIT_ENVVARS {} 0 l {} {}\
+   init_envvars {MODULES_INIT_ENVVARS {@initenvvars@} 0 l {} {}\
       initConfInitEnvvars}\
    linked_envvars {MODULES_LINKED_ENVVARS {} 0 l {} {}\
       initConfLinkedEnvvars}\

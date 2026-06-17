@@ -164,6 +164,9 @@ editor := @editor@
 # path change behavior
 pathentryreorder := @pathentryreorder@
 
+# environment variable configurations
+initenvvars := @initenvvars@
+
 # shell completion location
 bashcompletiondir := @bashcompletiondir@
 fishcompletiondir := @fishcompletiondir@
