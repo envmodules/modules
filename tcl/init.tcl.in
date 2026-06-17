@@ -71,7 +71,7 @@ array set g_state_defs [list\
 # value, is configuration lockable to default value, value kind, valid value
 # list?, internal value representation?, proc to call to initialize option
 # value, valid value list kind
-##nagelfar ignore #102 Too long line
+##nagelfar ignore #103 Too long line
 array set g_config_defs [list\
    contact {MODULECONTACT root@localhost 0 s}\
    abort_on_error {MODULES_ABORT_ON_ERROR {@abortonerror@} 0 l {load ml\
@@ -108,6 +108,8 @@ array set g_config_defs [list\
    implicit_requirement {MODULES_IMPLICIT_REQUIREMENT @implicitrequirement@ 0\
       b {0 1}}\
    info_extension {MODULES_INFO_EXTENSION 0 0 b {0 1}}\
+   init_envvars {MODULES_INIT_ENVVARS {} 0 l {} {}\
+      initConfInitEnvvars}\
    linked_envvars {MODULES_LINKED_ENVVARS {} 0 l {} {}\
       initConfLinkedEnvvars}\
    list_output {MODULES_LIST_OUTPUT {@listoutput@} 0 l {header idx variant\
@@ -369,6 +371,11 @@ proc getConf {option {valifundef {}}} {
    } else {
       return $::g_configs($option)
    }
+}
+
+# Check if configuration option has been defined
+proc isConfDefined {option} {
+   return [info exists ::g_configs($option)]
 }
 
 # Set configuration option value
@@ -814,6 +821,39 @@ proc initConfTagColorName {envvar value validvallist intvallist} {
    # set table for efficient search
    foreach tag [split $value :] {
       set ::g_tagColorName($tag) 1
+   }
+
+   return $value
+}
+
+# Initialize env variable initial value array
+proc initConfInitEnvvars {envvar value validvallist intvallist} {
+   # overridden value coming from environment
+   if {[isEnvVarDefined $envvar]} {
+      if {[catch {
+         # try to set the variable init value mapping table
+         array set testarr [split $::env($envvar) {:=}]
+         set value $::env($envvar)
+         set setfromenv 1
+      } errMsg ]} {
+         reportWarning "Ignore invalid value set in $envvar ($::env($envvar))"
+      }
+   }
+
+   # test default value
+   if {![info exists setfromenv]} {
+      if {[catch {
+         array set testarr [split $value {:=}]
+      } errMsg ]} {
+         reportWarning "Ignore invalid default value for 'init_envvars'\
+            config ($value)"
+         # define an empty list if no valid value set
+         set value {}
+      }
+   }
+
+   foreach {envvar init_value} [split $value {:=}] {
+      set ::g_initEnvvars($envvar) $init_value
    }
 
    return $value

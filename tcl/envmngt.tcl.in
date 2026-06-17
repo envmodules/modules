@@ -1476,6 +1476,17 @@ proc isEnvVarProtected {var_name} {
    return [expr {$var_name in [getConfList protected_envvars]}]
 }
 
+proc hasEnvVarInitValue {var_name} {
+   if {![isConfDefined init_envvars]} {
+      getConf init_envvars
+   }
+   return [info exists ::g_initEnvvars($var_name)]
+}
+
+proc envVarInitValue {var_name} {
+   return $::g_initEnvvars($var_name)
+}
+
 proc reset-to-unset-env {var {val {}}} {
    set ::env($var) $val
    # set var as cleared if val is empty
@@ -1766,6 +1777,19 @@ proc unload-path {cmd mode dflbhv args} {
       set newpath $dir_list
    }
 
+   # clear environment variable if new value equals initial value
+   if {[hasEnvVarInitValue $var] && [envVarInitValue $var] eq [join $newpath\
+      $separator]} {
+      set init_value [envVarInitValue $var]
+      if {!$isrefcount || ![info exists countarr($init_value)] ||\
+         $countarr($init_value) <= 1} {
+         set newpath [list]
+         if {[info exists countarr($init_value)]} {
+            unset countarr($init_value)
+         }
+      }
+   }
+
    # set env variable and corresponding reference counter in any case
    if {![llength $newpath]} {
       unset-env $var
@@ -1801,8 +1825,20 @@ proc add-path {cmd mode dflbhv args} {
    # clean any previously defined pushenv stack
    unset-env [getPushenvVarName $var] 1
 
+   set sharevar [getModshareVarName $var]
+   set isrefcount [expr {$sharevar ne {}}]
+
+   # use initial value defined for env var if not yet defined
+   if {![isEnvVarDefined $var] && [hasEnvVarInitValue $var]} {
+      set init_value [envVarInitValue $var]
+      set-env $var $init_value
+      # setup reference counter in case of empty string entry
+      if {$init_value eq {} && $isrefcount} {
+         set-env $sharevar $init_value:1
+      }
+   }
+
    # no reference count management when no share variable is returned
-   set isrefcount [expr {[set sharevar [getModshareVarName $var]] ne {}}]
    if {$isrefcount} {
       array set countarr [getReferenceCountArray $var $separator]
    }
