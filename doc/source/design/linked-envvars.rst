@@ -3,7 +3,7 @@
 Linked environment variables
 ============================
 
-This document describes the mechanism to link one environment variables onto
+This document describes the mechanism to link one environment variable onto
 others and apply the same value changes.
 
 The goal is to link environment variables together and apply all changes to

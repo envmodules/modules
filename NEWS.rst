@@ -96,6 +96,7 @@ Modules 5.7.0 (not yet released)
   :mconfig:`linked_envvars` is changed with :subcmd:`config` sub-command, it
   sets the :envvar:`MODULES_LINKED_ENVVARS` environment variable. (fix issue
   #609)
+* Doc: add :ref:`init-envvars` design notes.
 
 
 .. _5.6 release notes:
