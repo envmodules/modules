@@ -1161,6 +1161,20 @@ instance :instopt:`--without-modulepath<--with-modulepath>`):
     .. versionchanged:: 5.0
        Configuration option default set to ``etcdir``
 
+.. instopt:: --with-init-envvars=LIST
+
+ Initial values to assign to environment variables before they are modified
+ for the first time. Each entry in LIST must use the format
+ ``VARIABLE_NAME=initial_value``. Entries are separated by ``:``.
+
+ This installation option defines the default value of the
+ :mconfig:`init_envvars` configuration option which could be changed after
+ installation with the :subcmd:`config` sub-command.
+
+ .. only:: html or latex
+
+    .. versionadded:: 5.7
+
 .. instopt:: --with-light-background-colors=SGRLIST
 
  Default color set to apply if terminal background color is defined to
@@ -1722,6 +1736,9 @@ installation.
 |                                   |                                              | :envvar:`MODULES_IMPLICIT_REQUIREMENT`       |              |           |
 +-----------------------------------+----------------------------------------------+----------------------------------------------+--------------+-----------+
 | :mconfig:`info_extension`         | ``0``                                        | :envvar:`MODULES_INFO_EXTENSION`             |              |           |
++-----------------------------------+----------------------------------------------+----------------------------------------------+--------------+-----------+
+| :mconfig:`init_envvars`           | *Empty by default*                           | :instopt:`--with-init-envvars`               |              |           |
+|                                   |                                              | :envvar:`MODULES_INIT_ENVVARS`               |              |           |
 +-----------------------------------+----------------------------------------------+----------------------------------------------+--------------+-----------+
 | :mconfig:`linked_envvars`         | *Empty by default*                           | :envvar:`MODULES_LINKED_ENVVARS`             |              |           |
 +-----------------------------------+----------------------------------------------+----------------------------------------------+--------------+-----------+
