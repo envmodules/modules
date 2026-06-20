@@ -5180,6 +5180,29 @@ ENVIRONMENT
 
     .. versionadded:: 5.7
 
+.. envvar:: MODULES_INIT_ENVVARS
+
+ A colon-separated list of environment variable initial definitions. Each
+ definition must use the format ``VARIABLE_NAME=initial_value``. When an
+ environment variable is modified for the first time, the corresponding
+ initial value is assigned before the modification is applied.
+
+ This mechanism applies to all path-like environment variable management
+ modulefile commands and module sub-commands (:mfcmd:`append-path`,
+ :mfcmd:`prepend-path` and :mfcmd:`remove-path`).
+
+ When an entry is removed from an environment variable, the variable is unset
+ if its resulting value matches the configured initial value and no explicit
+ reference counter is associated with it.
+
+ This environment variable value supersedes the default value set in the
+ :mconfig:`init_envvars` configuration option. It can be defined with the
+ :subcmd:`config` sub-command.
+
+ .. only:: html or latex
+
+    .. versionadded:: 5.7
+
 .. envvar:: MODULES_LINKED_ENVVARS
 
  A colon-separated list of environment variable link sets. Each link set is a

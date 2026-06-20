@@ -1077,7 +1077,8 @@ The following environment variables appeared on Modules 5.
 |            | :envvar:`MODULES_PAGINATE`,                                     |
 |            | :envvar:`MODULES_NON_EXPORTABLE_TAGS`,                          |
 |            | :envvar:`MODULES_INFO_EXTENSION`,                               |
-|            | :envvar:`MODULES_LINKED_ENVVARS`                                |
+|            | :envvar:`MODULES_LINKED_ENVVARS`,                               |
+|            | :envvar:`MODULES_INIT_ENVVARS`                                  |
 +------------+-----------------------------------------------------------------+
 
 Modules Specific Tcl Commands
