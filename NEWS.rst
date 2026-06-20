@@ -97,6 +97,12 @@ Modules 5.7.0 (not yet released)
   sets the :envvar:`MODULES_LINKED_ENVVARS` environment variable. (fix issue
   #609)
 * Doc: add :ref:`init-envvars` design notes.
+* Add the :mconfig:`init_envvars` configuration option to define initial
+  values to assign to environment variables before they are modified for the
+  first time. This option can be changed at installation time with
+  :instopt:`--with-init-envvars`. When :mconfig:`init_envvars` is changed with
+  :subcmd:`config` sub-command, it sets the :envvar:`MODULES_INIT_ENVVARS`
+  environment variable. (fix issue #572)
 
 
 .. _5.6 release notes:
