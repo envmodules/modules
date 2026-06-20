@@ -1196,9 +1196,13 @@ the *modulefile* is being loaded.
  configuration option is activated, the *modulefile* is considered a
  dependency by the loaded modulefiles stored in the added modulepaths.
 
- If a link is defined for variable through the :mconfig:`linked_envvars`
+ If a link is defined for *variable* through the :mconfig:`linked_envvars`
  configuration option, the same :mfcmd:`prepend-path` command is applied to
  all associated environment variables.
+
+ If an initial value is defined for the *variable* through the
+ :mconfig:`init_envvars` configuration option, that value is assigned before
+ the modification is applied when the *variable* is not already set.
 
  .. only:: html or latex
 
@@ -1363,7 +1367,7 @@ the *modulefile* is being loaded.
  which is named by prefixing *variable* by :envvar:`__MODULES_PUSHENV_\
  <__MODULES_PUSHENV_\<VAR\>>`.
 
- If a link is defined for variable through the :mconfig:`linked_envvars`
+ If a link is defined for *variable* through the :mconfig:`linked_envvars`
  configuration option, the same :mfcmd:`pushenv` command is applied to all
  associated environment variables.
 
@@ -1456,9 +1460,14 @@ the *modulefile* is being loaded.
 
  An error is raised if *value* equals *delimiter* character.
 
- If a link is defined for variable through the :mconfig:`linked_envvars`
+ If a link is defined for *variable* through the :mconfig:`linked_envvars`
  configuration option, the same :mfcmd:`remove-path` command is applied to
  all associated environment variables.
+
+ If an initial value is defined for *variable* through the
+ :mconfig:`init_envvars` configuration option, variable is unset when, after
+ the modification, its value matches the configured initial value and no
+ explicit reference counter is defined.
 
  .. only:: html or latex
 
@@ -1549,7 +1558,7 @@ the *modulefile* is being loaded.
 
  Any newline character in *value* is chopped if using *csh* or *tcsh* shells.
 
- If a link is defined for variable through the :mconfig:`linked_envvars`
+ If a link is defined for *variable* through the :mconfig:`linked_envvars`
  configuration option, the same :mfcmd:`setenv` command is applied to all
  associated environment variables.
 
@@ -1677,7 +1686,7 @@ the *modulefile* is being loaded.
  environment *variable* is also unset when *modulefile* is unloaded. These
  behaviors are applied even if an optional *value* is defined.
 
- If a link is defined for variable through the :mconfig:`linked_envvars`
+ If a link is defined for *variable* through the :mconfig:`linked_envvars`
  configuration option, the same :mfcmd:`unsetenv` command is applied to all
  associated environment variables.
 

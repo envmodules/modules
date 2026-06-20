@@ -1248,6 +1248,22 @@ Module Sub-Commands
 
      .. versionadded:: 5.7
 
+ .. mconfig:: init_envvars
+
+  Initial values to assign to environment variables right before they are
+  modified for the first time.
+
+  This configuration option is set to an empty value by default. It can be
+  changed at installation time with :instopt:`--with-init-envvars` option. The
+  :envvar:`MODULES_INIT_ENVVARS` environment variable is defined by
+  :subcmd:`config` sub-command when changing this configuration option from
+  its default value. See :envvar:`MODULES_INIT_ENVVARS` description for
+  details
+
+  .. only:: html or latex
+
+     .. versionadded:: 5.7
+
  .. mconfig:: linked_envvars
 
   Define links between environment variables to apply same value modification
