@@ -135,6 +135,53 @@ The output of ``module display`` also includes the environment variable
 changes applied to linked environment variables, making these propagated
 updates visible before a module is loaded.
 
+.. _Init environment variables:
+
+Initialize environment variables on first modification
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+A new configuration option, :mconfig:`init_envvars`, has been added to define
+initial values for environment variables that are modified through path-like
+modulefile commands.
+
+This feature is particularly useful for variables such as ``MANPATH``, which
+require a leading or trailing colon character to preserve access to the system
+default search paths. Previously, modifying an undefined ``MANPATH`` could
+prevent system manual pages from being found. See the :ref:`man-path` cookbook
+for details.
+
+The :mconfig:`init_envvars` option defines a colon-separated list of
+``VARIABLE_NAME=initial_value`` entries. When a path-like operation is applied
+to an environment variable that is not currently set, the configured initial
+value is assigned before the modification is performed.
+
+For example, with the following configuration:
+
+.. parsed-literal::
+
+    :ps:`$` module config init_envvars MANPATH=
+
+loading a module that prepends a directory to ``MANPATH``:
+
+.. parsed-literal::
+
+    :sgrcm:`prepend-path` MANPATH /opt/pkg/man
+
+will keep a colon character at the end of ``MANPATH``
+
+.. parsed-literal::
+
+    :ps:`$` echo $MANPATH
+    /opt/pkg/man:
+
+This mechanism applies to all path-like environment variable management
+commands, including :mfcmd:`append-path`, :mfcmd:`prepend-path` and
+:mfcmd:`remove-path`.
+
+When values are later removed from an environment variable, it is
+automatically unset if its resulting value matches the configured initial
+value and no explicit reference counter is associated with it.
+
 
 v5.6
 ----
