@@ -1,0 +1,410 @@
+##############################################################################
+#   Modules Revision 3.0
+#   Providing a flexible user environment
+#
+#   File:		modules.50-cmds/%M%
+#   Revision:		%I%
+#   First Edition:	2026/06/21
+#   Last Mod.:		%U%, %G%
+#
+#   Authors:		Xavier Delaruelle, xavier.delaruelle@cea.fr
+#
+#   Description:	Testuite testsequence
+#   Command:		load, unload, append-path, prepend-path, remove-path
+#   Modulefiles:    init, source-sh
+#   Sub-Command:
+#
+#   Comment:	%C{
+#         Test init_envvars mechanism
+#		}C%
+#
+##############################################################################
+
+set mp $modpath.4
+set mpre $modpathre.4
+setenv_var MODULEPATH $mp
+
+# basic init test
+setenv_var MODULES_INIT_ENVVARS FOO=init
+unsetenv_var FOO
+
+setenv_var TESTSUITE_INIT_ENVVARS append1
+set ans [list]
+lappend ans [list set FOO init:value]
+lappend ans [list set _LMFILES_ $mp/init/1]
+lappend ans [list set LOADEDMODULES init/1]
+testouterr_cmd bash {load init/1} $ans {}
+
+setenv_var TESTSUITE_INIT_ENVVARS prepend1
+set ans [list]
+lappend ans [list set FOO value:init]
+lappend ans [list set _LMFILES_ $mp/init/1]
+lappend ans [list set LOADEDMODULES init/1]
+testouterr_cmd bash {load init/1} $ans {}
+
+setenv_var TESTSUITE_INIT_ENVVARS remove1
+set ans [list]
+lappend ans [list unset FOO]
+lappend ans [list set _LMFILES_ $mp/init/1]
+lappend ans [list set LOADEDMODULES init/1]
+testouterr_cmd bash {load init/1} $ans {}
+
+set ans [list]
+lappend ans [list set FOO init:value]
+testouterr_cmd bash {append-path FOO value} $ans {}
+
+set ans [list]
+lappend ans [list set FOO value:init]
+testouterr_cmd bash {prepend-path FOO value} $ans {}
+
+set ans [list]
+lappend ans [list unset FOO]
+testouterr_cmd bash {remove-path FOO value} $ans {}
+
+
+setenv_var FOO base
+
+setenv_var TESTSUITE_INIT_ENVVARS append1
+set ans [list]
+lappend ans [list set FOO base:value]
+lappend ans [list set _LMFILES_ $mp/init/1]
+lappend ans [list set LOADEDMODULES init/1]
+testouterr_cmd bash {load init/1} $ans {}
+
+setenv_var TESTSUITE_INIT_ENVVARS prepend1
+set ans [list]
+lappend ans [list set FOO value:base]
+lappend ans [list set _LMFILES_ $mp/init/1]
+lappend ans [list set LOADEDMODULES init/1]
+testouterr_cmd bash {load init/1} $ans {}
+
+set ans [list]
+lappend ans [list set FOO base:value]
+testouterr_cmd bash {append-path FOO value} $ans {}
+
+set ans [list]
+lappend ans [list set FOO value:base]
+testouterr_cmd bash {prepend-path FOO value} $ans {}
+
+setenv_var TESTSUITE_INIT_ENVVARS remove1
+set ans [list]
+lappend ans [list set FOO base]
+lappend ans [list set _LMFILES_ $mp/init/1]
+lappend ans [list set LOADEDMODULES init/1]
+testouterr_cmd bash {load init/1} $ans {}
+
+set ans [list]
+lappend ans [list set FOO base]
+testouterr_cmd bash {remove-path FOO value} $ans {}
+
+setenv_var FOO value
+setenv_var TESTSUITE_INIT_ENVVARS remove1
+set ans [list]
+lappend ans [list unset FOO]
+lappend ans [list set _LMFILES_ $mp/init/1]
+lappend ans [list set LOADEDMODULES init/1]
+testouterr_cmd bash {load init/1} $ans {}
+
+set ans [list]
+lappend ans [list unset FOO]
+testouterr_cmd bash {remove-path FOO value} $ans {}
+
+# unset env var has it equals initial value
+setenv_var FOO init:value
+setenv_var TESTSUITE_INIT_ENVVARS remove1
+set ans [list]
+lappend ans [list unset FOO]
+lappend ans [list set _LMFILES_ $mp/init/1]
+lappend ans [list set LOADEDMODULES init/1]
+testouterr_cmd bash {load init/1} $ans {}
+
+set ans [list]
+lappend ans [list unset FOO]
+testouterr_cmd bash {remove-path FOO value} $ans {}
+
+skip_if_quick_mode
+
+
+# no impact on non-path-like modulefile commands
+unsetenv_var FOO
+setenv_var TESTSUITE_INIT_ENVVARS setenv1
+set ans [list]
+lappend ans [list set FOO value]
+lappend ans [list set _LMFILES_ $mp/init/1]
+lappend ans [list set LOADEDMODULES init/1]
+testouterr_cmd bash {load init/1} $ans {}
+
+setenv_var TESTSUITE_INIT_ENVVARS pushenv1
+set ans [list]
+lappend ans [list set FOO value]
+lappend ans [list set _LMFILES_ $mp/init/1]
+lappend ans [list set LOADEDMODULES init/1]
+lappend ans [list set __MODULES_PUSHENV_FOO init/1&value]
+testouterr_cmd bash {load init/1} $ans {}
+
+setenv_var TESTSUITE_INIT_ENVVARS unsetenv1
+set ans [list]
+lappend ans [list unset FOO]
+lappend ans [list set _LMFILES_ $mp/init/1]
+lappend ans [list set LOADEDMODULES init/1]
+testouterr_cmd bash {load init/1} $ans {}
+
+
+# unload then unset
+setenv_loaded_module [list init/1] [list $mp/init/1]
+
+setenv_var TESTSUITE_INIT_ENVVARS append1
+setenv_var FOO init:value
+set ans [list]
+lappend ans [list unset FOO]
+lappend ans [list unset _LMFILES_]
+lappend ans [list unset LOADEDMODULES]
+testouterr_cmd bash {unload init/1} $ans {}
+
+setenv_var TESTSUITE_INIT_ENVVARS prepend1
+setenv_var FOO value:init
+testouterr_cmd bash {unload init/1} $ans {}
+
+setenv_var TESTSUITE_INIT_ENVVARS append1
+setenv_var FOO init:base:value
+set ans [list]
+lappend ans [list set FOO init:base]
+lappend ans [list unset _LMFILES_]
+lappend ans [list unset LOADEDMODULES]
+testouterr_cmd bash {unload init/1} $ans {}
+
+setenv_var TESTSUITE_INIT_ENVVARS prepend1
+testouterr_cmd bash {unload init/1} $ans {}
+
+
+# some reference counter defined
+setenv_var FOO init:value
+setenv_var __MODULES_SHARE_FOO init:2
+setenv_var TESTSUITE_INIT_ENVVARS append1
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO init:2]
+lappend ans [list set FOO init]
+lappend ans [list unset _LMFILES_]
+lappend ans [list unset LOADEDMODULES]
+testouterr_cmd bash {unload init/1} $ans {}
+
+setenv_var TESTSUITE_INIT_ENVVARS prepend1
+testouterr_cmd bash {unload init/1} $ans {}
+
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO init:2]
+lappend ans [list set FOO init]
+testouterr_cmd bash {remove-path FOO value} $ans {}
+
+unsetenv_var __MODULES_SHARE_FOO
+unsetenv_var FOO
+unsetenv_loaded_module
+
+
+# multiple value defined in config
+setenv_var MODULES_INIT_ENVVARS BAR=value:FOO=init
+setenv_var TESTSUITE_INIT_ENVVARS append1
+
+set ans [list]
+lappend ans [list set FOO init:value]
+lappend ans [list set _LMFILES_ $mp/init/1]
+lappend ans [list set LOADEDMODULES init/1]
+testouterr_cmd bash {load init/1} $ans {}
+
+setenv_var MODULES_INIT_ENVVARS FOO=base:BAR=value:FOO=init
+testouterr_cmd bash {load init/1} $ans {}
+
+
+# initial value identical to added value
+setenv_var MODULES_INIT_ENVVARS FOO=value
+setenv_var TESTSUITE_INIT_ENVVARS append1
+
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO value:2]
+lappend ans [list set FOO value]
+lappend ans [list set _LMFILES_ $mp/init/1]
+lappend ans [list set LOADEDMODULES init/1]
+testouterr_cmd bash {load init/1} $ans {}
+
+set ans [list]
+lappend ans [list set FOO value]
+testouterr_cmd bash {append-path FOO value} $ans {}
+
+
+# initial value identical to added value and duplicates allowed
+setenv_var MODULES_INIT_ENVVARS FOO=value
+setenv_var TESTSUITE_INIT_ENVVARS append_dup1
+
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO value:2]
+lappend ans [list set FOO value:value]
+lappend ans [list set _LMFILES_ $mp/init/1]
+lappend ans [list set LOADEDMODULES init/1]
+testouterr_cmd bash {load init/1} $ans {}
+
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO value:2]
+lappend ans [list set FOO value:value]
+testouterr_cmd bash {append-path --duplicates FOO value} $ans {}
+
+
+# coupled effect with linked_envvars
+setenv_var MODULES_INIT_ENVVARS FOO=init
+setenv_var MODULES_LINKED_ENVVARS FOO&BAR
+setenv_var TESTSUITE_INIT_ENVVARS append1
+set ans [list]
+lappend ans [list set FOO init:value]
+lappend ans [list set BAR value]
+lappend ans [list set _LMFILES_ $mp/init/1]
+lappend ans [list set LOADEDMODULES init/1]
+testouterr_cmd bash {load init/1} $ans {}
+
+setenv_var MODULES_INIT_ENVVARS BAR=base:FOO=init
+set ans [list]
+lappend ans [list set FOO init:value]
+lappend ans [list set BAR base:value]
+lappend ans [list set _LMFILES_ $mp/init/1]
+lappend ans [list set LOADEDMODULES init/1]
+testouterr_cmd bash {load init/1} $ans {}
+
+setenv_var MODULES_INIT_ENVVARS BAR=value:FOO=init
+set ans [list]
+lappend ans [list set FOO init:value]
+lappend ans [list set __MODULES_SHARE_BAR value:2]
+lappend ans [list set BAR value]
+lappend ans [list set _LMFILES_ $mp/init/1]
+lappend ans [list set LOADEDMODULES init/1]
+testouterr_cmd bash {load init/1} $ans {}
+
+unsetenv_var MODULES_LINKED_ENVVARS
+
+
+# initial value set to empty string
+setenv_var MODULES_INIT_ENVVARS FOO=
+unsetenv_var FOO
+setenv_var TESTSUITE_INIT_ENVVARS append1
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO :1]
+lappend ans [list set FOO :value]
+lappend ans [list set _LMFILES_ $mp/init/1]
+lappend ans [list set LOADEDMODULES init/1]
+testouterr_cmd bash {load init/1} $ans {}
+
+setenv_var TESTSUITE_INIT_ENVVARS prepend1
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO :1]
+lappend ans [list set FOO value:]
+lappend ans [list set _LMFILES_ $mp/init/1]
+lappend ans [list set LOADEDMODULES init/1]
+testouterr_cmd bash {load init/1} $ans {}
+
+
+# envvar not set, but share counter set (should not happen)
+setenv_var __MODULES_SHARE_FOO :1
+testouterr_cmd bash {load init/1} $ans {}
+unsetenv_var __MODULES_SHARE_FOO
+
+
+# unload that leads to unset with reference counter
+setenv_loaded_module [list init/1] [list $mp/init/1]
+setenv_var __MODULES_SHARE_FOO :1
+setenv_var MODULES_INIT_ENVVARS FOO=
+
+setenv_var TESTSUITE_INIT_ENVVARS append1
+setenv_var FOO :value
+set ans [list]
+lappend ans [list unset __MODULES_SHARE_FOO]
+lappend ans [list unset FOO]
+lappend ans [list unset _LMFILES_]
+lappend ans [list unset LOADEDMODULES]
+testouterr_cmd bash {unload init/1} $ans {}
+
+setenv_var TESTSUITE_INIT_ENVVARS prepend1
+setenv_var FOO value:
+testouterr_cmd bash {unload init/1} $ans {}
+
+# unload that does not lead to unset with reference counter
+setenv_var __MODULES_SHARE_FOO :2
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO :2]
+lappend ans [list set FOO {}]
+lappend ans [list unset _LMFILES_]
+lappend ans [list unset LOADEDMODULES]
+testouterr_cmd bash {unload init/1} $ans {}
+
+setenv_var __MODULES_SHARE_FOO :2:value:2
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO :2]
+lappend ans [list set FOO value:]
+lappend ans [list unset _LMFILES_]
+lappend ans [list unset LOADEDMODULES]
+testouterr_cmd bash {unload init/1} $ans {}
+
+# check with sub-command that ignores reference counter
+setenv_var __MODULES_SHARE_FOO :2
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO :2]
+lappend ans [list set FOO {}]
+testouterr_cmd bash {remove-path FOO value} $ans {}
+
+setenv_var __MODULES_SHARE_FOO :2:value:2
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO :2]
+lappend ans [list set FOO {}]
+testouterr_cmd bash {remove-path FOO value} $ans {}
+
+setenv_var __MODULES_SHARE_FOO :1:value:2
+set ans [list]
+lappend ans [list unset __MODULES_SHARE_FOO]
+lappend ans [list unset FOO]
+testouterr_cmd bash {remove-path FOO value} $ans {}
+
+unsetenv_loaded_module
+unsetenv_var FOO
+unsetenv_var __MODULES_SHARE_FOO
+
+
+if {$install_initenvvars eq {}} {
+
+# bad value in config envvar
+setenv_var MODULES_INIT_ENVVARS :FOO=
+setenv_var TESTSUITE_INIT_ENVVARS append1
+unsetenv_var FOO
+set ans [list]
+lappend ans [list set FOO value]
+set tserr "$warn_msgs: Ignore invalid value set in MODULES_INIT_ENVVARS (:FOO=)"
+testouterr_cmd bash {append-path FOO value} $ans $tserr
+
+setenv_var MODULES_INIT_ENVVARS FOO=:
+set ans [list]
+lappend ans [list set FOO value]
+lappend ans [list set _LMFILES_ $mp/init/1]
+lappend ans [list set LOADEDMODULES init/1]
+set tserr [msg_load init/1 "$warn_msgs: Ignore invalid value set in MODULES_INIT_ENVVARS (FOO=:)"]
+testouterr_cmd bash {load init/1} $ans $tserr
+
+setenv_var MODULES_INIT_ENVVARS :
+testouterr_cmd bash {load init/1} $ans {}
+
+setenv_var MODULES_INIT_ENVVARS {}
+testouterr_cmd bash {load init/1} $ans {}
+
+setenv_var MODULES_INIT_ENVVARS =value
+testouterr_cmd bash {load init/1} $ans {}
+
+setenv_var MODULES_INIT_ENVVARS FOO
+set tserr [msg_load init/1 "$warn_msgs: Ignore invalid value set in MODULES_INIT_ENVVARS (FOO)"]
+testouterr_cmd bash {load init/1} $ans $tserr
+
+setenv_var MODULES_INIT_ENVVARS FOO=value:BAR
+set tserr [msg_load init/1 "$warn_msgs: Ignore invalid value set in MODULES_INIT_ENVVARS (FOO=value:BAR)"]
+testouterr_cmd bash {load init/1} $ans $tserr
+
+}
+
+
+#
+#  Cleanup
+#
+
+reset_test_env

@@ -11,7 +11,8 @@
 #
 #   Description:	Testuite testsequence
 #   Command:		load, unload, display, help, show, test,
-#                   refresh, whatis
+#                   refresh, whatis, append-path, prepend-path,
+#                   remove-path
 #   Modulefiles:    link, source-sh
 #   Sub-Command:
 #
