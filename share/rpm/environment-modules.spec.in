@@ -121,7 +121,8 @@ have access to the module alias.
            --enable-modulespath \
            --with-python=%{pythonbin} \
            --with-modulepath=%{_datadir}/Modules/modulefiles:%{_sysconfdir}/modulefiles:%{_datadir}/modulefiles \
-           --with-quarantine-vars='LD_LIBRARY_PATH LD_PRELOAD'
+           --with-quarantine-vars='LD_LIBRARY_PATH LD_PRELOAD' \
+           --with-init-envvars='MANPATH='
 
 %if 0%{?fedora} >= 22 || 0%{?rhel} >= 7
 %make_build
