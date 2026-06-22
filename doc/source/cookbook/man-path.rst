@@ -70,8 +70,22 @@ man page directories.
 
 If your modulefiles modify :envvar:`MANPATH`, it is recommended to initialize
 this environment variable with a single colon (``:``) during Modules startup.
-To do this, add the following line to the ``initrc`` configuration file
-(typically located in ``/etc/environment-modules``):
+
+To do this on Modules 5.7 or any newer version, add the following line to the
+``initrc`` configuration file (typically located in
+``/etc/environment-modules``):
+
+.. code-block:: tcl
+
+   module config init_envvars MANPATH=
+
+With this configuration, the ``MANPATH`` environment variable will be
+initialized to an empty string right before its first modification. As a
+result a leading or finishing colon character will be set the first time a
+path entry is added to ``MANPATH``.
+
+With older versions of Modules, add the following line to the ``initrc``
+configuration file:
 
 .. code-block:: tcl
 
