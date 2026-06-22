@@ -2157,7 +2157,10 @@ proc cmdModuleAutoinit {} {
       @setmanpath@@notusemanpath@}
       @setmanpath@if {{@mandir@} ni [split $manpath :]} {
       @setmanpath@   if {![isEnvVarDefined MANPATH]} {
-      @setmanpath@      append-path MANPATH {}
+      @setmanpath@      if {![hasEnvVarInitValue MANPATH] || [envVarInitValue MANPATH] ne\
+      @setmanpath@         {}} {
+      @setmanpath@         append-path MANPATH {}
+      @setmanpath@      }
       @setmanpath@   # ensure no duplicate ':' is set
       @setmanpath@   } elseif {[envVarEquals MANPATH :]} {
       @setmanpath@      remove-path MANPATH {}
