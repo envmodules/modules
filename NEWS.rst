@@ -106,6 +106,8 @@ Modules 5.7.0 (not yet released)
 * Enable lexical binding in Emacs addon file. (contribution from Peter Oliver)
 * Script: update :command:`mt` utility to analyze test suite log file when
   test suite run is aborted.
+* Correctly match loaded modules specified as requirement with a trailing
+  ``/`` character after module name. (fix issue #640)
 
 
 .. _5.6 release notes:

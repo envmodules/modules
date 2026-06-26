@@ -622,11 +622,15 @@ proc modEqProc {pattern mod {test equal} {trspec 1} {ismodlo 0} {vrcmp 0}\
       set pmod $pattern
    }
    # trim dup trailing / char and adapt pmod suffix if it starts with /
+   set endwslash 0
    if {[string index $pmod end] eq {/}} {
-      set pmod [string trimright $pmod /]/
-      set endwslash 1
-   } else {
-      set endwslash 0
+      #  trailing / will be automatically added in the eqstart tests
+      if {$test eq {eqstart}} {
+         set pmod [string trimright $pmod /]
+      } else {
+         set pmod [string trimright $pmod /]/
+         set endwslash 1
+      }
    }
    # get alternative names if mod is loading(1) or loaded(2)
    set altlist [switch -- $ismodlo {
@@ -759,11 +763,14 @@ proc modEqProcIcase {pattern mod {test equal} {trspec 1} {ismodlo 0} {vrcmp\
    } else {
       set pmod $pattern
    }
+   set endwslash 0
    if {[string index $pmod end] eq {/}} {
-      set pmod [string trimright $pmod /]/
-      set endwslash 1
-   } else {
-      set endwslash 0
+      if {$test eq {eqstart}} {
+         set pmod [string trimright $pmod /]
+      } else {
+         set pmod [string trimright $pmod /]/
+         set endwslash 1
+      }
    }
    set altlist [switch -- $ismodlo {
       7 {getLoadedAltname $mod {alias}}
@@ -888,11 +895,14 @@ proc modEqProcExtdfl {pattern mod {test equal} {trspec 1} {ismodlo 0} {vrcmp\
    } else {
       set pmod $pattern
    }
+   set endwslash 0
    if {[string index $pmod end] eq {/}} {
-      set pmod [string trimright $pmod /]/
-      set endwslash 1
-   } else {
-      set endwslash 0
+      if {$test eq {eqstart}} {
+         set pmod [string trimright $pmod /]
+      } else {
+         set pmod [string trimright $pmod /]/
+         set endwslash 1
+      }
    }
    set altlist [switch -- $ismodlo {
       7 {getLoadedAltname $mod {alias}}
@@ -1033,11 +1043,14 @@ proc modEqProcIcaseExtdfl {pattern mod {test equal} {trspec 1} {ismodlo 0}\
    } else {
       set pmod $pattern
    }
+   set endwslash 0
    if {[string index $pmod end] eq {/}} {
-      set pmod [string trimright $pmod /]/
-      set endwslash 1
-   } else {
-      set endwslash 0
+      if {$test eq {eqstart}} {
+         set pmod [string trimright $pmod /]
+      } else {
+         set pmod [string trimright $pmod /]/
+         set endwslash 1
+      }
    }
    set altlist [switch -- $ismodlo {
       7 {getLoadedAltname $mod {alias}}

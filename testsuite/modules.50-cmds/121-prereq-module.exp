@@ -136,6 +136,34 @@ lappend ans [list set LOADEDMODULES "$module_troff:$module_tron:$module"]
 lappend ans [list set testsuite yes]
 testouterr_cmd_re "sh" "switch --auto $module_set $module_tron" $ans [msg_load $module_tron $err_trace]\n\n[msg_top_switch $module_set $module_tron {} {} {} {} $module]
 
+
+# test prereq command with module spec with trailng slash/at character
+unsetenv_loaded_module
+unsetenv_var __MODULES_LMPREREQ
+setenv_var MODULEPATH $modpath.4
+setenv_var TESTSUITE_PREREQ prereq_slash
+setenv_var MODULES_ADVANCED_VERSION_SPEC 1
+setenv_var MODULES_IMPLICIT_DEFAULT 1
+
+set ans [list]
+lappend ans [list set __MODULES_LMALTNAME bar/2&as|bar/default&as|bar/latest]
+lappend ans [list set __MODULES_LMPREREQ foo/1.0&bar/]
+lappend ans [list set _LMFILES_ $modpath.4/bar/2:$modpath.4/foo/1.0]
+lappend ans [list set LOADEDMODULES bar/2:foo/1.0]
+lappend ans [list set __MODULES_LMTAG bar/2&auto-loaded]
+set tserr [msg_top_load foo/1.0 {} bar/2 {}]
+testouterr_cmd sh {load --auto foo/1.0} $ans $tserr
+
+setenv_var TESTSUITE_PREREQ prereq_at
+set ans [list]
+lappend ans [list set __MODULES_LMALTNAME bar/2&as|bar/default&as|bar/latest]
+lappend ans [list set __MODULES_LMPREREQ foo/1.0&bar@]
+lappend ans [list set _LMFILES_ $modpath.4/bar/2:$modpath.4/foo/1.0]
+lappend ans [list set LOADEDMODULES bar/2:foo/1.0]
+lappend ans [list set __MODULES_LMTAG bar/2&auto-loaded]
+testouterr_cmd sh {load --auto foo/1.0} $ans $tserr
+
+
 #
 #  Cleanup
 #

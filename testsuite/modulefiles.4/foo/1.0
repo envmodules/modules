@@ -73,3 +73,13 @@ if {[info exists env(TESTSUITE_MODULEPATH_OPT)]} {
         }
     }
 }
+if {[info exists env(TESTSUITE_PREREQ)]} {
+    switch -- $env(TESTSUITE_PREREQ) {
+        prereq_slash {
+            prereq bar/
+        }
+        prereq_at {
+            prereq bar@
+        }
+    }
+}
