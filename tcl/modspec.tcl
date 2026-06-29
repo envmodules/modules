@@ -241,6 +241,10 @@ proc defineDoesModMatchAtDepthProc {contains querydepth test} {
    }
 }
 
+proc extendedDefaultCharGlobMatch {} {
+   return {.*}
+}
+
 # Define procedure to check module version equals pattern. Adapt procedure
 # code whether icase and extended_default are enabled or disabled
 proc defineModVersCmpProc {icase extdfl} {
@@ -270,6 +274,7 @@ proc defineModVersCmpProc {icase extdfl} {
 # alternative definitions of modVersCmp proc
 proc modVersCmpProc {cmpspec versspec modvers test {psuf {}}} {
    set ret 0
+   set echar [extendedDefaultCharGlobMatch]
    switch -- $cmpspec {
       in {
          # check each verspec in list until match
@@ -295,26 +300,27 @@ proc modVersCmpProc {cmpspec versspec modvers test {psuf {}}} {
          # are always extended_default-enabled (as 1.2 includes 1.2.12 for
          # instance) and equal, eqstart and match tests are equivalent
          set ret [expr {[isVersion $modvers] && ([versioncmp $modvers\
-            $versspec] != -1 || [string match $versspec.* $modvers])}]
+            $versspec] != -1 || [string match $versspec$echar $modvers])}]
       }
       le {
          # 'ge' comment also applies here
          set ret [expr {[isVersion $modvers] && ([versioncmp $versspec\
-            $modvers] != -1 || [string match $versspec.* $modvers])}]
+            $modvers] != -1 || [string match $versspec$echar $modvers])}]
       }
       be {
          # 'ge' comment also applies here
          lassign $versspec lovers hivers
          set ret [expr {[isVersion $modvers] && ([versioncmp $modvers\
-            $lovers] != -1 || [string match $lovers.* $modvers]) &&\
+            $lovers] != -1 || [string match $lovers$echar $modvers]) &&\
             ([versioncmp $hivers $modvers] != -1 || [string match\
-            $hivers.* $modvers])}]
+            $hivers$echar $modvers])}]
       }
    }
    return $ret
 }
 proc modVersCmpProcIcase {cmpspec versspec modvers test {psuf {}}} {
    set ret 0
+   set echar [extendedDefaultCharGlobMatch]
    switch -- $cmpspec {
       in {
          foreach inspec $versspec {
@@ -336,24 +342,27 @@ proc modVersCmpProcIcase {cmpspec versspec modvers test {psuf {}}} {
       }
       ge {
          set ret [expr {[isVersion $modvers] && ([versioncmp $modvers\
-            $versspec] != -1 || [string match -nocase $versspec.* $modvers])}]
+            $versspec] != -1 || [string match -nocase $versspec$echar\
+            $modvers])}]
       }
       le {
          set ret [expr {[isVersion $modvers] && ([versioncmp $versspec\
-            $modvers] != -1 || [string match -nocase $versspec.* $modvers])}]
+            $modvers] != -1 || [string match -nocase $versspec$echar\
+            $modvers])}]
       }
       be {
          lassign $versspec lovers hivers
          set ret [expr {[isVersion $modvers] && ([versioncmp $modvers\
-            $lovers] != -1 || [string match $lovers.* $modvers]) &&\
+            $lovers] != -1 || [string match $lovers$echar $modvers]) &&\
             ([versioncmp $hivers $modvers] != -1 || [string match -nocase\
-            $hivers.* $modvers])}]
+            $hivers$echar $modvers])}]
       }
    }
    return $ret
 }
 proc modVersCmpProcExtdfl {cmpspec versspec modvers test {psuf {}}} {
    set ret 0
+   set echar [extendedDefaultCharGlobMatch]
    switch -- $cmpspec {
       in {
          foreach inspec $versspec {
@@ -372,30 +381,31 @@ proc modVersCmpProcExtdfl {cmpspec versspec modvers test {psuf {}}} {
             ##nagelfar ignore Non static subcommand
             set ret [string $test $versspec $modvers]
          }
-         if {!$ret && [string match $versspec.* $modvers]} {
+         if {!$ret && [string match $versspec$echar $modvers]} {
             set ret 1
          }
       }
       ge {
          set ret [expr {[isVersion $modvers] && ([versioncmp $modvers\
-            $versspec] != -1 || [string match $versspec.* $modvers])}]
+            $versspec] != -1 || [string match $versspec$echar $modvers])}]
       }
       le {
          set ret [expr {[isVersion $modvers] && ([versioncmp $versspec\
-            $modvers] != -1 || [string match $versspec.* $modvers])}]
+            $modvers] != -1 || [string match $versspec$echar $modvers])}]
       }
       be {
          lassign $versspec lovers hivers
          set ret [expr {[isVersion $modvers] && ([versioncmp $modvers\
-            $lovers] != -1 || [string match $lovers.* $modvers]) &&\
+            $lovers] != -1 || [string match $lovers$echar $modvers]) &&\
             ([versioncmp $hivers $modvers] != -1 || [string match\
-            $hivers.* $modvers])}]
+            $hivers$echar $modvers])}]
       }
    }
    return $ret
 }
 proc modVersCmpProcIcaseExtdfl {cmpspec versspec modvers test {psuf {}}} {
    set ret 0
+   set echar [extendedDefaultCharGlobMatch]
    switch -- $cmpspec {
       in {
          foreach inspec $versspec {
@@ -414,24 +424,26 @@ proc modVersCmpProcIcaseExtdfl {cmpspec versspec modvers test {psuf {}}} {
             ##nagelfar ignore Non static subcommand
             set ret [string $test -nocase $versspec $modvers]
          }
-         if {!$ret && [string match -nocase $versspec.* $modvers]} {
+         if {!$ret && [string match -nocase $versspec$echar $modvers]} {
             set ret 1
          }
       }
       ge {
          set ret [expr {[isVersion $modvers] && ([versioncmp $modvers\
-            $versspec] != -1 || [string match -nocase $versspec.* $modvers])}]
+            $versspec] != -1 || [string match -nocase $versspec$echar\
+            $modvers])}]
       }
       le {
          set ret [expr {[isVersion $modvers] && ([versioncmp $versspec\
-            $modvers] != -1 || [string match -nocase $versspec.* $modvers])}]
+            $modvers] != -1 || [string match -nocase $versspec$echar\
+            $modvers])}]
       }
       be {
          lassign $versspec lovers hivers
          set ret [expr {[isVersion $modvers] && ([versioncmp $modvers\
-            $lovers] != -1 || [string match $lovers.* $modvers]) &&\
+            $lovers] != -1 || [string match $lovers$echar $modvers]) &&\
             ([versioncmp $hivers $modvers] != -1 || [string match -nocase\
-            $hivers.* $modvers])}]
+            $hivers$echar $modvers])}]
       }
    }
    return $ret
@@ -536,10 +548,11 @@ proc defineModEqStaticProc {icase extdfl modspec} {
             append procbody "
                if {!\$ret && \[string first / \$pmod\] != -1} {
                   if {\$test eq {match}} {
-                     set pmodextdfl \$pmod.*
+                     set pmodextdfl \$pmod
                   } else {
-                     set pmodextdfl {$pmodescglob.*}
+                     set pmodextdfl {$pmodescglob}
                   }
+                  append pmodextdfl \[extendedDefaultCharGlobMatch\]
                   set ret \[string match $nocasearg\$pmodextdfl \$mod\]
                }"
          }
@@ -958,10 +971,11 @@ proc modEqProcExtdfl {pattern mod {test equal} {trspec 1} {ismodlo 0} {vrcmp\
       # try the extended default match if not root module and not eqspec test
       if {![info exists eqspec] && !$ret && [string first / $pmod] != -1} {
          if {$test eq {match}} {
-            set pmodextdfl $pmod.*
+            set pmodextdfl $pmod
          } else {
-            set pmodextdfl $pmodescglob.*
+            set pmodextdfl $pmodescglob
          }
+         append pmodextdfl [extendedDefaultCharGlobMatch]
          set ret [string match $pmodextdfl $mod]
          if {!$ret && [llength $altlist]} {
             foreach alt $altlist {
@@ -1107,10 +1121,11 @@ proc modEqProcIcaseExtdfl {pattern mod {test equal} {trspec 1} {ismodlo 0}\
       # try the extended default match if not root module and not eqspec test
       if {![info exists eqspec] && !$ret && [string first / $pmod] != -1} {
          if {$test eq {match}} {
-            set pmodextdfl $pmod.*
+            set pmodextdfl $pmod
          } else {
-            set pmodextdfl $pmodescglob.*
+            set pmodextdfl $pmodescglob
          }
+         append pmodextdfl [extendedDefaultCharGlobMatch]
          set ret [string match -nocase $pmodextdfl $mod]
          if {!$ret && [llength $altlist]} {
             foreach alt $altlist {
