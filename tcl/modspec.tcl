@@ -242,7 +242,7 @@ proc defineDoesModMatchAtDepthProc {contains querydepth test} {
 }
 
 proc extendedDefaultCharGlobMatch {} {
-   return {.*}
+   return {[-.]*}
 }
 
 # Define procedure to check module version equals pattern. Adapt procedure

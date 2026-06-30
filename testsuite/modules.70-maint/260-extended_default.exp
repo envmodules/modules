@@ -81,7 +81,7 @@ setenv_var MODULES_EXTENDED_DEFAULT 1
 
 # test over different kind of module versions
 array set exactmatch [list extdfl/1.1.0 1 extdfl/2.0 1]
-foreach {query match} [list extdfl/1 extdfl/1.3.1 extdfl/1.0 extdfl/1.0.2 extdfl/1.0.0 ERR extdfl/1.1 extdfl/1.1.0-beta extdfl/1.1.0 extdfl/1.1.0 extdfl/1.2 extdfl/1.2.10 extdfl/1.3 extdfl/1.3.1 extdfl/1.4 extdfl/1.4.5 ext*l/1.4 ERR ext?fl/1.4 ERR extdfl/2 extdfl/2.0.1 extdfl/2.0 extdfl/2.0 extdfl2/3.0 extdfl2/3.0.15 extdfl2/3 extdfl2/3.10.2 extdfl2/3.1 extdfl2/3.1.7 extdfl2/3.9 extdfl2/3.9.2 extdfl2/3.09 extdfl2/3.09.3 extdfl3/1 extdfl3/1.3/4 extdflb ERR extdflb.4 ERR extdflc ERR e.t.fl/1.4 e.t.fl/1.4.5 e??.*/1.4 ERR] {
+foreach {query match} [list extdfl/1 extdfl/1.3.1 extdfl/1.0 extdfl/1.0.2 extdfl/1.0.0 extdfl/1.0.0-beta extdfl/1.1 extdfl/1.1.0-beta extdfl/1.1.0 extdfl/1.1.0 extdfl/1.2 extdfl/1.2.10 extdfl/1.3 extdfl/1.3.1 extdfl/1.4 extdfl/1.4.5 ext*l/1.4 ERR ext?fl/1.4 ERR extdfl/2 extdfl/2.0.1 extdfl/2.0 extdfl/2.0 extdfl2/3.0 extdfl2/3.0.15 extdfl2/3 extdfl2/3.10.2 extdfl2/3.1 extdfl2/3.1.7 extdfl2/3.9 extdfl2/3.9.2 extdfl2/3.09 extdfl2/3.09.3 extdfl3/1 extdfl3/1.3/4 extdflb ERR extdflb.4 ERR extdflc ERR e.t.fl/1.4 e.t.fl/1.4.5 e??.*/1.4 ERR] {
     if {$match eq {ERR}} {
         set ans ERR
         set tserr $err_path'$query'
