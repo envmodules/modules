@@ -3146,8 +3146,9 @@ Constraints can be expressed to refine the selection of module version to:
 Advanced specification of single version or list of versions may benefit from
 the activation of the extended default mechanism (see
 :envvar:`MODULES_EXTENDED_DEFAULT`) to use an abbreviated notation like ``@1``
-to refer to more precise version numbers like ``1.2.3``. Range of versions on
-its side natively handles abbreviated versions.
+to refer to more precise version numbers like ``1.2.3``. Characters ``.`` and
+``-`` are considered version number separator to determine abbreviated
+versions. Range of versions on its side natively handles abbreviated versions.
 
 In order to be specified in a range of versions or compared to a range of
 versions, the version major element should corresponds to a number. For
@@ -5008,9 +5009,9 @@ ENVIRONMENT
 
  If set to ``1``, a specified module version is matched against starting
  portion of existing module versions, where portion is a substring separated
- from the rest of the version string by a ``.`` character. For example
+ from the rest of the version string by ``.`` or ``-`` characters. For example
  specified modules ``mod/1`` and ``mod/1.2`` will match existing modulefile
- ``mod/1.2.3``.
+ ``mod/1.2.3`` and ``mod/2.4`` will match ``mod/2.4-91db5cf2``.
 
  In case multiple modulefiles match the specified module version and a single
  module has to be selected, the explicitly set default version is returned if
@@ -5025,6 +5026,9 @@ ENVIRONMENT
  .. only:: html or latex
 
     .. versionadded:: 4.4
+
+    .. versionchanged:: 5.7
+       Character ``-`` is also considered a version number separator
 
 .. envvar:: MODULES_FAMILY_<NAME>
 

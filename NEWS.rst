@@ -108,6 +108,9 @@ Modules 5.7.0 (not yet released)
   test suite run is aborted.
 * Correctly match loaded modules specified as requirement with a trailing
   ``/`` character after module name. (fix issue #640)
+* Also consider ``-`` in addition to ``.`` as a version number separator
+  character when selecting a module with the :mconfig:`extended_default`
+  mechanism. (fix issue #619)
 
 
 .. _5.6 release notes:

@@ -764,6 +764,9 @@ Starting version 5.5, characters ``+`` and ``~`` may be part of module name or
 version as long as the string part next to these character is not a valid
 variant name.
 
+Starting version 5.7, character ``-`` is considered a version number separator
+for :mconfig:`extended_default` mechanism.
+
 Environment
 """""""""""
 

@@ -25,15 +25,16 @@ Specification
   - query soft/1 returns nothing
   - query soft/10.1.2 returns highest among soft/10.1.2.4 soft/10.1.2.3
 
-- In situation where soft/1.1(default) soft/1.2 soft/2.1 soft/2.2
+- In situation where soft/1.1(default) soft/1.2 soft/2.1 soft/2.2 soft/3.4-ad75bc9a
 
   - query soft/1 returns soft/1.1
   - query soft/2 returns soft/2.2
+  - query soft/3.4 returns soft/3.4-ad75bc9a
 
-- Character considered as version number separator: ``.``
+- Characters considered as version number separator: ``.`` and ``-``
 
   - list: ``.`` and ``-``
-  - ``-`` was also considered initially, but cannot determine in all case the highest version specified after this character (may find a hash name, strings like *rc*, *alpha*, *beta*, etc)
+  - ``-`` is considered a version number separator character since version 5.7
   - not possible with ``+`` as it is used by variant specification
 
 - Does not apply to the root part of module name

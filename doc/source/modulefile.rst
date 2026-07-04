@@ -1949,8 +1949,8 @@ The equivalent :file:`.modulerc` would look like:
 If the extended default mechanism is enabled (see
 :envvar:`MODULES_EXTENDED_DEFAULT` in :ref:`module(1)`) the module version
 specified is matched against starting portion of existing module versions,
-where portion is a substring separated from the rest of version string by a
-``.`` character.
+where portion is a substring separated from the rest of version string by
+``.`` or ``-`` characters.
 
 When the implicit default mechanism and the `Advanced module version
 specifiers`_ are both enabled, a ``default`` and ``latest`` symbolic versions
@@ -2081,7 +2081,9 @@ Advanced specification of single version or list of versions may benefit from
 the activation of the extended default mechanism (see
 :envvar:`MODULES_EXTENDED_DEFAULT` in :ref:`module(1)`) to use an abbreviated
 notation like ``@1`` to refer to more precise version numbers like ``1.2.3``.
-Range of versions on its side natively handles abbreviated versions.
+Characters ``.`` and ``-`` are considered version number separator to
+determine abbreviated versions. Range of versions on its side natively handles
+abbreviated versions.
 
 In order to be specified in a range of versions or compared to a range of
 versions, the version major element should corresponds to a number. For
@@ -2108,6 +2110,9 @@ version will be selected.
 
    .. versionchanged:: 4.8
       Use of version range is allowed in version list
+
+   .. versionchanged:: 5.7
+      Character ``-`` is also considered a version number separator
 
 Variants
 ^^^^^^^^
