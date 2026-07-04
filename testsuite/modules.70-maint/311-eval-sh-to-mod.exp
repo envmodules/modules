@@ -71,6 +71,16 @@ foreach var [array names -glob FOO*] {
     unsetenv_var $var
 }
 
+# prepare things if PYTHONPATH is configured by autoinit
+if {[is_conf_enabled setpythonpath]} {
+    unsetenv_var PYTHONPATH
+    if {[string first { } $install_initdir] != -1} {
+        set initdirenc "{$install_initdir}"
+    } else {
+        set initdirenc $install_initdir
+    }
+}
+
 # expected script env changes
 set tsvarpre "prepend-path\tFOOPATH /path/to/dir1 /path/to/dir2 /path/to/dir3
 prepend-path\tFOOPATHCB /path/to/dir1 /path/to/d\\{r2 /path/to/dir3
@@ -495,8 +505,11 @@ if {$install_versioning eq {y}} {
 setenv\t\tMODULE_VERSION_STACK $install_version\n"
 }
 append tserr $tsvarsetwpath
-append tserr "setenv\t\tMODULES_COLLECTION_TARGET bar
-setenv\t\ttestsuite yes"
+append tserr "setenv\t\tMODULES_COLLECTION_TARGET bar"
+if {[is_conf_enabled setpythonpath]} {
+    append tserr "\nsetenv\t\tPYTHONPATH $initdirenc"
+}
+append tserr "\nsetenv\t\ttestsuite yes"
 set tserrbash "$tserr$extratserr"
 foreach sh $shtomod_avail_shells {
     # unset module definition on bash when module is predefined
@@ -514,7 +527,11 @@ if {$install_versioning eq {y}} {
 setenv\t\tMODULE_VERSION_STACK $install_version\n"
 }
 append tserr $tsvarsetwpath
-append tserr "setenv\t\tMODULES_COLLECTION_TARGET bar$extratserr"
+append tserr "setenv\t\tMODULES_COLLECTION_TARGET bar"
+if {[is_conf_enabled setpythonpath]} {
+    append tserr "\nsetenv\t\tPYTHONPATH $initdirenc"
+}
+append tserr $extratserr
 testouterr_shtomod bash-eval {} OK $tserr
 
 # module is loaded prior sh-to-mod
@@ -526,7 +543,11 @@ if {$install_versioning eq {y}} {
 setenv\t\tMODULE_VERSION_STACK $install_version\n"
 }
 append tserr $tsvarsetwpath
-append tserr "setenv\t\tMODULES_COLLECTION_TARGET bar$extratserr"
+append tserr "setenv\t\tMODULES_COLLECTION_TARGET bar"
+if {[is_conf_enabled setpythonpath]} {
+    append tserr "\nsetenv\t\tPYTHONPATH $initdirenc"
+}
+append tserr $extratserr
 testouterr_shtomod bash-eval {} OK $tserr
 
 

@@ -267,6 +267,28 @@ if {[string length $nafelgar_script]} {
    testall_cmd sh "module config tcl_linter $nafelgar_script; module lint --redirect $testsuite_modpath.3/lcompat/.version" $tserr {} 0
 }
 
+
+# test Python module is found if PYTHONPATH is defined
+if {$install_setpythonpath eq {y} && [info exists shell_path(python)]} {
+   # create a temporary script that checks import of module command
+   # cannot pass the code as argument to python command due to the intermediate processing done by bin/install_* script
+   set temp_script $env(TESTSUITEDIR)/tempt_script.py
+   set fid [open $temp_script w]
+   puts $fid "from env_modules import module\nmodule('list', '-t')"
+   close $fid
+
+   if {$install_loadedmodules ne ""} {
+      set tserr "$cur_loaded\n[join $lm_list {.*\n}]"
+   } else {
+      set tserr $no_loaded
+   }
+
+   testall_cmd_re sh "$shell_path(python) $temp_script" {} $tserr 0
+
+   file delete $temp_script
+}
+
+
 #
 #  Clean up variables used in this test case
 #

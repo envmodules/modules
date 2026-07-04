@@ -1602,6 +1602,16 @@ setenv_var TESTSUITE_SHTOMOD_MODULE 1
 setenv_var MODULES_SET_SHELL_STARTUP 0
 setenv_var MODULES_CMD [file normalize $env(TESTSUITEDIR)/../modulecmd.tcl]
 
+# prepare things if PYTHONPATH is configured by autoinit
+if {[is_conf_enabled setpythonpath]} {
+    unsetenv_var PYTHONPATH
+    if {[string first { } $install_initdir] != -1} {
+        set initdirenc "{$install_initdir}"
+    } else {
+        set initdirenc $install_initdir
+    }
+}
+
 set lmsourceshpath {}
 # setup simpler MANPATH value for tests if autoinit adds Modules man location to MANPATH
 if {$install_setmanpath eq {y}} {
@@ -1685,9 +1695,20 @@ if {$is_modules_defined} {
     set extraans {}
 }
 if {$install_versioning eq {y}} {
-lappend ans [list set __MODULES_LMSOURCESH source-sh/1\&bash\ testsuite/example/sh-to-mod.sh\|${lmsourceshpath}setenv\ MODULE_VERSION\ $install_version\|setenv\ MODULE_VERSION_STACK\ $install_version\|setenv\ MODULES_COLLECTION_TARGET\ bar\|setenv\ testsuite\ yes$extraans]
+    if {[is_conf_enabled setpythonpath]} {
+        lappend ans [list set __MODULES_LMSOURCESH source-sh/1\&bash\ testsuite/example/sh-to-mod.sh\|${lmsourceshpath}setenv\ MODULE_VERSION\ $install_version\|setenv\ MODULE_VERSION_STACK\ $install_version\|setenv\ MODULES_COLLECTION_TARGET\ bar\|setenv\ PYTHONPATH\ $initdirenc\|setenv\ testsuite\ yes$extraans]
+    } else {
+        lappend ans [list set __MODULES_LMSOURCESH source-sh/1\&bash\ testsuite/example/sh-to-mod.sh\|${lmsourceshpath}setenv\ MODULE_VERSION\ $install_version\|setenv\ MODULE_VERSION_STACK\ $install_version\|setenv\ MODULES_COLLECTION_TARGET\ bar\|setenv\ testsuite\ yes$extraans]
+    }
 } else {
-lappend ans [list set __MODULES_LMSOURCESH source-sh/1\&bash\ testsuite/example/sh-to-mod.sh\|${lmsourceshpath}setenv\ MODULES_COLLECTION_TARGET\ bar\|setenv\ testsuite\ yes$extraans]
+    if {[is_conf_enabled setpythonpath]} {
+        lappend ans [list set __MODULES_LMSOURCESH source-sh/1\&bash\ testsuite/example/sh-to-mod.sh\|${lmsourceshpath}setenv\ MODULES_COLLECTION_TARGET\ bar\|setenv\ PYTHONPATH\ $initdirenc\|setenv\ testsuite\ yes$extraans]
+    } else {
+        lappend ans [list set __MODULES_LMSOURCESH source-sh/1\&bash\ testsuite/example/sh-to-mod.sh\|${lmsourceshpath}setenv\ MODULES_COLLECTION_TARGET\ bar\|setenv\ testsuite\ yes$extraans]
+    }
+}
+if {[is_conf_enabled setpythonpath]} {
+    lappend ans [list set PYTHONPATH $install_initdir]
 }
 if {$install_versioning eq {y}} {
 lappend ans [list set MODULE_VERSION $install_version]
@@ -1740,8 +1761,11 @@ if {$install_versioning eq {y}} {
     append tserr "setenv\t\tMODULE_VERSION $install_version
 setenv\t\tMODULE_VERSION_STACK $install_version\n"
 }
-append tserr "setenv\t\tMODULES_COLLECTION_TARGET bar
-setenv\t\ttestsuite yes$extratserr
+append tserr "setenv\t\tMODULES_COLLECTION_TARGET bar"
+if {[is_conf_enabled setpythonpath]} {
+    append tserr "\nsetenv\t\tPYTHONPATH $initdirenc"
+}
+append tserr "\nsetenv\t\ttestsuite yes$extratserr
 module-whatis\tsource-sh/1
 -------------------------------------------------------------------"
 testouterr_cmd sh {display source-sh/1} OK $tserr
@@ -1781,9 +1805,20 @@ lappend ans [list set _LMFILES_ $mp/source-sh/1]
 lappend ans [list set LOADEDMODULES source-sh/1]
 lappend ans [list set MODULES_COLLECTION_TARGET bar]
 if {$install_versioning eq {y}} {
-lappend ans [list set __MODULES_LMSOURCESH source-sh/1\&bash\ testsuite/example/sh-to-mod.sh\|${lmsourceshpath}setenv\ MODULE_VERSION\ $install_version\|setenv\ MODULE_VERSION_STACK\ $install_version\|setenv\ MODULES_COLLECTION_TARGET\ bar$extraans]
+    if {[is_conf_enabled setpythonpath]} {
+        lappend ans [list set __MODULES_LMSOURCESH source-sh/1\&bash\ testsuite/example/sh-to-mod.sh\|${lmsourceshpath}setenv\ MODULE_VERSION\ $install_version\|setenv\ MODULE_VERSION_STACK\ $install_version\|setenv\ MODULES_COLLECTION_TARGET\ bar\|setenv\ PYTHONPATH\ $initdirenc$extraans]
+    } else {
+        lappend ans [list set __MODULES_LMSOURCESH source-sh/1\&bash\ testsuite/example/sh-to-mod.sh\|${lmsourceshpath}setenv\ MODULE_VERSION\ $install_version\|setenv\ MODULE_VERSION_STACK\ $install_version\|setenv\ MODULES_COLLECTION_TARGET\ bar$extraans]
+    }
 } else {
-lappend ans [list set __MODULES_LMSOURCESH source-sh/1\&bash\ testsuite/example/sh-to-mod.sh\|${lmsourceshpath}setenv\ MODULES_COLLECTION_TARGET\ bar$extraans]
+    if {[is_conf_enabled setpythonpath]} {
+        lappend ans [list set __MODULES_LMSOURCESH source-sh/1\&bash\ testsuite/example/sh-to-mod.sh\|${lmsourceshpath}setenv\ MODULES_COLLECTION_TARGET\ bar\|setenv\ PYTHONPATH\ $initdirenc$extraans]
+    } else {
+        lappend ans [list set __MODULES_LMSOURCESH source-sh/1\&bash\ testsuite/example/sh-to-mod.sh\|${lmsourceshpath}setenv\ MODULES_COLLECTION_TARGET\ bar$extraans]
+    }
+}
+if {[is_conf_enabled setpythonpath]} {
+    lappend ans [list set PYTHONPATH $install_initdir]
 }
 if {$install_versioning eq {y}} {
 lappend ans [list set MODULE_VERSION $install_version]
@@ -1819,9 +1854,20 @@ lappend ans [list set _LMFILES_ $modpath/setenv/1.0:$mp/source-sh/1]
 lappend ans [list set LOADEDMODULES setenv/1.0:source-sh/1]
 lappend ans [list set MODULES_COLLECTION_TARGET bar]
 if {$install_versioning eq {y}} {
-lappend ans [list set __MODULES_LMSOURCESH source-sh/1\&bash\ testsuite/example/sh-to-mod.sh\|${lmsourceshpath}setenv\ MODULE_VERSION\ $install_version\|setenv\ MODULE_VERSION_STACK\ $install_version\|setenv\ MODULES_COLLECTION_TARGET\ bar$extraans]
+    if {[is_conf_enabled setpythonpath]} {
+        lappend ans [list set __MODULES_LMSOURCESH source-sh/1\&bash\ testsuite/example/sh-to-mod.sh\|${lmsourceshpath}setenv\ MODULE_VERSION\ $install_version\|setenv\ MODULE_VERSION_STACK\ $install_version\|setenv\ MODULES_COLLECTION_TARGET\ bar\|setenv\ PYTHONPATH\ $initdirenc$extraans]
+    } else {
+        lappend ans [list set __MODULES_LMSOURCESH source-sh/1\&bash\ testsuite/example/sh-to-mod.sh\|${lmsourceshpath}setenv\ MODULE_VERSION\ $install_version\|setenv\ MODULE_VERSION_STACK\ $install_version\|setenv\ MODULES_COLLECTION_TARGET\ bar$extraans]
+    }
 } else {
-lappend ans [list set __MODULES_LMSOURCESH source-sh/1\&bash\ testsuite/example/sh-to-mod.sh\|${lmsourceshpath}setenv\ MODULES_COLLECTION_TARGET\ bar$extraans]
+    if {[is_conf_enabled setpythonpath]} {
+        lappend ans [list set __MODULES_LMSOURCESH source-sh/1\&bash\ testsuite/example/sh-to-mod.sh\|${lmsourceshpath}setenv\ MODULES_COLLECTION_TARGET\ bar\|setenv\ PYTHONPATH\ $initdirenc$extraans]
+    } else {
+        lappend ans [list set __MODULES_LMSOURCESH source-sh/1\&bash\ testsuite/example/sh-to-mod.sh\|${lmsourceshpath}setenv\ MODULES_COLLECTION_TARGET\ bar$extraans]
+    }
+}
+if {[is_conf_enabled setpythonpath]} {
+    lappend ans [list set PYTHONPATH $install_initdir]
 }
 if {$install_versioning eq {y}} {
 lappend ans [list set MODULE_VERSION $install_version]

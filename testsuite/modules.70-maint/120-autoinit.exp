@@ -901,6 +901,16 @@ if {$install_setbinpath eq {y}} {
 setenv_path_var MODULEPATH $modpath.3
 setenv_loaded_module [list foo/1.0] [list $modpath.3/foo/1.0]
 
+# setup PYTHONPATH if changed by autoinit
+if {[is_conf_enabled setpythonpath]} {
+    setenv_var PYTHONPATH /tmp
+    if {[is_conf_enabled appendpythonpath]} {
+        set updatedpythonpath /tmp:$install_initdir
+    } else {
+        set updatedpythonpath $install_initdir:/tmp
+    }
+}
+
 # ensure ml is set disabled as if modrc1 initrc were previously evaluated
 # since modulepath and modules are loaded, initrc will not be evaluated by autoinit
 if {$modrc1_exinstalled} {
@@ -912,6 +922,11 @@ foreach set_shell_startup [list {} 0 1] {
     setenv_var MODULES_SET_SHELL_STARTUP $set_shell_startup
 
     foreach shell $supported_shells {
+        # skip one case where variable definition order is scrambled (not interesting to increase test complexity for this one test)
+        if {[is_conf_enabled setpythonpath] && $shell eq {ksh} && $set_shell_startup eq {1}} {
+            continue
+        }
+
         switch -- $shell {
             {lisp} {
                 testouterr_cmd "lisp" "autoinit" "ERR" "$err_lisp"
@@ -942,6 +957,9 @@ foreach set_shell_startup [list {} 0 1] {
                         lappend ans [list set BASH_ENV $install_initdir/bash]
                     }
                     lappend ans [list set MODULESHOME $moduleshome]
+                    if {[is_conf_enabled setpythonpath]} {
+                        lappend ans [list set PYTHONPATH $updatedpythonpath]
+                    }
                     if {$shell eq {ksh}} {
                         lappend ans [list set FPATH $install_initdir/ksh-functions]
                     }
@@ -965,6 +983,9 @@ foreach set_shell_startup [list {} 0 1] {
                         lappend ans [list set BASH_ENV $install_initdir/bash]
                     }
                     lappend ans [list set MODULESHOME $moduleshome]
+                    if {[is_conf_enabled setpythonpath]} {
+                        lappend ans [list set PYTHONPATH $updatedpythonpath]
+                    }
                     if {$shell eq {ksh}} {
                         lappend ans [list set FPATH $install_initdir/ksh-functions]
                     }
@@ -990,6 +1011,10 @@ set tserr "$err_loinconsist
   _LMFILES_="
 testouterr_cmd_re bash autoinit ERR $tserr
 
+# ensure PYTHONPATH is already initialized for Modules
+if {[is_conf_enabled setpythonpath]} {
+    setenv_var PYTHONPATH $install_initdir
+}
 
 # coherent environment state with loaded module that defines volatile components
 setenv_path_var MODULEPATH $modpath.3

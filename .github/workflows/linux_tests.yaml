@@ -21,6 +21,7 @@ jobs:
         --enable-quarantine-support
         --disable-set-binpath
         --disable-set-manpath
+        --disable-set-pythonpath
       COVERAGE: y
       EXTRA_SCRIPT_PRETEST: make install-testmodulerc install-testetcrc install-testmodspath-empty install-testmoguicmd
       EXTRA_SCRIPT_POSTTEST: make uninstall-testconfig
@@ -386,6 +387,7 @@ jobs:
         --with-tclsh=/usr/local/bin/tclsh9.1
         --prefix=/tmp/modules
         --with-tcl=/usr/local/lib
+        --enable-append-pythonpath
         --enable-append-manpath
         --enable-append-binpath
         --with-bin-search-path=/usr/bin:/bin
