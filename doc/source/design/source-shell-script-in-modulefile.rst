@@ -103,6 +103,8 @@ Specification
 
   - if this module is unloaded and if it does not trigger the unload of the modulefile using ``source-sh``, variable will be unset as source-sh script has not increased variable reference counter
 
+- **Limitation**: Script will not get access to shell aliases, functions or completions defined in interactive mode or shell profile configurations
+
 - **Note**: environment change done through ``source-sh`` will not preserve change order occurring in sourced script, as all changes are analyzed after sourcing script
 
 - Most shell will not get the full environment content when spawned as a sub-process

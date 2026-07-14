@@ -126,6 +126,10 @@ Modules 5.7.0 (not yet released)
   which causes :instopt:`--enable-set-pythonpath` to append the Modules
   ``init`` directory to :envvar:`PYTHONPATH` instead of prepending it.
   (contribution from Byron Boulton)
+* Doc: clarify shell script, executed by :mfcmd:`source-sh` modulefile command
+  or :subcmd:`sh-to-mod` sub-command, does not get access to shell aliases,
+  functions or completions settings only available in interactive sessions or
+  defined in profile files. (fix issue #646)
 
 
 .. _5.6 release notes:

@@ -2634,6 +2634,11 @@ Module Sub-Commands
  is not sourced but the output resulting from its execution is evaluated to
  determine the environment changes it does.
 
+ .. note:: *shell* is run in non-interactive mode without loading any shell
+    configuration or profile. As a result, script does not have access to
+    transient definitions that are only available in interactive sessions or
+    profile files, such as shell aliases, functions, or completion settings.
+
  .. only:: html or latex
 
     .. versionadded:: 4.6
