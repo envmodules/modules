@@ -16,6 +16,7 @@
 /libtestutil-dupgetgroups.so
 /libtestutil-time.so
 /libtestutil-mktime.so
+/libtestutil-tcl_loadfile.so
 /envmodules.c.gcov
 /envmodules.gcda
 /envmodules.gcno

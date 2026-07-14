@@ -130,6 +130,8 @@ Modules 5.7.0 (not yet released)
   or :subcmd:`sh-to-mod` sub-command, does not get access to shell aliases,
   functions or completions settings only available in interactive sessions or
   defined in profile files. (fix issue #646)
+* Report a global known error when Modules Tcl extension library cannot be
+  loaded. (fix issue #644)
 
 
 .. _5.6 release notes:

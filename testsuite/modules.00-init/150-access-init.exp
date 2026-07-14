@@ -75,7 +75,7 @@ if {[info exists tclextlib_file]} {
     } else {
         set tserr "$error_msgs: couldn't load file \"$tclextlib_file_abs_re\":.*"
     }
-    testouterr_cmd_re sh {-V} {} $tserr
+    testouterr_cmd_re sh {-V} ERR $tserr
     file delete $tclextlib_file
     file rename $tclextlib_file.orig $tclextlib_file
 }

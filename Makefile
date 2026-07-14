@@ -79,7 +79,8 @@ TEST_PREREQ += lib/libtestutil-closedir$(SHLIB_SUFFIX) \
 	lib/libtestutil-0getgroups$(SHLIB_SUFFIX) \
 	lib/libtestutil-dupgetgroups$(SHLIB_SUFFIX) \
 	lib/libtestutil-time$(SHLIB_SUFFIX) \
-	lib/libtestutil-mktime$(SHLIB_SUFFIX)
+	lib/libtestutil-mktime$(SHLIB_SUFFIX) \
+	lib/libtestutil-tcl_loadfile$(SHLIB_SUFFIX)
 endif
 endif
 
@@ -660,6 +661,9 @@ lib/libtestutil-time$(SHLIB_SUFFIX):
 lib/libtestutil-mktime$(SHLIB_SUFFIX):
 	$(MAKE) --no-print-directory -C lib $(@F)
 
+lib/libtestutil-tcl_loadfile$(SHLIB_SUFFIX):
+	$(MAKE) --no-print-directory -C lib $(@F)
+
 # example configs for test rules
 testsuite/example/.modulespath: testsuite/example/.modulespath.in
 	$(translate-in-script)
@@ -1172,6 +1176,7 @@ $(V).SILENT: initdir pkgdoc doc version.inc share/rpm/environment-modules.spec \
 	lib/libtestutil-getpwuid$(SHLIB_SUFFIX) lib/libtestutil-getgroups$(SHLIB_SUFFIX) \
 	lib/libtestutil-0getgroups$(SHLIB_SUFFIX) lib/libtestutil-mktime$(SHLIB_SUFFIX) \
 	lib/libtestutil-dupgetgroups$(SHLIB_SUFFIX) lib/libtestutil-time$(SHLIB_SUFFIX) \
+	lib/libtestutil-tcl_loadfile$(SHLIB_SUFFIX) \
 	testsuite/example/.modulespath testsuite/example/modulespath-wild \
 	testsuite/example/modulerc testsuite/example/initrc-1 testsuite/example/initrc \
 	dist-tar dist-gzip dist-bzip2 dist-win $(MODULECMDTEST) $(MODULECMDTEST)_i

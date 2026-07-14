@@ -625,7 +625,11 @@ if {[catch {
    ##nagelfar ignore +2 Too long line
    @libtclenvmodules@if {[file readable [getConf tcl_ext_lib]]} {
    @libtclenvmodules@   reportDebug "Load Tcl extension library ([getConf tcl_ext_lib])"
-   @libtclenvmodules@   load [file normalize [getConf tcl_ext_lib]] Envmodules
+   @libtclenvmodules@   if {[catch {
+   @libtclenvmodules@      load [file normalize [getConf tcl_ext_lib]] Envmodules
+   @libtclenvmodules@   } errMsg]} {
+   @libtclenvmodules@      reportErrorAndExit $errMsg
+   @libtclenvmodules@   }
    @libtclenvmodules@   setState tcl_ext_lib_loaded 1
    @libtclenvmodules@}
    # use fallback procs if extension library is not loaded

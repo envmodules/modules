@@ -1,0 +1,44 @@
+##############################################################################
+#   Modules Revision 3.0
+#   Providing a flexible user environment
+#
+#   File:		modules.00-init/%M%
+#   Revision:		%I%
+#   First Edition:	2026/07/17
+#   Last Mod.:		%U%, %G%
+#
+#   Authors:		Xavier Delaruelle, xavier.delaruelle@cea.fr
+#
+#   Description:	Testuite testsequence
+#   Command:		load
+#   Modulefiles:    bar, foo
+#   Sub-Command:
+#
+#   Comment: %C{
+#         Test Modules Tcl extended library
+#   }C%
+#
+##############################################################################
+
+skip_if_quick_mode
+
+# test error report when loading library
+# ensure we are in a specific test mode so we can play with installed files
+# no need to specifically test on Darwin system and on Tcl < 9
+if {[siteconfig_isStderrTty] && $tcl_platform(os) ne "Darwin" &&\
+    [info exists tclextlib_file] && [info exists tcl_loadfilelib_file] &&\
+    [file exists $tcl_loadfilelib_file] && [cmpversion $tclsh_version 9.0] > -1} {
+    setenv_var LD_PRELOAD $tcl_loadfilelib_file
+
+    set tserr "$error_msgs: error message"
+    testouterr_cmd sh {-V} ERR $tserr
+
+    unsetenv_var LD_PRELOAD
+}
+
+
+#
+#  Cleanup
+#
+
+reset_test_env

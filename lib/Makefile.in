@@ -60,6 +60,10 @@ libtestutil-mktime@SHLIB_SUFFIX@: testutil-mktime.c
 	$(ECHO_CC)
 	$(LDCC) $< -o $@
 
+libtestutil-tcl_loadfile@SHLIB_SUFFIX@: testutil-tcl_loadfile.c
+	$(ECHO_CC)
+	$(LDCC) $< -o $@
+
 clean:
 	rm -f envmodules.o
 	rm -f libtclenvmodules@TCL_SHLIB_SUFFIX@
@@ -70,6 +74,7 @@ clean:
 	rm -f libtestutil-dupgetgroups@SHLIB_SUFFIX@
 	rm -f libtestutil-time@SHLIB_SUFFIX@
 	rm -f libtestutil-mktime@SHLIB_SUFFIX@
+	rm -f libtestutil-tcl_loadfile@SHLIB_SUFFIX@
 	rm -f envmodules.c.gcov envmodules.gcda envmodules.gcno
 
 distclean: clean
@@ -95,4 +100,4 @@ $(V).SILENT: envmodules.o libtclenvmodules@TCL_SHLIB_SUFFIX@ \
 	libtestutil-closedir@SHLIB_SUFFIX@ libtestutil-getpwuid@SHLIB_SUFFIX@ \
 	libtestutil-getgroups@SHLIB_SUFFIX@ libtestutil-0getgroups@SHLIB_SUFFIX@ \
 	libtestutil-dupgetgroups@SHLIB_SUFFIX@ libtestutil-time@SHLIB_SUFFIX@ \
-	libtestutil-mktime@SHLIB_SUFFIX@
+	libtestutil-mktime@SHLIB_SUFFIX@ libtestutil-tcl_loadfile@SHLIB_SUFFIX@

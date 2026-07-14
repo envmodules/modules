@@ -168,6 +168,7 @@ if {$install_libtclenvmodules eq {y}} {
     set dupgetgroupslib_file lib/libtestutil-dupgetgroups$install_shlib_suffix
     set timelib_file lib/libtestutil-time$install_shlib_suffix
     set mktimelib_file lib/libtestutil-mktime$install_shlib_suffix
+    set tcl_loadfilelib_file lib/libtestutil-tcl_loadfile$install_shlib_suffix
 }
 
 # check file permission capabilities
