@@ -315,6 +315,12 @@ else
   loggercmd := $(logger)
 endif
 
+ifneq ($(domainnameopts),)
+  domainnamecmd := $(domainname) $(domainnameopts)
+else
+  domainnamecmd := $(domainname)
+endif
+
 ifeq ($(color),y)
   setcolor := auto
 else
@@ -457,6 +463,7 @@ sed -e 's|@prefix@|$(prefix)|g' \
 	-e 's|@loggedevents@|$(loggedevents)|g' \
 	-e 's|@loggercmd@|$(loggercmd)|g' \
 	-e 's|@pagercmd@|$(pagercmd)|g' \
+	-e 's|@domainnamecmd@|$(domainnamecmd)|g' \
 	-e 's|@paginate@|$(setpaginate)|g' \
 	-e 's|@verbosity@|$(verbosity)|g' \
 	-e 's|@color@|$(setcolor)|g' \
