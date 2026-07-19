@@ -42,12 +42,13 @@ zshcompletiondir tcllinter tcllinteropts nagelfardatadir nagelfaraddons \
 stickypurge uniquenameloaded abortonerror sourcecache logger loggeropts \
 loggedevents conflictunload spideroutput spiderterseoutput spiderindepth \
 emacsdatadir emacsaddons requirevia compressedchangelog paginate initenvvars \
-setpythonpath appendpythonpath"
+setpythonpath appendpythonpath domainname domainnameopts"
 libarglist=()
 
 # flags to know if argument has been specified on command-line
 defpageropts=1
 defloggeropts=1
+defdomainnameopts=1
 
 # set argument default values
 prefix=/usr/local/Modules
@@ -100,6 +101,8 @@ VERSION=
 RELEASE=
 # shellcheck disable=SC2034
 initconfin=etcdir
+domainname='domainname'
+domainnameopts=''
 loggedevents=
 logger='logger'
 loggeropts='-t modules'
@@ -387,6 +390,13 @@ Optional Packages:
                           Rendition (SGR) code (elements in SGRLIST are
                           separated by \`:')
                           [$darkbgcolors]
+  --with-domainname=BIN   name or full path of default domainname program to use
+                          use to fetch domain name returned by \`uname domain'
+                          (can be superseded at run-time by environment
+                          variable) [$domainname]
+  --with-domainname-opts=OPTLIST
+                          settings to apply to default domainname program
+                          [$domainnameopts]
   --with-editor=BIN       name or full path of default editor program to use to
                           edit modulefiles [$editor]
   --with-fishcompletiondir=DIR
@@ -850,6 +860,11 @@ for arg in "$@"; do
       check_and_get_package_value "initconfin" "$arg" "$allowedval" ;;
    --with-tclsh=*|--without-tclsh)
       tclshbin=$(get_package_value "$arg") ;;
+   --with-domainname=*|--without-domainname)
+      domainname=$(get_package_value "$arg" "") ;;
+   --with-domainname-opts=*|--without-domainname-opts)
+      domainnameopts=$(get_package_value "$arg" "")
+      defdomainnameopts=0 ;;
    --with-logger=*|--without-logger)
       logger=$(get_package_value "$arg" "") ;;
    --with-logger-opts=*|--without-logger-opts)
@@ -1130,6 +1145,19 @@ PS=$reqpath
 check_requirement 'basename' '' "PATH=$binsearchpath"
 # shellcheck disable=SC2034
 BASENAME=$reqpath
+
+# get domainname program location from standard PATHs or /usr/local/bin
+# or validate location passed as argument
+if [ -n "$domainname" ]; then
+   check_requirement "$domainname" '' "PATH=$binsearchpath"
+   domainname=$reqpath
+fi
+# adapt domainname program settings dependings of specified args
+# code not needed at the moment as no options defined by default, but useful if changed in the future
+if [ $defdomainnameopts -eq 1 ] && [ "${domainname##*/}" != 'domainname' ]; then
+    domainnameopts=''
+    echo_warning "As chosen domainname is not \`domainname', default domainname options are cleared"
+fi
 
 # get logger program location from standard PATHs or /usr/local/bin
 # or validate location passed as argument

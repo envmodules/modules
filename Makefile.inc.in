@@ -68,6 +68,10 @@ usemanpath := @usemanpath@
 # compress ChangeLog file
 compressedchangelog := @compressedchangelog@
 
+# domainname setup
+domainname := @domainname@
+domainnameopts := @domainnameopts@
+
 # logger setup
 loggedevents := @loggedevents@
 logger := @logger@

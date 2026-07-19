@@ -58,6 +58,13 @@ if {$install_loggeropts ne {}} {
     append install_loggercmd " $install_loggeropts"
 }
 
+set install_domainname "@domainname@"
+set install_domainnameopts "@domainnameopts@"
+set install_domainnamecmd $install_domainname
+if {$install_domainnameopts ne {}} {
+    append install_domainnamecmd " $install_domainnameopts"
+}
+
 set install_verbosity "@verbosity@"
 
 set install_color "@color@"
