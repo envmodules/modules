@@ -27,7 +27,7 @@ array set g_state_defs [list\
    autoinit {0}\
    cache_mcookie_version {5.3}\
    clock_seconds {<undef> initStateClockSeconds}\
-   domainname {<undef> {runCommand domainname}}\
+   domainname {<undef> initStateDomainname}\
    error_count {0}\
    extra_siteconfig_loaded {0}\
    false_rendered {0}\
@@ -97,6 +97,7 @@ array set g_config_defs [list\
    colors {MODULES_COLORS {} 0 l {} {} initConfColors}\
    conflict_unload {MODULES_CONFLICT_UNLOAD @conflictunload@ 0 b {0 1}}\
    csh_limit {{} 4000 0 i}\
+   domainname {MODULES_DOMAINNAME {domainname} 0 s}\
    extra_siteconfig {MODULES_SITECONFIG <undef> 1 s {}}\
    editor {MODULES_EDITOR {@editor@} 0 s {} {} initConfEditor}\
    hide_auto_loaded {MODULES_HIDE_AUTO_LOADED 0 0 b {0 1}}\
@@ -515,6 +516,10 @@ proc initStateReportfd {} {
 proc initStateLinkedEnvvars {} {
    getConf linked_envvars
    return [array get ::g_linkedEnvvars]
+}
+
+proc initStateDomainname {} {
+   return [runCommand {*}[getConf domainname]]
 }
 
 # Determine if logging need to be started
