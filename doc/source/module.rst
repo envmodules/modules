@@ -5009,6 +5009,19 @@ ENVIRONMENT
 
     .. versionadded:: 5.5
 
+.. envvar:: MODULES_DOMAINNAME
+
+ Command to fetch domain name. The value of this variable is composed of a
+ domainname command name or path eventually followed by command-line options.
+
+ This environment variable value supersedes the default value set in the
+ :mconfig:`domainname` configuration option. It can be defined with the
+ :subcmd:`config` sub-command.
+
+ .. only:: html or latex
+
+    .. versionadded:: 5.7
+
 .. envvar:: MODULES_EDITOR
 
  Text editor command name or path for use to open modulefile through the
