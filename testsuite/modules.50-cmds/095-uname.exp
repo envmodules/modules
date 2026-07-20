@@ -121,7 +121,16 @@ foreach field [list sysname release machine] {
 foreach field [list nodename version] {
     testouterr_cmd "csh" "load $module/$field" "ERR" [msg_load $module/$field $uname_warn]
 }
-testouterr_cmd "csh" "load $module/domain" "ERR" [msg_load $module/domain $domainname_warn]
+
+if {$domainname ne {} && [is_full_path $install_domainname]} {
+    set ans [list]
+    lappend ans [list set _LMFILES_ "$modulefile/domain"]
+    lappend ans [list set LOADEDMODULES "$module/domain"]
+    lappend ans [list set testsuite $u_domain noescval]
+	testouterr_cmd_re "csh" "load $module/domain" $ans {}
+} else {
+    testouterr_cmd "csh" "load $module/domain" "ERR" [msg_load $module/domain $domainname_warn]
+}
 
 
 #

@@ -500,7 +500,7 @@ foreach param [lsort [array names configset]] {
 }
 
 append tserr "\n\n$state_header"
-if {[auto_execok uname] eq {} || [auto_execok domainname] eq {}} {
+if {[auto_execok uname] eq {} || $domainname eq {}} {
     append tserr "(\nWARNING: Command '\\S+' cannot be found)+"
 }
 if {$lsb_cmd eq {}} {
@@ -564,7 +564,7 @@ foreach param [lsort [array names configset]] {
     }
 }
 append tserr "\n\n$state_header"
-if {[auto_execok uname] eq {} || [auto_execok domainname] eq {}} {
+if {[auto_execok uname] eq {} || $domainname eq {}} {
     append tserr "(\nWARNING: Command '\\S+' cannot be found)+"
 }
 if {$lsb_cmd eq {}} {
