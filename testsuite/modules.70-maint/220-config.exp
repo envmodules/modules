@@ -74,6 +74,7 @@ array set configdfl [list\
     colors                    [expr {$install_termbg eq {dark} ? $valid_darkbgcolors : $valid_lightbgcolors}]\
     conflict_unload           [expr {$install_conflictunload eq {y}}]\
     contact                   root@localhost\
+    domainname                "$install_domainnamecmd"\
     editor                    "$install_editor"\
     extended_default          [expr {$install_extendeddefault eq {y}}]\
     extra_siteconfig          <undef>\
@@ -147,6 +148,7 @@ array set configvar [list\
     colors                    MODULES_COLORS\
     conflict_unload           MODULES_CONFLICT_UNLOAD\
     contact                   MODULECONTACT\
+    domainname                MODULES_DOMAINNAME\
     editor                    MODULES_EDITOR\
     extended_default          MODULES_EXTENDED_DEFAULT\
     extra_siteconfig          MODULES_SITECONFIG\
@@ -426,6 +428,8 @@ foreach param [array names configvar] {
         set val foo=%
     } elseif {$param eq {pager}} {
         set val $configdfl(pager)
+    } elseif {$param eq {domainname}} {
+        set val $configdfl(domainname)
     } elseif {$param eq {init_envvars}} {
         set val FOO=val
     } elseif {$param eq {linked_envvars}} {
