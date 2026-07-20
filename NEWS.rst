@@ -132,6 +132,11 @@ Modules 5.7.0 (not yet released)
   defined in profile files. (fix issue #646)
 * Report a global known error when Modules Tcl extension library cannot be
   loaded. (fix issue #644)
+* Add :mconfig:`domainname` configuration option to define the command to run
+  to fetch domain name. It can be changed at installation time with
+  :instopt:`--with-domainname` and :instopt:`--with-domainname-opts` options.
+  When :mconfig:`domainname` is changed with :subcmd:`config` sub-command, it
+  sets the :envvar:`MODULES_DOMAINNAME` environment variable. (fix issue #645)
 
 
 .. _5.6 release notes:
