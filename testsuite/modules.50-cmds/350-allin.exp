@@ -50,7 +50,7 @@ set u_release $tcl_platform(osVersion)
 set u_machine $tcl_platform(machine)
 set u_nodename [exec uname -n]
 set u_version [exec uname -v]
-set u_domain [exec domainname]
+set u_domain [exec {*}$install_domainnamecmd]
 regsub -all {([.+?()])} $u_sysname {\\\1} u_sysnamere
 regsub -all {([.+?()])} $u_release {\\\1} u_releasere
 regsub -all {([.+?()])} $u_machine {\\\1} u_machinere

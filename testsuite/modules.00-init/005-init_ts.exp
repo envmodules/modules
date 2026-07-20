@@ -248,7 +248,7 @@ if {![string length $xrdb]} {
 send_user "\tX11 setup is [expr {$is_xrdb_avail ? {KO} : {OK}}]\n"
 
 # check if domainname binary is available on this system
-set domainname [auto_execok domainname]
+set domainname [auto_execok $install_domainname]
 
 # ensure id command is run with POSIX locale to correctly parse it
 if {[info exists ::env(LANG)]} {
@@ -466,7 +466,7 @@ set xrdb_warn "$x11_warn_prefix\n$error_msgs: $xrdb_notfound_msg"
 if {!$is_xrdb_avail} {
     set x11_warn "$x11_warn_prefix\n$error_msgs: $xrdb_issue_msg"
 }
-set domainname_warn "$error_msgs: Command 'domainname' cannot be found"
+set domainname_warn "$error_msgs: Command '$install_domainname' cannot be found"
 set lsb_cmd_err "$error_msgs: Command 'lsb_release' cannot be found"
 
 
@@ -947,6 +947,10 @@ proc is_config_locked {option} {
 
 proc is_real_shell {shell} {
     return [expr {[lsearch -exact $::real_shells $shell] != -1}]
+}
+
+proc is_full_path {file_path} {
+    return [regexp {^(|\.|\.\.)/} $file_path]
 }
 
 # helper procedures to format block message output

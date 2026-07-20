@@ -61,14 +61,14 @@ if {$uname eq ""} {
 
 if {$domainname eq ""} {
     if {$verbose} {
-        send_user "\tNo executable 'domainname' found ...\n"
+        send_user "\tNo executable '$install_domainname' found ...\n"
     }
     set u_domain "unknown"
 } else {
     if {$verbose} {
-        send_user "\tUsing '$domainname' for domainname checking ...\n"
+        send_user "\tUsing '$install_domainnamecmd' for domainname checking ...\n"
     }
-    set u_domain [exec $domainname]
+    set u_domain [exec {*}$install_domainnamecmd]
 }
 
 #
