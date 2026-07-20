@@ -1301,7 +1301,8 @@ The following Modules configuration option has been introduced on Modules 5.
 +------------+-----------------------------------------------------------------+
 | 5.7        | :mconfig:`path_entry_reorder`, :mconfig:`paginate`,             |
 |            | :mconfig:`non_exportable_tags`, :mconfig:`info_extension`,      |
-|            | :mconfig:`linked_envvars`, :mconfig:`init_envvars`              |
+|            | :mconfig:`linked_envvars`, :mconfig:`init_envvars`,             |
+|            | :mconfig:`domainname`                                           |
 +------------+-----------------------------------------------------------------+
 
 :mconfig:`auto_handling`
