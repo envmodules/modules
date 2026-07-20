@@ -1108,20 +1108,19 @@ Module Sub-Commands
   configuration option from its default value. See :envvar:`MODULECONTACT`
   description for details.
 
- .. mconfig:: extended_default
+ .. mconfig:: domainname
 
-  Allow partial module version specification.
+  Command to fetch domain name.
 
-  Default value is ``1``. It can be changed at installation time with
-  :instopt:`--disable-extended-default<--enable-extended-default>` option. The
-  :envvar:`MODULES_EXTENDED_DEFAULT` environment variable is defined by
+  Default value is ``domainname``. It can be changed at installation time with
+  :instopt:`--with-domainname` and :instopt:`--with-domainname-opts` options.
+  The :envvar:`MODULES_DOMAINNAME` environment variable is defined by
   :subcmd:`config` sub-command when changing this configuration option from
-  its default value. See :envvar:`MODULES_EXTENDED_DEFAULT` description for
-  details.
+  its default value. See :envvar:`MODULES_DOMAINNAME` description for details.
 
   .. only:: html or latex
 
-     .. versionadded:: 4.4
+     .. versionadded:: 5.7
 
  .. mconfig:: editor
 
@@ -1137,6 +1136,21 @@ Module Sub-Commands
   .. only:: html or latex
 
      .. versionadded:: 4.8
+
+ .. mconfig:: extended_default
+
+  Allow partial module version specification.
+
+  Default value is ``1``. It can be changed at installation time with
+  :instopt:`--disable-extended-default<--enable-extended-default>` option. The
+  :envvar:`MODULES_EXTENDED_DEFAULT` environment variable is defined by
+  :subcmd:`config` sub-command when changing this configuration option from
+  its default value. See :envvar:`MODULES_EXTENDED_DEFAULT` description for
+  details.
+
+  .. only:: html or latex
+
+     .. versionadded:: 4.4
 
  .. mconfig:: extra_siteconfig
 
