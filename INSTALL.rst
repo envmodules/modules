@@ -1125,6 +1125,32 @@ instance :instopt:`--without-modulepath<--with-modulepath>`):
     .. versionchanged:: 5.6
        Default ``nearly-forbidden`` tag color changed
 
+.. instopt:: --with-domainname=BIN
+
+ Name or full path of default domainname program to use to fetch domain name
+ (can be superseded at run-time by environment variable)
+ (default=\ ``domainname``)
+
+ This installation option and :instopt:`--with-domainname-opts` define the
+ default value of the :mconfig:`domainname` configuration option which could
+ be changed after installation with the :subcmd:`config` sub-command.
+
+ .. only:: html or latex
+
+    .. versionadded:: 5.7
+
+.. instopt:: --with-domainname-opts=OPTLIST
+
+ Settings to apply to default domainname program (default=)
+
+ This installation option and :instopt:`--with-domainname` define the default
+ value of the :mconfig:`domainname` configuration option which could be
+ changed after installation with the :subcmd:`config` sub-command.
+
+ .. only:: html or latex
+
+    .. versionadded:: 5.7
+
 .. instopt:: --with-editor=BIN
 
  Name or full path of default editor program to use to open modulefile through
@@ -1724,6 +1750,10 @@ installation.
 +-----------------------------------+----------------------------------------------+----------------------------------------------+--------------+-----------+
 | :mconfig:`extended_default`       | ``1``                                        | :instopt:`--enable-extended-default`,        |              |           |
 |                                   |                                              | :envvar:`MODULES_EXTENDED_DEFAULT`           |              |           |
++-----------------------------------+----------------------------------------------+----------------------------------------------+--------------+-----------+
+| :mconfig:`domainname`             | ``domainname``                               | :instopt:`--with-domainname`,                |              |           |
+|                                   |                                              | :instopt:`--with-domainname-opts`,           |              |           |
+|                                   |                                              | :envvar:`MODULES_DOMAINNAME`                 |              |           |
 +-----------------------------------+----------------------------------------------+----------------------------------------------+--------------+-----------+
 | :mconfig:`editor`                 | ``vi``                                       | :instopt:`--with-editor`,                    |              |           |
 |                                   |                                              | :envvar:`MODULES_EDITOR`                     |              |           |
