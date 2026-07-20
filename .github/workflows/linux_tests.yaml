@@ -100,6 +100,8 @@ jobs:
         --disable-color
         --with-icase=never
         --with-tcl-linter=nagelfar135/nagelfar.tcl
+        --with-domainname=hostname
+        --with-domainname-opts=-d
       COVERAGE: y
       EXTRA_SCRIPT_PRETEST: make install-testinitrc install-testsiteconfig
       EXTRA_SCRIPT_POSTTEST: make uninstall-testconfig
@@ -181,6 +183,8 @@ jobs:
         --enable-set-shell-startup
         --enable-path-entry-reorder
         --disable-compressed-changelog
+        --with-domainname=hostname
+        --with-domainname-opts=-d
       COVERAGE: y
       EXTRA_SCRIPT_PRETEST: make install-testinitrc-1 install-testetcrc install-testmodspath
       EXTRA_SCRIPT_POSTTEST: make uninstall-testconfig

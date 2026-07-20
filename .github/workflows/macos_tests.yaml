@@ -11,7 +11,11 @@ jobs:
   macos:
     runs-on: macos-15
     env:
-      CONFIGURE_OPTS: --prefix=/tmp/modules --with-loadedmodules=null:dot --with-tcl=/opt/homebrew/lib --with-tclsh=/opt/homebrew/bin/tclsh
+      CONFIGURE_OPTS: |
+        --prefix=/tmp/modules
+        --with-loadedmodules=null:dot
+        --with-tcl=/opt/homebrew/lib
+        --with-tclsh=/opt/homebrew/bin/tclsh
       COVERAGE: y
       EXTRA_SCRIPT_PRETEST: make install-testsiteconfig-1 && export TESTSUITE_ENABLE_SITECONFIG=1
       EXTRA_SCRIPT_POSTTEST: unset TESTSUITE_ENABLE_SITECONFIG
