@@ -19,13 +19,14 @@
  ************************************************************************/
 
 #define _ISOC99_SOURCE
-#define _XOPEN_SOURCE
+#define _XOPEN_SOURCE 500
 
 #include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>
 #include <limits.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <dirent.h>
 #include <pwd.h>
 #include <grp.h>
@@ -84,7 +85,9 @@ Envmodules_GetFilesInDirectoryObjCmd(
    int have_modulerc = 0;
    int have_version = 0;
    int is_hidden;
+   int is_dir;
    char path[PATH_MAX];
+   struct stat st;
 
    /* Parse arguments. */
    if (objc == 3) {
@@ -129,6 +132,21 @@ Envmodules_GetFilesInDirectoryObjCmd(
          Tcl_ListObjAppendElement(interp, ltmp, Tcl_NewStringObj(path, -1));
          is_hidden = (direntry->d_name[0] == '.') ? 1 : 0;
          Tcl_ListObjAppendElement(interp, ltmp, Tcl_NewIntObj(is_hidden));
+         /* Determine if entry is a directory using d_type when available,
+          * falling back to stat() for DT_UNKNOWN/DT_LNK (symlinks to
+          * dirs and NFS v3 where d_type is always DT_UNKNOWN) */
+#ifdef DT_DIR
+         if (direntry->d_type == DT_DIR) {
+            is_dir = 1;
+         } else if (direntry->d_type != DT_UNKNOWN
+               && direntry->d_type != DT_LNK) {
+            is_dir = 0;
+         } else
+#endif
+         {
+            is_dir = (!stat(path, &st) && S_ISDIR(st.st_mode)) ? 1 : 0;
+         }
+         Tcl_ListObjAppendElement(interp, ltmp, Tcl_NewIntObj(is_dir));
       }
    }
    /* Do not treat error happening during read to send list of valid files. */
@@ -150,10 +168,12 @@ Envmodules_GetFilesInDirectoryObjCmd(
       snprintf(path, sizeof(path), "%s/%s", dir, ".modulerc");
       Tcl_ListObjAppendElement(interp, lres, Tcl_NewStringObj(path, -1));
       Tcl_ListObjAppendElement(interp, lres, Tcl_NewIntObj(0));
+      Tcl_ListObjAppendElement(interp, lres, Tcl_NewIntObj(0));
    }
    if (have_version) {
       snprintf(path, sizeof(path), "%s/%s", dir, ".version");
       Tcl_ListObjAppendElement(interp, lres, Tcl_NewStringObj(path, -1));
+      Tcl_ListObjAppendElement(interp, lres, Tcl_NewIntObj(0));
       Tcl_ListObjAppendElement(interp, lres, Tcl_NewIntObj(0));
    }
    /* Then append regular elements. */
