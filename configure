@@ -48,6 +48,7 @@ libarglist=()
 # flags to know if argument has been specified on command-line
 defpageropts=1
 defloggeropts=1
+defdomainname=1
 defdomainnameopts=1
 
 # set argument default values
@@ -861,7 +862,8 @@ for arg in "$@"; do
    --with-tclsh=*|--without-tclsh)
       tclshbin=$(get_package_value "$arg") ;;
    --with-domainname=*|--without-domainname)
-      domainname=$(get_package_value "$arg" "") ;;
+      domainname=$(get_package_value "$arg" "")
+      defdomainname=0 ;;
    --with-domainname-opts=*|--without-domainname-opts)
       domainnameopts=$(get_package_value "$arg" "")
       defdomainnameopts=0 ;;
@@ -1146,9 +1148,9 @@ check_requirement 'basename' '' "PATH=$binsearchpath"
 # shellcheck disable=SC2034
 BASENAME=$reqpath
 
-# get domainname program location from standard PATHs or /usr/local/bin
+# if option defined, get domainname program location from standard PATHs or /usr/local/bin
 # or validate location passed as argument
-if [ -n "$domainname" ]; then
+if [ $defdomainname -eq 0 ] && [ -n "$domainname" ]; then
    check_requirement "$domainname" '' "PATH=$binsearchpath"
    domainname=$reqpath
 fi
