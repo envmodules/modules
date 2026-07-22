@@ -296,19 +296,16 @@ setenv_var FOOPATHSP "/path/to/dir2 /path"
 setenv_var FOOPATHSPEM "/path/to/dir2 /path"
 setenv_var FOOPATHCB "/path/to/d{r2:/path"
 setenv_var FOOPATHWC "/path/to/d*r2:/path"
+# the prepend and append chunks here would use a different delimiter
+# character ('/' vs ':'): a plain setenv is used instead of the two path
+# commands, to produce a more consistent value
 set tserr "#%Module
-append-path\t-d / FOOPATH dir3
-append-path\t-d / FOOPATHCB dir3
-append-path\t-d / FOOPATHEM dir3
-append-path\t-d / FOOPATHSP dir3
-append-path\t-d / FOOPATHSPEM {dir3 }
-append-path\t-d / FOOPATHWC dir3
-prepend-path\t-d { } FOOPATHSP /path/to/dir1
-prepend-path\t-d { } FOOPATHSPEM /path/to/dir1
-prepend-path\tFOOPATH /path/to/dir1
-prepend-path\tFOOPATHCB /path/to/dir1
-prepend-path\tFOOPATHEM {} /path/to/dir1
-prepend-path\tFOOPATHWC /path/to/dir1"
+setenv\t\tFOOPATH /path/to/dir1:/path/to/dir2:/path/to/dir3
+setenv\t\tFOOPATHCB /path/to/dir1:/path/to/d\\{r2:/path/to/dir3
+setenv\t\tFOOPATHEM :/path/to/dir1:/path/to/dir2:/path/to/dir3
+setenv\t\tFOOPATHSP {/path/to/dir1 /path/to/dir2 /path/to/dir3}
+setenv\t\tFOOPATHSPEM {/path/to/dir1 /path/to/dir2 /path/to/dir3 }
+setenv\t\tFOOPATHWC /path/to/dir1:/path/to/d*r2:/path/to/dir3"
 testouterr_shtomod ALL {} OK $tserr
 unsetenv_var FOOPATH
 unsetenv_var FOOPATHEM
@@ -370,8 +367,7 @@ append-path\t-d { } FOOPATHDUPSP /path/to/dir3 /path/to:dir4
 append-path\t-d { } FOOPATHDUPSPEM /path/to/dir3 {}
 append-path\tFOOPATHDUP /path/to/dir3 {/path/to dir4}
 append-path\tFOOPATHDUPEM /path/to/dir3 {}
-append-path\tFOOPATHDUPMIX /path/to/dir3 {}
-prepend-path\t-d { } FOOPATHDUPMIX :/path/to/dir1:/path/to/dir1"
+setenv\t\tFOOPATHDUPMIX {:/path/to/dir1:/path/to/dir1 /path/to/dir2 /path/to/dir1:/path/to/dir3:/path/to/dir3:}"
 testouterr_shtomod ALL {} OK $tserr
 
 # ambiguous prior value
@@ -409,13 +405,12 @@ setenv_var FOOPATHDUPMIX "/path/to/dir1 /path/to/dir2"
 setenv_var FOOPATHDUPSP {/path/to:dir4}
 setenv_var FOOPATHDUPSPEM {/path/to/dir3 }
 set tserr "#%Module
-append-path\t-d { } FOOPATHDUPMIX /path/to/dir1:/path/to/dir3:/path/to/dir3:
 append-path\t-d { } FOOPATHDUPSP /path/to/dir3
 append-path\tFOOPATHDUP /path/to/dir2 /path/to/dir3 {/path/to dir4}
 prepend-path\t-d { } FOOPATHDUPSP /path/to/dir1 /path/to/dir2
 prepend-path\t-d { } FOOPATHDUPSPEM /path/to/dir1 /path/to/dir2
 prepend-path\tFOOPATHDUPEM /path/to/dir2
-prepend-path\tFOOPATHDUPMIX /path/to/dir1"
+setenv\t\tFOOPATHDUPMIX {:/path/to/dir1:/path/to/dir1 /path/to/dir2 /path/to/dir1:/path/to/dir3:/path/to/dir3:}"
 testouterr_shtomod ALL {} OK $tserr
 
 unsetenv_var TESTSUITE_SHTOMOD_PATHDUP

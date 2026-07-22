@@ -137,6 +137,11 @@ Modules 5.7.0 (not yet released)
   :instopt:`--with-domainname` and :instopt:`--with-domainname-opts` options.
   When :mconfig:`domainname` is changed with :subcmd:`config` sub-command, it
   sets the :envvar:`MODULES_DOMAINNAME` environment variable. (fix issue #645)
+* Update the :mfcmd:`source-sh` modulefile command and :subcmd:`sh-to-mod`
+  sub-command mechanism to produce a more consistent value for a path-like
+  environment variable change that requires both a prepended and an appended
+  part expressed with a different delimiter character: a :mfcmd:`setenv`
+  command is now generated instead in this situation.
 
 
 .. _5.6 release notes:

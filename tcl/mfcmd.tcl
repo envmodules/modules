@@ -1682,45 +1682,62 @@ proc sh-to-mod {elt_ignored_list args} {
             $varbef($name) $varaft($name)]] == -1} {
             lappend modcontent [list setenv $name $varaft($name)]
          } else {
-            # content should be prepended
-            if {$idx > 0} {
-               set modcmd [list prepend-path]
+            set doprepend [expr {$idx > 0}]
+            if {$doprepend} {
                # check from the end to get the largest chunk to prepend
                set idx [string last $varbef($name) $varaft($name)]
                # get delimiter from char found between new and existing value
-               set delim [string index $varaft($name) $idx-1]
-               if {$delim ne $pathsep} {
-                  lappend modcmd -d $delim
-               }
-               lappend modcmd $name
-               # split value and remove duplicate entries
-               set vallist [list]
-               lappendNoDup vallist {*}[split [string range $varaft($name) 0\
-                  $idx-2] $delim]
-               # an empty element is added
-               if {![llength $vallist]} {
-                  lappend vallist {}
-               }
-               lappend modcontent [list {*}$modcmd {*}$vallist]
+               set predelim [string index $varaft($name) $idx-1]
             }
-            # content should be appended
-            if {($idx + [string length $varbef($name)]) < [string length\
-               $varaft($name)]} {
-               set modcmd [list append-path]
-               set delim [string index $varaft($name) $idx+[string length\
-                  $varbef($name)]]
-               if {$delim ne $pathsep} {
-                  lappend modcmd -d $delim
+            set doappend [expr {($idx + [string length $varbef($name)]) <\
+               [string length $varaft($name)]}]
+            if {$doappend} {
+               set appdelim [string index $varaft($name) $idx+[string\
+                  length $varbef($name)]]
+            }
+
+            # if content must both be prepended and appended but each side
+            # uses a different delimiter character, the change cannot be
+            # expressed as a coherent pair of path-manipulation commands,
+            # since each delimiter implies a different, incompatible split
+            # of the value: fall back to a plain setenv to correctly
+            # capture the new value
+            if {$doprepend && $doappend && $predelim ne $appdelim} {
+               lappend modcontent [list setenv $name $varaft($name)]
+            } else {
+               # content should be prepended
+               if {$doprepend} {
+                  set modcmd [list prepend-path]
+                  if {$predelim ne $pathsep} {
+                     lappend modcmd -d $predelim
+                  }
+                  lappend modcmd $name
+                  # split value and remove duplicate entries
+                  set vallist [list]
+                  lappendNoDup vallist {*}[split [string range\
+                     $varaft($name) 0 $idx-2] $predelim]
+                  # an empty element is added
+                  if {![llength $vallist]} {
+                     lappend vallist {}
+                  }
+                  lappend modcontent [list {*}$modcmd {*}$vallist]
                }
-               lappend modcmd $name
-               set vallist [list]
-               lappendNoDup vallist {*}[split [string range $varaft($name)\
-                  [expr {$idx + [string length $varbef($name)] + 1}] end]\
-                  $delim]
-               if {![llength $vallist]} {
-                  lappend vallist {}
+               # content should be appended
+               if {$doappend} {
+                  set modcmd [list append-path]
+                  if {$appdelim ne $pathsep} {
+                     lappend modcmd -d $appdelim
+                  }
+                  lappend modcmd $name
+                  set vallist [list]
+                  lappendNoDup vallist {*}[split [string range\
+                     $varaft($name) [expr {$idx + [string length\
+                     $varbef($name)] + 1}] end] $appdelim]
+                  if {![llength $vallist]} {
+                     lappend vallist {}
+                  }
+                  lappend modcontent [list {*}$modcmd {*}$vallist]
                }
-               lappend modcontent [list {*}$modcmd {*}$vallist]
             }
          }
       }

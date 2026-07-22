@@ -194,6 +194,13 @@ Specification
 
 - An environment variable equaling to the path separator character (``:``) prior script evaluation is considered as undefined prior script evaluation to avoid misleading analysis
 
+- Path-like variable change is recorded as a ``setenv`` command instead of ``prepend-path`` and ``append-path`` commands when the newly prepended and newly appended parts would each need a different delimiter character to be expressed
+
+  - Prior and after variable values are compared to find a common part between them: what is found before this common part is expressed as a ``prepend-path`` command and what is found after it as an ``append-path`` command
+  - Each of these two commands may need its own delimiter character, determined from the character found in the after value right before (for the prepended part) or right after (for the appended part) the common part, when this character is not the variable path separator
+  - When the delimiter character determined for the prepended part differs from the one determined for the appended part, describing the change as a ``prepend-path`` and an ``append-path`` command would not correctly reproduce the resulting value, as each command would independently split and de-duplicate the full variable value using its own delimiter
+  - A ``setenv`` command directly setting the after value is generated instead in this situation, to always accurately reflect the change made by the script
+
 - Environment variables made for Modules private use are filtered-out from the environment changes produced
 
   - ``LOADEDMODULES``, ``_LMFILES_`` and any variable prefixed by ``__MODULES_`` are concerned
