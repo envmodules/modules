@@ -689,16 +689,16 @@ setenv_var FOOPATHDUPMIX /path/to/dir2
 setenv_var FOOPATHDUPSP /path/to/dir2
 setenv_var FOOPATHDUPSPEM /path/to/dir2
 set tserr "#%Module
+append-path\t--duplicates -d { } FOOPATHDUPSP /path/to/dir1 /path/to/dir3 /path/to:dir4 /path/to/dir3
+append-path\t--duplicates -d { } FOOPATHDUPSPEM /path/to/dir1 /path/to/dir3 /path/to/dir3 {}
+append-path\t--duplicates FOOPATHDUP /path/to/dir1 /path/to/dir3 {/path/to dir4} /path/to/dir3
+append-path\t--duplicates FOOPATHDUPEM /path/to/dir1 /path/to/dir3 {} /path/to/dir3
 append-path\t-d { } FOOPATHDUPMIX /path/to/dir1:/path/to/dir3:/path/to/dir3:
-append-path\t-d { } FOOPATHDUPSP /path/to/dir1 /path/to/dir3 /path/to:dir4
-append-path\t-d { } FOOPATHDUPSPEM /path/to/dir1 /path/to/dir3 {}
-append-path\tFOOPATHDUP /path/to/dir1 /path/to/dir3 {/path/to dir4}
-append-path\tFOOPATHDUPEM /path/to/dir1 /path/to/dir3 {}
-prepend-path\t-d { } FOOPATHDUPMIX :/path/to/dir1:/path/to/dir1
-prepend-path\t-d { } FOOPATHDUPSP /path/to/dir1
-prepend-path\t-d { } FOOPATHDUPSPEM /path/to/dir1
-prepend-path\tFOOPATHDUP /path/to/dir1
-prepend-path\tFOOPATHDUPEM {} /path/to/dir1"
+prepend-path\t--duplicates -d { } FOOPATHDUPSP /path/to/dir1 /path/to/dir1
+prepend-path\t--duplicates -d { } FOOPATHDUPSPEM /path/to/dir1 /path/to/dir1
+prepend-path\t--duplicates FOOPATHDUP /path/to/dir1 /path/to/dir1
+prepend-path\t--duplicates FOOPATHDUPEM {} /path/to/dir1 /path/to/dir1
+prepend-path\t-d { } FOOPATHDUPMIX :/path/to/dir1:/path/to/dir1"
 testouterr_shtomod ALL {} OK $tserr
 
 # multiple paths as prior value
@@ -708,14 +708,14 @@ setenv_var FOOPATHDUPMIX "/path/to/dir2 /path/to/dir1"
 setenv_var FOOPATHDUPSP "/path/to/dir2 /path/to/dir1"
 setenv_var FOOPATHDUPSPEM "/path/to/dir2 /path/to/dir1"
 set tserr "#%Module
-append-path\t-d { } FOOPATHDUPSP /path/to/dir3 /path/to:dir4
-append-path\t-d { } FOOPATHDUPSPEM /path/to/dir3 {}
-append-path\tFOOPATHDUP /path/to/dir3 {/path/to dir4}
-append-path\tFOOPATHDUPEM /path/to/dir3 {}
-prepend-path\t-d { } FOOPATHDUPSP /path/to/dir1
-prepend-path\t-d { } FOOPATHDUPSPEM /path/to/dir1
-prepend-path\tFOOPATHDUP /path/to/dir1
-prepend-path\tFOOPATHDUPEM {} /path/to/dir1
+append-path\t--duplicates -d { } FOOPATHDUPSP /path/to/dir3 /path/to:dir4 /path/to/dir3
+append-path\t--duplicates -d { } FOOPATHDUPSPEM /path/to/dir3 /path/to/dir3 {}
+append-path\t--duplicates FOOPATHDUP /path/to/dir3 {/path/to dir4} /path/to/dir3
+append-path\t--duplicates FOOPATHDUPEM /path/to/dir3 {} /path/to/dir3
+prepend-path\t--duplicates -d { } FOOPATHDUPSP /path/to/dir1 /path/to/dir1
+prepend-path\t--duplicates -d { } FOOPATHDUPSPEM /path/to/dir1 /path/to/dir1
+prepend-path\t--duplicates FOOPATHDUP /path/to/dir1 /path/to/dir1
+prepend-path\t--duplicates FOOPATHDUPEM {} /path/to/dir1 /path/to/dir1
 setenv\t\tFOOPATHDUPMIX {:/path/to/dir1:/path/to/dir1 /path/to/dir2 /path/to/dir1:/path/to/dir3:/path/to/dir3:}"
 testouterr_shtomod ALL {} OK $tserr
 
@@ -726,8 +726,8 @@ setenv_var FOOPATHDUPMIX :
 setenv_var FOOPATHDUPSP /path/to/dir1
 setenv_var FOOPATHDUPSPEM { }
 set tserr "#%Module
-append-path\t-d { } FOOPATHDUPSP /path/to/dir1 /path/to/dir2 /path/to/dir3 /path/to:dir4
-append-path\tFOOPATHDUP /path/to/dir1 /path/to/dir2 /path/to/dir3 {/path/to dir4}
+append-path\t--duplicates -d { } FOOPATHDUPSP /path/to/dir1 /path/to/dir2 /path/to/dir1 /path/to/dir3 /path/to:dir4 /path/to/dir3
+append-path\t--duplicates FOOPATHDUP /path/to/dir1 /path/to/dir2 /path/to/dir1 /path/to/dir3 {/path/to dir4} /path/to/dir3
 prepend-path\t-d 3 FOOPATHDUPSPEM {/path/to/dir1 /path/to/dir1 /path/to/dir2 /path/to/dir1 /path/to/dir} { /path/to/dir}
 setenv\t\tFOOPATHDUPEM :/path/to/dir1:/path/to/dir1:/path/to/dir2:/path/to/dir1:/path/to/dir3::/path/to/dir3
 setenv\t\tFOOPATHDUPMIX {:/path/to/dir1:/path/to/dir1 /path/to/dir2 /path/to/dir1:/path/to/dir3:/path/to/dir3:}"
@@ -740,8 +740,8 @@ setenv_var FOOPATHDUPMIX {}
 setenv_var FOOPATHDUPSP /path/to/dir1
 setenv_var FOOPATHDUPSPEM {}
 set tserr "#%Module
-append-path\t-d { } FOOPATHDUPSP /path/to/dir1 /path/to/dir2 /path/to/dir3 /path/to:dir4
-append-path\tFOOPATHDUP /path/to/dir1 /path/to/dir2 /path/to/dir3 {/path/to dir4}
+append-path\t--duplicates -d { } FOOPATHDUPSP /path/to/dir1 /path/to/dir2 /path/to/dir1 /path/to/dir3 /path/to:dir4 /path/to/dir3
+append-path\t--duplicates FOOPATHDUP /path/to/dir1 /path/to/dir2 /path/to/dir1 /path/to/dir3 {/path/to dir4} /path/to/dir3
 setenv\t\tFOOPATHDUPEM :/path/to/dir1:/path/to/dir1:/path/to/dir2:/path/to/dir1:/path/to/dir3::/path/to/dir3
 setenv\t\tFOOPATHDUPMIX {:/path/to/dir1:/path/to/dir1 /path/to/dir2 /path/to/dir1:/path/to/dir3:/path/to/dir3:}
 setenv\t\tFOOPATHDUPSPEM {/path/to/dir1 /path/to/dir1 /path/to/dir2 /path/to/dir1 /path/to/dir3 /path/to/dir3 }"
@@ -754,12 +754,12 @@ setenv_var FOOPATHDUPMIX "/path/to/dir1 /path/to/dir2"
 setenv_var FOOPATHDUPSP {/path/to:dir4}
 setenv_var FOOPATHDUPSPEM {/path/to/dir3 }
 set tserr "#%Module
-append-path\t-d { } FOOPATHDUPSP /path/to/dir3
-append-path\tFOOPATHDUP /path/to/dir1 /path/to/dir2 /path/to/dir3 {/path/to dir4}
-append-path\tFOOPATHDUPEM /path/to/dir3
-prepend-path\t-d { } FOOPATHDUPSP /path/to/dir1 /path/to/dir2 /path/to/dir3
-prepend-path\t-d { } FOOPATHDUPSPEM /path/to/dir1 /path/to/dir2 /path/to/dir3
-prepend-path\tFOOPATHDUPEM {} /path/to/dir1 /path/to/dir2
+append-path\t--duplicates -d { } FOOPATHDUPSP /path/to/dir3
+append-path\t--duplicates FOOPATHDUP /path/to/dir1 /path/to/dir2 /path/to/dir1 /path/to/dir3 {/path/to dir4} /path/to/dir3
+append-path\t--duplicates FOOPATHDUPEM /path/to/dir3
+prepend-path\t--duplicates -d { } FOOPATHDUPSP /path/to/dir1 /path/to/dir1 /path/to/dir2 /path/to/dir1 /path/to/dir3
+prepend-path\t--duplicates -d { } FOOPATHDUPSPEM /path/to/dir1 /path/to/dir1 /path/to/dir2 /path/to/dir1 /path/to/dir3
+prepend-path\t--duplicates FOOPATHDUPEM {} /path/to/dir1 /path/to/dir1 /path/to/dir2
 setenv\t\tFOOPATHDUPMIX {:/path/to/dir1:/path/to/dir1 /path/to/dir2 /path/to/dir1:/path/to/dir3:/path/to/dir3:}"
 testouterr_shtomod ALL {} OK $tserr
 

@@ -1707,36 +1707,94 @@ proc sh-to-mod {elt_ignored_list args} {
             } else {
                # content should be prepended
                if {$doprepend} {
-                  set modcmd [list prepend-path]
+                  # split value: a directory found several times in this
+                  # list is not de-duplicated, as it is genuinely meant to
+                  # be added at each of these positions in the resulting
+                  # value
+                  set prelist [split [string range $varaft($name) 0\
+                     $idx-2] $predelim]
+                  set preuniq [list]
+                  lappendNoDup preuniq {*}$prelist
+                  set predupbylen [expr {[llength $prelist] !=\
+                     [llength $preuniq]}]
+                  # an empty element is added
+                  if {![llength $prelist]} {
+                     lappend prelist {}
+                  }
+               }
+               # content should be appended
+               if {$doappend} {
+                  set applist [split [string range $varaft($name)\
+                     [expr {$idx + [string length $varbef($name)] + 1}]\
+                     end] $appdelim]
+                  set appuniq [list]
+                  lappendNoDup appuniq {*}$applist
+                  set appdupbylen [expr {[llength $applist] !=\
+                     [llength $appuniq]}]
+                  if {![llength $applist]} {
+                     lappend applist {}
+                  }
+               }
+
+               # a directory to add is genuinely meant to end up at this
+               # specific position in the resulting value, so pass
+               # --duplicates on the corresponding command to avoid it
+               # being silently absorbed by prepend-path/append-path's
+               # default dedup behavior, or relocated by the
+               # path_entry_reorder configuration option, when this
+               # directory:
+               # - is already found in the value the variable had prior
+               #   the script evaluation
+               # - is found several times in the directory list to add
+               #   for this command
+               # - is found in both the directory list to prepend and the
+               #   directory list to append
+               set dupacross 0
+               if {$doprepend && $doappend} {
+                  foreach dir $prelist {
+                     if {$dir in $applist} {
+                        set dupacross 1
+                        break
+                     }
+                  }
+               }
+               if {$doprepend} {
+                  set predupopt [list]
+                  if {$dupacross || $predupbylen} {
+                     set predupopt [list --duplicates]
+                  } else {
+                     foreach dir $prelist {
+                        if {$dir in [split $varbef($name) $predelim]} {
+                           set predupopt [list --duplicates]
+                           break
+                        }
+                     }
+                  }
+                  set modcmd [list prepend-path {*}$predupopt]
                   if {$predelim ne $pathsep} {
                      lappend modcmd -d $predelim
                   }
                   lappend modcmd $name
-                  # split value and remove duplicate entries
-                  set vallist [list]
-                  lappendNoDup vallist {*}[split [string range\
-                     $varaft($name) 0 $idx-2] $predelim]
-                  # an empty element is added
-                  if {![llength $vallist]} {
-                     lappend vallist {}
-                  }
-                  lappend modcontent [list {*}$modcmd {*}$vallist]
+                  lappend modcontent [list {*}$modcmd {*}$prelist]
                }
-               # content should be appended
                if {$doappend} {
-                  set modcmd [list append-path]
+                  set appdupopt [list]
+                  if {$dupacross || $appdupbylen} {
+                     set appdupopt [list --duplicates]
+                  } else {
+                     foreach dir $applist {
+                        if {$dir in [split $varbef($name) $appdelim]} {
+                           set appdupopt [list --duplicates]
+                           break
+                        }
+                     }
+                  }
+                  set modcmd [list append-path {*}$appdupopt]
                   if {$appdelim ne $pathsep} {
                      lappend modcmd -d $appdelim
                   }
                   lappend modcmd $name
-                  set vallist [list]
-                  lappendNoDup vallist {*}[split [string range\
-                     $varaft($name) [expr {$idx + [string length\
-                     $varbef($name)] + 1}] end] $appdelim]
-                  if {![llength $vallist]} {
-                     lappend vallist {}
-                  }
-                  lappend modcontent [list {*}$modcmd {*}$vallist]
+                  lappend modcontent [list {*}$modcmd {*}$applist]
                }
             }
          }
