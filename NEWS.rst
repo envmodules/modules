@@ -142,6 +142,16 @@ Modules 5.7.0 (not yet released)
   environment variable change that requires both a prepended and an appended
   part expressed with a different delimiter character: a :mfcmd:`setenv`
   command is now generated instead in this situation.
+* Update the :mfcmd:`source-sh` modulefile command and :subcmd:`sh-to-mod`
+  sub-command mechanism to no longer de-duplicate a path entry found several
+  times in the entries it prepends or in the entries it appends, and to add
+  the ``--duplicates`` option on a generated :mfcmd:`prepend-path` or
+  :mfcmd:`append-path` command when one of the path entries it adds is
+  already found in the variable value prior script evaluation, is found
+  several times in the entries it adds or is found in both the entries it
+  prepends and the entries it appends, so this entry is not silently
+  absorbed by these commands' default de-duplication behavior nor relocated
+  by the :mconfig:`path_entry_reorder` configuration option.
 
 
 .. _5.6 release notes:

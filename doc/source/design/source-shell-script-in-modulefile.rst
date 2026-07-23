@@ -183,14 +183,16 @@ Specification
 
     - to separate each output kind and then be able to split them for separate analysis
 
-- De-duplication of path entries is applied for changes on path-like environment variables
+- Path entries found in the newly prepended entries or in the newly appended entries for a variable are never de-duplicated: every occurrence is kept and passed on the corresponding ``prepend-path`` or ``append-path`` command
 
-  - If the same path entry appears several times in the newly prepended entries for a variable, the first occurrence of this entry is kept others are dropped
-  - If the same path entry appears several times in the newly appended entries for a variable, the first occurrence of this entry is kept others are dropped
-  - De-duplication is not applied for path entries:
+- The ``--duplicates`` option is added to a ``prepend-path`` or ``append-path`` command when one of the entries it adds:
 
-    - appearing in both the new prepended entries and newly appended entries
-    - appearing in newly prepended entries or newly appended entries and in entries defined prior script evaluation
+  - is already found in the variable value prior script evaluation
+  - is found several times in the newly prepended entries or in the newly appended entries
+  - is found in both the newly prepended entries and the newly appended entries
+
+  - Such an entry is genuinely meant to end up at this specific position in the resulting value
+  - Without this option, ``prepend-path`` and ``append-path``'s default de-duplication behavior would silently absorb the entry, and the ``path_entry_reorder`` configuration option could relocate it, which would not correctly reproduce the change made by the script
 
 - An environment variable equaling to the path separator character (``:``) prior script evaluation is considered as undefined prior script evaluation to avoid misleading analysis
 
