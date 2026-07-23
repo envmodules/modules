@@ -1650,6 +1650,54 @@ proc execShAndGetEnv {elt_ignored_list shell script args} {
    }
 }
 
+# split the range of a variable value to prepend or append into a
+# directory list for sh-to-mod: a directory found several times in this
+# list is not de-duplicated, as it is genuinely meant to be added at each
+# of these positions in the resulting value. Whether de-duplication would
+# have dropped an entry is also reported, to guide the --duplicates
+# option decision made in mkPathAddModCmd
+proc splitPathAddList {rangeval delim} {
+   set dirlist [split $rangeval $delim]
+   set diruniq [list]
+   lappendNoDup diruniq {*}$dirlist
+   set dupbylen [expr {[llength $dirlist] != [llength $diruniq]}]
+   # an empty element is added
+   if {![llength $dirlist]} {
+      lappend dirlist {}
+   }
+   return [list $dirlist $dupbylen]
+}
+
+# build the prepend-path or append-path modulefile command adding dirlist
+# to variable name for sh-to-mod. --duplicates is set on this command
+# when one of its entries is genuinely meant to end up at this specific
+# position in the resulting value, so it is not silently absorbed by
+# prepend-path/append-path's default dedup behavior, nor relocated by the
+# path_entry_reorder configuration option: this is the case when this
+# entry is already found in befval, was found several times in dirlist
+# prior de-duplication (dupbylen), or is also found in the list of
+# entries added on the other side of the value (dupacross)
+proc mkPathAddModCmd {cmdname dirlist dupbylen dupacross delim pathsep\
+   befval name} {
+   set dupopt [list]
+   if {$dupacross || $dupbylen} {
+      set dupopt [list --duplicates]
+   } else {
+      foreach dir $dirlist {
+         if {$dir in [split $befval $delim]} {
+            set dupopt [list --duplicates]
+            break
+         }
+      }
+   }
+   set modcmd [list $cmdname {*}$dupopt]
+   if {$delim ne $pathsep} {
+      lappend modcmd -d $delim
+   }
+   lappend modcmd $name
+   return [list {*}$modcmd {*}$dirlist]
+}
+
 # execute script with args through shell and convert environment changes into
 # corresponding modulefile commands
 proc sh-to-mod {elt_ignored_list args} {
@@ -1707,48 +1755,21 @@ proc sh-to-mod {elt_ignored_list args} {
             } else {
                # content should be prepended
                if {$doprepend} {
-                  # split value: a directory found several times in this
-                  # list is not de-duplicated, as it is genuinely meant to
-                  # be added at each of these positions in the resulting
-                  # value
-                  set prelist [split [string range $varaft($name) 0\
-                     $idx-2] $predelim]
-                  set preuniq [list]
-                  lappendNoDup preuniq {*}$prelist
-                  set predupbylen [expr {[llength $prelist] !=\
-                     [llength $preuniq]}]
-                  # an empty element is added
-                  if {![llength $prelist]} {
-                     lappend prelist {}
-                  }
+                  lassign [splitPathAddList [string range $varaft($name)\
+                     0 $idx-2] $predelim] prelist predupbylen
                }
                # content should be appended
                if {$doappend} {
-                  set applist [split [string range $varaft($name)\
+                  lassign [splitPathAddList [string range $varaft($name)\
                      [expr {$idx + [string length $varbef($name)] + 1}]\
-                     end] $appdelim]
-                  set appuniq [list]
-                  lappendNoDup appuniq {*}$applist
-                  set appdupbylen [expr {[llength $applist] !=\
-                     [llength $appuniq]}]
-                  if {![llength $applist]} {
-                     lappend applist {}
-                  }
+                     end] $appdelim] applist appdupbylen
                }
 
-               # a directory to add is genuinely meant to end up at this
-               # specific position in the resulting value, so pass
-               # --duplicates on the corresponding command to avoid it
-               # being silently absorbed by prepend-path/append-path's
-               # default dedup behavior, or relocated by the
-               # path_entry_reorder configuration option, when this
-               # directory:
-               # - is already found in the value the variable had prior
-               #   the script evaluation
-               # - is found several times in the directory list to add
-               #   for this command
-               # - is found in both the directory list to prepend and the
-               #   directory list to append
+               # a directory found in both the prepended and appended
+               # entries is also genuinely meant to end up at each of
+               # these positions in the resulting value: this is passed
+               # on to mkPathAddModCmd along with each side's own
+               # dupbylen, to decide whether --duplicates should be set
                set dupacross 0
                if {$doprepend && $doappend} {
                   foreach dir $prelist {
@@ -1759,42 +1780,14 @@ proc sh-to-mod {elt_ignored_list args} {
                   }
                }
                if {$doprepend} {
-                  set predupopt [list]
-                  if {$dupacross || $predupbylen} {
-                     set predupopt [list --duplicates]
-                  } else {
-                     foreach dir $prelist {
-                        if {$dir in [split $varbef($name) $predelim]} {
-                           set predupopt [list --duplicates]
-                           break
-                        }
-                     }
-                  }
-                  set modcmd [list prepend-path {*}$predupopt]
-                  if {$predelim ne $pathsep} {
-                     lappend modcmd -d $predelim
-                  }
-                  lappend modcmd $name
-                  lappend modcontent [list {*}$modcmd {*}$prelist]
+                  lappend modcontent [mkPathAddModCmd prepend-path\
+                     $prelist $predupbylen $dupacross $predelim $pathsep\
+                     $varbef($name) $name]
                }
                if {$doappend} {
-                  set appdupopt [list]
-                  if {$dupacross || $appdupbylen} {
-                     set appdupopt [list --duplicates]
-                  } else {
-                     foreach dir $applist {
-                        if {$dir in [split $varbef($name) $appdelim]} {
-                           set appdupopt [list --duplicates]
-                           break
-                        }
-                     }
-                  }
-                  set modcmd [list append-path {*}$appdupopt]
-                  if {$appdelim ne $pathsep} {
-                     lappend modcmd -d $appdelim
-                  }
-                  lappend modcmd $name
-                  lappend modcontent [list {*}$modcmd {*}$applist]
+                  lappend modcontent [mkPathAddModCmd append-path\
+                     $applist $appdupbylen $dupacross $appdelim $pathsep\
+                     $varbef($name) $name]
                }
             }
          }
