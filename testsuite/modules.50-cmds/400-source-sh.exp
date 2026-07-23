@@ -23,13 +23,39 @@
 set mp $modpath.2
 set mpre [regsub -all "\(\[.+?\]\)" $mp {\\\1}]
 
+foreach path_entry_reorder {0 1} {
+
+setenv_var MODULES_PATH_ENTRY_REORDER $path_entry_reorder
+
+# reset state accumulated by a previous run through this loop, so each
+# path_entry_reorder value is tested from the same clean starting point
+foreach var [array names env -glob FOO*] {
+    unsetenv_var $var
+}
+foreach var [array names env -glob __MODULES_*] {
+    unsetenv_var $var
+}
+unsetenv_var TESTSUITE_SHTOMOD_NOVAR
+unsetenv_var TESTSUITE_SHTOMOD_NOPATH
+unsetenv_var TESTSUITE_SHTOMOD_NOFUNC
+unsetenv_var TESTSUITE_SHTOMOD_NOALIAS
+unsetenv_var TESTSUITE_SHTOMOD_NOCOMP
+unsetenv_var TESTSUITE_SHTOMOD_NOCD
+unsetenv_var TESTSUITE_SHTOMOD_PATHDUP
+unsetenv_var TESTSUITE_SHTOMOD_MODULE
+unsetenv_var TESTSUITE_SHTOMOD_UNSETALFUNCCOMP
+unsetenv_var TESTSUITE_SHTOMOD_FUZZYOUT1
+unsetenv_var TESTSUITE_SOURCESH_ESCCHAR
+unsetenv_var MODULES_SET_SHELL_STARTUP
+unsetenv_var MODULES_CMD
+unsetenv_loaded_module
+
 # setup specific environment
 setenv_path_var MODULEPATH $mp
 
 setenv_var TESTSUITE_SHTOMOD_PATHDUP 1
 setenv_var TESTSUITE_SHTOMOD_NOCOMP 1
 
-setenv_var MODULES_PATH_ENTRY_REORDER 0
 
 #
 # load and unload tests
@@ -527,7 +553,7 @@ $mp/source-sh/5.0:
 
 chdir		$mp
 prepend-path	FOOPATH /path/to/dir1 /path/to/dir2 /path/to/dir3
-prepend-path	FOOPATHCB /path/to/dir1 /path/to/d{r2 /path/to/dir3
+prepend-path	FOOPATHCB /path/to/dir1 /path/to/d\{r2 /path/to/dir3
 prepend-path	FOOPATHDUP /path/to/dir1 /path/to/dir2 /path/to/dir3 {/path/to dir4}
 prepend-path	FOOPATHDUPEM {} /path/to/dir1 /path/to/dir2 /path/to/dir3
 prepend-path	FOOPATHDUPMIX {} /path/to/dir1 {/path/to/dir1 /path/to/dir2 /path/to/dir1} /path/to/dir3
@@ -552,7 +578,7 @@ set-function\tfuncsp {
 set-function\tfuncwc {
     echo sou*sh}
 setenv		FOO value
-setenv		FOOCB va{ue
+setenv		FOOCB va\{ue
 setenv		FOOEM {}
 setenv		FOOPATHDUPSPEM {/path/to/dir1 /path/to/dir1 /path/to/dir2 /path/to/dir1 /path/to/dir3 /path/to/dir3 }
 setenv		FOOPATHSP {/path/to/dir1 /path/to/dir2 /path/to/dir3}
@@ -592,7 +618,7 @@ $mp/source-sh/5.1:
 
 chdir		$mp
 prepend-path	FOOPATH /path/to/dir1 /path/to/dir2 /path/to/dir3
-prepend-path	FOOPATHCB /path/to/dir1 /path/to/d{r2 /path/to/dir3
+prepend-path	FOOPATHCB /path/to/dir1 /path/to/d\{r2 /path/to/dir3
 prepend-path	FOOPATHDUP /path/to/dir1 /path/to/dir2 /path/to/dir3 {/path/to dir4}
 prepend-path	FOOPATHDUPEM {} /path/to/dir1 /path/to/dir2 /path/to/dir3
 prepend-path	FOOPATHDUPMIX {} /path/to/dir1 {/path/to/dir1 /path/to/dir2 /path/to/dir1} /path/to/dir3
@@ -619,7 +645,7 @@ set-function\tfuncwc {
 setenv		FOO value
 setenv		FOOARG1 arg1
 setenv		FOOARG2 arg2
-setenv		FOOCB va{ue
+setenv		FOOCB va\{ue
 setenv		FOOEM {}
 setenv		FOOPATHDUPSPEM {/path/to/dir1 /path/to/dir1 /path/to/dir2 /path/to/dir1 /path/to/dir3 /path/to/dir3 }
 setenv		FOOPATHSP {/path/to/dir1 /path/to/dir2 /path/to/dir3}
@@ -1002,7 +1028,7 @@ set tserr_disp3 "---------------------------------------------------------------
 $mp/source-sh/5.0:
 
 setenv		FOO value
-setenv		FOOCB va{ue
+setenv		FOOCB va\{ue
 setenv		FOOEM {}
 setenv		FOOSP {value }
 setenv		FOOWC va*ue
@@ -1966,6 +1992,8 @@ unsetenv_var TESTSUITE_SHTOMOD_UNSETALFUNCCOMP
 
 } elseif {$verbose} {
     send_user "\tSkip tests relying on an excepted siteconfig file installed\n"
+}
+
 }
 
 
