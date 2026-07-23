@@ -1,0 +1,21 @@
+#compdef ml
+
+_ml() {
+   typeset -A opt_args
+
+   _arguments -C \
+      '(-T --trace)'{-T,--trace}'[Enable trace and debug messages]' \
+      '(-D --debug)'{-D,--debug}'[Enable debug messages]' \
+      '(-v --verbose)'{-v,--verbose}'[Enable verbose messages]' \
+      '(-s --silent)'{-s,--silent}'[Turn off error, warning and informational messages]' \
+      '(-h --help)'{-h,--help}'[Usage info]' \
+      '(-V --version)'{-V,--version}'[Module version]' \
+      '--dumpname[Module implementation name]' \
+      '(-w --width=)'{-w,--width=}'[Set output width]' \
+      '(-p --paginate)'{-p,--paginate}'[Pipe mesg output into a pager if stream attached to terminal]' \
+      '(-P --no-pager)'{-P,--no-pager}'[Do not pipe message output into a pager]' \
+      '(--color --color=)'{--color,--color=}'[Colorize the output]' \
+      '--ignore-cache[Ignore module cache]'
+}
+
+exec "$@"

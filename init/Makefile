@@ -52,7 +52,7 @@ endif
 
 ALL_SHELLS = $(SH_LIKE) $(CSH_LIKE) $(OTHER)
 
-all: $(ALL_SHELLS) initrc bash_completion zsh-functions/_module $(EXAMPLE_MODFILES_SRCDIR)/modules
+all: $(ALL_SHELLS) initrc bash_completion zsh-functions/_module zsh-functions/_ml  $(EXAMPLE_MODFILES_SRCDIR)/modules
 ifeq ($(versioning),y)
 all: $(EXAMPLE_MODFILES_SRCDIR)/version
 endif
@@ -263,6 +263,7 @@ else
 	$(INSTALL_DATA) bash_completion '$(DESTDIR)$(bashcompletiondir)/'
 endif
 	$(INSTALL_DATA) zsh-functions/_module '$(DESTDIR)$(zshcompletiondir)/'
+	$(INSTALL_DATA) zsh-functions/_ml '$(DESTDIR)$(zshcompletiondir)'
 	$(INSTALL_DATA) ksh '$(DESTDIR)$(initdir)/ksh-functions/module'
 	$(INSTALL_DATA) ksh '$(DESTDIR)$(initdir)/ksh-functions/ml'
 	$(INSTALL_DATA) initrc '$(DESTDIR)$(initrc)'
@@ -296,6 +297,7 @@ else
 	rm -f '$(DESTDIR)$(fishcompletiondir)/fish_completion'
 endif
 	rm -f '$(DESTDIR)$(zshcompletiondir)/_module'
+	rm -f '$(DESTDIR)$(zshcompletiondir)/_ml'
 	rm -f '$(DESTDIR)$(modulespath)' '$(DESTDIR)$(initrc)'
 	$(RMDIR_IGN_NON_EMPTY) '$(DESTDIR)$(modulefilesdir)' || true
 	@if [ -d '$(DESTDIR)$(modulefilesdir)' ]; then echo; echo "WARNING: '$(DESTDIR)$(modulefilesdir)' is not empty so skip removal" >&2; echo; fi
@@ -316,7 +318,7 @@ ifeq ($(versioning),y)
 endif
 
 clean:
-	rm -f $(ALL_SHELLS) initrc bash_completion zsh-functions/_module modulespath $(EXAMPLE_MODFILES_SRCDIR)/modules
+	rm -f $(ALL_SHELLS) initrc bash_completion zsh-functions/_module zsh-functions/_ml modulespath $(EXAMPLE_MODFILES_SRCDIR)/modules
 ifeq ($(versioning),y)
 	rm -f $(EXAMPLE_MODFILES_SRCDIR)/version
 endif
@@ -327,6 +329,6 @@ V = 1
 endif
 # let verbose by default the install/clean/test and other specific non-build targets
 $(V).SILENT: sh ksh bash zsh csh tcsh fish perl.pm env_modules.py ruby.rb lisp tcl \
-	cmake r.R bash_completion tcsh_completion zsh-functions/_module profile.sh \
+	cmake r.R bash_completion tcsh_completion zsh-functions/_module zsh-functions/_ml profile.sh \
 	profile.csh modulespath initrc $(EXAMPLE_MODFILES_SRCDIR)/modules \
 	$(EXAMPLE_MODFILES_SRCDIR)/version pwsh.ps1
