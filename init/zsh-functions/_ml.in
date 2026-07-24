@@ -210,6 +210,7 @@ _ml() {
             'stashshow:Display information about stash collection'
             'cachebuild:Create cache file for modulepath(s)'
             'cacheclear:Delete cache file in enabled modulepath(s)'
+            _ml_avail
          )
          # show commands only with compatible options
          if (( !$+opt_args[-h] && !$+opt_args[--help] \
