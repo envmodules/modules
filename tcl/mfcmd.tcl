@@ -1650,54 +1650,6 @@ proc execShAndGetEnv {elt_ignored_list shell script args} {
    }
 }
 
-# split the range of a variable value to prepend or append into a
-# directory list for sh-to-mod: a directory found several times in this
-# list is not de-duplicated, as it is genuinely meant to be added at each
-# of these positions in the resulting value. Whether de-duplication would
-# have dropped an entry is also reported, to guide the --duplicates
-# option decision made in mkPathAddModCmd
-proc splitPathAddList {rangeval delim} {
-   set dirlist [split $rangeval $delim]
-   set diruniq [list]
-   lappendNoDup diruniq {*}$dirlist
-   set dupbylen [expr {[llength $dirlist] != [llength $diruniq]}]
-   # an empty element is added
-   if {![llength $dirlist]} {
-      lappend dirlist {}
-   }
-   return [list $dirlist $dupbylen]
-}
-
-# build the prepend-path or append-path modulefile command adding dirlist
-# to variable name for sh-to-mod. --duplicates is set on this command
-# when one of its entries is genuinely meant to end up at this specific
-# position in the resulting value, so it is not silently absorbed by
-# prepend-path/append-path's default dedup behavior, nor relocated by the
-# path_entry_reorder configuration option: this is the case when this
-# entry is already found in befval, was found several times in dirlist
-# prior de-duplication (dupbylen), or is also found in the list of
-# entries added on the other side of the value (dupacross)
-proc mkPathAddModCmd {cmdname dirlist dupbylen dupacross delim pathsep\
-   befval name} {
-   set dupopt [list]
-   if {$dupacross || $dupbylen} {
-      set dupopt [list --duplicates]
-   } else {
-      foreach dir $dirlist {
-         if {$dir in [split $befval $delim]} {
-            set dupopt [list --duplicates]
-            break
-         }
-      }
-   }
-   set modcmd [list $cmdname {*}$dupopt]
-   if {$delim ne $pathsep} {
-      lappend modcmd -d $delim
-   }
-   lappend modcmd $name
-   return [list {*}$modcmd {*}$dirlist]
-}
-
 # execute script with args through shell and convert environment changes into
 # corresponding modulefile commands
 proc sh-to-mod {elt_ignored_list args} {
@@ -1724,71 +1676,76 @@ proc sh-to-mod {elt_ignored_list args} {
    foreach name $diff {
       if {$name ni $ignvarlist && ![string equal -length 10 $name\
          __MODULES_]} {
+         set idx [string first $varbef($name) $varaft($name)]
+         set doprepend [expr {$idx > 0}]
+         if {$doprepend} {
+            # check from the end to get the largest chunk to prepend
+            set idx [string last $varbef($name) $varaft($name)]
+            # get delimiter from char found between new and existing value
+            set predelim [string index $varaft($name) $idx-1]
+            set delim $predelim
+         }
+         set appdelim_idx [expr {$idx + [string length $varbef($name)]}]
+         set doappend [expr {$appdelim_idx < [string length $varaft($name)]}]
+         if {$doappend} {
+            set appdelim [string index $varaft($name) $appdelim_idx]
+            set delim $appdelim
+         }
          # new value is totally different (also consider a bare ':' as a
          # totally different value to avoid erroneous matches)
-         if {$varbef($name) eq $pathsep || [set idx [string first\
-            $varbef($name) $varaft($name)]] == -1} {
+         # if content must both be prepended and appended but each side uses a
+         # different delimiter character, consider new value totally different
+         if {$varbef($name) eq $pathsep || $idx == -1 || ($doprepend &&\
+            $doappend && $predelim ne $appdelim)} {
             lappend modcontent [list setenv $name $varaft($name)]
          } else {
-            set doprepend [expr {$idx > 0}]
+            set alllist [list]
+            # de-dup pre-existing list to correctly determine if new dup added
+            lappendNoDup alllist {*}[split $varbef($name) $delim]
+            set addmodcmd [list]
+            # content should be prepended
             if {$doprepend} {
-               # check from the end to get the largest chunk to prepend
-               set idx [string last $varbef($name) $varaft($name)]
-               # get delimiter from char found between new and existing value
-               set predelim [string index $varaft($name) $idx-1]
+               set prelist [split [string range $varaft($name) 0 $idx-2]\
+                  $delim]
+               # an empty element is added
+               if {![llength $prelist]} {
+                  lappend prelist {}
+               }
+               lappend alllist {*}$prelist
+               lappend addmodcmd prepend-path $prelist
             }
-            set doappend [expr {($idx + [string length $varbef($name)]) <\
-               [string length $varaft($name)]}]
+            # content should be appended
             if {$doappend} {
-               set appdelim [string index $varaft($name) $idx+[string\
-                  length $varbef($name)]]
+               set applist [split [string range $varaft($name) [expr\
+                  {$appdelim_idx + 1}] end] $delim]
+               # an empty element is added
+               if {![llength $applist]} {
+                  lappend applist {}
+               }
+               lappend alllist {*}$applist
+               lappend addmodcmd append-path $applist
             }
 
-            # if content must both be prepended and appended but each side
-            # uses a different delimiter character, the change cannot be
-            # expressed as a coherent pair of path-manipulation commands,
-            # since each delimiter implies a different, incompatible split
-            # of the value: fall back to a plain setenv to correctly
-            # capture the new value
-            if {$doprepend && $doappend && $predelim ne $appdelim} {
-               lappend modcontent [list setenv $name $varaft($name)]
-            } else {
-               # content should be prepended
-               if {$doprepend} {
-                  lassign [splitPathAddList [string range $varaft($name)\
-                     0 $idx-2] $predelim] prelist predupbylen
-               }
-               # content should be appended
-               if {$doappend} {
-                  lassign [splitPathAddList [string range $varaft($name)\
-                     [expr {$idx + [string length $varbef($name)] + 1}]\
-                     end] $appdelim] applist appdupbylen
-               }
+            # if a directory is found several times in prepended or appended
+            # list, or across both list, or already in pre-existing value:
+            # should not be de-duplicated by prepend-path/append-path's
+            # default behavior, nor relocated by the path_entry_reorder
+            # configuration option. a plain membership test (rather than
+            # merging pre-existing value into alllist) is required here, as
+            # merging would let lappendNoDup silently skip an entry already
+            # in alllist, hiding the very overlap this check looks for
+            set isdup [isDupInList $alllist]
 
-               # a directory found in both the prepended and appended
-               # entries is also genuinely meant to end up at each of
-               # these positions in the resulting value: this is passed
-               # on to mkPathAddModCmd along with each side's own
-               # dupbylen, to decide whether --duplicates should be set
-               set dupacross 0
-               if {$doprepend && $doappend} {
-                  foreach dir $prelist {
-                     if {$dir in $applist} {
-                        set dupacross 1
-                        break
-                     }
-                  }
+            foreach {cmd addlist} $addmodcmd {
+               set addcmd [list $cmd]
+               if {$isdup} {
+                  lappend addcmd --duplicates
                }
-               if {$doprepend} {
-                  lappend modcontent [mkPathAddModCmd prepend-path\
-                     $prelist $predupbylen $dupacross $predelim $pathsep\
-                     $varbef($name) $name]
+               if {$delim ne $pathsep} {
+                  lappend addcmd -d $delim
                }
-               if {$doappend} {
-                  lappend modcontent [mkPathAddModCmd append-path\
-                     $applist $appdupbylen $dupacross $appdelim $pathsep\
-                     $varbef($name) $name]
-               }
+               lappend addcmd $name {*}$addlist
+               lappend modcontent $addcmd
             }
          }
       }
