@@ -1,0 +1,408 @@
+#compdef ml
+
+#
+# Zsh command-line completion for module
+# Copyright (C) 2017 Xavier Delaruelle <xavier.delaruelle@cea.fr>
+#
+
+_ml_avail() {
+   local cur="${1:-}";
+   # skip avail call if word currently being completed is an option keyword
+   if [ -z "$cur" -o "${cur:0:1}" != '-' ]; then
+      module avail --color=never -s -t -S --no-indepth -o 'alias:indesym' $cur 2>&1
+   fi
+}
+
+_ml_spider() {
+   local cur="${1:-}";
+   # skip spider call if word currently being completed is an option keyword
+   if [ -z "$cur" -o "${cur:0:1}" != '-' ]; then
+      module spider --color=never -s -t -S --no-indepth -o 'alias:indesym' $cur 2>&1
+   fi
+}
+
+_ml_savelist() {
+   module savelist --color=never -s -t 2>&1 | sed '
+      /No named collection\.$/d;
+      /Named collection list$/d;
+      /:$/d;'
+}
+
+_ml_stashlist() {
+   module stashlist --color=never -s -t 2>&1 | sed '
+      /No stash collection\.$/d;
+      /Stash collection list$/d;
+      /:$/d;'
+}
+
+_ml_not_yet_loaded() {
+   _ml_avail ${1:-} | sort | @SED_ERE@ "\%^(${LOADEDMODULES//:/|})$%d"
+}
+
+
+_ml_avail_mods() {
+   local -a avail_mods;
+   local suffix=' ';
+   avail_mods=(${$(_ml_avail $cur ${1:-})})
+
+   # do not append space to word completed if it is a directory (ends with /)
+   for val in $avail_mods; do
+      if [ "${val: -1:1}" = '/' ]; then
+         suffix=''
+         break
+      fi
+   done
+
+   compadd -S "$suffix" -a avail_mods && ret=0
+}
+
+_ml_spider_mods() {
+   local -a spider_mods;
+   local suffix=' ';
+   spider_mods=(${$(_ml_spider $cur ${1:-})})
+
+   # do not append space to word completed if it is a directory (ends with /)
+   for val in $spider_mods; do
+      if [ "${val: -1:1}" = '/' ]; then
+         suffix=''
+         break
+      fi
+   done
+
+   compadd -S "$suffix" -a spider_mods && ret=0
+}
+
+_ml_saved_colls() {
+   local -a saved_colls;
+   saved_colls=(${$(_ml_savelist)})
+
+   _describe -t saved-colls 'saved collections' saved_colls && ret=0
+}
+
+_ml_stash_colls() {
+   local -a stash_colls;
+   stash_colls=(${$(_ml_stashlist)})
+
+   _describe -t stash-colls 'stash collections' stash_colls && ret=0
+}
+
+_ml_notloaded_mods() {
+   local -a not_yet_loaded_mods;
+   local suffix=' ';
+   not_yet_loaded_mods=(${$(_ml_not_yet_loaded ${1:-})})
+
+   # do not append space to word completed if it is a directory (ends with /)
+   for val in $not_yet_loaded_mods; do
+      if [ "${val: -1:1}" = '/' ]; then
+         suffix=''
+         break
+      fi
+   done
+
+   compadd -S "$suffix" -a not_yet_loaded_mods && ret=0
+}
+
+_ml_loaded_mods() {
+   local -a loaded_mods;
+   loaded_mods=(${=LOADEDMODULES//:/ })
+
+   _describe -t loaded-mods 'loaded modulefiles' loaded_mods && ret=0
+}
+
+_ml_used_paths() {
+   local -a used_paths;
+   used_paths=(${=MODULEPATH//:/ })
+
+   _describe -t used-paths 'enabled modulepaths' used_paths && ret=0
+}
+
+
+_ml() {
+   typeset -A opt_args
+
+   _arguments -C \
+      '(-T --trace)'{-T,--trace}'[Enable trace and debug messages]' \
+      '(-D --debug)'{-D,--debug}'[Enable debug messages]' \
+      '(-v --verbose)'{-v,--verbose}'[Enable verbose messages]' \
+      '(-s --silent)'{-s,--silent}'[Turn off error, warning and informational messages]' \
+      '(-h --help)'{-h,--help}'[Usage info]' \
+      '(-V --version)'{-V,--version}'[Module version]' \
+      '--dumpname[Module implementation name]' \
+      '(-w --width=)'{-w,--width=}'[Set output width]' \
+      '(-p --paginate)'{-p,--paginate}'[Pipe mesg output into a pager if stream attached to terminal]' \
+      '(-P --no-pager)'{-P,--no-pager}'[Do not pipe message output into a pager]' \
+      '(--color --color=)'{--color,--color=}'[Colorize the output]' \
+      '--ignore-cache[Ignore module cache]' \
+      '--ignore-user-rc[Skip evaluation of user-specific module rc file]' \
+      '(-): :->cmd' \
+      '(-)*:: :->arg' && ret=0
+
+   case $state in
+      (cmd)
+         local -a cmds; cmds=(
+            'add:Load modulefile(s)'
+            'load:Load modulefile(s)'
+            'add-any:Load first available modulefile in list'
+            'load-any:Load first available modulefile in list'
+            'try-add:Attempt to load modulefile(s), no complain'
+            'try-load:Attempt to load modulefile(s), no complain'
+            'rm:Remove modulefile(s)'
+            'remove:Remove modulefile(s)'
+            'del:Remove modulefile(s)'
+            'unload:Remove modulefile(s)'
+            'purge:Unload all loaded modulefiles'
+            'reload:Unload then load all loaded modulefiles'
+            'update:Unload then load all loaded modulefiles'
+            'refresh:Refresh volatile components of loaded modulefiles'
+            'switch:Unload mod1 and load mod2'
+            'swap:Unload mod1 and load mod2'
+            'list:List loaded modules'
+            'avail:List all or matching available modules'
+            'spider:Scan all modulepaths and list all or matching available modules'
+            'is-avail:Is any of the modulefile(s) available'
+            'is-loaded:Test if any of the modulefile(s) are loaded'
+            'info-loaded:Get full name of matching loaded module(s)'
+            'aliases:List all module aliases'
+            'whatis:Print whatis information of modulefile(s)'
+            'apropos:Search all name and whatis containing str'
+            'keyword:Search all name and whatis containing str'
+            'search:Search all name and whatis containing str'
+            'save:Save current module list to collection'
+            'restore:Restore module list from collection or file'
+            'saverm:Remove saved collection'
+            'disable:Remove saved collection'
+            'saveshow:Display information about collection'
+            'describe:Display information about collection'
+            'savelist:List all saved collections'
+            'is-saved:Test if any of the collection(s) exists'
+            'initlist:List all modules loaded from init file'
+            'initadd:Add modulefile to shell init file'
+            'initrm:Remove modulefile from shell init file'
+            'initprepend:Add to beginning of list in init file'
+            'initswitch:Switch mod1 with mod2 from init file'
+            'initclear:Clear all modulefiles from init file'
+            'help:Print this or modulefile(s) help info'
+            'display:Display information about modulefile(s)'
+            'show:Display information about modulefile(s)'
+            'test:Test modulefile(s)'
+            'use:Add dir(s) to MODULEPATH variable'
+            'unuse:Remove dir(s) from MODULEPATH variable'
+            'is-used:Is any of the dir(s) enabled in MODULEPATH'
+            'path:Print modulefile path'
+            'paths:Print path of matching available modules'
+            'source:Execute scriptfile(s)'
+            'append-path:Append value to environment variable'
+            'prepend-path:Prepend value to environment variable'
+            'remove-path:Remove value from environment variable'
+            'clear:Reset Modules-specific runtime information'
+            'config:Display or set Modules configuration'
+            'sh-to-mod:Make modulefile from script env changes'
+            'edit:Open modulefile in editor'
+            'state:Display Modules state'
+            'lint:Check syntax of modulefile'
+            'mod-to-sh:Make shell code from modulefile env changes'
+            'reset:Restore initial environment'
+            'stash:Save current environment and reset'
+            'stashclear:Remove all stash collections'
+            'stashlist:List all stash collections'
+            'stashpop:Restore then remove stash collection'
+            'stashrm:Remove stash collection'
+            'stashshow:Display information about stash collection'
+            'cachebuild:Create cache file for modulepath(s)'
+            'cacheclear:Delete cache file in enabled modulepath(s)'
+            _ml_avail
+         )
+         # show commands only with compatible options
+         if (( !$+opt_args[-h] && !$+opt_args[--help] \
+            && !$+opt_args[-V] && !$+opt_args[--version] \
+            && !$+opt_args[--dumpname] )); then
+            _describe -t cmds 'Module Sub-Commands' cmds && ret=0
+         fi
+         ;;
+      (arg)
+         local cmd="${words[1]}"
+         local cur="${words[CURRENT]}"
+         case $cmd in
+            (load|add|load-any|add-any|try-load|try-add)
+               _arguments \
+                  '--auto[Enable automated module handling mode]' \
+                  '--no-auto[Disable automated module handling mode]' \
+                  '(-f --force)'{-f,--force}'[By-pass dependency consistency]' \
+                  '(-i --icase)'{-i,--icase}'[Case insensitive match]' \
+                  '--tag=[Apply tag to loading module]' \
+                  "*::modulefile:{_ml_notloaded_mods $cur}" && ret=0
+               ;;
+            (avail)
+               _arguments \
+                  '(-l --long)'{-l,--long}'[Display output in long format]' \
+                  '(-t --terse)'{-t,--terse}'[Display output in terse format]' \
+                  '(-j --json)'{-j,--json}'[Display output in JSON format]' \
+                  '(-o --output=)'{-o,--output=}'[Define elements to output in addition to module names]' \
+                  '(-a --all)'{-a,--all}'[Include hidden modules in search]' \
+                  '(-d --default)'{-d,--default}'[Only show default versions available]' \
+                  '(-L --latest)'{-L,--latest}'[Only show latest versions available]' \
+                  '(-i --icase)'{-i,--icase}'[Case insensitive match]' \
+                  '(-S --starts-with)'{-S,--starts-with}'[Search modules whose name begins with query string]' \
+                  '(-C --contains)'{-C,--contains}'[Search modules whose name contains query string]' \
+                  '--indepth[Perform recursive avail search]' \
+                  '--no-indepth[Perform non-recursive avail search]' \
+                  "*::modulefile:{_ml_avail_mods $cur}" && ret=0
+               ;;
+            (spider)
+               _arguments \
+                  '(-l --long)'{-l,--long}'[Display output in long format]' \
+                  '(-t --terse)'{-t,--terse}'[Display output in terse format]' \
+                  '(-j --json)'{-j,--json}'[Display output in JSON format]' \
+                  '(-o --output=)'{-o,--output=}'[Define elements to output in addition to module names]' \
+                  '(-a --all)'{-a,--all}'[Include hidden modules in search]' \
+                  '(-d --default)'{-d,--default}'[Only show default versions available]' \
+                  '(-L --latest)'{-L,--latest}'[Only show latest versions available]' \
+                  '(-i --icase)'{-i,--icase}'[Case insensitive match]' \
+                  '(-S --starts-with)'{-S,--starts-with}'[Search modules whose name begins with query string]' \
+                  '(-C --contains)'{-C,--contains}'[Search modules whose name contains query string]' \
+                  '--indepth[Perform recursive avail search]' \
+                  '--no-indepth[Perform non-recursive avail search]' \
+                  "*::modulefile:{_ml_spider_mods $cur}" && ret=0
+               ;;
+            (aliases)
+               _arguments \
+                  '(-a --all)'{-a,--all}'[Include hidden modules in search]' && ret=0
+               ;;
+            (list)
+               _arguments \
+                  '(-l --long)'{-l,--long}'[Display output in long format]' \
+                  '(-t --terse)'{-t,--terse}'[Display output in terse format]' \
+                  '(-j --json)'{-j,--json}'[Display output in JSON format]' \
+                  '(-o --output=)'{-o,--output=}'[Define elements to output in addition to module names]' \
+                  '(-a --all)'{-a,--all}'[Include hidden modules in list]' && ret=0
+               ;;
+            (savelist)
+               local -a opts; opts=(
+                  '-l:Display output in long format'
+                  '--long:Display output in long format'
+                  '-t:Display output in terse format'
+                  '--terse:Display output in terse format'
+                  '-j:Display output in JSON format'
+                  '--json:Display output in JSON format'
+                  '-o:Define elements to output in addition to module names'
+                  '--output=:Define elements to output in addition to module names'
+               )
+               _describe -t opts 'Switches' opts && ret=0
+               ;;
+            (stashlist)
+               _arguments \
+                  '(-l --long)'{-l,--long}'[Display output in long format]' \
+                  '(-t --terse)'{-t,--terse}'[Display output in terse format]' \
+                  '(-j --json)'{-j,--json}'[Display output in JSON format]' && ret=0
+               ;;
+            (stashpop|stashshow|stashrm)
+               _alternative 'avail-stashs:collections:{_ml_stash_colls}' \
+                  && ret=0
+               ;;
+            (clear)
+               _arguments \
+                  '(-f --force)'{-f,--force}'[Skip confirmation dialog]' && ret=0
+               ;;
+            (restore|save|saveshow|describe|saverm|disable|is-saved)
+               _alternative 'avail-colls:collections:{_ml_saved_colls}' \
+                  && ret=0
+               ;;
+            (rm|del|remove|unload)
+               _arguments \
+                  '--auto[Enable automated module handling mode]' \
+                  '--no-auto[Disable automated module handling mode]' \
+                  '(-f --force)'{-f,--force}'[By-pass dependency consistency]' \
+                  '(-i --icase)'{-i,--icase}'[Case insensitive match]' \
+                  '*::modulefile:_ml_loaded_mods' && ret=0
+               ;;
+            (switch|swap)
+               _arguments \
+                  '--auto[Enable automated module handling mode]' \
+                  '--no-auto[Disable automated module handling mode]' \
+                  '(-f --force)'{-f,--force}'[By-pass dependency consistency]' \
+                  '(-i --icase)'{-i,--icase}'[Case insensitive match]' \
+                  '--tag=[Apply tag to loading module]' \
+                  '1:loaded modulefile:_ml_loaded_mods' \
+                  "2:modulefile:{_ml_notloaded_mods $cur}" && ret=0
+               ;;
+            (unuse|is-used)
+               _alternative 'used-paths:modulepaths:{_ml_used_paths}' \
+                  && ret=0
+               ;;
+            (use)
+               _arguments \
+                  '(-a --append)'{-a,--append}'[Append directory to MODULEPATH]' \
+                  '(-p --prepend)'{-p,--prepend}'[Prepend directory to MODULEPATH]' \
+                  '*:modulepath:_files -/' && ret=0
+               ;;
+            (cachebuild)
+               _arguments \
+                  '*:modulepath:_files -/' && ret=0
+               ;;
+            (display|help|show|test|path|paths|is-loaded|info-loaded)
+               _arguments \
+                  '(-i --icase)'{-i,--icase}'[Case insensitive match]' \
+                  "*::modulefile:{_ml_avail_mods $cur}" && ret=0
+               ;;
+            (is-avail)
+               _arguments \
+                  '(-i --icase)'{-i,--icase}'[Case insensitive match]' \
+                  '(-a --all)'{-a,--all}'[Include hidden modules in search]' \
+                  "*::modulefile:{_ml_avail_mods $cur}" && ret=0
+               ;;
+            (whatis)
+               _arguments \
+                  '(-i --icase)'{-i,--icase}'[Case insensitive match]' \
+                  '(-j --json)'{-j,--json}'[Display output in JSON format]' \
+                  '(-a --all)'{-a,--all}'[Include hidden modules in search]' \
+                  "*::modulefile:{_ml_avail_mods $cur}" && ret=0
+               ;;
+            (apropos|keyword|search)
+               _arguments \
+                  '(-j --json)'{-j,--json}'[Display output in JSON format]' \
+                  '(-a --all)'{-a,--all}'[Include hidden modules in search]' \
+                  && ret=0
+               ;;
+            (append-path|prepend-path)
+               _arguments \
+                  '(-d --delim)'{-d,--delim}'[Path element separator]' \
+                  '--duplicates[Duplicate existing element]' \
+                  && ret=0
+               ;;
+            (remove-path)
+               _arguments \
+                  '(-d --delim)'{-d,--delim}'[Path element separator]' \
+                  '--index[Remove path element with index]' \
+                  && ret=0
+               ;;
+            (config)
+               _arguments \
+                  '--dump-state[Report each state value of current Modules execution]' \
+                  '--reset[Unset environment variable relative to configuration key]' \
+                  '1:configuration key:(abort_on_error advanced_version_spec auto_handling avail_indepth avail_output avail_terse_output cache_buffer_bytes cache_expiry_secs collection_pin_version collection_pin_tag collection_target color colors conflict_unload contact domainname editor extended_default extra_siteconfig hide_auto_loaded home icase ignore_cache ignore_user_rc implicit_default implicit_requirement init_envvars info_extension linked_envvars list_output list_terse_output locked_configs logged_events logger mcookie_check mcookie_version_check ml nearly_forbidden_days non_exportable_tags pager paginate path_entry_reorder protected_envvars quarantine_support rcfile redirect_output require_via reset_target_state run_quarantine search_match set_shell_startup shells_with_ksh_fpath silent_shell_debug source_cache spider_indepth spider_output spider_terse_output sticky_purge tag_abbrev tag_color_name tcl_linter term_background term_width unique_name_loaded unload_match_order variant_shortcut verbosity wa_277)' \
+                  && ret=0
+               ;;
+            (edit)
+               _arguments \
+                  "*::modulefile:{_ml_avail_mods $cur}" && ret=0
+               ;;
+            (lint)
+               _arguments \
+                  '(-i --icase)'{-i,--icase}'[Case insensitive match]' \
+                  '(-a --all)'{-a,--all}'[Include hidden modules in search]' \
+                  "*::modulefile:{_ml_avail_mods $cur}" && ret=0
+               ;;
+            (mod-to-sh)
+               _arguments \
+                  '--auto[Enable automated module handling mode]' \
+                  '--no-auto[Disable automated module handling mode]' \
+                  '(-f --force)'{-f,--force}'[By-pass dependency consistency]' \
+                  '(-i --icase)'{-i,--icase}'[Case insensitive match]' \
+                  "*::modulefile:{_ml_notloaded_mods $cur}" && ret=0
+               ;;
+         esac
+         ;;
+   esac
+}
+
+_ml "$@"
