@@ -322,6 +322,13 @@ proc getDiffBetweenList {list1 list2} {
    return [list $res1 $res2]
 }
 
+# returns if at least one element in list is present several times
+proc isDupInList {arg_list} {
+   ##nagelfar ignore #2 Unknown variable
+   lappendNoDup uniq_list {*}$arg_list
+   return [expr {[llength $arg_list] != [llength $uniq_list]}]
+}
+
 # return intersection of all lists: elements present in every list
 proc getIntersectBetweenList {args} {
    foreach lst $args {
