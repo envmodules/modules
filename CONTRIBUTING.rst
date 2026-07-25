@@ -102,6 +102,8 @@ Start coding
   without your patch.
 * `Run the tests <running-the-tests_>`_ and `verify coverage <running-test-coverage_>`_.
 * `Sign-off your commits <developer-certificate-of-origin_>`_.
+* If you used `AI coding assistants <ai-coding-assistants_>`_, disclose it in
+  your commit message.
 * Push your commits to GitHub and `create a pull request`_.
 
 .. _committing as you go: https://afraid-to-commit.readthedocs.io/en/latest/git/commandlinegit.html#commit-your-changes
@@ -314,6 +316,8 @@ Commit message conventions
   subject line alone says everything there is to say.
 * Reference an issue this commit resolves on its own line in the body,
   e.g. ``Fixes #645`` or ``Closes #572``.
+* Disclose `AI coding assistants <ai-coding-assistants_>`_ involvement, if
+  any, with an ``Assisted-by:`` trailer.
 * `Sign-off your commits <developer-certificate-of-origin_>`_ with a
   ``Signed-off-by:`` trailer, always as the last line of the commit
   message.
@@ -356,6 +360,33 @@ will fail. You will need to amend your commit::
     git commit --amend -s
 
 .. _Developer Certificate of Origin (DCO): https://developercertificate.org/
+
+.. _ai-coding-assistants:
+
+AI coding assistants
+~~~~~~~~~~~~~~~~~~~~~
+
+Modules follows the Linux kernel's approach to AI-assisted contributions. AI
+tools may help write a patch, but the human submitter remains fully
+responsible for it: reviewing all AI-generated code, ensuring it complies
+with the project's licensing requirements and `coding conventions
+<coding-conventions_>`_, and testing it thoroughly.
+
+AI agents must not add ``Signed-off-by`` tags. Only a human can certify the
+`DCO <developer-certificate-of-origin_>`_, so the human submitter still adds
+their own ``Signed-off-by`` line as usual.
+
+When AI tools are used, disclose their involvement with an ``Assisted-by``
+trailer at the end of the commit message::
+
+    Assisted-by: AGENT_NAME:MODEL_VERSION [TOOL1] [TOOL2]
+
+``AGENT_NAME`` is the name of the AI tool or framework and ``MODEL_VERSION``
+is the specific model version used. ``[TOOL1] [TOOL2]`` are optional
+specialized analysis tools used alongside it (e.g. a linter); basic
+development tools (git, make, editors) should not be listed. For example::
+
+    Assisted-by: Claude:claude-sonnet-5
 
 .. _commit-hooks:
 
