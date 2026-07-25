@@ -631,6 +631,19 @@ README:
 	$(ECHO_GEN)
 	sed -e '181,187d' -e '1,10d' -e 's|\[\(.*\?\)\]\[[0-9]\]|\1|' $@.md > $@
 
+# AGENTS.md (https://agents.md) is the single source of instructions for AI
+# coding assistants working in this repository. Codex and Mistral Vibe read
+# it directly, but Claude Code and Gemini CLI only look for their own
+# CLAUDE.md/GEMINI.md filename, so generate a stub for each that just
+# imports AGENTS.md
+CLAUDE.md: AGENTS.md
+	$(ECHO_GEN)
+	echo '@AGENTS.md' > $@
+
+GEMINI.md: AGENTS.md
+	$(ECHO_GEN)
+	echo '@AGENTS.md' > $@
+
 script/add.modules: script/add.modules.in
 	$(translate-in-script)
 	chmod +x $@
@@ -934,6 +947,8 @@ ifeq ($(wildcard .git),.git)
 	rm -f ChangeLog*
 endif
 	rm -f README
+	rm -f CLAUDE.md
+	rm -f GEMINI.md
 	rm -f modulecmd.tcl
 	rm -f $(MODULECMDTEST) $(MODULECMDTEST)_i
 	rm -f tcl/cache.tcl
@@ -1177,8 +1192,8 @@ $(V).SILENT: initdir pkgdoc doc version.inc share/rpm/environment-modules.spec \
 	tcl/cache.tcl_i tcl/coll.tcl_i tcl/envmngt.tcl_i tcl/init.tcl_i tcl/interp.tcl_i \
 	tcl/main.tcl_i tcl/mfcmd.tcl_i tcl/modfind.tcl_i tcl/modeval.tcl_i \
 	tcl/modscan.tcl_i tcl/modspec.tcl_i tcl/report.tcl_i tcl/subcmd.tcl_i \
-	tcl/util.tcl_i ChangeLog ChangeLog.gz README script/add.modules \
-	script/gitlog2changelog.py script/modulecmd \
+	tcl/util.tcl_i ChangeLog ChangeLog.gz README CLAUDE.md GEMINI.md \
+	script/add.modules script/gitlog2changelog.py script/modulecmd \
 	lib/libtclenvmodules$(SHLIB_SUFFIX) lib/libtestutil-closedir$(SHLIB_SUFFIX) \
 	lib/libtestutil-getpwuid$(SHLIB_SUFFIX) lib/libtestutil-getgroups$(SHLIB_SUFFIX) \
 	lib/libtestutil-0getgroups$(SHLIB_SUFFIX) lib/libtestutil-mktime$(SHLIB_SUFFIX) \

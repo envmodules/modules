@@ -1,6 +1,8 @@
 /modulecmd.tcl
 /ChangeLog*
 /README
+/CLAUDE.md
+/GEMINI.md
 /Makefile.inc
 /version.inc
 /modules.log
@@ -60,6 +62,11 @@
 /modules-*.tar.bz2
 /modules-*-win
 /modules-*-win.zip
+# ignore local settings directories of AI coding assistants
+/.claude
+/.codex
+/.gemini
+/.vibe
 # ignore vim swap files
 *.swp
 *.swo
