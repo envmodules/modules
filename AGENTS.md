@@ -124,6 +124,16 @@ cd doc && make html   # requires Sphinx >= 1.0; output in doc/_build/html
   `modules.92-spider`, `lint.00-init`, `install.00-init`. Each `.exp` file is
   numbered/prefixed (e.g. `470-variant.exp`); `script/mt 50/470` targets it.
   `modulefiles*/` subdirectories hold fixture modulefiles used by the tests.
+  Add fixture modulefiles for a *new* test under the highest-numbered
+  `modulefiles.N` directory (e.g. `modulefiles.4`; check for a higher one
+  first) rather than the default `modulefiles/` directory — many existing
+  tests (`aliases`, `avail`, `spider`, `scan_eval`, ...) enumerate a
+  modulepath's *entire* content, so adding to the heavily shared default dir
+  changes their expected output. Even a numbered dir gets referenced
+  wholesale by some tests and by filesystem-glob-order-dependent debug-trace
+  assertions elsewhere in the suite, so run the full test suite after adding
+  fixtures there and update any expected output it exposes — don't assume
+  isolation is complete just from picking the newest numbered directory.
 - `share/` — Nagelfar syntax databases, RPM spec, logo assets
 - `doc/source/` — Sphinx documentation source
   - `design/` — design notes for individual features (one `.rst` per feature)
@@ -163,6 +173,13 @@ cd doc && make html   # requires Sphinx >= 1.0; output in doc/_build/html
   `Signed-off-by:` trailer on behalf of the AI — only the human committer
   signs off — and disclose AI involvement with an `Assisted-by:` trailer,
   e.g. `Assisted-by: Claude:claude-sonnet-5`.
+
+## Updating NEWS.rst
+
+Add a new entry at the *end* of the current in-development version's bullet
+list (immediately before the next `.. _X.Y release notes:` section marker),
+not inserted by topic or alphabetically — entries are in the order changes
+landed.
 
 ## Adding a new `module` sub-command or config option
 
