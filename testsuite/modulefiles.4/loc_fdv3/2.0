@@ -1,0 +1,3 @@
+#%Module
+variant myvar val1 val2
+module-whatis loc_fdv3/2.0

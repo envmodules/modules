@@ -98,3 +98,11 @@ if {[info exists env(TESTSUITE_PROVIDE)]} {
         }
     }
 }
+
+if {[info exists env(TESTSUITE_FASTDEFVERS)]} {
+    switch -- $env(TESTSUITE_FASTDEFVERS) {
+        hide1 {
+            module-hide --hard loc_fdv4/2.0
+        }
+    }
+}

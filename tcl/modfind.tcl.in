@@ -2984,10 +2984,112 @@ proc findModulesInMemCache {searchid} {
    return [list $match_searchid $mod_list]
 }
 
+# when 'mod_name' is 'stop_mod''s own parent directory, narrow
+# 'elt_list_name' (in the {path hid} pairs shape returned by
+# getFilesInDirectory) down to only what is needed to tell whether stop_mod
+# is the implicit 'default'/'latest' version of that directory: its
+# dotfiles (always kept, the general consolidation phase in getModules
+# deals with them normally) plus, among its plain elements, only the
+# dictionary range from stop_mod up to either the first higher element that
+# is itself valid and not hidden (stop_mod is then known not to be
+# default/latest) or the highest element if none qualifies. Left untouched
+# in any other case: this is not stop_mod's own directory, stop_mod does not
+# exist in it, or it is not itself a valid modulefile, in which case there
+# is nothing to optimize
+proc trimElemListForStopmod {dir mod_name stop_mod elt_list_name} {
+   if {![string length $stop_mod] || $mod_name ne [file dirname $stop_mod]} {
+      return
+   }
+
+   upvar $elt_list_name elt_list
+   array set elt_arr $elt_list
+
+   if {![info exists elt_arr($dir/$stop_mod)] || [lindex [checkValidModule\
+      $dir/$stop_mod] 0] ne {true}} {
+      return
+   }
+
+   # first fill updated element list with rc files if any and remove them from
+   # reference array to work only on other items
+   array set up_elt_arr {}
+   foreach rc_tail {.modulerc .version} {
+      set elt $dir/$mod_name/$rc_tail
+      if {[info exists elt_arr($elt)]} {
+         set up_elt_arr($elt) $elt_arr($elt)
+         unset elt_arr($elt)
+      }
+   }
+
+   set tail_list {}
+   foreach elt [array names elt_arr] {
+      lappend tail_list [file tail $elt]
+   }
+
+   # source the modulepath root '.modulerc' then this directory's own
+   # '.modulerc' and '.version' right away (in that order) if not already
+   # done, as any of them may set a hiding rule needed below, to correctly
+   # tell if a sibling actually is a qualifying higher element (guarded the
+   # same way the general consolidation phase guards its own later,
+   # deferred sourcing of them)
+   global g_rcfilesSourced
+   set top_rc_file $dir/.modulerc
+   if {![info exists g_rcfilesSourced($top_rc_file)] && [file readable\
+      $top_rc_file]} {
+      execute-modulerc $top_rc_file .modulerc .modulerc
+      set g_rcfilesSourced($top_rc_file) 1
+   }
+   foreach rc_tail {.modulerc .version} {
+      set rc_elt $dir/$mod_name/$rc_tail
+      if {[info exists up_elt_arr($rc_elt)] && ![info exists\
+         g_rcfilesSourced($rc_elt)]} {
+         set rc_mod $mod_name/$rc_tail
+         execute-modulerc $rc_elt $rc_mod $rc_mod
+         set g_rcfilesSourced($rc_elt) 1
+      }
+   }
+
+   # sort this directory's plain elements and look, starting from the
+   # highest one down to stop_mod, for the first element that is itself
+   # valid and not hidden: whether or not it turns out to be stop_mod
+   # itself, it is this directory's true implicit default/latest, needed
+   # as-is by the caller to correctly resolve it for every module in this
+   # directory, not just stop_mod. Only the elements from that point up to
+   # the highest one need to be kept to reflect it, plus stop_mod's own
+   # element if it lies below that point
+   set stop_tail [file tail $stop_mod]
+   set sorted_tails [lsort -dictionary $tail_list]
+   set stop_idx [lsearch -exact $sorted_tails $stop_tail]
+   set top_idx $stop_idx
+   for {set ti [expr {[llength $sorted_tails] - 1}]} {$ti > $stop_idx}\
+      {incr ti -1} {
+      set fp_tail [lindex $sorted_tails $ti]
+      set fp_elt $dir/$mod_name/$fp_tail
+      if {[file isdirectory $fp_elt]} {
+         # a nested version directory: its own validity cannot be settled
+         # without recursing into it, give up trying to stop early, keep
+         # everything untouched like usual
+         return
+      }
+      if {[lindex [checkValidModule $fp_elt] 0] eq {true} &&\
+         ![isModuleHidden $mod_name/$fp_tail $stop_mod 0 $fp_elt]} {
+         set top_idx $ti
+         break
+      }
+   }
+
+   # only keep rc files, stop_mod and highest element the updated structure
+   set up_elt_arr($dir/$stop_mod) $elt_arr($dir/$stop_mod)
+   if {$top_idx > $stop_idx} {
+      set elt $dir/$mod_name/[lindex $sorted_tails $top_idx]
+      set up_elt_arr($elt) $elt_arr($elt)
+   }
+   set elt_list [array get up_elt_arr]
+}
+
 # Walk through provided list of directories and files to find modules
 proc findModulesFromDirsAndFiles {dir full_list depthlvl fetch_mtime\
    res_arrname {indir_arrname {}} {hidden_listname {}} {fknown_arrname {}}\
-   {dknown_arrname {}}} {
+   {dknown_arrname {}} {stop_mod {}}} {
    # link to variables/arrays from upper context
    upvar $res_arrname mod_list
    if {$indir_arrname ne {}} {
@@ -3024,6 +3126,12 @@ proc findModulesFromDirsAndFiles {dir full_list depthlvl fetch_mtime\
                set mod_list($modulename) [list accesserr [parseAccessIssue\
                   $element] $element]
             } else {
+               # narrow elt_list down to what is needed to correctly tell
+               # whether stop_mod is the implicit default/latest version of
+               # this directory, when this is stop_mod's own directory
+               # (left untouched in any other case)
+               trimElemListForStopmod $dir $modulename $stop_mod elt_list
+
                # Add each element in the current directory to the list
                foreach {fpelt hid} $elt_list {
                   lappend full_list $fpelt
@@ -3082,13 +3190,15 @@ proc findModulesFromDirsAndFiles {dir full_list depthlvl fetch_mtime\
    }
 }
 
-# finds all module-related files matching mod in the module path dir
-proc findModules {dir mod depthlvl fetch_mtime} {
+# finds all module-related files matching mod in the module path dir.
+# 'stop_mod' helps optimize the search when looking for an exact existing
+# modulefile
+proc findModules {dir mod depthlvl fetch_mtime {stop_mod {}}} {
    reportDebug "finding '$mod' in $dir (depthlvl=$depthlvl,\
       fetch_mtime=$fetch_mtime)"
 
    # generated search id (for cache search/save) by compacting given args
-   set searchid $dir:$mod:$depthlvl:$fetch_mtime
+   set searchid $dir:$mod:$depthlvl:$fetch_mtime:$stop_mod
 
    # look at memory cache for a compatible result
    lassign [findModulesInMemCache $searchid] cache_searchid cache_list
@@ -3127,7 +3237,8 @@ proc findModules {dir mod depthlvl fetch_mtime} {
    }
 
    # walk through list of dirs and files to find modules
-   findModulesFromDirsAndFiles $dir $full_list $depthlvl $fetch_mtime mod_list
+   findModulesFromDirsAndFiles $dir $full_list $depthlvl $fetch_mtime\
+      mod_list {} {} {} {} $stop_mod
 
    reportDebug "found [array names mod_list]"
 
@@ -3212,6 +3323,18 @@ proc getModules {dir {mod {}} {fetch_mtime 0} {search {}} {filter {}}} {
       set add_rc_defs 1
       array set found_list {}
    } else {
+      # an exact 'name/version' query (no wildcard/contains, no result
+      # filtering), possibly along with a variant or an extra match search
+      # specifier, resolved in a single-module context (unlike a listing
+      # one, e.g. avail/whatis/search) lets findModules shortcut its
+      # directory search (see there); left empty in any other case
+      set stop_mod {}
+      set modnamevers [getModuleNameAndVersFromVersSpec $mod]
+      if {$resctx && $earlyfilter && $filter eq {} && [getCmpSpecFromVersSpec\
+         $mod] eq {eq} && $querydepth == 1} {
+         set stop_mod $modnamevers
+      }
+
       # find modules by searching mod root name in order to catch all module
       # related entries to correctly computed auto symbols afterward
 
@@ -3233,7 +3356,8 @@ proc getModules {dir {mod {}} {fetch_mtime 0} {search {}} {filter {}}} {
       # unless EMS need to be performed (findModules should fetch everything)
       set depthlvl [expr {$indepth || $ems_required ? 0 : $querydepth + 1}]
 
-      array set found_list [findModules $dir $findmod $depthlvl $fetch_mtime]
+      array set found_list [findModules $dir $findmod $depthlvl\
+         $fetch_mtime $stop_mod]
    }
 
    # Phase #1: consolidate every kind of entries (directory, modulefile,

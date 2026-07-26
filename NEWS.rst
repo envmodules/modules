@@ -152,6 +152,13 @@ Modules 5.7.0 (not yet released)
   prepends and the entries it appends, so this entry is not silently
   absorbed by these commands' default de-duplication behavior nor relocated
   by the :mconfig:`path_entry_reorder` configuration option.
+* Resolve an exact ``name/version`` specification without validating every
+  sibling modulefile found in its directory, by walking versions from the
+  dictionary-highest to the dictionary-lowest and stopping as soon as the
+  implicit ``default`` and ``latest`` symbolic versions are settled. A
+  substantial performance improvement is observed when loading an existing
+  modulefile out of a directory holding hundreds or thousands of sibling
+  versions. (fix issue #561)
 
 
 .. _5.6 release notes:

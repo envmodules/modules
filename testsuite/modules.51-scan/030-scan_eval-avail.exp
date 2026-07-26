@@ -257,7 +257,7 @@ testouterr_cmd_re sh {avail -T -t scan@1.1:2.1 foo=val4} OK $tserr
 set tserr ".*
 Get modules: {} matching 'scan@1.1:2.0 foo=val2' in ''
 .*
-Get modules: {scan/2.0 scan/1.1} matching 'scan@1.1:2.0 foo=val2' in '$mpre'
+Get modules: {scan/(2\.0|1\.1) scan/(2\.0|1\.1)} matching 'scan@1.1:2.0 foo=val2' in '$mpre'
 scan/1.1{foo=val1,val2,val3}
 scan/2.0{foo=val2,val3,val4}"
 testouterr_cmd_re sh {avail -T -t scan@1.1:2.0 foo=val2} OK $tserr
@@ -332,7 +332,7 @@ testouterr_cmd_re sh {avail -T -t scan@1.1:2.0 foo=val4} OK $tserr
 set tserr ".*
 Get modules: {} matching 'scan@1.1:2.1 foo=val2' in ''
 .*
-Get modules: {scan/2.0 scan/1.1 scan/2.1} matching 'scan@1.1:2.1 foo=val2' in '$mpre'
+Get modules: {scan/(2\.0|1\.1|2\.1) scan/(2\.0|1\.1|2\.1) scan/(2\.0|1\.1|2\.1)} matching 'scan@1.1:2.1 foo=val2' in '$mpre'
 scan/1.1{foo=val1,val2,val3}
 scan/2.0{foo=val2,val3,val4}
 scan/2.1{foo=val2,val3,val4}"
@@ -358,7 +358,7 @@ testouterr_cmd_re sh {avail -T -t scan@latest foo=val4} OK $tserr
 set tserr ".*
 Get modules: {} matching 'scan@1.1:2.0 foo=val2' in ''
 .*
-Get modules: {scan/2.0 scan/1.1} matching 'scan@1.1:2.0 foo=val2' in '$mpre'
+Get modules: {scan/(2\.0|1\.1) scan/(2\.0|1\.1)} matching 'scan@1.1:2.0 foo=val2' in '$mpre'
 scan/1.1{foo=val1,val2,val3}
 scan/2.0{foo=val2,val3,val4}"
 testouterr_cmd_re sh {avail -T -t scan@1.1:2.0 foo=val2} OK $tserr

@@ -1,7 +1,7 @@
 #!/usr/bin/env tclsh
 #
 # MB, make bench between modulecmd versions
-# Copyright (C) 2019-2025 Xavier Delaruelle
+# Copyright (C) 2019-2026 Xavier Delaruelle
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ Available tests:
   help, avail, avail_cache, avail2, avail2_cache, avail3, avail3_cache,
   avail4, avail4_cache, whatis, whatis_cache, whatis2, whatis2_cache,
   whatis3, whatis3_cache, apropos, load, load_cache, load2, load2_cache,
-  list, list2, purge, unload
+  load3, load3_cache, list, list2, purge, unload
   (all tests selected by default)
 
 Modes:
@@ -196,7 +196,8 @@ foreach arg $argv {
       help - avail - avail_cache - avail2 - avail2_cache - avail3 -\
          avail3_cache - avail4 - avail4_cache - whatis - whatis_cache -\
          whatis2 - whatis2_cache - whatis3 - whatis3_cache - apropos - load -\
-         load_cache - load2 - load2_cache - list - list2 - purge - unload {
+         load_cache - load2 - load2_cache - load3 - load3_cache -\
+         list - list2 - purge - unload {
          lappend testlist $arg
       }
       --with-lmod=* {
@@ -232,7 +233,7 @@ if {![info exists testlist]} {
       set testlist [list help avail avail_cache avail2 avail2_cache avail3\
          avail3_cache avail4 avail4_cache whatis whatis_cache whatis2\
          whatis2_cache whatis3 whatis3_cache apropos load load_cache load2\
-         load2_cache list list2 purge unload]
+         load2_cache load3 load3_cache list list2 purge unload]
    }
 } elseif {[info exists lmod_cmd]} {
    foreach test $testlist {
@@ -338,11 +339,69 @@ catch {unset env(__MODULES_SHARE_MODULEPATH)}
 # define bench tests and their arguments and environment
 set modpath $curdir/testsuite/modulefiles
 array set testsubcmdlist [list avail2 avail avail3 avail avail4 avail whatis2\
-   whatis whatis3 whatis load2 load list2 list]
+   whatis whatis3 whatis load2 load load3 load list2 list]
 array set testarglist [list avail2 load whatis2 load load load/all unload\
-   load/all load2 R-bundle-Bioconductor/3.18-foss-2023a-R-4.3.2]
+   load/all load2 R-bundle-Bioconductor/3.18-foss-2023a-R-4.3.2 load3\
+   bigmod/1.1]
 array set testoptlist [list avail4_lmod --ignore_cache load2_lmod\
    --ignore_cache]
+
+# the load3 bench needs a module root holding several hundred sibling
+# versions (mixing valid and invalid modulefiles, matching the shape
+# reported by sites with large modulepath directories), generated on the
+# fly rather than checked into the repository and removed once done
+set bigmoddir $modpath.bigmod/bigmod
+set need_bigmod [expr {{load3} in $testlist || {load3_cache} in $testlist}]
+if {$need_bigmod} {
+   file mkdir $bigmoddir
+   set bigmod_content {#%Module
+
+proc ModulesHelp {} {
+    puts stderr {Lorem ipsum dolor sit amet, consectetur adipiscing elit.}
+    puts stderr {Sed non risus. Suspendisse lectus tortor, dignissim sit amet,}
+    puts stderr {adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam.}
+    puts stderr {Maecenas ligula massa, varius a, semper congue, euismod non, mi.}
+    puts stderr {Proin porttitor, orci nec nonummy molestie, enim est eleifend mi,}
+    puts stderr {non fermentum diam nisl sit amet erat. Duis semper. Duis arcu massa,}
+    puts stderr {scelerisque vitae, consequat in, }
+    puts stderr {Lorem ipsum dolor sit amet, consectetur adipiscing elit.}
+    puts stderr {Sed non risus. Suspendisse lectus tortor, dignissim sit amet,}
+    puts stderr {adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam.}
+    puts stderr {Maecenas ligula massa, varius a, semper congue, euismod non, mi.}
+    puts stderr {Proin porttitor, orci nec nonummy molestie, enim est eleifend mi,}
+    puts stderr {non fermentum diam nisl sit amet erat. Duis semper. Duis arcu massa,}
+    puts stderr {scelerisque vitae, consequat in, }
+    puts stderr {Lorem ipsum dolor sit amet, consectetur adipiscing elit.}
+    puts stderr {Sed non risus. Suspendisse lectus tortor, dignissim sit amet,}
+    puts stderr {adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam.}
+    puts stderr {Maecenas ligula massa, varius a, semper congue, euismod non, mi.}
+    puts stderr {Proin porttitor, orci nec nonummy molestie, enim est eleifend mi,}
+    puts stderr {non fermentum diam nisl sit amet erat. Duis semper. Duis arcu massa,}
+    puts stderr {scelerisque vitae, consequat in, }
+}
+
+# comment code of the modulefile
+module-whatis {returns all various module-info values}
+
+# comment code of the modulefile
+setenv FOO value
+append-path BAR /path/to/directory
+setenv QUX {Lorem ipsum dolor sit amet, consectetur adipiscing elit.}
+setenv FOO2 value
+append-path BAR2 /path/to/directory
+setenv QUX2 {Lorem ipsum dolor sit amet, consectetur adipiscing elit.}
+}
+   for {set bigmodvers 1} {$bigmodvers <= 500} {incr bigmodvers} {
+      set fid [open $bigmoddir/1.$bigmodvers w]
+      puts $fid $bigmod_content
+      close $fid
+   }
+   foreach bigmodvers {50 150 250 350 450} {
+      set fid [open $bigmoddir/1.$bigmodvers.orig w]
+      puts $fid {not a modulefile}
+      close $fid
+   }
+}
 
 # load test environment recorded in external files
 foreach testenv_file [glob $curdir/testsuite/mb/testenv_*] {
@@ -368,7 +427,8 @@ set testenvlist(purge_lmod) $testenvlist(list2_lmod)
 # some tests have a minimum version requirement
 array set testcompatlist [list avail3 4.6.0 whatis3 4.6.0 avail_cache 5.3.0\
    avail2_cache 5.3.0 avail3_cache 5.3.0 whatis_cache 5.3.0 whatis2_cache\
-   5.3.0 whatis3_cache 5.3.0 load_cache 5.3.0 load2_cache 5.3.0]
+   5.3.0 whatis3_cache 5.3.0 load_cache 5.3.0 load2_cache 5.3.0 load3_cache\
+   5.3.0]
 
 # adapt output table to test mode
 if {$mode eq {profile}} {
@@ -423,6 +483,11 @@ foreach tag $taglist {
    if {$tag ne {lmod}} {
       catch {file delete modulecmd.$tag lib/libtclenvmodules.so.$tag}
    }
+}
+
+# clean generated load3 bench modulefiles
+if {$need_bigmod} {
+   file delete -force $modpath.bigmod
 }
 catch {file delete tcl/mfinterp.tcl}
 
