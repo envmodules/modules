@@ -131,6 +131,7 @@ set tserr "$modlin Aliases $modlin
 tag/1.1.al -> tag/1.0
 
 $modlin Versions $modlin
+loc_fdv2/default -> loc_fdv2/1.2
 tag/1.1.sym -> tag/1.0"
 
 testouterr_cmd_re sh {aliases} OK $tserr
@@ -167,6 +168,7 @@ set tserr "$modlin Aliases $modlin
 tag/1.1.al -> tag/1.0
 
 $modlin Versions $modlin
+loc_fdv2/default -> loc_fdv2/1.2
 tag/1.1.sym -> tag/1.0"
 
 testouterr_cmd_re sh {aliases} OK $tserr

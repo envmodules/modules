@@ -38,19 +38,42 @@ have been implemented:
   match the module root name specification, instead of comparing against all
   loaded modules.
 
+* Lighter-weight resolution of an exact ``name/version`` specification: sites
+  with a modulepath directory holding hundreds or thousands of sibling
+  modulefiles reported slow ``module load`` commands even when the requested
+  version already exists. Correctly computing the implicit ``default`` and
+  ``latest`` symbolic versions of such a directory used to require validating
+  every sibling modulefile in it. The lookup now walks candidate versions from
+  the dictionary-highest to the dictionary-lowest and stops validating as soon
+  as this can be answered: either a higher valid version is found (the
+  requested one is then known not to be ``default`` or ``latest``), or the
+  requested version itself is reached, in which case
+  nothing higher exists. This bypasses the exhaustive scan without changing
+  the resolved result.
+
 For this work, the :command:`mb` utility was extended with new benchmark tests
-that loads 137 modulefiles, lists the loaded modules, and then purges them.
-Running this benchmark highlights the performance improvements, as shown in
-the table below:
+that loads 137 modulefiles (``load2``), lists the loaded modules (``list2``),
+and then purges them. Running this benchmark highlights the performance
+improvements, as shown in the table below:
 
 +---------+-------------+--------------------+
 |         |      v5.6.1 |             v5.7.0 |
 +=========+=============+====================+
-|    load |     1038 ms |      384 ms (-63%) |
+|   load2 |     1038 ms |      384 ms (-63%) |
 +---------+-------------+--------------------+
-|    list |      222 ms |       29 ms (-87%) |
+|   list2 |      222 ms |       29 ms (-87%) |
 +---------+-------------+--------------------+
 |   purge |      568 ms |      303 ms (-46%) |
++---------+-------------+--------------------+
+
+A ``load3`` benchmark test was also added, loading a low, non-default
+version of a module out of 500 sibling versions in the same directory. It
+specifically exercises the lighter-weight resolution described above:
+
++---------+-------------+--------------------+
+|         |     v5.6.1  |             v5.7.0 |
++=========+=============+====================+
+|   load3 |       30 ms |       19 ms (-36%) |
 +---------+-------------+--------------------+
 
 These measurements were obtained on a system where all modulefiles are stored

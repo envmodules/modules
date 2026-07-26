@@ -1,0 +1,3 @@
+#%Module
+
+module-hide --hard [file dirname $ModulesCurrentModulefile]/2.0

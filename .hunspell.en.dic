@@ -1312,6 +1312,9 @@ profiler
 moduleTop
 struct
 load2
+load3
+ms
+stopmod
 list2
 lrem
 replaceFromList

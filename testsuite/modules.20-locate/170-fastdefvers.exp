@@ -1,0 +1,244 @@
+##############################################################################
+#   Modules Revision 3.0
+#   Providing a flexible user environment
+#
+#   File:		modules.20-locate/%M%
+#   Revision:		%I%
+#   First Edition:	2026/07/26
+#   Last Mod.:		%U%, %G%
+#
+#   Authors:		Xavier Delaruelle, xavier.delaruelle@cea.fr
+#
+#   Description:	Testuite testsequence
+#   Command:		load, display
+#   Modulefiles:	loc_fdv1, loc_fdv2, loc_fdv3, loc_fdv4, loc_fdv5
+#   Sub-Command:
+#
+#   Comment:	%C{
+#			Check that the lighter-weight resolution attempted for an exact
+#			'name/version' specification that matches an existing modulefile
+#			(see findModulesFromDirsAndFiles's 'stopmod' handling) resolves
+#			the implicit 'default' and 'latest' symbolic versions exactly
+#			like the exhaustive search does, on a directory holding many
+#			sibling versions: a hard hidden modulefile sorting above the
+#			actual highest usable version, an explicitly defined 'default'
+#			distinct from the implicit 'latest', a variant value specified
+#			along with the query, a hiding rule set in the modulepath's own
+#			top-level '.modulerc' and a hiding rule targeting a full path
+#			modulefile designation.
+#		}C%
+#
+##############################################################################
+
+#
+# Variables for this test
+#
+
+# use a dedicated modulepath so these new fixtures do not affect other tests
+# that enumerate the whole content of the default modulepath
+setenv_path_var MODULEPATH $modpath.4
+
+set module_1 "loc_fdv1"
+set module_1_low "$module_1/1.0"
+set module_1_top "$module_1/2.5"
+set module_1_hidden "$module_1/2.9"
+set modulefile_1_low "$modpath.4/$module_1_low"
+set modulefilere_1_low "$modpathre.4/$module_1_low"
+set modulefile_1_top "$modpath.4/$module_1_top"
+set modulefilere_1_top "$modpathre.4/$module_1_top"
+
+set module_2 "loc_fdv2"
+set module_2_default "$module_2/1.2"
+set module_2_top "$module_2/2.3"
+set modulefile_2_default "$modpath.4/$module_2_default"
+set modulefilere_2_default "$modpathre.4/$module_2_default"
+set modulefile_2_top "$modpath.4/$module_2_top"
+set modulefilere_2_top "$modpathre.4/$module_2_top"
+
+set module_3 "loc_fdv3"
+set module_3_low "$module_3/1.0"
+set module_3_top "$module_3/2.0"
+set modulefile_3_low "$modpath.4/$module_3_low"
+set modulefile_3_top "$modpath.4/$module_3_top"
+
+set module_4 "loc_fdv4"
+set module_4_low "$module_4/1.0"
+set module_4_top "$module_4/1.1"
+set module_4_hidden "$module_4/2.0"
+set modulefile_4_low "$modpath.4/$module_4_low"
+set modulefile_4_top "$modpath.4/$module_4_top"
+
+set module_5 "loc_fdv5"
+set module_5_top "$module_5/1.0"
+set module_5_hidden "$module_5/2.0"
+set modulefile_5_top "$modpath.4/$module_5_top"
+
+#
+# loc_fdv1: bare name and low exact version both resolve correctly, skipping
+# past an invalid modulefile (3.0) and a hard hidden one (2.9), neither of
+# which should be considered a candidate for the implicit highest version
+#
+
+set ans [list]
+if {[is_conf_enabled advversspec implicitdefault]} {
+    lappend ans [list set __MODULES_LMALTNAME\
+        $module_1_top&as|$module_1/default&as|$module_1/latest]
+}
+lappend ans [list set _LMFILES_ $modulefile_1_top]
+lappend ans [list set LOADEDMODULES $module_1_top]
+
+test_cmd "sh" "load $module_1" [if_implicitdefault $ans ERR]\
+    [if_implicitdefault 0 1]
+
+testouterr_cmd_re "sh" "display $module_1" [if_implicitdefault OK ERR]\
+    [if_implicitdefault "$modlin\n$modulefilere_1_top:\n\nmodule-whatis\\s+$module_1_top\n$modlin"\
+    "$err_nodefault'$module_1'"]
+
+#
+# loading the low exact version directly must succeed and must not carry the
+# 'default' or 'latest' alternate names, as a higher usable version exists
+#
+
+set ans [list]
+lappend ans [list set _LMFILES_ $modulefile_1_low]
+lappend ans [list set LOADEDMODULES $module_1_low]
+
+test_cmd "sh" "load $module_1_low" $ans
+
+testouterr_cmd_re "sh" "display $module_1_low" "OK"\
+    "$modlin\n$modulefilere_1_low:\n\nmodule-whatis\\s+$module_1_low\n$modlin"
+
+#
+# loading the actual highest usable version directly must carry both the
+# 'default' and 'latest' alternate names
+#
+
+set ans [list]
+if {[is_conf_enabled advversspec implicitdefault]} {
+    lappend ans [list set __MODULES_LMALTNAME\
+        $module_1_top&as|$module_1/default&as|$module_1/latest]
+}
+lappend ans [list set _LMFILES_ $modulefile_1_top]
+lappend ans [list set LOADEDMODULES $module_1_top]
+
+test_cmd "sh" "load $module_1_top" $ans
+
+#
+# the hard hidden version stays unreachable even when queried by its exact
+# name
+#
+
+testouterr_cmd_re "sh" "display $module_1_hidden" "ERR"\
+    "$err_path'$module_1_hidden'"
+
+skip_if_quick_mode
+
+#
+# loc_fdv2: an explicitly defined 'default' distinct from the implicit
+# 'latest' must each resolve independently and carry only their own
+# alternate name, not the other one. Unlike loc_fdv1's implicit default,
+# this one is set via a '.version' rule, so it resolves regardless of the
+# 'implicit_default' configuration option
+#
+
+set ans [list]
+lappend ans [list set __MODULES_LMALTNAME\
+    $module_2_default&$module_2/default&$module_2]
+lappend ans [list set _LMFILES_ $modulefile_2_default]
+lappend ans [list set LOADEDMODULES $module_2_default]
+
+test_cmd "sh" "load $module_2" $ans
+
+testouterr_cmd_re "sh" "display $module_2" "OK"\
+    "$modlin\n$modulefilere_2_default:\n\nmodule-whatis\\s+$module_2_default\n$modlin"
+
+set ans [list]
+if {[is_conf_enabled advversspec implicitdefault]} {
+    lappend ans [list set __MODULES_LMALTNAME\
+        $module_2_top&as|$module_2/latest]
+}
+lappend ans [list set _LMFILES_ $modulefile_2_top]
+lappend ans [list set LOADEDMODULES $module_2_top]
+
+test_cmd "sh" "load $module_2_top" $ans
+
+#
+# loc_fdv3: a variant value specified along with an exact 'name/version'
+# query must not prevent the fast path from being taken, nor affect its
+# correctness
+#
+
+if {[is_conf_enabled advversspec]} {
+
+set ans [list]
+lappend ans [list set __MODULES_LMVARIANT $module_3_low&myvar|val2|0|0]
+lappend ans [list set _LMFILES_ $modulefile_3_low]
+lappend ans [list set LOADEDMODULES $module_3_low]
+
+test_cmd "sh" "load $module_3_low myvar=val2" $ans
+
+set ans [list]
+lappend ans [list set __MODULES_LMVARIANT $module_3_top&myvar|val2|0|0]
+if {[is_conf_enabled advversspec implicitdefault]} {
+    lappend ans [list set __MODULES_LMALTNAME\
+        $module_3_top&as|$module_3/default&as|$module_3/latest]
+}
+lappend ans [list set _LMFILES_ $modulefile_3_top]
+lappend ans [list set LOADEDMODULES $module_3_top]
+
+test_cmd "sh" "load $module_3_top myvar=val2" $ans
+
+}
+
+#
+# loc_fdv4: a module-hide rule declared in the modulepath's own top-level
+# '.modulerc' (as opposed to the module directory's own '.modulerc', already
+# covered by loc_fdv1) must also be honored while resolving the implicit
+# highest version
+#
+
+setenv_var TESTSUITE_FASTDEFVERS hide1
+
+set ans [list]
+lappend ans [list set _LMFILES_ $modulefile_4_low]
+lappend ans [list set LOADEDMODULES $module_4_low]
+
+test_cmd "sh" "load $module_4_low" $ans
+
+set ans [list]
+if {[is_conf_enabled advversspec implicitdefault]} {
+    lappend ans [list set __MODULES_LMALTNAME\
+        $module_4_top&as|$module_4/default&as|$module_4/latest]
+}
+lappend ans [list set _LMFILES_ $modulefile_4_top]
+lappend ans [list set LOADEDMODULES $module_4_top]
+
+test_cmd "sh" "load $module_4_top" $ans
+
+testouterr_cmd_re "sh" "display $module_4_hidden" "ERR"\
+    "$err_path'$module_4_hidden'"
+
+#
+# loc_fdv5: a module-hide rule targeting a full path modulefile designation
+# (as opposed to a relative 'name/version' one) must also be honored while
+# resolving the implicit highest version
+#
+
+set ans [list]
+if {[is_conf_enabled advversspec implicitdefault]} {
+    lappend ans [list set __MODULES_LMALTNAME\
+        $module_5_top&as|$module_5/default&as|$module_5/latest]
+}
+lappend ans [list set _LMFILES_ $modulefile_5_top]
+lappend ans [list set LOADEDMODULES $module_5_top]
+
+test_cmd "sh" "load $module_5_top" $ans
+
+testouterr_cmd_re "sh" "display $module_5_hidden" "ERR"\
+    "$err_path'$module_5_hidden'"
+
+#
+# Cleanup
+#
+
+reset_test_env
