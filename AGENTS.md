@@ -161,6 +161,9 @@ cd doc && make html   # requires Sphinx >= 1.0; output in doc/_build/html
 - No trailing whitespace, no misspellings (enforced by the `pre-commit`/
   `commit-msg` hooks in `script/`, backed by `codespell` and `hunspell`)
 - Code must remain compatible with Tcl 8.5+
+- Comments must convey information the code cannot — see "Code comments" in
+  `CONTRIBUTING.rst` for the full guidelines (based on Ousterhout's
+  *A Philosophy of Software Design*)
 
 ## Commit conventions
 

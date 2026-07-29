@@ -92,7 +92,8 @@ Start coding
 
 * Create a branch to identify the issue or feature you would like to work on
 * Using your favorite editor, make your changes, `committing as you go`_.
-* Comply to the `coding conventions of this project <coding-conventions_>`_.
+* Comply to the `coding conventions of this project <coding-conventions_>`_
+  and its `code comments guidelines <code-comments_>`_.
 * Your Tcl code has to be compatible with Tcl version 8.5 and above (see
   `Tcl 8.5 commands reference`_)
 * Include tests that cover any code changes you make. Make sure the test fails
@@ -253,6 +254,36 @@ Coding conventions
 * `No trailing space nor misspelling <commit-hooks_>`_
 
 .. _Tcl minimal escaping style: https://wiki.tcl-lang.org/page/Tcl+Minimal+Escaping+Style
+
+.. _code-comments:
+
+Code comments
+~~~~~~~~~~~~~
+
+Modules follows the code comment philosophy described by John Ousterhout in
+`A Philosophy of Software Design`_:
+
+* A comment should say something the code itself cannot: the reasoning
+  behind a choice, a non-obvious constraint or side effect, or a workaround
+  for a specific bug. Well-named identifiers and clear code already say
+  *what* is happening, so do not restate that in a comment.
+* Write comments at a different level of detail than the code: either more
+  precise, spelling out units, boundary conditions or special values that
+  the code leaves implicit, or more abstract, giving the reader a
+  big-picture summary of what a block of code accomplishes.
+* Document a procedure's interface from the caller's point of view, e.g.
+  what it does, its arguments and return value, and any non-obvious
+  behavior or ordering requirement, separately from implementation comments
+  that explain what a tricky part of the body does and why, not how.
+* Keep comments next to the code they describe and update them whenever
+  that code changes, so they never drift out of sync. Prefer higher-level
+  comments, which stay accurate across minor code changes, over ones that
+  just restate implementation detail.
+* Capture the *why* behind a non-obvious change as a comment in the code
+  itself, not only in the commit message, since a reader examining the code
+  later will not necessarily go digging through its history.
+
+.. _A Philosophy of Software Design: https://web.stanford.edu/~ouster/cgi-bin/aposd.php
 
 .. _developer-certificate-of-origin:
 

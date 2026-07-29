@@ -150,6 +150,7 @@ OpenMPI
 Orfanos
 Osel
 Ousterhout
+Ousterhout's
 PATHLIST
 PATHVAR
 PGI
@@ -682,6 +683,7 @@ prereqs
 prestdout
 prevalue
 proc
+procedure's
 procs
 ps
 pthreads
