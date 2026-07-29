@@ -91,7 +91,9 @@ Start coding
 ~~~~~~~~~~~~
 
 * Create a branch to identify the issue or feature you would like to work on
-* Using your favorite editor, make your changes, `committing as you go`_.
+* Using your favorite editor, make your changes, `committing as you go`_
+  and following the `commit message conventions
+  <commit-message-conventions_>`_ of this project.
 * Comply to the `coding conventions of this project <coding-conventions_>`_
   and its `code comments guidelines <code-comments_>`_.
 * Your Tcl code has to be compatible with Tcl version 8.5 and above (see
@@ -284,6 +286,34 @@ Modules follows the code comment philosophy described by John Ousterhout in
   later will not necessarily go digging through its history.
 
 .. _A Philosophy of Software Design: https://web.stanford.edu/~ouster/cgi-bin/aposd.php
+
+.. _commit-message-conventions:
+
+Commit message conventions
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Prefix the subject line with the area touched, followed by a colon and a
+  lowercase verb, when a change is confined to that area, e.g. ``doc:``,
+  ``ts:`` (testsuite), ``install:`` (build system), ``gh:`` (GitHub
+  Actions), ``init:`` (shell init/completion scripts), ``script:``
+  (maintainer tooling), ``rpm:``, ``lint:``, ``vim:``, ``emacs:`` or
+  ``lib:``. Combine two areas with a slash, e.g. ``doc/ts:``, only when a
+  single prefix would be misleading. Leave the subject unprefixed, with a
+  capitalized verb, for changes to the core Tcl engine or its behavior.
+* Use the imperative mood for the verb starting the subject, e.g. ``Add``
+  or ``doc: fix``, not ``Added``/``Adds`` or ``doc: fixed``/``fixes``.
+* Do not end the subject with a period and try to keep it around 50 to 72
+  characters.
+* Separate a commit body from its subject with a blank line and wrap it to
+  about the same width as the subject. Use it to explain *why* the change
+  is needed, following the `code comments guidelines <code-comments_>`_,
+  rather than restating what the diff already shows. Omit the body when the
+  subject line alone says everything there is to say.
+* Reference an issue this commit resolves on its own line in the body,
+  e.g. ``Fixes #645`` or ``Closes #572``.
+* `Sign-off your commits <developer-certificate-of-origin_>`_ with a
+  ``Signed-off-by:`` trailer, always as the last line of the commit
+  message.
 
 .. _developer-certificate-of-origin:
 

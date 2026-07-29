@@ -167,6 +167,8 @@ cd doc && make html   # requires Sphinx >= 1.0; output in doc/_build/html
 
 ## Commit conventions
 
+- Follow the "Commit message conventions" section in `CONTRIBUTING.rst` for
+  subject-line prefix/verb/length, body wrapping, and trailer order.
 - Every commit needs a DCO `Signed-off-by:` trailer matching the committer's
   git `user.name`/`user.email` — use `git commit -s`.
 - Patches (bug fix or feature) should include tests, and the test should be
