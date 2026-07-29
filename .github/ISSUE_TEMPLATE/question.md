@@ -5,5 +5,5 @@ labels: question
 ---
 To post question, please use preferably either:
 
-* the Modules mailing-list: https://sourceforge.net/projects/modules/lists/modules-interest
+* the Modules mailing-list: https://lists.hpsf.io/g/modules-interest
 * the Modules chat room: https://matrix.to/#/#modules:matrix.org

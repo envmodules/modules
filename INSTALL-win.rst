@@ -30,7 +30,7 @@ Installation instructions
    `Magicsplat Tcl/Tk for Windows`_. Follow instructions provided with the
    chosen distribution to install it.
 
-.. _ActiveTcl: https://www.activestate.com/products/tcl/
+.. _ActiveTcl: https://www.activestate.com/tcl/
 .. _Magicsplat Tcl/Tk for Windows: https://www.magicsplat.com/tcl-installer/
 
 2. Once installed, verify that the ``tclsh`` command is correctly found in
