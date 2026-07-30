@@ -45,9 +45,13 @@ substitutions.
 
 ## Tests
 
+See `doc/source/devel/testsuite.rst` for the full description of how the
+testsuite (DejaGnu-based) is organized, how to add tests, and how to debug
+a failing one.
+
 ```sh
-make test                  # full suite via DejaGnu (~17,000 cases, ~12 min)
-make test QUICKTEST=y      # quick mode, most essential tests, ~1 min
+make test                  # full suite via DejaGnu (~25,000 cases, ~12 min)
+make test QUICKTEST=y      # quick mode, most essential tests (~1,900 cases, ~1 min)
 make testinstall           # test an already-`make install`ed tree
 ```
 

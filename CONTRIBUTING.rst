@@ -116,6 +116,7 @@ howtos are also available:
 
 * :ref:`add-new-sub-command`
 * :ref:`add-new-config-option`
+* :ref:`devel-testsuite`
 
 .. _running-the-tests:
 
@@ -127,11 +128,13 @@ Run the basic test suite with::
    make test
 
 This only runs the tests for the current environment. `GitHub Actions`_ will
-run the full suite when you submit your pull request.
+run the full suite when you submit your pull request. See
+:ref:`devel-testsuite` for a full description of how the testsuite is
+organized and how to add or debug tests.
 
-There are more than 17 000 test cases thus it generally takes around 12
+There are around 25 000 test cases thus it generally takes around 12
 minutes to run the full test suite. It can be executed in *quick* mode to just
-run the most essential tests in about 1 minute::
+run the most essential tests (around 1 900 test cases) in about 1 minute::
 
    make test QUICKTEST=y
 
