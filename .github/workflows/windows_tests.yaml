@@ -27,7 +27,7 @@ jobs:
         with:
           fetch-depth: 0
           set-safe-directory: /cygdrive/d/a/modules/modules
-      - uses: cygwin/cygwin-install-action@master
+      - uses: cygwin/cygwin-install-action@3f0a3f9f988f7e96b8c18098ae05eaec175f5b52 # v6.1
         with:
           # precise all sphinxcontrib packages required as dependency spec
           # of python39-sphinx package is regularly broken
@@ -78,7 +78,7 @@ jobs:
         with:
           fetch-depth: 0
           set-safe-directory: /cygdrive/d/a/modules/modules
-      - uses: cygwin/cygwin-install-action@master
+      - uses: cygwin/cygwin-install-action@3f0a3f9f988f7e96b8c18098ae05eaec175f5b52 # v6.1
         with:
           # precise all sphinxcontrib packages required as dependency spec
           # of python39-sphinx package is regularly broken
@@ -124,7 +124,7 @@ jobs:
         with:
           fetch-depth: 0
           set-safe-directory: /cygdrive/d/a/modules/modules
-      - uses: cygwin/cygwin-install-action@master
+      - uses: cygwin/cygwin-install-action@3f0a3f9f988f7e96b8c18098ae05eaec175f5b52 # v6.1
         with:
           # precise all sphinxcontrib packages required as dependency spec
           # of python39-sphinx package is regularly broken
