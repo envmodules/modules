@@ -7,6 +7,9 @@ on:
       - c-3.2
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   framework:
     strategy:
