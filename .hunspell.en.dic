@@ -149,6 +149,7 @@ NetCDF
 Neumärker
 OPTLIST
 OpenMPI
+OpenSSF
 Orfanos
 Osel
 Ousterhout
@@ -180,6 +181,7 @@ RequireCompiler
 RequireMPI
 RestrictUsage
 Riccardo
+SARIF
 SCCS
 SCM
 SGR
@@ -188,6 +190,7 @@ SHORTCUTLIST
 SOft
 SSD
 Satya
+Scorecard
 ShellCheck
 SoFt
 Solaris
