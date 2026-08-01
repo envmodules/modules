@@ -35,7 +35,7 @@ jobs:
       - name: Install Tcl under Windows
         shell: cmd
         run: |
-          curl -LfsS -o %TCL_INSTALLER%.exe %TCL_DL_URL%/%TCL_INSTALLER%.exe
+          curl -LfsS --retry 5 --retry-all-errors --retry-delay 5 -o %TCL_INSTALLER%.exe %TCL_DL_URL%/%TCL_INSTALLER%.exe
           %TCL_INSTALLER% /verysilent
       - name: Configure Git safe.directory
         run: |
@@ -67,7 +67,7 @@ jobs:
     runs-on: windows-2022
     env:
       TCL_INSTALLER: SetupTcl-8.6.17-x64_Bawt-3.2.0
-      TCL_DL_URL: http://www.bawt.tcl3d.org/download/Tcl-Pure
+      TCL_DL_URL: https://www.bawt.tcl3d.org/download/Tcl-Pure
       TCLSH_DIR: C:\Tcl\bin
       DIST_WIN: modules-*-win
     steps:
@@ -86,7 +86,7 @@ jobs:
       - name: Install Tcl under Windows
         shell: cmd
         run: |
-          curl -LfsS -o %TCL_INSTALLER%.exe %TCL_DL_URL%/%TCL_INSTALLER%.exe
+          curl -LfsS --retry 5 --retry-all-errors --retry-delay 5 -o %TCL_INSTALLER%.exe %TCL_DL_URL%/%TCL_INSTALLER%.exe
           %TCL_INSTALLER% /verysilent
       - name: Configure Git safe.directory
         run: |
