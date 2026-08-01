@@ -210,9 +210,9 @@ fi
 
 %files
 %if 0%{?rhel} && 0%{?rhel} <= 6
-%doc COPYING.GPLv2
+%doc COPYING
 %else
-%license COPYING.GPLv2
+%license COPYING
 %endif
 %doc ChangeLog.gz README NEWS.txt MIGRATING.txt INSTALL.txt CONTRIBUTING.txt changes.txt
 %{_sysconfdir}/modulefiles

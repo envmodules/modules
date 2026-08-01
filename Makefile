@@ -774,7 +774,7 @@ ifneq ($(wildcard $(subst $(space),\$(space),$(DESTDIR)$(etcdir)/siteconfig.tcl)
 endif
 ifeq ($(docinstall),y)
 	$(INSTALL_DIR) '$(DESTDIR)$(docdir)'
-	$(INSTALL_DATA) COPYING.GPLv2 '$(DESTDIR)$(docdir)/'
+	$(INSTALL_DATA) COPYING '$(DESTDIR)$(docdir)/'
 	$(INSTALL_DATA) $(CHANGELOG) '$(DESTDIR)$(docdir)/'
 	$(INSTALL_DATA) README '$(DESTDIR)$(docdir)/'
 endif
@@ -852,7 +852,7 @@ ifeq ($(nagelfaraddons),y)
 	-rmdir -p '$(DESTDIR)$(nagelfardatadir)'
 endif
 ifeq ($(docinstall),y)
-	rm -f $(foreach docfile,$(CHANGELOG) README COPYING.GPLv2,'$(DESTDIR)$(docdir)/$(docfile)')
+	rm -f $(foreach docfile,$(CHANGELOG) README COPYING,'$(DESTDIR)$(docdir)/$(docfile)')
 ifeq ($(builddoc),n)
 	rmdir '$(DESTDIR)$(docdir)'
 endif
@@ -912,7 +912,7 @@ dist-win: modulecmd.tcl $(CHANGELOG) README pkgdoc
 	$(INSTALL_PROGRAM) script/ml.cmd $(DIST_WIN_PREFIX)/bin/
 	$(INSTALL_PROGRAM) script/envml.cmd $(DIST_WIN_PREFIX)/bin/
 	$(INSTALL_DIR) $(DIST_WIN_PREFIX)/doc
-	$(INSTALL_DATA) COPYING.GPLv2 $(DIST_WIN_PREFIX)/doc/
+	$(INSTALL_DATA) COPYING $(DIST_WIN_PREFIX)/doc/
 	$(INSTALL_DATA) $(CHANGELOG) $(DIST_WIN_PREFIX)/doc/
 	$(INSTALL_DATA) README $(DIST_WIN_PREFIX)/doc/
 	$(INSTALL_DATA) doc/build/MIGRATING.txt $(DIST_WIN_PREFIX)/doc/
