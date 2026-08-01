@@ -663,6 +663,7 @@ proc reportCmdTrace {cmdstring args} {
 }
 
 proc reportVersion {} {
+   ##nagelfar ignore Too long line
    report {Modules Release @MODULES_RELEASE@@MODULES_BUILD@\
       (@MODULES_BUILD_DATE@)}
 }

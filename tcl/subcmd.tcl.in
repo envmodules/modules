@@ -2060,6 +2060,7 @@ proc cmdModuleAutoinit {} {
 
    # define current Modules version if versioning enabled
    ##nagelfar ignore #4 Strange command
+   ##nagelfar ignore +3 Too long line
    @VERSIONING@if {![isEnvVarDefined MODULE_VERSION]} {
    @VERSIONING@   setenv MODULE_VERSION @MODULES_RELEASE@@MODULES_BUILD@
    @VERSIONING@   setenv MODULE_VERSION_STACK @MODULES_RELEASE@@MODULES_BUILD@
