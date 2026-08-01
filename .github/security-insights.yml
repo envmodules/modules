@@ -64,3 +64,20 @@ repository:
         date: '2026-08-01'
         comment: |
           OpenSSF Best Practices Badge (Passing level) self-assessment.
+    tools:
+      - name: ossf/scorecard-action
+        type: SAST
+        version: v2.4.4
+        comment: |
+          Runs OpenSSF Scorecard checks on push to main and weekly.
+          Results published to the OSSF API and uploaded to Security > Code
+          scanning via SARIF.
+        integration:
+          adhoc: false
+          ci: true
+          release: false
+        results:
+          ci:
+            name: Scorecard SARIF
+            predicate-uri: https://api.scorecard.dev
+            location: https://github.com/envmodules/modules/security/code-scanning
