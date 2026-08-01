@@ -60,5 +60,7 @@ repository:
   security:
     assessments:
       self:
+        evidence: https://www.bestpractices.dev/projects/13922
+        date: '2026-08-01'
         comment: |
-          Self assessment has not yet been completed.
+          OpenSSF Best Practices Badge (Passing level) self-assessment.
