@@ -20,7 +20,7 @@ jobs:
       EASYBUILD_MODULES_TOOL: EnvironmentModules
       EASYBUILD_MODULE_SYNTAX: ${{ matrix.module_syntax }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Install system packages

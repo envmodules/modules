@@ -23,7 +23,7 @@ jobs:
       EXTRA_SCRIPT_PRETEST: make install-testsiteconfig-1 && export TESTSUITE_ENABLE_SITECONFIG=1
       EXTRA_SCRIPT_POSTTEST: unset TESTSUITE_ENABLE_SITECONFIG
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Install system packages
