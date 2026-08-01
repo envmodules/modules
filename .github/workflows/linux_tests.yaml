@@ -29,7 +29,7 @@ jobs:
       EXTRA_SCRIPT_PRETEST: make install-testmodulerc install-testetcrc install-testmodspath-empty install-testmoguicmd
       EXTRA_SCRIPT_POSTTEST: make uninstall-testconfig
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Install system packages
@@ -109,7 +109,7 @@ jobs:
       EXTRA_SCRIPT_PRETEST: make install-testinitrc install-testsiteconfig
       EXTRA_SCRIPT_POSTTEST: make uninstall-testconfig
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Install system packages
@@ -192,7 +192,7 @@ jobs:
       EXTRA_SCRIPT_PRETEST: make install-testinitrc-1 install-testetcrc install-testmodspath
       EXTRA_SCRIPT_POSTTEST: make uninstall-testconfig
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Install system packages
@@ -265,7 +265,7 @@ jobs:
       EXTRA_SCRIPT_POSTTEST: unset TESTSUITE_ENABLE_SITECONFIG
       TESTSUITE_ENABLE_MODULECACHE: 1
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Install system packages
@@ -328,7 +328,7 @@ jobs:
       EXTRA_SCRIPT_PRETEST: make install-testsiteconfig-1 && export TESTSUITE_ENABLE_SITECONFIG=1
       EXTRA_SCRIPT_POSTTEST: unset TESTSUITE_ENABLE_SITECONFIG
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Install system packages
@@ -412,7 +412,7 @@ jobs:
       TESTSUITE_ENABLE_MODULECACHE: 1
       EXTRATEST_SOURCESH: y
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
           # change dir to launch tests from path containing specific chars
@@ -477,7 +477,7 @@ jobs:
         --with-tcl=/usr/local/lib
       COVERAGE: y
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Install system packages
@@ -563,7 +563,7 @@ jobs:
         run: |
           # avoid "detected dubious ownership in repository" error
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Build Modules
@@ -618,7 +618,7 @@ jobs:
         run: |
           # avoid "detected dubious ownership in repository" error
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Build Modules
