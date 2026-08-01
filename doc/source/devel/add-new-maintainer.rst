@@ -13,6 +13,8 @@ Modules project.
 * Subscribe to the `modules-TSC mailing-list`_ with *Owner* role
 * Update *Current Roaster* section in :file:`GOVERNANCE.rst` file
 * Update *Authors* section in :file:`README.md` file
+* Update *administrators* and *core-team* fields in
+  :file:`.github/security-insights.yml` file
 * Make an announcement to:
 
   * the modules-interest mailing-list

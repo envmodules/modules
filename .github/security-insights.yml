@@ -1,0 +1,64 @@
+header:
+  schema-version: 2.2.0
+  last-updated: '2026-08-01'
+  last-reviewed: '2026-08-01'
+  url: https://github.com/envmodules/modules/raw/main/.github/security-insights.yml
+
+project:
+  name: Modules
+  homepage: https://envmodules.io
+  steward:
+    uri: https://hpsf.io
+    comment: |
+      Modules is part of the High Performance Software Foundation (HPSF).
+  administrators:
+    - name: Xavier Delaruelle
+      email: xavier.delaruelle@cea.fr
+      social: https://github.com/xdelaruelle
+      primary: true
+    - name: Adrien Cotte
+      email: adrien.cotte@asplus.fr
+      social: https://github.com/adrien-cotte
+      primary: false
+  documentation:
+    detailed-guide: https://modules.readthedocs.io
+    design: https://modules.readthedocs.io/en/latest/design.html
+    code-of-conduct: https://github.com/envmodules/modules/blob/main/CODE_OF_CONDUCT.md
+    release-process: https://modules.readthedocs.io/en/latest/devel/create-new-release.html
+    support-policy: https://github.com/envmodules/modules/blob/main/SECURITY.md#supported-versions
+  repositories:
+    - name: modules
+      url: https://github.com/envmodules/modules
+      comment: |
+        Main and only source code repository for the Modules project.
+  vulnerability-reporting:
+    reports-accepted: true
+    bug-bounty-available: false
+    policy: https://github.com/envmodules/modules/blob/main/SECURITY.md
+
+repository:
+  url: https://github.com/envmodules/modules
+  status: active
+  accepts-change-request: true
+  accepts-automated-change-request: true
+  core-team:
+    - name: Xavier Delaruelle
+      email: xavier.delaruelle@cea.fr
+      social: https://github.com/xdelaruelle
+      primary: true
+    - name: Adrien Cotte
+      email: adrien.cotte@asplus.fr
+      social: https://github.com/adrien-cotte
+      primary: false
+  license:
+    url: https://github.com/envmodules/modules/blob/main/COPYING.GPLv2
+    expression: GPL-2.0-or-later
+  documentation:
+    contributing-guide: https://modules.readthedocs.io/en/latest/CONTRIBUTING.html
+    governance: https://modules.readthedocs.io/en/latest/GOVERNANCE.html
+    security-policy: https://github.com/envmodules/modules/blob/main/SECURITY.md
+  security:
+    assessments:
+      self:
+        comment: |
+          Self assessment has not yet been completed.
