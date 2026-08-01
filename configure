@@ -1213,6 +1213,7 @@ if [ $work_from_git_repo -eq 0 ]; then
   gitcurtag=$(git describe --tags --abbrev=0)
   gitcurdesc=$(git describe --tags)
   gitcurbranch=$(git rev-parse --abbrev-ref HEAD)
+  gitcurbranch=${gitcurbranch##*/}
   if [ "$gitcurtag" = "$gitcurdesc" ]; then
      build=''
   elif [ "$gitcurbranch" = 'main' ]; then
@@ -1232,7 +1233,8 @@ elif [[ " $build_refs " == *" main "* ]]; then
 elif [ "$build_refs" = "%D" ]; then
    build="+XX-g$build_hash"
 else
-   build="+${build_refs##* }-XX-g$build_hash"
+   build_lastref=${build_refs##* }
+   build="+${build_lastref##*/}-XX-g$build_hash"
 fi
 VERSION=$release$build
 # shellcheck disable=SC2034
