@@ -67,7 +67,7 @@ jobs:
       - name: Uninstall Modules
         run: |
           make uninstall
-      - uses: codecov/codecov-action@v6
+      - uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
       - uses: actions/upload-artifact@v7
@@ -154,7 +154,7 @@ jobs:
       - name: Uninstall Modules
         run: |
           make uninstall
-      - uses: codecov/codecov-action@v6
+      - uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
       - uses: actions/upload-artifact@v7
@@ -237,7 +237,7 @@ jobs:
       - name: Uninstall Modules
         run: |
           make uninstall
-      - uses: codecov/codecov-action@v6
+      - uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
       - uses: actions/upload-artifact@v7
@@ -305,7 +305,7 @@ jobs:
       - name: Uninstall Modules
         run: |
           make uninstall
-      - uses: codecov/codecov-action@v6
+      - uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
       - uses: actions/upload-artifact@v7
@@ -375,7 +375,7 @@ jobs:
       - name: Uninstall Modules
         run: |
           make uninstall
-      - uses: codecov/codecov-action@v6
+      - uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
       - uses: actions/upload-artifact@v7
@@ -520,7 +520,7 @@ jobs:
       - name: Uninstall Modules
         run: |
           make uninstall
-      - uses: codecov/codecov-action@v6
+      - uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
       - uses: actions/upload-artifact@v7
