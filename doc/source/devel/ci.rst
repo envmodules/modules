@@ -222,5 +222,8 @@ Dependency updates
 ``github-actions`` ecosystem (i.e. the ``uses:`` action references in
 :file:`.github/workflows/`) weekly and open pull requests to bump pinned
 versions, keeping the actions used by all of the above workflows current.
+It also checks the ``docker`` ecosystem in :file:`.clusterfuzzlite/`,
+keeping the digest-pinned ``FROM`` line in
+:file:`.clusterfuzzlite/Dockerfile` current.
 
 .. vim:set tabstop=2 shiftwidth=2 expandtab autoindent:
