@@ -159,6 +159,18 @@ Modules 5.7.0 (not yet released)
   substantial performance improvement is observed when loading an existing
   modulefile out of a directory holding hundreds or thousands of sibling
   versions. (fix issue #561)
+* Doc: add :ref:`module-find-and-resolution` design notes.
+* Doc: add :ref:`devel-testsuite` guide describing the DejaGnu testsuite
+  structure.
+* Doc: document and cross-reference :ref:`commit-message-conventions` in
+  :ref:`CONTRIBUTING`.
+* Doc: document :ref:`code-comments` conventions in :ref:`CONTRIBUTING`.
+* Doc: add :ref:`devel-ci` guide describing continuous integration usage.
+* Install: rename the shipped ``COPYING.GPLv2`` license file to ``COPYING``,
+  the name convention recognized by packaging tools.
+* Doc: fix favicon rendering with a black background instead of white on
+  viewers that ignore transparency, by setting its transparent pixels to a
+  white matte color instead of black.
 
 
 .. _5.6 release notes:
