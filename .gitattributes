@@ -2,6 +2,7 @@
 version.inc.in export-subst
 # no export of git-specific stuff
 .github export-ignore
+.clusterfuzzlite export-ignore
 .gitignore export-ignore
 .gitattributes export-ignore
 init/.gitignore export-ignore

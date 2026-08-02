@@ -37,15 +37,20 @@ Overview
 ``scorecard.yml``
     `OSSF Scorecard`_ supply-chain security analysis. Runs on push (to
     ``main``), weekly, manual.
+``cflite.yml``
+    `ClusterFuzzLite`_ fuzzing of the optional C helper library
+    (:file:`lib/`): a short pass on pull requests touching :file:`lib/`
+    or :file:`.clusterfuzzlite/`, and a longer batch pass bi-weekly/manual.
 
 All of the above live under :file:`.github/workflows/`.
 
 .. _OSSF Scorecard: https://github.com/ossf/scorecard
+.. _ClusterFuzzLite: https://google.github.io/clusterfuzzlite/
 
-Every build/test workflow (all except :file:`differential_shellcheck.yml`
-and :file:`scorecard.yml`) triggers on ``push`` to any branch except
-``c-main`` and ``c-3.2`` (legacy imported-history branches that are not
-active development targets) and on every ``pull_request``.
+Every build/test workflow (all except :file:`differential_shellcheck.yml`,
+:file:`scorecard.yml` and :file:`cflite.yml`) triggers on ``push`` to any
+branch except ``c-main`` and ``c-3.2`` (legacy imported-history branches
+that are not active development targets) and on every ``pull_request``.
 
 Build/test workflows
 ---------------------
@@ -154,6 +159,45 @@ to GitHub's Code scanning. This is unrelated to build/test coverage; it
 checks repository practices (branch protection, pinned dependencies, ...).
 See ``.github/security-insights.yml`` for how this feeds into the project's
 OpenSSF Best Practices self-assessment.
+
+Fuzzing (:file:`cflite.yml`)
+----------------------------
+
+Runs `ClusterFuzzLite`_, a lightweight continuous-fuzzing setup built on
+OSS-Fuzz's libFuzzer/sanitizer tooling, against the optional C helper
+library in :file:`lib/` (see ``lib/envmodules.c`` in the repository
+layout). This is what satisfies the `OSSF Scorecard`_ "Fuzzing" check
+above: for C/C++ projects Scorecard only recognizes OSS-Fuzz registration
+or the presence of a :file:`.clusterfuzzlite/Dockerfile`, not arbitrary
+libFuzzer harnesses on their own.
+
+:file:`.clusterfuzzlite/` at the repository root holds the fuzzing setup:
+
+``project.yaml``, ``Dockerfile``, ``build.sh``
+    Standard ClusterFuzzLite build integration files. ``build.sh``
+    regenerates :file:`lib/config.h` through ``lib/configure`` (with
+    ``--disable-shared --disable-stubs``, since the fuzz targets link
+    against libtcl directly rather than through the Tcl stub mechanism
+    the shipped extension uses) and compiles ``envmodules.c`` together
+    with each fuzz target.
+``fuzz_parsedatetimearg.c``, ``fuzz_readfile.c``, ``fuzz_getfilesindirectory.c``
+    One target per :file:`lib/envmodules.c` entry point that parses
+    externally-influenced input: date/time argument strings, file
+    content (including the ``#%Module`` magic-cookie check), and
+    directory-entry names, respectively. ``Envmodules_InitStateUsernameObjCmd``,
+    ``Envmodules_InitStateUsergroupsObjCmd`` and
+    ``Envmodules_InitStateClockSecondsObjCmd`` take no Tcl-level
+    arguments and only query process/OS state (uid, group list, current
+    time), so there is no fuzzer-mutable input for them and no fuzz
+    target is provided.
+
+:file:`cflite.yml` has two jobs, gated on the triggering event: ``PR`` runs
+a short AddressSanitizer/UndefinedBehaviorSanitizer fuzzing pass, in
+``code-change`` mode (reporting only issues newly introduced by the pull
+request's diff), on pull requests touching :file:`lib/` or
+:file:`.clusterfuzzlite/`. ``BatchFuzzing`` runs the same targets for a
+full hour, bi-weekly and on manual dispatch, to catch issues that need a
+deeper corpus to reach.
 
 Coverage
 --------
