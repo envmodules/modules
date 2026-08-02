@@ -16,6 +16,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <stdio.h>
+#include "config.h"
 #include "envmodules.h"
 
 #define MAX_ENTRIES 32

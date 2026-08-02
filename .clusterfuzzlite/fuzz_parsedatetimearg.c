@@ -5,6 +5,7 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include "config.h"
 #include "envmodules.h"
 
 int
