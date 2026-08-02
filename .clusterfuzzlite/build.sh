@@ -16,6 +16,13 @@
 MODROOT="$SRC/modules"
 FUZZDIR="$MODROOT/.clusterfuzzlite"
 
+# lib/configure is generated (gitignored, not checked into the repo);
+# the top-level ./configure normally creates it on demand via the same
+# 'autoreconf -i' before running it, which we replicate here since we
+# only need the C library, not a full top-level configure run.
+cd "$MODROOT/lib"
+autoreconf -i
+
 # Generate lib/config.h (PACKAGE_NAME, GETGROUPS_T, ...) through the
 # project's own TEA-based configure script. --disable-shared
 # --disable-stubs turns off USE_TCL_STUBS: the shipped module is a
@@ -23,7 +30,6 @@ FUZZDIR="$MODROOT/.clusterfuzzlite"
 # Envmodules_Init() runs Tcl_InitStubs(), but these fuzz targets call the
 # ObjCmd entry points directly and link against libtcl itself, which
 # doesn't export tclStubsPtr/Tcl_InitStubs.
-cd "$MODROOT/lib"
 TCLCONFDIR=$(dirname "$(find /usr -name tclConfig.sh | head -n1)")
 ./configure --with-tcl="$TCLCONFDIR" --disable-shared --disable-stubs
 
