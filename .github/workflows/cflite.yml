@@ -1,0 +1,79 @@
+name: ClusterFuzzLite fuzzing
+
+on:
+  pull_request:
+    paths:
+      - 'lib/**'
+      - '.clusterfuzzlite/**'
+      - '.github/workflows/cflite.yml'
+  schedule:
+    # bi-weekly, 03:00 UTC on the 1st and 15th of each month; cron has no
+    # native "every 2 weeks" field, so day-of-month is the usual
+    # approximation for a bi-weekly cadence
+    - cron: '0 3 1,15 * *'
+  workflow_dispatch:
+
+permissions: read-all
+
+jobs:
+  PR:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      # output-sarif: true below has run_fuzzers upload results to code
+      # scanning, which needs write access to that API
+      security-events: write
+    concurrency:
+      group: ${{ github.workflow }}-${{ matrix.sanitizer }}-${{ github.ref }}
+      cancel-in-progress: true
+    strategy:
+      fail-fast: false
+      matrix:
+        sanitizer:
+          - address
+          - undefined
+    steps:
+      - name: Build Fuzzers (${{ matrix.sanitizer }})
+        id: build
+        uses: google/clusterfuzzlite/actions/build_fuzzers@v1
+        with:
+          language: c
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          sanitizer: ${{ matrix.sanitizer }}
+      - name: Run Fuzzers (${{ matrix.sanitizer }})
+        id: run
+        uses: google/clusterfuzzlite/actions/run_fuzzers@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          fuzz-seconds: 300
+          mode: 'code-change'
+          sanitizer: ${{ matrix.sanitizer }}
+          output-sarif: true
+
+  BatchFuzzing:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        sanitizer:
+          - address
+          - undefined
+    steps:
+      - name: Build Fuzzers (${{ matrix.sanitizer }})
+        id: build
+        uses: google/clusterfuzzlite/actions/build_fuzzers@v1
+        with:
+          language: c
+          sanitizer: ${{ matrix.sanitizer }}
+      - name: Run Fuzzers (${{ matrix.sanitizer }})
+        id: run
+        uses: google/clusterfuzzlite/actions/run_fuzzers@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          fuzz-seconds: 3600
+          mode: 'batch'
+          sanitizer: ${{ matrix.sanitizer }}
+          output-sarif: true
