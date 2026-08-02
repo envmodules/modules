@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <sys/mman.h>
 #include <unistd.h>
+#include "config.h"
 #include "envmodules.h"
 
 int
