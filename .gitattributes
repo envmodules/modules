@@ -2,7 +2,6 @@
 version.inc.in export-subst
 # no export of git-specific stuff
 .github export-ignore
-.clusterfuzzlite export-ignore
 .gitignore export-ignore
 .gitattributes export-ignore
 init/.gitignore export-ignore
@@ -17,5 +16,10 @@ script/commit-msg export-ignore
 script/pre-commit export-ignore
 .codespellrc export-ignore
 .hunspell.en.dic export-ignore
+# .clusterfuzzlite is intentionally NOT export-ignored: GitHub's archive
+# generation (used by e.g. codeload.github.com) honors export-ignore, and
+# OSSF Scorecard's Fuzzing check reads .clusterfuzzlite/Dockerfile from
+# that same archive, so export-ignoring it hides the fuzzing setup from
+# Scorecard entirely
 # no export of website-specific content
 doc/talk export-ignore
