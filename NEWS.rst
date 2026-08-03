@@ -171,6 +171,8 @@ Modules 5.7.0 (not yet released)
 * Doc: fix favicon rendering with a black background instead of white on
   viewers that ignore transparency, by setting its transparent pixels to a
   white matte color instead of black.
+* Doc: document Windows Terminal profile setup as an alternative way to
+  initialize Modules on Windows without an install script. (fix issue #634)
 
 
 .. _5.6 release notes:

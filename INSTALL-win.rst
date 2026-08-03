@@ -96,6 +96,24 @@ For PowerShell, you may adapt profile script to make ``envmodule`` command
 initialized when ``pwsh`` shell starts. See the PowerShell documentation on
 how to `customize your shell environment <https://learn.microsoft.com/en-us/powershell/scripting/learn/shell/creating-profiles>`_.
 
+Alternatively, if you use `Windows Terminal`_, a PowerShell or ``pwsh``
+profile can be set to initialize Modules on startup without altering the
+system-wide ``PATH`` environment variable and without running an install
+script. Once the Windows-specific distribution zipball has been unpacked to
+a directory of your choice (for instance ``C:\Program Files\Environment
+Modules``), open the Windows Terminal settings, select the profile to
+adapt and set its *Command line* to::
+
+        pwsh.exe -NoExit -Command "& Import-Module 'C:\Program Files\Environment Modules\init\pwsh.ps1'"
+
+Use ``powershell.exe`` instead of ``pwsh.exe`` to rely on the Windows
+built-in PowerShell rather than PowerShell Core, and adapt the path passed
+to ``Import-Module`` to match where the distribution zipball was unpacked.
+The ``envmodule`` command then gets initialized every time this profile
+starts.
+
+.. _Windows Terminal: https://learn.microsoft.com/en-us/windows/terminal/
+
 Modules installation is now operational and you can setup your modulefiles. By
 default, the ``modulefiles`` directory in installation directory is defined as
 a modulepath and contains few modulefile examples::
