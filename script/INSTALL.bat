@@ -23,7 +23,9 @@ set FIND=%SYSTEMROOT%\system32\find
 echo %PATH% | %FIND% /i "%binpath:"=%">nul || set "NEWPATH=%binpath%;%PATH%"
 if not "%NEWPATH%" == "" (
    set "PATH=%NEWPATH%"
-   setx /M PATH "%NEWPATH%"
+   :: 'reg add' is used instead of 'setx /M' as the latter silently
+   :: truncates the value it persists to 1024 characters
+   reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" /v PATH /t REG_EXPAND_SZ /d "%NEWPATH%" /f
 )
 if errorlevel 1 ( exit /b 3 )
 

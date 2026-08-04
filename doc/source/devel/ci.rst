@@ -107,7 +107,10 @@ on Windows:
     <https://www.bawt.tcl3d.org/>`_), built via ``make dist-win`` and
     installed/tested/uninstalled through the generated
     :file:`INSTALL.bat`/:file:`TESTINSTALL.bat`/:file:`UNINSTALL.bat`
-    scripts, driven from a ``cmd`` shell.
+    scripts, driven from a ``cmd`` shell. Before installing, the inherited
+    ``PATH`` is padded past the legacy 1024-character limit of the
+    ``setx`` tool (mimicking a Visual Studio Developer Prompt) to guard
+    against the persisted system ``PATH`` getting silently truncated.
 ``native-pwsh``
     Same native Windows install, but through the PowerShell variant
     (:file:`INSTALL_PWSH.bat`/:file:`TESTINSTALL_PWSH.ps1`).

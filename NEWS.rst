@@ -173,6 +173,12 @@ Modules 5.7.0 (not yet released)
   white matte color instead of black.
 * Doc: document Windows Terminal profile setup as an alternative way to
   initialize Modules on Windows without an install script. (fix issue #634)
+* Install: use ``reg add`` instead of ``setx /M`` to persist the system-wide
+  ``PATH`` environment variable in :file:`INSTALL.bat` and
+  :file:`UNINSTALL.bat`, as ``setx`` silently truncates the value it writes
+  to 1024 characters, which could corrupt the system ``PATH`` when installing
+  from a shell with an already long inherited ``PATH`` (e.g. a Visual Studio
+  Developer Prompt). (fix issue #654)
 
 
 .. _5.6 release notes:

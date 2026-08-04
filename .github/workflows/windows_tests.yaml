@@ -48,7 +48,31 @@ jobs:
         run: |
           jar xvf %DIST_WIN%.zip
           cd %DIST_WIN%
-          INSTALL.bat
+          :: replace (rather than extend) the inherited PATH with a
+          :: controlled value that is still past the legacy 1024-character
+          :: limit of the 'setx' tool previously used here, to simulate a
+          :: large pre-existing PATH such as found in a Visual Studio
+          :: Developer Prompt (see GH-654), while staying safely under the
+          :: 8191-character command line length limit of cmd.exe
+          setlocal enabledelayedexpansion
+          set "PATH=%SYSTEMROOT%\system32;%SYSTEMROOT%"
+          for /L %%i in (1,1,50) do set "PATH=!PATH!;C:\dummy-path-segment-%%i"
+          set "PATH=!PATH!;C:\marker-end-of-long-path"
+          call INSTALL.bat
+      - name: Check persisted PATH is not truncated
+        shell: cmd
+        run: |
+          reg query "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" /v PATH > persisted-path.txt
+          %SYSTEMROOT%\system32\find /i "marker-end-of-long-path" persisted-path.txt >nul
+          if errorlevel 1 (
+              echo "persisted system PATH truncated: marker entry not found"
+              exit /b 1
+          )
+          %SYSTEMROOT%\system32\find /i "%MODULE_DIR%" persisted-path.txt >nul
+          if errorlevel 1 (
+              echo "installation 'bin' directory not found in persisted system PATH"
+              exit /b 1
+          )
       - name: Test Modules installation
         shell: cmd
         run: |
