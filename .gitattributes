@@ -23,3 +23,7 @@ script/pre-commit export-ignore
 # Scorecard entirely
 # no export of website-specific content
 doc/talk export-ignore
+# these Windows batch scripts intentionally use CRLF line endings, do not
+# flag the CR as a trailing whitespace error
+script/INSTALL.bat whitespace=cr-at-eol
+script/UNINSTALL.bat whitespace=cr-at-eol

@@ -736,6 +736,7 @@ setState
 setenv
 setgid
 setq
+setx
 severities
 sexualized
 sgr
