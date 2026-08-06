@@ -3949,6 +3949,8 @@ An additional siteconfig script may be specified through the
 exists the extra siteconfig is sourced by :file:`modulecmd.tcl` right after
 main siteconfig script.
 
+.. _Hooks:
+
 Hooks
 """""
 

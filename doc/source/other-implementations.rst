@@ -45,9 +45,9 @@ table highlights features that are unique to each implementation.
        * `Path entry priorities`_
        * ``--regexp`` search option
        * `settarg`_
-       * `Hook functions`_
        * |LMOD_FILE_IGNORE_PATTERNS|_ environment variable
        * `MarkDown support in module help and whatis`_
+       * `Load dot hidden modules without leading dot`_
      - * Integration with *cmd* and *pwsh* shells and *Tcl* language
        * :ref:`Automated module handling<MODULES_AUTO_HANDLING>`
        * :ref:`Advanced module version specifiers`
@@ -83,6 +83,7 @@ table highlights features that are unique to each implementation.
 .. |LMOD_FILE_IGNORE_PATTERNS| replace:: ``LMOD_FILE_IGNORE_PATTERNS``
 .. _LMOD_FILE_IGNORE_PATTERNS: https://lmod.readthedocs.io/en/latest/090_configuring_lmod.html#setting-environment-variables-or-cosmic-assign-at-startup
 .. _MarkDown support in module help and whatis: https://lmod.readthedocs.io/en/latest/106_markdown_help.html
+.. _Load dot hidden modules without leading dot: https://lmod.readthedocs.io/en/latest/079_hidden_modules.html#dot-leading-version-directories-and-lmod-dot-hidden-load-alias
 
 The following table highlights ``module`` sub-commands that are exclusive to
 either Lmod or Modules. In some cases, similar functionality exists under
@@ -94,7 +95,7 @@ at the end of this section to map these equivalents.
 
    * - |lmod_version|
      - |modules_version|
-   * - ``category``, ``overview``, ``tablelist``
+   * - ``category``, ``last-error``, ``overview``, ``tablelist``
      - :subcmd:`aliases`, :subcmd:`append-path`, :subcmd:`cachebuild`,
        :subcmd:`cacheclear`, :subcmd:`clear`, :subcmd:`config`,
        :subcmd:`edit`, :subcmd:`info-loaded`, :subcmd:`initadd`,
@@ -120,10 +121,9 @@ the end of this section to map these equivalents.
      - |modules_version|
    * - ``module-forbid-regex``, ``module-hide-regex``, ``remove-property``
      - :mfcmd:`getvariant`, :mfcmd:`is-saved`, :mfcmd:`is-used`,
-       :mfcmd:`lsb-release`, :mfcmd:`module-tag`, :mfcmd:`module-virtual`,
-       :mfcmd:`module-warn`, :mfcmd:`modulepath-label`, :mfcmd:`provide`,
-       :mfcmd:`reportWarning`, :mfcmd:`uncomplete`, :mfcmd:`variant`,
-       :mfcmd:`x-resource`
+       :mfcmd:`lsb-release`, :mfcmd:`module-tag`, :mfcmd:`module-warn`,
+       :mfcmd:`modulepath-label`, :mfcmd:`provide`, :mfcmd:`reportWarning`,
+       :mfcmd:`uncomplete`, :mfcmd:`variant`, :mfcmd:`x-resource`
 
 See the :ref:`Compatibility with Lmod Tcl modulefile` section for details on
 how the implementation of the Tcl modulefile commands differ between Lmod and
@@ -153,8 +153,7 @@ implementation.
    * - Lmod + `XALT`_
      - :ref:`Logging activity`
    * - `Hook functions`_
-     - :ref:`Override any internal procedures or set trace hook<Site-specific
-       configuration>`
+     - :ref:`Hooks`
    * - `Module hierarchy`_
      - :ref:`Requiring via module`
    * - `Autoswap`_
@@ -293,4 +292,4 @@ If you're aware of a ``module``-related project missing from this list, feel
 free to :ref:`contact us<Community>` so we can add it.
 
 .. |modules_version| replace:: Modules 5.7.0 (not yet released)
-.. |lmod_version| replace:: Lmod 9.2.5
+.. |lmod_version| replace:: Lmod 9.3.0
