@@ -1532,3 +1532,5 @@ auditRequestedLoad
 blockModule
 fd
 lindex
+hookEvents
+runHooks

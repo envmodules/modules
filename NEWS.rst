@@ -187,6 +187,8 @@ Modules 5.7.0 (not yet released)
   or procedure renaming, which bind to internal implementation details, to
   run code before or after a modulefile or modulerc evaluation. (fix issue
   #607)
+* Doc: add :ref:`add-new-hook-event` guide describing how to contribute a
+  new hook event.
 
 
 .. _5.6 release notes:

@@ -243,7 +243,8 @@ available for anything not (yet) covered by a hook event.
 
 These four events are only the first ones introduced through ``add-hook``;
 additional hook events will be added in the future as real site needs for
-them come up.
+them come up. See :ref:`add-new-hook-event` for the guide contributors can
+follow to propose one.
 
 
 v5.6
