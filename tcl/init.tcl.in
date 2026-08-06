@@ -179,6 +179,11 @@ array set g_config_defs [list\
    wa_277 {MODULES_WA_277 @wa277@ 0 b {0 1}}\
 ]
 
+# List of events on which a site-specific procedure can be registered through
+# the add-hook command
+set g_hookEvents {before-modulefile-eval after-modulefile-eval\
+   before-modulerc-eval after-modulerc-eval}
+
 # Get state value
 proc getState {state {valifundef {}} {catchinitproc 0}} {
    if {![info exists ::g_states($state)]} {
@@ -928,6 +933,32 @@ proc commandAbortOnError {{command {}}} {
    set abort_command_list [getConfList abort_on_error]
    return [expr {[isTopEvaluation] && ![getState force] && $command in\
       $abort_command_list}]
+}
+
+# Register a site-specific procedure to be called when given hook event
+# occurs. Several procedures may be registered on the same event, they are
+# then called in their registration order
+proc add-hook {event proc_name} {
+   if {$event ni $::g_hookEvents} {
+      knerror "Unknown hook event '$event'"
+   }
+   lappend ::g_hooks($event) $proc_name
+}
+
+# Call every procedure registered on given hook event with provided
+# arguments. An error raised by a hook procedure is reported but does not
+# interrupt the other procedures registered on this event nor the
+# modulefile or modulerc evaluation being wrapped
+proc runHooks {event args} {
+   if {[info exists ::g_hooks($event)]} {
+      foreach hookproc $::g_hooks($event) {
+         if {[catch {$hookproc {*}$args} errMsg]} {
+            reportError "Hook procedure '$hookproc' registered on\
+               '$event' event failed\n[formatErrStackTrace $::errorInfo\
+               $hookproc {}]"
+         }
+      }
+   }
 }
 
 # ;;; Local Variables:
