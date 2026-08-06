@@ -720,4 +720,125 @@ if {[info exists env(TESTSUITE_ENABLE_SITECONFIG_INITCONFINITENVVARS)]} {
     report [string length [getConf init_envvars]]
 }
 
+# add-hook command and hook event tests
+if {[info exists env(TESTSUITE_ENABLE_SITECONFIG_HOOK)]} {
+    switch -- $env(TESTSUITE_ENABLE_SITECONFIG_HOOK) {
+        unknownevent {
+            add-hook not-an-event testsuite_hook_unknown
+        }
+        modulefile {
+            proc testsuite_hook_before_modulefile {modfile modname\
+                modnamevr modspec mode requested} {
+                report "HOOK before-modulefile-eval $modfile $modname\
+                    $modnamevr $modspec $mode $requested"
+            }
+            proc testsuite_hook_after_modulefile {modfile modname modnamevr\
+                modspec mode requested status} {
+                report "HOOK after-modulefile-eval $modfile $modname\
+                    $modnamevr $modspec $mode $requested $status"
+            }
+            add-hook before-modulefile-eval testsuite_hook_before_modulefile
+            add-hook after-modulefile-eval testsuite_hook_after_modulefile
+        }
+        modulerc {
+            proc testsuite_hook_before_modulerc {modfile modname} {
+                report "HOOK before-modulerc-eval $modfile $modname"
+            }
+            proc testsuite_hook_after_modulerc {modfile modname status} {
+                report "HOOK after-modulerc-eval $modfile $modname $status"
+            }
+            add-hook before-modulerc-eval testsuite_hook_before_modulerc
+            add-hook after-modulerc-eval testsuite_hook_after_modulerc
+        }
+        multiple {
+            proc testsuite_hook_multi1 {modfile modname modnamevr modspec\
+                mode requested} {
+                report "HOOK1 $modname"
+            }
+            proc testsuite_hook_multi2 {modfile modname modnamevr modspec\
+                mode requested} {
+                report "HOOK2 $modname"
+            }
+            add-hook before-modulefile-eval testsuite_hook_multi1
+            add-hook before-modulefile-eval testsuite_hook_multi2
+        }
+        error {
+            proc testsuite_hook_error {modfile modname modnamevr modspec\
+                mode requested} {
+                error "hook failure for $modname"
+            }
+            proc testsuite_hook_after_error {modfile modname modnamevr\
+                modspec mode requested} {
+                report "HOOK survived after error for $modname"
+            }
+            add-hook before-modulefile-eval testsuite_hook_error
+            add-hook before-modulefile-eval testsuite_hook_after_error
+        }
+        arity_missing {
+            proc testsuite_hook_arity_missing {modfile modname} {
+                report "HOOK should not be reached for $modname"
+            }
+            add-hook before-modulefile-eval testsuite_hook_arity_missing
+        }
+        arity_extra {
+            proc testsuite_hook_arity_extra {modfile modname modnamevr\
+                modspec mode requested extra} {
+                report "HOOK should not be reached for $modname"
+            }
+            add-hook before-modulefile-eval testsuite_hook_arity_extra
+        }
+        codeerror {
+            proc testsuite_hook_codeerror {modfile modname modnamevr modspec\
+                mode requested} {
+                testsuite_hook_undefined_command $modname
+            }
+            add-hook before-modulefile-eval testsuite_hook_codeerror
+        }
+        error_second {
+            proc testsuite_hook_first_ok {modfile modname modnamevr modspec\
+                mode requested} {
+                report "HOOK1 ok for $modname"
+            }
+            proc testsuite_hook_second_error {modfile modname modnamevr\
+                modspec mode requested} {
+                error "second hook failure for $modname"
+            }
+            add-hook before-modulefile-eval testsuite_hook_first_ok
+            add-hook before-modulefile-eval testsuite_hook_second_error
+        }
+        docexamples {
+            # replicates the auditRequestedLoad example from module.rst
+            # (using report instead of writing to a real file, for test
+            # purposes)
+            proc testsuite_hook_audit_requested {modfile modname modnamevr\
+                modspec mode requested} {
+                if {$requested && $mode eq {load}} {
+                    report "would audit: $modnamevr"
+                }
+            }
+            add-hook before-modulefile-eval testsuite_hook_audit_requested
+
+            # replicates the hook_procedure example from module.rst
+            proc testsuite_hook_setenv {modfile modname modnamevr modspec\
+                mode requested} {
+                set modfile_interp [getCurrentModfileInterpName]
+                interp eval $modfile_interp setenv MYVAR value
+            }
+            add-hook before-modulefile-eval testsuite_hook_setenv
+        }
+        blockmodule {
+            # replicates the blockModule example from module.rst (Advanced
+            # hooks): a low-level trace-based hook that can reject a
+            # modulefile evaluation outright, unlike add-hook
+            proc testsuite_hook_block_module {cmdstring op} {
+                if {[lindex $cmdstring 2] eq {foo/1.0}} {
+                    error "foo/1.0 is blocked by site policy"
+                }
+            }
+            trace add execution execute-modulefile enter\
+                testsuite_hook_block_module
+        }
+    }
+}
+
 }

@@ -1,0 +1,496 @@
+##############################################################################
+#   Modules Revision 3.0
+#   Providing a flexible user environment
+#
+#   File:		modules.50-cmds/%M%
+#   Revision:		%I%
+#   First Edition:	2026/08/05
+#   Last Mod.:		%U%, %G%
+#
+#   Authors:		Xavier Delaruelle, xavier.delaruelle@cea.fr
+#
+#   Description:	Testuite testsequence
+#   Command:		load, unload, avail
+#   Modulefiles:    err, foo, puts, scan
+#   Sub-Command:
+#
+#   Comment:	%C{
+#           Test add-hook command and hook events
+#		}C%
+#
+##############################################################################
+
+skip_if_quick_mode
+
+set mp $modpath.4
+set mpre $modpathre.4
+setenv_path_var MODULEPATH $mp
+
+# no global RC file evaluation should interfere with hook checks below
+unsetenv_var MODULERCFILE
+
+# check expected siteconfig file is installed
+set is_stderr_tty [siteconfig_isStderrTty]
+if {$is_stderr_tty} {
+
+# unknown hook event is a fatal siteconfig error
+setenv_var TESTSUITE_ENABLE_SITECONFIG_HOOK unknownevent
+set tserr [escre "$error_msgs: Site configuration source failed
+  Unknown hook event 'not-an-event'"]
+append tserr {(\n.*)*}
+testouterr_cmd_re sh {avail foo} ERR $tserr
+unsetenv_var TESTSUITE_ENABLE_SITECONFIG_HOOK
+
+
+# before/after-modulefile-eval hooks fire with correct arguments on load
+# and unload
+setenv_var TESTSUITE_ENABLE_SITECONFIG_HOOK modulefile
+
+set tserr "HOOK before-modulefile-eval $mp/foo/2.0 foo/2.0 foo/2.0 foo/2.0\
+load 1
+HOOK after-modulefile-eval $mp/foo/2.0 foo/2.0 foo/2.0 foo/2.0 load 1 0"
+set ans [list]
+lappend ans [list set _LMFILES_ $mp/foo/2.0]
+lappend ans [list set LOADEDMODULES foo/2.0]
+testouterr_cmd sh {load foo/2.0} $ans $tserr
+
+setenv_loaded_module [list foo/2.0] [list $mp/foo/2.0]
+set tserr "HOOK before-modulefile-eval $mp/foo/2.0 foo/2.0 foo/2.0 foo/2.0\
+unload 1
+HOOK after-modulefile-eval $mp/foo/2.0 foo/2.0 foo/2.0 foo/2.0 unload 1 0"
+set ans [list]
+lappend ans [list unset _LMFILES_]
+lappend ans [list unset LOADEDMODULES]
+testouterr_cmd sh {unload foo/2.0} $ans $tserr
+unsetenv_loaded_module
+
+unsetenv_var TESTSUITE_ENABLE_SITECONFIG_HOOK
+
+
+# before/after-modulerc-eval hooks fire with correct arguments, for both
+# the modulepath root modulerc and the per-directory one
+setenv_var TESTSUITE_ENABLE_SITECONFIG_HOOK modulerc
+
+set tserr "HOOK before-modulerc-eval $mp/.modulerc .modulerc
+HOOK after-modulerc-eval $mp/.modulerc .modulerc 0
+HOOK before-modulerc-eval $mp/puts/.modulerc puts/.modulerc
+HOOK after-modulerc-eval $mp/puts/.modulerc puts/.modulerc 0"
+set ans [list]
+lappend ans [list set __MODULES_LMALTNAME puts/2&as|puts/default&as|puts/latest]
+lappend ans [list set _LMFILES_ $mp/puts/2]
+lappend ans [list set LOADEDMODULES puts/2]
+testouterr_cmd sh {load puts/2} $ans $tserr
+
+setenv_loaded_module [list puts/2] [list $mp/puts/2]
+unsetenv_loaded_module
+unsetenv_var __MODULES_LMALTNAME
+
+unsetenv_var TESTSUITE_ENABLE_SITECONFIG_HOOK
+
+
+# after-modulerc-eval hook reports a non-zero status when modulerc
+# evaluation fails, and evaluation of the module continues afterward
+setenv_var TESTSUITE_ENABLE_SITECONFIG_HOOK modulerc
+setenv_var TESTSUITE_PUTS log_rc_and_unk
+
+set tserr [escre "HOOK before-modulerc-eval $mp/.modulerc .modulerc
+HOOK after-modulerc-eval $mp/.modulerc .modulerc 0
+HOOK before-modulerc-eval $mp/puts/.modulerc puts/.modulerc"]
+append tserr {(\n.*)*}
+append tserr [escre "HOOK after-modulerc-eval $mp/puts/.modulerc puts/.modulerc 1"]
+set ans [list]
+lappend ans [list set __MODULES_LMALTNAME puts/2&as|puts/default&as|puts/latest]
+lappend ans [list set _LMFILES_ $mp/puts/2]
+lappend ans [list set LOADEDMODULES puts/2]
+testouterr_cmd_re sh {load puts/2} [shell_out sh $ans] $tserr
+
+setenv_loaded_module [list puts/2] [list $mp/puts/2]
+unsetenv_loaded_module
+unsetenv_var __MODULES_LMALTNAME
+
+unsetenv_var TESTSUITE_PUTS
+unsetenv_var TESTSUITE_ENABLE_SITECONFIG_HOOK
+
+
+# several procedures registered on the same event are called in their
+# registration order
+setenv_var TESTSUITE_ENABLE_SITECONFIG_HOOK multiple
+set tserr "HOOK1 foo/2.0
+HOOK2 foo/2.0"
+set ans [list]
+lappend ans [list set _LMFILES_ $mp/foo/2.0]
+lappend ans [list set LOADEDMODULES foo/2.0]
+testouterr_cmd sh {load foo/2.0} $ans $tserr
+unsetenv_var TESTSUITE_ENABLE_SITECONFIG_HOOK
+
+
+# an error raised by a hook procedure is reported but does not prevent the
+# other procedures registered on the same event from running, nor the
+# wrapped modulefile evaluation from proceeding
+setenv_var TESTSUITE_ENABLE_SITECONFIG_HOOK error
+set tserr [escre "HOOK survived after error for foo/2.0
+
+Loading foo/2.0
+  ERROR: Hook procedure 'testsuite_hook_error' registered on<EXM>'before-modulefile-eval' event failed
+    hook failure for foo/2.0"]
+append tserr {(\n.*)*}
+set ans [list]
+lappend ans [list set _LMFILES_ $mp/foo/2.0]
+lappend ans [list set LOADEDMODULES foo/2.0]
+lappend ans [list ERR]
+testouterr_cmd_re sh {load foo/2.0} [shell_out sh $ans] $tserr
+unsetenv_var TESTSUITE_ENABLE_SITECONFIG_HOOK
+
+
+# a registered hook procedure declared with fewer arguments than the event
+# provides is reported as a wrong-number-of-arguments error, non-fatally
+setenv_var TESTSUITE_ENABLE_SITECONFIG_HOOK arity_missing
+set tserr [escre "Loading foo/2.0
+  ERROR: Hook procedure 'testsuite_hook_arity_missing' registered on<EXM>'before-modulefile-eval' event failed
+    wrong # args: should be \"testsuite_hook_arity_missing modfile\
+modname\""]
+append tserr {(\n.*)*}
+set ans [list]
+lappend ans [list set _LMFILES_ $mp/foo/2.0]
+lappend ans [list set LOADEDMODULES foo/2.0]
+lappend ans [list ERR]
+testouterr_cmd_re sh {load foo/2.0} [shell_out sh $ans] $tserr
+unsetenv_var TESTSUITE_ENABLE_SITECONFIG_HOOK
+
+
+# a registered hook procedure declared with more (required) arguments than
+# the event provides is reported as a wrong-number-of-arguments error,
+# non-fatally
+setenv_var TESTSUITE_ENABLE_SITECONFIG_HOOK arity_extra
+set tserr [escre "Loading foo/2.0
+  ERROR: Hook procedure 'testsuite_hook_arity_extra' registered on<EXM>'before-modulefile-eval' event failed
+    wrong # args: should be"]
+append tserr {.*(\n.*)*}
+set ans [list]
+lappend ans [list set _LMFILES_ $mp/foo/2.0]
+lappend ans [list set LOADEDMODULES foo/2.0]
+lappend ans [list ERR]
+testouterr_cmd_re sh {load foo/2.0} [shell_out sh $ans] $tserr
+unsetenv_var TESTSUITE_ENABLE_SITECONFIG_HOOK
+
+
+# a Tcl code issue (call to an undefined command) in a registered hook
+# procedure is reported non-fatally, same as an explicit error
+setenv_var TESTSUITE_ENABLE_SITECONFIG_HOOK codeerror
+set tserr [escre "Loading foo/2.0
+  ERROR: Hook procedure 'testsuite_hook_codeerror' registered on<EXM>'before-modulefile-eval' event failed
+    invalid command name \"testsuite_hook_undefined_command\""]
+append tserr {(\n.*)*}
+set ans [list]
+lappend ans [list set _LMFILES_ $mp/foo/2.0]
+lappend ans [list set LOADEDMODULES foo/2.0]
+lappend ans [list ERR]
+testouterr_cmd_re sh {load foo/2.0} [shell_out sh $ans] $tserr
+unsetenv_var TESTSUITE_ENABLE_SITECONFIG_HOOK
+
+
+# an error raised by the second registered procedure does not undo the
+# result (its report output) already produced by the first registered
+# procedure
+setenv_var TESTSUITE_ENABLE_SITECONFIG_HOOK error_second
+set tserr [escre "HOOK1 ok for foo/2.0
+
+Loading foo/2.0
+  ERROR: Hook procedure 'testsuite_hook_second_error' registered on<EXM>'before-modulefile-eval' event failed
+    second hook failure for foo/2.0"]
+append tserr {(\n.*)*}
+set ans [list]
+lappend ans [list set _LMFILES_ $mp/foo/2.0]
+lappend ans [list set LOADEDMODULES foo/2.0]
+lappend ans [list ERR]
+testouterr_cmd_re sh {load foo/2.0} [shell_out sh $ans] $tserr
+unsetenv_var TESTSUITE_ENABLE_SITECONFIG_HOOK
+
+
+#
+# hooks fire with the correct 'mode' argument across the different module
+# evaluation modes, on both a successful and a failing evaluation
+#
+
+set sepline [string repeat - 67]
+setenv_var TESTSUITE_ENABLE_SITECONFIG_HOOK modulefile
+
+# help, successful evaluation (mode help, requested)
+set tserr "$sepline
+Module Specific Help for $mp/foo/2.0:
+
+HOOK before-modulefile-eval $mp/foo/2.0 foo/2.0 foo/2.0 foo/2.0 help 1
+WARNING: Unable to find ModulesHelp in $mp/foo/2.0.
+HOOK after-modulefile-eval $mp/foo/2.0 foo/2.0 foo/2.0 foo/2.0 help 1 0
+$sepline"
+testouterr_cmd sh {help foo/2.0} OK $tserr
+
+# display, successful evaluation (mode display, requested)
+set tserr "$sepline
+$mp/foo/2.0:
+
+HOOK before-modulefile-eval $mp/foo/2.0 foo/2.0 foo/2.0 foo/2.0 display 1
+HOOK after-modulefile-eval $mp/foo/2.0 foo/2.0 foo/2.0 foo/2.0 display 1 0
+$sepline"
+testouterr_cmd sh {display foo/2.0} OK $tserr
+
+# show, successful evaluation (same as display, mode display, requested)
+testouterr_cmd sh {show foo/2.0} OK $tserr
+
+# whatis, successful evaluation (mode whatis, not requested)
+set tserr "HOOK before-modulefile-eval $mp/foo/2.0 foo/2.0 foo/2.0 foo/2.0\
+whatis 0
+HOOK after-modulefile-eval $mp/foo/2.0 foo/2.0 foo/2.0 foo/2.0 whatis 0 0"
+testouterr_cmd sh {whatis foo/2.0} OK $tserr
+
+# search, successful evaluation (mode whatis, not requested); search
+# evaluates every module in the modulepath so only check the lines
+# relating to the targeted module are present, tolerating the rest
+set tserr [escre "HOOK before-modulefile-eval $mp/foo/2.0 foo/2.0 foo/2.0\
+foo/2.0 whatis 0
+HOOK after-modulefile-eval $mp/foo/2.0 foo/2.0 foo/2.0 foo/2.0 whatis 0 0"]
+testouterr_cmd_re sh {search foo/2.0} {.*} "(.*\n)*${tserr}(\n.*)*"
+
+unsetenv_var TESTSUITE_ENABLE_SITECONFIG_HOOK
+
+
+# for the failing evaluation checks below, only the before-hook line and
+# the after-hook line with its status are matched exactly; the internal
+# Tcl error text in between (whose formatting/indentation differs depending
+# on whether the command holds its output for later display) is tolerated
+# with a wildcard, as it is already covered by dedicated non-hook tests
+# elsewhere in the testsuite
+
+# help, failing evaluation (status 1, overall command fails)
+setenv_var TESTSUITE_ENABLE_SITECONFIG_HOOK modulefile
+setenv_var TESTSUITE_ABORT_ON_ERROR error
+set tserr [escre "$sepline
+Module Specific Help for $mp/err/1.0:
+
+HOOK before-modulefile-eval $mp/err/1.0 err/1.0 err/1.0 err/1.0 help 1"]
+append tserr {.*(\n.*)*}
+append tserr [escre "HOOK after-modulefile-eval $mp/err/1.0 err/1.0 err/1.0\
+err/1.0 help 1 1
+$sepline"]
+testouterr_cmd_re sh {help err/1.0} ERR $tserr
+
+# display, failing evaluation (status 1, overall command fails)
+set tserr [escre "$sepline
+$mp/err/1.0:
+
+HOOK before-modulefile-eval $mp/err/1.0 err/1.0 err/1.0 err/1.0 display 1"]
+append tserr {.*(\n.*)*}
+append tserr [escre "HOOK after-modulefile-eval $mp/err/1.0 err/1.0 err/1.0\
+err/1.0 display 1 1
+$sepline"]
+testouterr_cmd_re sh {display err/1.0} ERR $tserr
+
+# show, failing evaluation (same as display)
+testouterr_cmd_re sh {show err/1.0} ERR $tserr
+
+# whatis, failing evaluation (status 1, but overall command still succeeds)
+set tserr [escre\
+   "HOOK before-modulefile-eval $mp/err/1.0 err/1.0 err/1.0 err/1.0 whatis 0"]
+append tserr {.*(\n.*)*}
+append tserr [escre\
+   "HOOK after-modulefile-eval $mp/err/1.0 err/1.0 err/1.0 err/1.0 whatis 0\
+1"]
+testouterr_cmd_re sh {whatis err/1.0} {} $tserr
+
+# search, failing evaluation (status 1, overall command still succeeds);
+# only check the lines relating to the targeted module are present
+set tserr [escre\
+   "HOOK before-modulefile-eval $mp/err/1.0 err/1.0 err/1.0 err/1.0 whatis 0"]
+append tserr {.*(\n.*)*}
+append tserr [escre\
+   "HOOK after-modulefile-eval $mp/err/1.0 err/1.0 err/1.0 err/1.0 whatis 0\
+1"]
+testouterr_cmd_re sh {search err/1.0} {.*} "(.*\n)*${tserr}(\n.*)*"
+
+unsetenv_var TESTSUITE_ABORT_ON_ERROR
+unsetenv_var TESTSUITE_ENABLE_SITECONFIG_HOOK
+
+
+#
+# scan mode: modulefiles evaluated during an extra-match search triggered
+# by a variant-aware avail query
+#
+
+setenv_var MODULES_ADVANCED_VERSION_SPEC 1
+setenv_var MODULES_AVAIL_INDEPTH 1
+setenv_var MODULES_AVAIL_TERSE_OUTPUT alias:dirwsym:sym:tag:variant
+setenv_var TESTSUITE_ENABLE_SITECONFIG_HOOK modulefile
+
+# avail listing itself is written to stderr, not stdout, like the hook
+# messages, so both are checked together as anserr, in the order they are
+# produced: hook messages first, then the listing
+set listing "scan/1.0\nscan/1.1\nscan/2.0\{foo=val1,val2,val3\}\n"
+append listing "scan/2.1\{foo=val1,val2,val3\}"
+
+# successful scan evaluation (mode scan, not requested)
+setenv_var TESTSUITE_SCAN hooktest
+set tserr "HOOK before-modulefile-eval $mp/scan/1.0 scan/1.1 scan/1.1\
+scan/1.1 scan 0
+HOOK after-modulefile-eval $mp/scan/1.0 scan/1.1 scan/1.1 scan/1.1 scan 0 0
+HOOK before-modulefile-eval $mp/scan/2.0 scan/2.0 scan/2.0 scan/2.0 scan 0
+HOOK after-modulefile-eval $mp/scan/2.0 scan/2.0 scan/2.0 scan/2.0 scan 0 0
+HOOK before-modulefile-eval $mp/scan/2.0 scan/2.1 scan/2.1 scan/2.1 scan 0
+HOOK after-modulefile-eval $mp/scan/2.0 scan/2.1 scan/2.1 scan/2.1 scan 0 0
+HOOK before-modulefile-eval $mp/scan/1.0 scan/1.0 scan/1.0 scan/1.0 scan 0
+HOOK after-modulefile-eval $mp/scan/1.0 scan/1.0 scan/1.0 scan/1.0 scan 0 0
+$listing"
+testouterr_cmd sh {avail -t scan} {} $tserr
+unsetenv_var TESTSUITE_SCAN
+
+# failing scan evaluation (status 1, but errors are silently inhibited and
+# overall command still succeeds, consistent with scan mode tolerating
+# broken modulefiles during a background scan)
+setenv_var TESTSUITE_SCAN unk1
+set tserr "HOOK before-modulefile-eval $mp/scan/1.0 scan/1.1 scan/1.1\
+scan/1.1 scan 0
+HOOK after-modulefile-eval $mp/scan/1.0 scan/1.1 scan/1.1 scan/1.1 scan 0 1
+HOOK before-modulefile-eval $mp/scan/2.0 scan/2.0 scan/2.0 scan/2.0 scan 0
+HOOK after-modulefile-eval $mp/scan/2.0 scan/2.0 scan/2.0 scan/2.0 scan 0 0
+HOOK before-modulefile-eval $mp/scan/2.0 scan/2.1 scan/2.1 scan/2.1 scan 0
+HOOK after-modulefile-eval $mp/scan/2.0 scan/2.1 scan/2.1 scan/2.1 scan 0 0
+HOOK before-modulefile-eval $mp/scan/1.0 scan/1.0 scan/1.0 scan/1.0 scan 0
+HOOK after-modulefile-eval $mp/scan/1.0 scan/1.0 scan/1.0 scan/1.0 scan 0 1
+$listing"
+testouterr_cmd sh {avail -t scan} {} $tserr
+unsetenv_var TESTSUITE_SCAN
+
+unsetenv_var TESTSUITE_ENABLE_SITECONFIG_HOOK
+unsetenv_var MODULES_ADVANCED_VERSION_SPEC
+unsetenv_var MODULES_AVAIL_INDEPTH
+unsetenv_var MODULES_AVAIL_TERSE_OUTPUT
+
+
+# before/after-modulefile-eval hooks also fire for the global and user RC
+# files sourced ahead of the requested module: these files are evaluated
+# through execute-modulefile (mode load), not execute-modulerc, same as any
+# other modulefile passed to the 'source' sub-command
+setenv_var TESTSUITE_ENABLE_SITECONFIG_HOOK modulefile
+setenv_var MODULERCFILE "$env(TESTSUITEDIR)/etc/modulerc:$env(TESTSUITEDIR)/etc/rc"
+
+set globalrc $env(TESTSUITEDIR)/etc/modulerc
+set userrc $env(TESTSUITEDIR)/etc/rc
+set tserr "HOOK before-modulefile-eval $globalrc $globalrc $globalrc\
+$globalrc load 1
+HOOK after-modulefile-eval $globalrc $globalrc $globalrc $globalrc load 1 0
+HOOK before-modulefile-eval $userrc $userrc $userrc $userrc load 1
+HOOK after-modulefile-eval $userrc $userrc $userrc $userrc load 1 0
+HOOK before-modulefile-eval $mp/foo/2.0 foo/2.0 foo/2.0 foo/2.0 load 1
+HOOK after-modulefile-eval $mp/foo/2.0 foo/2.0 foo/2.0 foo/2.0 load 1 0"
+set ans [list]
+lappend ans [list set _LMFILES_ $mp/foo/2.0]
+lappend ans [list set LOADEDMODULES foo/2.0]
+testouterr_cmd sh {load foo/2.0} $ans $tserr
+
+unsetenv_var MODULERCFILE
+unsetenv_var TESTSUITE_ENABLE_SITECONFIG_HOOK
+
+
+# hooks fire with the resolved variant specification in modnamevr while
+# modname stays the bare module name
+set mp3 $modpath.3
+setenv_path_var MODULEPATH $mp3
+setenv_var TESTSUITE_ENABLE_SITECONFIG_HOOK modulefile
+setenv_var TESTSUITE_VARIANT_TAG default
+
+set tserr "HOOK before-modulefile-eval $mp3/variant/8.0 variant/8.0\
+variant/8.0 foo=val1 variant/8.0 foo=val1 load 1
+HOOK after-modulefile-eval $mp3/variant/8.0 variant/8.0 variant/8.0\
+foo=val1 variant/8.0 foo=val1 load 1 0"
+set ans [list]
+lappend ans [list set __MODULES_LMVARIANT\
+   variant/8.0&foo|val1|0|0&bar|2|0|2]
+lappend ans [list set _LMFILES_ $mp3/variant/8.0]
+lappend ans [list set LOADEDMODULES variant/8.0]
+testouterr_cmd sh {load variant/8.0 foo=val1} $ans $tserr
+
+unsetenv_var TESTSUITE_VARIANT_TAG
+unsetenv_var TESTSUITE_ENABLE_SITECONFIG_HOOK
+setenv_path_var MODULEPATH $mp
+
+
+#
+# validate the add-hook examples given in the module.rst documentation
+#
+
+setenv_var TESTSUITE_ENABLE_SITECONFIG_HOOK docexamples
+
+# auditRequestedLoad-equivalent example only reports on a directly
+# requested load, and the hook_procedure-equivalent example successfully
+# defines MYVAR through the modulefile interpreter, proving a
+# before-modulefile-eval hook can now reach it (it fires after the
+# interpreter has been created and reset)
+set tserr {would audit: foo/2.0}
+set ans [list]
+lappend ans [list set _LMFILES_ $mp/foo/2.0]
+lappend ans [list set LOADEDMODULES foo/2.0]
+lappend ans [list set MYVAR value]
+testouterr_cmd sh {load foo/2.0} $ans $tserr
+
+# not a direct load request: neither example produces anything
+testouterr_cmd sh {whatis foo/2.0} OK {}
+
+unsetenv_var TESTSUITE_ENABLE_SITECONFIG_HOOK
+
+
+# the "Advanced hooks" blockModule example rejects loading foo/1.0
+# specifically, through a low-level trace add-hook cannot express, while
+# leaving every other module -- including foo/1.0 itself in a listing --
+# unaffected
+setenv_var TESTSUITE_ENABLE_SITECONFIG_HOOK blockmodule
+
+set tserr [escre "Loading foo/1.0
+  ERROR: foo/1.0 is blocked by site policy"]
+append tserr {(\n.*)*}
+testouterr_cmd_re sh {load foo/1.0} ERR $tserr
+
+set ans [list]
+lappend ans [list set _LMFILES_ $mp/foo/2.0]
+lappend ans [list set LOADEDMODULES foo/2.0]
+testouterr_cmd sh {load foo/2.0} $ans {}
+
+set ans "$mp:\nfoo/1.0\nfoo/2.0\nfoo/9.0"
+testouterr_cmd sh {avail -t foo} OK $ans
+
+unsetenv_var TESTSUITE_ENABLE_SITECONFIG_HOOK
+
+
+# modulerc hooks do not fire for the global/user RC files sourced ahead of
+# a requested module (see the before/after-modulefile-eval hooks test
+# above, which shows those same files instead trigger the modulefile
+# events): only the modulerc hooks for the real .modulerc files resolved
+# under the modulepath are produced
+setenv_var TESTSUITE_ENABLE_SITECONFIG_HOOK modulerc
+setenv_var MODULERCFILE "$env(TESTSUITEDIR)/etc/modulerc:$env(TESTSUITEDIR)/etc/rc"
+
+set tserr "HOOK before-modulerc-eval $mp/.modulerc .modulerc
+HOOK after-modulerc-eval $mp/.modulerc .modulerc 0
+HOOK before-modulerc-eval $mp/puts/.modulerc puts/.modulerc
+HOOK after-modulerc-eval $mp/puts/.modulerc puts/.modulerc 0"
+set ans [list]
+lappend ans [list set __MODULES_LMALTNAME puts/2&as|puts/default&as|puts/latest]
+lappend ans [list set _LMFILES_ $mp/puts/2]
+lappend ans [list set LOADEDMODULES puts/2]
+testouterr_cmd sh {load puts/2} $ans $tserr
+
+setenv_loaded_module [list puts/2] [list $mp/puts/2]
+unsetenv_loaded_module
+unsetenv_var __MODULES_LMALTNAME
+
+unsetenv_var MODULERCFILE
+unsetenv_var TESTSUITE_ENABLE_SITECONFIG_HOOK
+
+} elseif {$verbose} {
+    send_user "\tSkip tests relying on an excepted siteconfig file installed\n"
+}
+
+
+#
+#  Cleanup
+#
+
+reset_test_env
