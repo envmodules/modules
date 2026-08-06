@@ -205,6 +205,46 @@ When values are later removed from an environment variable, it is
 automatically unset if its resulting value matches the configured initial
 value and no explicit reference counter is associated with it.
 
+Hook API
+^^^^^^^^
+
+Site code that needs to run right before or after a modulefile or modulerc
+evaluation could so far only be attached through the ``trace`` Tcl command or
+by renaming an internal :file:`modulecmd.tcl` procedure, both of which bind
+to implementation details that may change from one Modules version to the
+next.
+
+A new ``add-hook`` siteconfig command is introduced to register a procedure
+on one of four stable events without relying on such internal details:
+:mhook:`before-modulefile-eval`, :mhook:`after-modulefile-eval`,
+:mhook:`before-modulerc-eval` and :mhook:`after-modulerc-eval`. Several
+procedures can be registered on the same event; they are then called in
+their registration order.
+
+.. code-block:: tcl
+
+   proc auditRequestedLoad {modfile modname modnamevr modspec mode requested} {
+      if {$requested && $mode eq {load}} {
+         set fd [open /var/log/modules-audit.log a]
+         puts $fd "[clock format [clock seconds]] $modnamevr"
+         close $fd
+      }
+   }
+   add-hook before-modulefile-eval auditRequestedLoad
+
+An error raised by a hook procedure is reported but does not abort the
+running ``module`` command nor prevent other procedures registered on the
+same event from running, since these hooks fire on nearly every modulefile
+or modulerc evaluation.
+
+See the *Hooks* section of :manpage:`module(1)` man page for the full
+argument contract of each event. The ``trace``/rename techniques remain
+available for anything not (yet) covered by a hook event.
+
+These four events are only the first ones introduced through ``add-hook``;
+additional hook events will be added in the future as real site needs for
+them come up.
+
 
 v5.6
 ----
