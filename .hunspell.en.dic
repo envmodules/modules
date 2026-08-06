@@ -1534,3 +1534,6 @@ fd
 lindex
 hookEvents
 runHooks
+appdir
+build3
+rsync

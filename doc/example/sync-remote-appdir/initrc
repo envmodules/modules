@@ -1,0 +1,9 @@
+#%Module5.7
+
+# give the 'remote' module tag its own abbreviation and color, and make
+# sure it is not persisted onto a module once it gets loaded (see the "Sync
+# remote application directories on first load" cookbook recipe)
+module config tag_abbrev "+remote=R"
+module config colors "+R=38;5;202"
+module config tag_color_name +remote
+module config non_exportable_tags +remote

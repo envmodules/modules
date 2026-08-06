@@ -189,6 +189,7 @@ Modules 5.7.0 (not yet released)
   #607)
 * Doc: add :ref:`add-new-hook-event` guide describing how to contribute a
   new hook event.
+* Doc: add :ref:`sync-remote-appdir` cookbook recipe.
 
 
 .. _5.6 release notes:

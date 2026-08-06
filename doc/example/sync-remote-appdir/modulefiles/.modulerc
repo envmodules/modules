@@ -1,0 +1,21 @@
+#%Module5.7
+
+# tag every module listed in the remote application directory map as
+# 'remote', unless its application directory has already been synced to
+# local disk (see siteconfig.tcl for how the sync itself is triggered)
+set mapfile [file join /remote_apps .module_appdir_map]
+if {[file readable $mapfile]} {
+   set fid [open $mapfile r]
+   set fdata [split [read $fid] "\n"]
+   close $fid
+   foreach fline $fdata {
+      if {[llength $fline] != 2} {
+         continue
+      }
+      lassign $fline modnamevr appdir
+      set syncedfile [file join /local_apps ".$appdir.synced"]
+      if {![file exists $syncedfile]} {
+         module-tag remote $modnamevr
+      }
+   }
+}
