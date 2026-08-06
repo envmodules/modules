@@ -31,3 +31,13 @@
 # defined in this file
 #set modulerc_extra_cmds {command1 procedure1 command2 procedure2}
 
+# register a procedure to run on a hook event with the add-hook command.
+# see 'Hooks' section in module(1) manpage for the current list of events
+# and their argument contract. several procedures can be registered on the
+# same event: they are then all called, in their registration order, every
+# time the event occurs
+#proc myHookProcedure {modfile modname modnamevr modspec mode requested} {
+#   # code to run right before each modulefile evaluation
+#}
+#add-hook before-modulefile-eval myHookProcedure
+

@@ -379,6 +379,10 @@ def setup(app):
                         objname='siteconfig variable',
                         indextemplate='pair: %s; siteconfig variable',
                         parse_node=parse_cmd_args_node)
+    app.add_object_type(directivename='mhook', rolename='mhook',
+                        objname='hook event',
+                        indextemplate='pair: %s; hook event',
+                        parse_node=parse_cmd_args_node)
     app.add_object_type('instopt', 'instopt',
                         objname='installation option',
                         indextemplate='pair: %s; installation option',
