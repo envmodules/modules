@@ -276,12 +276,18 @@ proc execute-modulefile {modfile modname modnamevrvar modspec requested\
       g_modfileUntrackVars g_modfileProcs $aliasesVN $aliasesPassArgVN\
       $tracesVN g_modfileRenameCmds $dumpCommandsVN
 
+   runHooks before-modulefile-eval $modfile $modname $modnamevr $modspec\
+      $mode $requested
+
    set vr_spec_list [getVariantListFromVersSpec $modnamevr]
    set failed_eval [catch {evaluateModulefile $itrp $modfile $vr_spec_list}\
       errorMsg]
 
    set eval_return_code [renderModulefileEvalError $itrp $mode $modfile\
       $failed_eval $errorMsg]
+
+   runHooks after-modulefile-eval $modfile $modname $modnamevr $modspec\
+      $mode $requested $eval_return_code
 
    if {$mode eq {load} && ![isStateDefined rc_running]} {
       if {[catch {checkModuleConflict $modname $modnamevr} errorMsg]} {
@@ -610,9 +616,14 @@ proc execute-modulerc {modfile modname modspec} {
       g_modrcUntrackVars g_modrcProcs g_modrcAliases g_modrcAliasesPassArg\
       g_modrcAliasesTraces g_modrcRenameCmds g_modrcCommands
 
+   runHooks before-modulerc-eval $modfile $modname
+
    set failed_eval [catch {evaluateModulerc $itrp $modfile} errorMsg]
 
-   renderModulercEvalError $itrp $modfile $failed_eval $errorMsg
+   set eval_return_code [renderModulercEvalError $itrp $modfile $failed_eval\
+      $errorMsg]
+
+   runHooks after-modulerc-eval $modfile $modname $eval_return_code
 
    # default version set via ModulesVersion variable in .version file
    # override previously defined default version for modname
