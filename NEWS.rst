@@ -180,6 +180,13 @@ Modules 5.7.0 (not yet released)
   from a shell with an already long inherited ``PATH`` (e.g. a Visual Studio
   Developer Prompt). (fix issue #654)
 * Doc: add :ref:`hook-api` design notes.
+* Add the ``add-hook`` siteconfig command to register a procedure on one of
+  4 stable hook events (:mhook:`before-modulefile-eval`,
+  :mhook:`after-modulefile-eval`, :mhook:`before-modulerc-eval`,
+  :mhook:`after-modulerc-eval`), so sites no longer need to rely on ``trace``
+  or procedure renaming, which bind to internal implementation details, to
+  run code before or after a modulefile or modulerc evaluation. (fix issue
+  #607)
 
 
 .. _5.6 release notes:

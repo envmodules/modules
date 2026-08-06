@@ -831,6 +831,24 @@ user environment is already configured.
 
 Starting version ``5.5``, support for Windows *pwsh* shell is introduced.
 
+Siteconfig hooks
+""""""""""""""""
+
+Starting version ``5.7``, the ``add-hook`` siteconfig command is introduced
+to register a procedure to run on a hook event, as a replacement for the
+``trace``/procedure-renaming techniques that bind to internal
+implementation details.
+
+The following hook events appeared on Modules 5.
+
++------------+-----------------------------------------------------------------+
+| Introduced | New hook events                                                 |
+| in version |                                                                 |
++============+=================================================================+
+| 5.7        | :mhook:`before-modulefile-eval`, :mhook:`after-modulefile-eval`,|
+|            | :mhook:`before-modulerc-eval`, :mhook:`after-modulerc-eval`     |
++------------+-----------------------------------------------------------------+
+
 Command line switches
 """""""""""""""""""""
 

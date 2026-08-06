@@ -1527,3 +1527,8 @@ API
 api
 modnamevr
 modulerc's
+logRequestedLoad
+auditRequestedLoad
+blockModule
+fd
+lindex

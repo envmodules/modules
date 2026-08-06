@@ -3952,20 +3952,156 @@ main siteconfig script.
 Hooks
 """""
 
-Siteconfig relies on the ability of the Tcl language to overwrite previously
-defined variables and procedures. Sites may deploy their own Tcl code in
-siteconfig to adapt :file:`modulecmd.tcl` to their specific needs. The
-``trace`` Tcl command may especially be used to define hooks that are run when
-entering or leaving a given procedure, or when a variable is read or written.
-See :manpage:`trace(n)` man page for detailed information. The following
-example setup a procedure that is executed before each modulefile evaluation:
+The ``add-hook`` command lets siteconfig register a procedure to be called
+on one of the fixed set of hook events listed below, without having to know
+anything about the internal implementation of :file:`modulecmd.tcl`. This is
+the recommended way to run site-specific code before or after a modulefile
+or modulerc evaluation. It is called this way::
+
+    add-hook event procedure
+
+``event`` must be one of the hook events listed below; an unrecognized event
+name is a siteconfig error, raised immediately when ``add-hook`` is called.
+Several procedures may be registered on the same event: they are then all
+called, in their registration order, every time the event occurs.
+
+If ``procedure`` raises an error, this error is reported but does not stop
+the other procedures registered on the same event from being called, and
+does not interrupt the modulefile or modulerc evaluation the event relates
+to.
+
+Unless stated otherwise, hook procedures execute in the context of the main
+Tcl interpreter -- the same one siteconfig itself runs in -- never in the
+modulefile- or modulerc-specific sub-interpreter the event relates to. See
+the second example below for how a hook procedure can still reach that
+sub-interpreter when it needs to run modulefile or modulerc commands.
+
+.. only:: html or latex
+
+   .. versionadded:: 5.7
+
+.. mhook:: before-modulefile-eval modfile modname modnamevr modspec mode\
+   requested
+
+ Called right before a modulefile is evaluated, with the path of the
+ modulefile (``modfile``), the module name and version being evaluated,
+ without its variant specification (``modname``), the module name, version and
+ variant (``modnamevr``), the module specification as it was passed to the
+ internal evaluation call, prior to resolution -- typically what the user
+ typed on the command line (``modspec``), the current evaluation mode
+ (``mode``, see :mfcmd:`module-info`) and whether this modulefile evaluation
+ was directly requested by the user or triggered as a side effect, for
+ instance an automatically-loaded dependency (``requested``, a boolean).
+ The value ``procedure`` returns, if any, is ignored.
+
+ .. only:: html or latex
+
+    .. versionadded:: 5.7
+
+.. mhook:: after-modulefile-eval modfile modname modnamevr modspec mode\
+   requested status
+
+ Called right after a modulefile has been evaluated, with the same
+ arguments as :mhook:`before-modulefile-eval` plus ``status``: ``0`` if the
+ modulefile evaluated without error, ``1`` otherwise. The value
+ ``procedure`` returns, if any, is ignored.
+
+ .. only:: html or latex
+
+    .. versionadded:: 5.7
+
+.. mhook:: before-modulerc-eval modfile modname
+
+ Called right before a modulerc or :file:`.version` file is evaluated, with
+ the path of the file (``modfile``) and the modulerc short name (``modname``).
+ Modulerc evaluation is not tied to a single evaluation mode nor to a specific
+ request the way modulefile evaluation is, so neither a ``mode`` nor a
+ ``requested`` argument is provided here. The value ``procedure`` returns, if
+ any, is ignored.
+
+ This event, and :mhook:`after-modulerc-eval`, only apply to a
+ :file:`.modulerc` or :file:`.version` file resolved while looking up a
+ module under a modulepath. The RC files read once at startup
+ (:mconfig:`rcfile` and the other sources listed there) are not modulerc
+ files: they are evaluated through
+ :mhook:`before-modulefile-eval`/:mhook:`after-modulefile-eval` instead, in
+ ``load`` mode, exactly like any file passed to the :subcmd:`source`
+ sub-command.
+
+ .. only:: html or latex
+
+    .. versionadded:: 5.7
+
+.. mhook:: after-modulerc-eval modfile modname status
+
+ Called right after a modulerc or :file:`.version` file has been evaluated,
+ with the same arguments as :mhook:`before-modulerc-eval` plus ``status``:
+ ``0`` if the file evaluated without error, ``1`` otherwise. The value
+ ``procedure`` returns, if any, is ignored.
+
+ .. only:: html or latex
+
+    .. versionadded:: 5.7
+
+The following example uses ``add-hook`` to record every directly-requested
+modulefile load to a site-defined audit file. This is a different need
+than the built-in :mconfig:`logger` integration (see channel argument of
+:mfcmd:`puts`), which only forwards messages a modulefile explicitly sends
+to it:
 
 .. code-block:: tcl
 
-    proc beforeEval {cmdstring code result op} {
-       # code to run right before each modulefile evaluation
+    proc auditRequestedLoad {modfile modname modnamevr modspec mode requested} {
+       if {$requested && $mode eq {load}} {
+          set fd [open /var/log/modules-audit.log a]
+          puts $fd "[clock format [clock seconds]] $modnamevr"
+          close $fd
+       }
     }
-    trace add execution execute-modulefile enter beforeEval
+    add-hook before-modulefile-eval auditRequestedLoad
+
+If a hook procedure running in the context of the main interpreter needs to
+execute modulefile commands (for example, to define environment variables),
+these commands should be run through the current modulefile Tcl interpreter.
+This ensures that the commands behave consistently with the current modulefile
+evaluation mode.
+
+.. code-block:: tcl
+
+    proc hook_procedure {modfile modname modnamevr modspec mode requested} {
+        # get the name of the current modulefile Tcl interpreter
+        set modfile_interp [getCurrentModfileInterpName]
+
+        # execute a modulefile command in the current interpreter context
+        interp eval $modfile_interp setenv MYVAR value
+    }
+    add-hook before-modulefile-eval hook_procedure
+
+Advanced hooks
+""""""""""""""
+
+Siteconfig relies on the ability of the Tcl language to overwrite previously
+defined variables and procedures. For needs ``add-hook`` does not cover --
+for instance rejecting a modulefile evaluation outright, something a hook
+procedure cannot do since its return value is ignored -- sites may still
+deploy their own Tcl code in siteconfig to adapt :file:`modulecmd.tcl` to
+their specific needs. The ``trace`` Tcl command may especially be used to
+define hooks that are run when entering or leaving a given procedure, or
+when a variable is read or written. See :manpage:`trace(n)` man page for
+detailed information. The following example blocks the evaluation of a
+specific modulefile by raising an error from an ``enter`` trace on the
+internal ``execute-modulefile`` procedure, something that cannot be
+expressed through :mhook:`before-modulefile-eval`:
+
+.. code-block:: tcl
+
+    proc blockModule {cmdstring op} {
+       # third word of cmdstring is the resolved module name and version
+       if {[lindex $cmdstring 2] eq {foo/1.0}} {
+          error "foo/1.0 is blocked by site policy"
+       }
+    }
+    trace add execution execute-modulefile enter blockModule
 
 Another possibility is to override the definition of an existing procedure by
 first renaming its original version then creating a new procedure that will add
@@ -3983,20 +4119,9 @@ adds a new query option to the :mfcmd:`module-info` modulefile command:
        }
     }
 
-If a hook procedure needs to execute modulefile commands (for example, to
-define environment variables), these commands should be run through the
-current modulefile Tcl interpreter. This ensures that the commands behave
-consistently with the current modulefile evaluation mode.
-
-.. code-block:: tcl
-
-    proc hook_procedure {value} {
-        # get the name of the current modulefile Tcl interpreter
-        set modfile_interp [getCurrentModfileInterpName]
-
-        # execute a modulefile command in the current interpreter context
-        interp eval $modfile_interp setenv MYVAR $value
-    }
+These techniques bind to :file:`modulecmd.tcl` internal procedure names and
+call signatures, which may change across versions; prefer ``add-hook``
+when one of its events covers the need.
 
 Siteconfig hook variables
 """""""""""""""""""""""""
