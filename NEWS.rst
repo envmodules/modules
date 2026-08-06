@@ -179,6 +179,7 @@ Modules 5.7.0 (not yet released)
   to 1024 characters, which could corrupt the system ``PATH`` when installing
   from a shell with an already long inherited ``PATH`` (e.g. a Visual Studio
   Developer Prompt). (fix issue #654)
+* Doc: add :ref:`hook-api` design notes.
 
 
 .. _5.6 release notes:
