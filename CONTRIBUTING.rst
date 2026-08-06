@@ -116,6 +116,7 @@ howtos are also available:
 
 * :ref:`add-new-sub-command`
 * :ref:`add-new-config-option`
+* :ref:`add-new-hook-event`
 * :ref:`devel-testsuite`
 
 .. _running-the-tests:
