@@ -1,0 +1,39 @@
+name: completion-tests
+
+on:
+  push:
+    branches-ignore:
+      - c-main
+      - c-3.2
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  completion-all:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Install system packages
+        run: |
+          sudo apt-get -y update
+          sudo apt-get install -y expect-dev dejagnu python3-sphinx gzip bash tcl8.6 python3
+          # libtclenvmodules build requirements
+          sudo apt-get install -y gcc autoconf tcl8.6-dev
+      - name: Build Modules
+        run: |
+          ./configure
+          make
+      - name: Test shell Tab completion
+        run: |
+          script/mt comp
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: testsuite-logs-${{ github.job }}
+          path: |
+            completion.log
+          retention-days: 5
