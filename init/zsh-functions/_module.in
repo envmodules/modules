@@ -134,6 +134,9 @@ _module() {
       '(--color --color=)'{--color,--color=}'[Colorize the output]' \
       '--ignore-cache[Ignore module cache]' \
       '--ignore-user-rc[Skip evaluation of user-specific module rc file]' \
+      '--timer[Report execution times]' \
+      '--redirect[Send output to stdout]' \
+      '--no-redirect[Send output to stderr]' \
       '(-): :->cmd' \
       '(-)*:: :->arg' && ret=0
 
