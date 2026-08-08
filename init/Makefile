@@ -131,6 +131,7 @@ comp_mfile_opts := -i --icase
 comp_whatis_opts := -a -i -j --all --icase --json
 comp_search_opts := -a -j --all --json
 comp_aliases_opts := -a --all
+comp_use_opts := -a --append -p --prepend
 comp_isavail_opts := -a -i --all --icase
 comp_lint_opts := -a -i --all --icase
 comp_modtosh_opts := --auto --no-auto --force -f --icase -i
@@ -161,6 +162,7 @@ sed -e 's|@prefix@|$(prefix)|g' \
 	-e 's|@comp_whatis_opts@|$(comp_whatis_opts)|g' \
 	-e 's|@comp_search_opts@|$(comp_search_opts)|g' \
 	-e 's|@comp_aliases_opts@|$(comp_aliases_opts)|g' \
+	-e 's|@comp_use_opts@|$(comp_use_opts)|g' \
 	-e 's|@comp_isavail_opts@|$(comp_isavail_opts)|g' \
 	-e 's|@comp_lint_opts@|$(comp_lint_opts)|g' \
 	-e 's|@comp_modtosh_opts@|$(comp_modtosh_opts)|g' \
