@@ -270,7 +270,9 @@ _module() {
                   '(-t --terse)'{-t,--terse}'[Display output in terse format]' \
                   '(-j --json)'{-j,--json}'[Display output in JSON format]' \
                   '(-o --output=)'{-o,--output=}'[Define elements to output in addition to module names]' \
-                  '(-a --all)'{-a,--all}'[Include hidden modules in list]' && ret=0
+                  '(-a --all)'{-a,--all}'[Include hidden modules in list]' \
+                  '(-S --starts-with)'{-S,--starts-with}'[Search modules whose name begins with query string]' \
+                  '(-C --contains)'{-C,--contains}'[Search modules whose name contains query string]' && ret=0
                ;;
             (savelist)
                local -a opts; opts=(
@@ -282,6 +284,10 @@ _module() {
                   '--json:Display output in JSON format'
                   '-o:Define elements to output in addition to module names'
                   '--output=:Define elements to output in addition to module names'
+                  '-S:Search modules whose name begins with query string'
+                  '--starts-with:Search modules whose name begins with query string'
+                  '-C:Search modules whose name contains query string'
+                  '--contains:Search modules whose name contains query string'
                )
                _describe -t opts 'Switches' opts && ret=0
                ;;
