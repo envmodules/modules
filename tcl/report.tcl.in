@@ -2018,13 +2018,18 @@ proc reportUsage {} {
    report {Usage: module [options] [command] [args ...]
 
 Loading / Unloading commands:
-  add | load      modulefile [...]  Load modulefile(s)
-  try-add | try-load modfile [...]  Load modfile(s), no complain if not found
-  add-any | load-any modfile [...]  Load first available modulefile in list
-  rm | unload     modulefile [...]  Remove modulefile(s)
+  add | load [-f] [-i] [--auto|--no-auto] [--tag=LIST] modulefile [...]
+                                    Load modulefile(s)
+  try-add | try-load [-f] [-i] [--auto|--no-auto] [--tag=LIST] modfile [...]
+                                    Load modfile(s), no complain if not found
+  add-any | load-any [-f] [-i] [--auto|--no-auto] [--tag=LIST] modfile [...]
+                                    Load first available modulefile in list
+  rm | remove | unload [-f] [-i] [--auto|--no-auto] modulefile [...]
+                                    Remove modulefile(s)
   purge                             Unload all loaded modulefiles
   reload | update                   Unload then load all loaded modulefiles
-  switch | swap   [mod1] mod2       Unload mod1 and load mod2
+  switch | swap [-f] [-i] [--auto|--no-auto] [--tag=LIST] [mod1] mod2
+                                    Unload mod1 and load mod2
   refresh                           Refresh loaded module volatile components
   reset                             Restore initial environment
 
@@ -2034,15 +2039,17 @@ Listing / Searching commands:
   avail  [-a] [-t|-l|-j] [-S|-C] [-d|-L] [--indepth|--no-indepth] [mod ...]
                                     List all or matching available modules
   aliases         [-a]              List all module aliases
-  whatis [-a] [-j] [modulefile ...] Print whatis information of modulefile(s)
+  whatis [-a] [-i] [-j] [modulefile ...]
+                                    Print whatis information of modulefile(s)
   apropos | keyword | search [-a] [-j] str
                                     Search all name and whatis containing str
   spider [-a] [-t|-l|-j] [-S|-C] [-d|-L] [--indepth|--no-indepth] [mod ...]
                                     Scan all modulepaths and list all or
                                     matching available modules
-  is-loaded       [modulefile ...]  Test if any of the modulefile(s) are loaded
-  is-avail        modulefile [...]  Is any of the modulefile(s) available
-  info-loaded     modulefile        Get full name of matching loaded module(s)
+  is-loaded  [-i] [modulefile ...]  Test if any of the modulefile(s) are loaded
+  is-avail   [-a] [-i] modulefile [...]
+                                    Is any of the modulefile(s) available
+  info-loaded   [-i] modulefile     Get full name of matching loaded module(s)
 
 Collection of modules handling commands:
   save            [collection|file] Save current module list to collection
@@ -2069,24 +2076,26 @@ Module cache handling commands:
   cacheclear                        Delete cache file in enabled modulepath(s)
 
 Other commands:
-  help            [modulefile ...]  Print this or modulefile(s) help info
-  display | show  modulefile [...]  Display information about modulefile(s)
-  test            [modulefile ...]  Test modulefile(s)
+  help       [-i] [modulefile ...]  Print this or modulefile(s) help info
+  display | show  [-i] modulefile [...]
+                                    Display information about modulefile(s)
+  test       [-i] [modulefile ...]  Test modulefile(s)
   use     [-a|-p] dir [...]         Add dir(s) to MODULEPATH variable
   unuse           dir [...]         Remove dir(s) from MODULEPATH variable
   is-used         [dir ...]         Is any of the dir(s) enabled in MODULEPATH
-  path            modulefile        Print modulefile path
-  paths           modulefile        Print path of matching available modules
+  path       [-i] modulefile        Print modulefile path
+  paths      [-i] modulefile        Print path of matching available modules
   clear           [-f]              Reset Modules-specific runtime information
   source          scriptfile [...]  Execute scriptfile(s)
   config [--dump-state|name [val]]  Display or set Modules configuration
   state           [name]            Display Modules state
   sh-to-mod       shell shellscript [arg ...]
                                     Make modulefile from script env changes
-  mod-to-sh       shell modulefile [...]
+  mod-to-sh  [-f] [-i] [--auto|--no-auto] shell modulefile [...]
                                     Make shell code from modulefile env changes
   edit            modulefile        Open modulefile in editor
-  lint       [-a] [modulefile ...]  Check syntax of modulefile
+  lint       [-a] [-i] [modulefile ...]
+                                    Check syntax of modulefile
 
 Switches:
   -t | --terse    Display output in terse format
