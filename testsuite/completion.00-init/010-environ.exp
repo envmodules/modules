@@ -1,0 +1,75 @@
+##############################################################################
+#   Modules Revision 3.0
+#   Providing a flexible user environment
+#
+#   File:		completion.00-init/%M%
+#   Revision:		%I%
+#   First Edition:	2026/08/07
+#   Last Mod.:		%U%, %G%
+#
+#   Authors:		Xavier Delaruelle, xavier.delaruelle@cea.fr
+#
+#   Description:	initialization of the shell environment
+#   Command:
+#   Sub-Command:
+#
+#   Comment:	%C{
+#			First time initialization: setup a clean, reproducible
+#			environment for the bash sessions spawned by completion
+#			tests
+#		}C%
+#
+##############################################################################
+
+if {$verbose} {
+   send_user "\tInitializing a clean environment ...\n"
+}
+
+# clear testsuite-related variables
+foreach var [concat [array names env -glob TESTSUITE_*]\
+   [list TESTSUITE TS0 TS1 TS2 TS3 TS4 TS4 TS6 TS7 TS8 TS9]] {
+   # preserve variable externally set to configure testsuite run
+   if {$var ne {TESTSUITE_ENABLE_SITECONFIG}} {
+      unsetenv_var $var
+   }
+}
+
+# start every completion test from a clean module environment
+unsetenv_var MODULEPATH
+unsetenv_var LOADEDMODULES
+unsetenv_var _LMFILES_
+foreach var [array names env] {
+   switch -glob $var {
+      __MODULES_SHARE_* - __MODULES_PUSHENV_* - __MODULES_QUAR_* - \
+      MODULES_FAMILY_* - MODULES_RUNENV_* - __MODULES_LM* {
+         unsetenv_var $var
+      }
+   }
+}
+
+# drop any 'module'/'ml' shell function inherited from the parent shell
+# environment, so autoinit defines them fresh in each spawned bash session
+unsetenv_var {BASH_FUNC_module()}
+unsetenv_var BASH_FUNC_module%%
+unsetenv_var {BASH_FUNC__module_raw()}
+unsetenv_var BASH_FUNC__module_raw%%
+unsetenv_var {BASH_FUNC_ml()}
+unsetenv_var BASH_FUNC_ml%%
+
+unsetenv_var MODULERCFILE
+
+# sandbox $HOME so any test writing real files there (e.g. 'module save',
+# which defaults to $HOME/.module) never touches a developer's actual home
+setenv_var HOME $completionhome
+
+# an interactive pager (e.g. less) would block an unattended pty waiting for
+# a keypress: disable paging for all completion test sessions
+setenv_var MODULES_PAGER cat
+
+# ensure colored output is disabled by default
+setenv_var MODULES_COLOR never
+
+# setup basic locale for tests
+setenv_var LANG C
+
+# vim:set tabstop=3 shiftwidth=3 expandtab autoindent:

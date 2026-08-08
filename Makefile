@@ -4,7 +4,7 @@
 	install-testmodspath-empty install-testmodspath-wild \
 	install-testmoguicmd uninstall-testconfig uninstall dist dist-tar \
 	dist-gzip dist-bzip2 dist-win srpm rpm clean distclean test-deps test \
-	testinstall testlint
+	testinstall testlint testcompletion
 
 # commands to install files
 INSTALL = install
@@ -1072,6 +1072,13 @@ testlint: initdir modulecmd.tcl $(NAGELFAR) script/add.modules script/modulecmd
 	OBJDIR=`pwd -P`; export OBJDIR; \
 	TESTSUITEDIR=`cd testsuite;pwd -P`; export TESTSUITEDIR; \
 	runtest --srcdir $$TESTSUITEDIR --objdir $$OBJDIR $(RUNTESTFLAGS) --tool lint $(RUNTESTFILES)
+
+testcompletion: initdir
+	TCLSH=$(TCLSH); export TCLSH; \
+	MODULECMD=$(MODULECMD); export MODULECMD; \
+	OBJDIR=`pwd -P`; export OBJDIR; \
+	TESTSUITEDIR=`cd testsuite;pwd -P`; export TESTSUITEDIR; \
+	runtest --srcdir $$TESTSUITEDIR --objdir $$OBJDIR $(RUNTESTFLAGS) --tool completion $(RUNTESTFILES)
 
 
 # install enhanced diff tool (to review test results)

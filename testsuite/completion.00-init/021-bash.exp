@@ -1,0 +1,265 @@
+##############################################################################
+#   Modules Revision 3.0
+#   Providing a flexible user environment
+#
+#   File:		completion.00-init/%M%
+#   Revision:		%I%
+#   First Edition:	2026/08/07
+#   Last Mod.:		%U%, %G%
+#
+#   Authors:		Xavier Delaruelle, xavier.delaruelle@cea.fr
+#
+#   Description:	Testuite testsequence
+#   Command:		avail, load, unload, ml, use, unuse, restore
+#   Sub-Command:
+#
+#   Comment:	%C{
+#			Check bash Tab completion: module names and option
+#			flags get listed, 'unload' lists/completes the
+#			currently loaded modules, 'ml' mirrors 'load' and also
+#			lists loaded modules among the option flags, 'use'
+#			completes a filesystem directory path, 'unuse'
+#			lists/filters the enabled modulepaths, 'restore'
+#			lists/filters the saved collections
+#		}C%
+#
+##############################################################################
+
+
+#
+# module names and option flags both get listed on Tab completion
+#
+
+setenv_path_var MODULEPATH $modpath
+
+completion_bash_start
+
+set got [completion_bash_list {module avail }]
+completion_assert_contains $got {advvers/ bar/ baz/ foo/}
+completion_assert_contains $got {--all --icase --terse}
+
+set got [completion_bash_list {module load }]
+completion_assert_contains $got {advvers/ bar/ baz/ foo/}
+completion_assert_contains $got {--force -f --icase}
+
+## "ba" is the common prefix of bar/ and baz/: a single Tab from "b" must
+## auto-insert the "a" inline, with a bell right before it since bar/baz
+## still leave the completion ambiguous beyond it
+set got [completion_bash_inline {module load b}]
+completion_assert_eq $got "\aa"
+
+## typed prefix is "ba", the full common prefix of bar/ and baz/: readline
+## auto-inserts any *further* common prefix on the first Tab, which would
+## eat one of the two Tabs the double-Tab below relies on to list matches
+## instead of just ringing the bell
+set got [completion_bash_list {module load ba}]
+completion_assert_contains $got {bar/ baz/}
+completion_assert_not_contains $got {foo/ advvers/}
+
+## "bar" uniquely matches the "bar/" module category: a single Tab must
+## complete it inline with a trailing '/' and no trailing space (so typing
+## can continue straight into a version), per the 'compopt -o nospace'
+## logic in _module_comgen_words_and_files
+set got [completion_bash_inline {module load bar}]
+completion_assert_eq $got {/}
+
+## from "bar/", double-Tab must list the versions available under it
+set got [completion_bash_list {module load bar/}]
+completion_assert_contains $got {bar/1.0 bar/2.0}
+
+## "flatlcompat" is a single, versionless module (no further completion
+## possible beneath it, so unlike "bar" above it does not end in '/'): a
+## single Tab must complete it inline, with a trailing space since it is
+## not a directory-style entry
+set got [completion_bash_inline {module load fl}]
+completion_assert_eq $got {atlcompat }
+
+completion_bash_close
+
+
+#
+# 'unload' lists the currently loaded modules alongside the option flags,
+# and lists/completes them on the typed prefix like any other candidate list
+#
+
+setenv_loaded_module [list bar/1.0 baz/1.0 foo/1.0]\
+   [list $modpath/bar/1.0 $modpath/baz/1.0 $modpath/foo/1.0]
+
+completion_bash_start
+
+set got [completion_bash_list {module unload }]
+completion_assert_contains $got {bar/1.0 baz/1.0 foo/1.0 --force -f --icase}
+
+## "ba" is the common prefix of bar/1.0 and baz/1.0: a single Tab from "b"
+## must auto-insert the "a" inline, with a bell right before it since
+## bar/1.0 and baz/1.0 still leave the completion ambiguous beyond it
+set got [completion_bash_inline {module unload b}]
+completion_assert_eq $got "\aa"
+
+## from "ba", nothing more can be auto-inserted (bar/1.0 and baz/1.0
+## diverge right there), so a double-Tab must list just the two matching
+## loaded modules, not foo/1.0
+set got [completion_bash_list {module unload ba}]
+completion_assert_contains $got {bar/1.0 baz/1.0}
+completion_assert_not_contains $got {foo/1.0}
+
+## "foo/1.0" is the only loaded module starting with "f", and no option
+## flag does either: a single Tab must complete the rest of it inline,
+## with a trailing space since a loaded-module candidate is not a
+## directory-style entry
+set got [completion_bash_inline {module unload f}]
+completion_assert_eq $got {oo/1.0 }
+
+completion_bash_close
+unsetenv_loaded_module
+
+
+#
+# 'ml' mirrors 'module load' completion for the bare sub-command case, and
+# additionally appends a "-<name>" candidate for every currently loaded
+# module once an option flag is being typed, letting it be typed straight
+# after "ml -" to unload it
+#
+
+setenv_path_var MODULEPATH $modpath
+
+completion_bash_start
+
+## unlike plain 'module load', a bare 'ml' also lists the top-level '-*'
+## command-line options (e.g. '-h'/'--help'), since with no sub-command
+## typed yet it cannot tell a bare 'module <sub-command>' apart from a
+## direct 'ml <module-to-load>' invocation
+set got [completion_bash_list {ml }]
+completion_assert_contains $got {advvers/ bar/ baz/ foo/ -h --help -D}
+
+completion_bash_raw {module load bar}
+
+## with bar/2.0 loaded (the default version, no .version file pins it), a
+## "-bar/2.0" candidate must appear among the option flags
+set got [completion_bash_list {ml -}]
+completion_assert_contains $got {-bar/2.0 --force -f --icase}
+
+## "-bar/2.0" is the only candidate starting with "-ba": a single Tab must
+## complete the rest of it inline, with a trailing space since it is not a
+## directory-style entry
+set got [completion_bash_inline {ml -ba}]
+completion_assert_eq $got {r/2.0 }
+
+completion_bash_close
+
+
+#
+# 'use' completes a filesystem directory path: the completion script
+# intentionally leaves COMPREPLY untouched for this sub-command, so it must
+# fall through to readline's own default filename completion (registered
+# via 'complete -o default')
+#
+
+set usedir "$env(TESTSUITEDIR)/completion-use-fixture"
+file delete -force $usedir
+file mkdir $usedir
+
+completion_bash_start
+
+## drop the last 3 characters of the fixture dir name ("ure"): a single Tab
+## must complete them back plus a trailing '/', with no trailing space,
+## exactly like the "bar" -> "bar/" case above -- this time from plain
+## readline directory completion rather than anything in the completion
+## script itself
+set got [completion_bash_inline "module use [string range $usedir 0 end-3]"]
+completion_assert_eq $got {ure/}
+
+completion_bash_close
+file delete -force $usedir
+
+
+#
+# 'unuse' lists the currently enabled modulepaths, and filters them on the
+# typed prefix like any other candidate list
+#
+
+setenv_path_var MODULEPATH $modpath "$env(TESTSUITEDIR)/modulefiles.4" /tmp
+
+completion_bash_start
+
+## all three modulepaths are absolute, so they all share a leading '/':
+## type it explicitly, otherwise readline auto-inserts that one-character
+## common prefix on the first Tab and the double-Tab below would only ring
+## the bell instead of listing (same trap as the "bar"/"ba" cases above)
+set got [completion_bash_list {module unuse /}]
+completion_assert_contains $got [list $modpath "$env(TESTSUITEDIR)/modulefiles.4" /tmp]
+
+## $modpath and modulefiles.4 share the ".../modulefiles." prefix, diverging
+## only on the trailing version digit: typing that full common prefix (so
+## the first Tab has nothing left to auto-insert) and double-Tab must list
+## only the two matching modulepaths, not the unrelated /tmp entry
+set got [completion_bash_list "module unuse $env(TESTSUITEDIR)/modulefiles."]
+completion_assert_contains $got [list $modpath "$env(TESTSUITEDIR)/modulefiles.4"]
+completion_assert_not_contains $got {/tmp}
+
+completion_bash_close
+
+
+#
+# with only one modulepath left matching a typed prefix, a single Tab must
+# complete the whole rest of it inline -- unlike the module-name case, a
+# modulepath candidate is not a directory-style entry, so (still unlike
+# "bar" -> "bar/" above) a trailing space is expected after it
+#
+
+setenv_path_var MODULEPATH "$env(TESTSUITEDIR)/modulefiles.4" /tmp
+
+completion_bash_start
+
+set got [completion_bash_inline "module unuse $env(TESTSUITEDIR)/module"]
+completion_assert_eq $got {files.4 }
+
+completion_bash_close
+
+
+#
+# 'restore' lists the saved collections, and filters them on the typed
+# prefix like any other candidate list
+#
+
+setenv_path_var MODULEPATH $modpath
+
+completion_bash_start
+
+completion_bash_raw {module save foo}
+completion_bash_raw {module save fox}
+completion_bash_raw {module save bar1}
+
+set got [completion_bash_list {module restore }]
+completion_assert_contains $got {foo fox bar1}
+
+## "fo" is the common prefix of foo/fox: a single Tab from "f" must
+## auto-insert the "o" inline (this is the same mechanism as the "bar"/"ba"
+## trap above, caught in the act instead of just avoided). Readline also
+## rings the bell right before that insertion, since foo/fox still leave
+## the completion ambiguous beyond it
+set got [completion_bash_inline {module restore f}]
+completion_assert_eq $got "\ao"
+
+## from "fo", nothing more can be auto-inserted (foo/fox diverge right
+## there), so a double-Tab must list just the two matching collections
+set got [completion_bash_list {module restore fo}]
+completion_assert_contains $got {foo fox}
+completion_assert_not_contains $got {bar1}
+
+## "bar1" is the only collection starting with "ba": a single Tab must
+## complete the rest of it inline, with a trailing space since a
+## collection candidate is not a directory-style entry
+set got [completion_bash_inline {module restore ba}]
+completion_assert_eq $got {r1 }
+
+completion_bash_close
+
+
+#
+#  Cleanup
+#
+
+reset_test_env
+
+# vim:set tabstop=3 shiftwidth=3 expandtab autoindent:

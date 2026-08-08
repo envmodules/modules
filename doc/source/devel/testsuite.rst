@@ -13,12 +13,12 @@ line tools. DejaGnu groups test files (``.exp``, for *expect script*) under a
 *tool*: a run of ``runtest --tool <name>`` sources every matching ``.exp``
 file it finds for that tool and reports a ``PASS``/``FAIL``/``XFAIL``/
 ``UNRESOLVED`` line for each individual check performed. Modules defines
-three tools, matched to three kinds of tests (see `Kinds of tests`_ below).
+four tools, matched to four kinds of tests (see `Kinds of tests`_ below).
 
 Kinds of tests
 --------------
 
-The testsuite exercises three different things, run as three separate
+The testsuite exercises four different things, run as four separate
 DejaGnu tools:
 
 ``modules``
@@ -32,8 +32,9 @@ DejaGnu tools:
 ``install``
     Checks a real ``make install``-ed tree: that the :command:`module`
     function/command is correctly defined once shell init scripts are
-    sourced, that shell completion works, that ``modulecmd`` is invoked
-    correctly from each shell's wrapper, etc. Driven by the
+    sourced, that the ``complete`` modulefile command emits the right
+    shell-specific completion registration snippet, that ``modulecmd`` is
+    invoked correctly from each shell's wrapper, etc. Driven by the
     :file:`install.00-init` directory.
 
 ``lint``
@@ -41,10 +42,18 @@ DejaGnu tools:
     scripts) over the repository's own scripts and reports any warning as a
     test failure. Driven by the :file:`lint.00-init` directory.
 
+``completion``
+    Drives a real, interactive shell process (via Expect ``spawn``/``send``/
+    ``expect``, not just a captured non-interactive run like the other three
+    tools) to press Tab against the built shell completion script and check
+    that the resulting candidate list holds the expected module names and
+    option flags. Driven by the :file:`completion.00-init` directory;
+    currently covers bash only, see `completion.00-init layout`_.
+
 Each tool corresponds to one Makefile target (``test``, ``testinstall``,
-``testlint``, see `Running the testsuite`_) and to one log file
-(:file:`modules.log`, :file:`install.log`, :file:`lint.log`) produced in the
-top build directory.
+``testlint``, ``testcompletion``, see `Running the testsuite`_) and to one
+log file (:file:`modules.log`, :file:`install.log`, :file:`lint.log`,
+:file:`completion.log`) produced in the top build directory.
 
 Two additional run modes apply to the ``modules`` tool rather than adding a
 new one:
@@ -67,12 +76,12 @@ Test file directories
 
 Test files are grouped in numbered directories named
 ``<tool>.<serienum>-<topic>``, e.g. :file:`modules.50-cmds`,
-:file:`install.00-init`, :file:`lint.00-init`. The ``<tool>`` prefix ties the
-directory to one of the three DejaGnu tools above (DejaGnu only looks at
-directories whose prefix matches the ``--tool`` given to ``runtest``); the
-two-digit ``<serienum>`` number fixes run order and is what you pass to
-:file:`script/mt` to select a whole directory (e.g. ``script/mt 50``); the
-``<topic>`` suffix is just a human-readable label.
+:file:`install.00-init`, :file:`lint.00-init`, :file:`completion.00-init`.
+The ``<tool>`` prefix ties the directory to one of the four DejaGnu tools
+above (DejaGnu only looks at directories whose prefix matches the ``--tool``
+given to ``runtest``); the two-digit ``<serienum>`` number fixes run order
+and is what you pass to :file:`script/mt` to select a whole directory (e.g.
+``script/mt 50``); the ``<topic>`` suffix is just a human-readable label.
 
 Current ``modules.*`` series, in run order:
 
@@ -137,13 +146,48 @@ Current ``modules.*`` series, in run order:
 ``99-finish``
     Testsuite teardown (removes cache files created for the run)
 
-``install.00-init`` and ``lint.00-init`` are each a single series (those
-tools are much smaller and don't need topic splitting).
+``install.00-init``, ``lint.00-init`` and ``completion.00-init`` are each a
+single series (those tools are much smaller and don't need topic splitting).
 
 Every series directory ends with a ``999-cleanup.exp`` file (see `Test file
 anatomy`_) and, for the ``modules`` tool, most series begin with a
 ``0NN-init_ts.exp`` file that sets up whatever fixtures that series' tests
 need (e.g. :file:`modules.90-avail/010-init_ts.exp`).
+
+``completion.00-init`` layout
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``completion`` tool follows the common ``005``/``006``/``010``/``011``
+setup numbering (see `Test file anatomy`_ and `Base test procedures`_ below)
+plus one extra layer, since driving real Tab-key completion is inherently
+shell-specific in a way none of the other three tools are:
+
+- ``005-init_ts.exp`` / ``006-procs.exp`` / ``010-environ.exp`` /
+  ``011-save_test_env.exp`` set up paths (the ``bash`` binary, the built
+  :file:`init/bash_completion` script, a clean fixture modulepath), the
+  shell-agnostic assert procedures (``completion_assert_contains``,
+  ``completion_assert_not_contains``, ``completion_assert_eq``), and the
+  clean baseline environment/``save_test_env`` checkpoint, exactly as for
+  the other tools.
+- ``0NN-<shell>-procs.exp`` defines one ``completion_<shell>_start`` /
+  ``completion_<shell>_raw`` / ``completion_<shell>_list`` /
+  ``completion_<shell>_inline`` / ``completion_<shell>_close`` set per
+  shell -- e.g. ``020-bash-procs.exp`` spawns a real ``bash`` pty, sources
+  :file:`init/bash_completion`, and drives double-Tab listings
+  (``completion_bash_list``, for an ambiguous prefix) or single-Tab inline
+  completions (``completion_bash_inline``, for a prefix with exactly one
+  match -- e.g. checking a directory-style entry completes with a
+  trailing ``/`` and no trailing space) through Expect.
+  ``completion_<shell>_list``/``_inline`` are responsible for recording the
+  cmdline they were passed into the shared ``completion_last_cmdline``
+  variable, which the generic assert procedures use to build their test
+  label.
+- ``0NN-<shell>.exp`` (e.g. ``021-bash.exp``) holds the actual test cases
+  for that shell, calling only its own ``completion_<shell>_*`` procs plus
+  the shared asserts.
+
+Adding a new shell means adding its own ``completion_<shell>_*`` procs file
+and test file; nothing in ``006-procs.exp`` needs to change.
 
 Fixture and support directories
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -554,6 +598,7 @@ With ``make``
     make test COVERAGE=y       # coverage-instrumented run, produces tcl/*.tcl_m
     make testinstall           # 'install' suite against a tree already processed by 'make install'
     make testlint              # 'lint' suite (Nagelfar + ShellCheck)
+    make testcompletion        # 'completion' suite (interactive Tab-completion tests)
 
 Each target ends up calling ``runtest --tool <tool> $(RUNTESTFLAGS)
 $(RUNTESTFILES)``: ``RUNTESTFILES``, if set, restricts the run to specific
@@ -578,19 +623,22 @@ calling ``make test`` directly when iterating on a specific area.
     script/mt cov                 # same as: make test COVERAGE=y
     script/mt install             # same as: make testinstall
     script/mt lint                # same as: make testlint
+    script/mt comp                # same as: make testcompletion
 
     script/mt 50/470              # only testsuite/modules.50-cmds/470-*.exp
     script/mt 50                  # every file in testsuite/modules.50-cmds
     script/mt 61                  # collection series (always run whole, see below)
     script/mt lint 00/030         # only testsuite/lint.00-init/030-*.exp
+    script/mt comp 00/021         # only testsuite/completion.00-init/021-*.exp
     script/mt 50/{280,290} 61     # several selections at once
     script/mt --help              # full usage
 
 Whichever files are selected, :file:`script/mt` always also runs the
 mandatory setup files for that tool (for ``modules``:
 ``00/005 00/006 00/010 00/050 00/060 00/080 00/085``; for ``install``:
-``00/005 00/006 00/010 00/011``; for ``lint``: ``00/005 00/006 00/011``),
-plus the ``999-cleanup.exp`` of every selected series. Passing a bare series
+``00/005 00/006 00/010 00/011``; for ``lint``: ``00/005 00/006 00/011``; for
+``completion``: ``00/005 00/006 00/010 00/011 00/020``), plus the
+``999-cleanup.exp`` of every selected series. Passing a bare series
 number always expands to every file in that directory, because several of
 those series are order-sensitive or enumerate a whole modulepath (see
 `Adding new test fixtures`_). The collection series (``61``) is one such
@@ -685,11 +733,11 @@ Debugging a broken test
    ``send_user`` progress messages emitted by ``config/base-config.exp``
    helpers like ``setenv_var``/``change_file_perms``), set
    ``RUNTESTFLAGS='-v -v'`` and call ``make test``/``testinstall``/
-   ``testlint`` directly, or invoke ``runtest`` yourself with the
-   environment variables :file:`script/mt`/the Makefile targets set up
-   (``TCLSH``, ``MODULECMD``, ``OBJDIR``, ``TESTSUITEDIR``) -- see the
-   ``test``/``testinstall``/``testlint`` targets in :file:`Makefile` for the
-   exact invocation.
+   ``testlint``/``testcompletion`` directly, or invoke ``runtest`` yourself
+   with the environment variables :file:`script/mt`/the Makefile targets set
+   up (``TCLSH``, ``MODULECMD``, ``OBJDIR``, ``TESTSUITEDIR``) -- see the
+   ``test``/``testinstall``/``testlint``/``testcompletion`` targets in
+   :file:`Makefile` for the exact invocation.
 4. **Check for order dependence.** If a test passes alone but fails in a
    full run (or vice-versa), suspect a missing/incomplete ``reset_test_env``
    footer in an earlier file, or a global-enumeration test (`Adding new test
@@ -705,7 +753,24 @@ Debugging a broken test
    :file:`lint.00-init/0NN-*.exp` files configure linter exclusions (e.g.
    the ``-e SC1090`` ShellCheck exclusion in
    :file:`lint.00-init/020-sh.exp`) before adding a new one.
-7. **Coverage regressions.** If a change is meant to add coverage for a new
+7. **``completion`` tool hangs/timeouts.** A run that hangs (rather than
+   fails) almost always means an ``expect`` pattern in a
+   ``completion_<shell>_*`` proc never matched, so it burned the default
+   timeout before falling through -- three recurring causes when scripting
+   readline-based completion: sending only a double-Tab against a prefix
+   that still has an unconsumed common-prefix extension (readline
+   auto-inserts it on the first Tab, so the listing needs a *third* Tab --
+   type the full common prefix yourself instead, see the ``module load ba``
+   case in
+   :file:`completion.00-init/021-bash.exp`); clearing an input line and then
+   matching on the prompt text reappearing (readline redraws a cleared line
+   with cursor-movement escapes, not by reprinting the prompt -- submit the
+   now-empty line instead, see ``completion_bash_list`` in
+   :file:`completion.00-init/020-bash-procs.exp`); and an interactive pager
+   (``less``) kicking in on an unexpected warning and blocking for a
+   keypress that never comes (set ``MODULES_PAGER=cat``, see
+   :file:`completion.00-init/010-environ.exp`).
+8. **Coverage regressions.** If a change is meant to add coverage for a new
    branch, confirm it with ``make test COVERAGE=y`` (or
    ``script/mt cov <serienum>/<num>``) and check the relevant :file:`tcl/*.tcl_m`
    file no longer flags that line ``;# Not covered``.

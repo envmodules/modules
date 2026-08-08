@@ -1,0 +1,68 @@
+##############################################################################
+#   Modules Revision 3.0
+#   Providing a flexible user environment
+#
+#   File:		completion.00-init/%M%
+#   Revision:		%I%
+#   First Edition:	2026/08/07
+#   Last Mod.:		%U%, %G%
+#
+#   Authors:		Xavier Delaruelle, xavier.delaruelle@cea.fr
+#
+#   Description:	Testuite testsequence
+#   Command:
+#   Sub-Command:
+#
+#   Comment:	%C{
+#			Defines all patterns used further in the testsuite
+#		}C%
+#
+##############################################################################
+
+proc find_bin {name} {
+   set path {}
+
+   if {[info exists ::env(PATH)]} {
+      foreach dir [split $::env(PATH) ":"] {
+         if {[file executable "$dir/$name"]} {
+            set path "$dir/$name"
+            break
+         }
+      }
+   }
+
+   return $path
+}
+
+if {$verbose} {
+   send_user "\tInitializing the testsuite ...\n"
+}
+
+set TCLSH $env(TCLSH)
+set MODULECMD $env(MODULECMD)
+
+# a bash binary is required to drive interactive completion tests
+set bashbin [find_bin bash]
+if {$bashbin eq {}} {
+   unsupported {no bash binary found to drive completion tests}
+}
+
+# built bash completion script under test
+set bashcompletion "$env(OBJDIR)/init/bash_completion"
+if {![file exists $bashcompletion]} {
+   unsupported "completion script not found: $bashcompletion (run 'make initdir' first)"
+}
+
+# clean modulefile fixture tree: unlike testsuite/modulefiles, this one holds
+# no modulefile deliberately broken to exercise error paths, which would get
+# in the way of straightforward completion listing checks
+set modpath "$env(TESTSUITEDIR)/modulefiles.3"
+
+# sandboxed $HOME for the spawned bash sessions: some completion tests (e.g.
+# 'module save') write real files there, which must never land under a
+# developer's actual home directory
+set completionhome "$env(TESTSUITEDIR)/completion-home"
+file delete -force $completionhome
+file mkdir $completionhome
+
+# vim:set tabstop=3 shiftwidth=3 expandtab autoindent:
