@@ -2,7 +2,7 @@
 
 function __fish_module_no_subcommand --description 'Test if modulecmd has yet to be given the subcommand'
    for i in (commandline -opc)
-      if contains -- $i add add-any load load-any try-add try-load rm remove del unload swap switch show display lint list avail is-loaded is-saved is-used is-avail info-loaded aliases use unuse refresh reload purge source whatis apropos keyword search test save reset restore saverm saveshow savelist stash stashclear stashlist stashpop stashrm stashshow initadd initprepend initrm initswitch initlist initclear path paths append-path prepend-path remove-path clear config sh-to-mod edit state mod-to-sh cachebuild cacheclear spider update disable describe
+      if contains -- $i add add-any load load-any try-add try-load rm remove del unload swap switch show display lint list avail is-loaded is-saved is-used is-avail info-loaded aliases use unuse refresh reload purge source whatis apropos keyword search test save reset restore saverm saveshow savelist stash stashclear stashlist stashpop stashrm stashshow path paths append-path prepend-path remove-path clear config sh-to-mod edit state mod-to-sh cachebuild cacheclear spider update disable describe
          return 1
       end
    end
@@ -11,7 +11,7 @@ end
 
 function __fish_module_use_avail --description 'Test if module command should have available packages as potential completion'
    for i in (commandline -opc)
-      if contains -- $i help add add-any load load-any try-add try-load swap switch show display avail is-loaded is-avail info-loaded whatis test initadd initprepend path paths edit lint mod-to-sh
+      if contains -- $i help add add-any load load-any try-add try-load swap switch show display avail is-loaded is-avail info-loaded whatis test path paths edit lint mod-to-sh
          return 0
       end
    end
@@ -30,15 +30,6 @@ end
 function __fish_module_use_list --description 'Test if module command should have loaded packages as potential completion'
    for i in (commandline -opc)
       if contains -- $i swap switch rm remove del unload
-         return 0
-      end
-   end
-   return 1
-end
-
-function __fish_module_use_initlist --description 'Test if module command should have packages in init file as potential completion'
-   for i in (commandline -opc)
-      if contains -- $i initrm initswitch
          return 0
       end
    end
@@ -75,8 +66,6 @@ end
 complete -c module -n '__fish_module_use_avail' -f -a "(module avail --color=never -s -t -S --no-indepth -o 'alias:indesym' (commandline -ct) 2>&1)"
 complete -c module -n '__fish_module_use_spider' -f -a "(module spider --color=never -s -t -S --no-indepth -o 'alias:indesym' (commandline -ct) 2>&1)"
 complete -c module -n '__fish_module_use_list' -f -a "(module list --color=never -s -t -o '' 2>&1)"
-complete -c module -n '__fish_module_use_initlist' -f -a "(module initlist --color=never -s 2>&1 | sed '\
-   / loads modules:\$/d;')"
 complete -c module -n '__fish_module_use_savelist' -f -a "(module savelist --color=never -s -t 2>&1 | sed '\
    /No named collection\.\$/d; \
    /Named collection list\$/d; \
@@ -121,12 +110,6 @@ complete -f -n '__fish_module_no_subcommand' -c module -a 'saveshow' --descripti
 complete -f -n '__fish_module_no_subcommand' -c module -a 'describe' --description 'Display information about collection'
 complete -f -n '__fish_module_no_subcommand' -c module -a 'savelist' --description 'List all saved collections'
 complete -f -n '__fish_module_no_subcommand' -c module -a 'is-saved' --description 'Test if any of the collection(s) exists'
-complete -f -n '__fish_module_no_subcommand' -c module -a 'initadd' --description 'Add modulefile to shell init file'
-complete -f -n '__fish_module_no_subcommand' -c module -a 'initprepend' --description 'Add to beginning of list in init file'
-complete -f -n '__fish_module_no_subcommand' -c module -a 'initrm' --description 'Remove modulefile from shell init file'
-complete -f -n '__fish_module_no_subcommand' -c module -a 'initswitch' --description 'Switch mod1 with mod2 from init file'
-complete -f -n '__fish_module_no_subcommand' -c module -a 'initlist' --description 'List all modules loaded from init file'
-complete -f -n '__fish_module_no_subcommand' -c module -a 'initclear' --description 'Clear all modulefiles from init file'
 complete -f -n '__fish_module_no_subcommand' -c module -a 'path' --description 'Print modulefile path'
 complete -f -n '__fish_module_no_subcommand' -c module -a 'paths' --description 'Print path of matching available modules'
 complete -f -n '__fish_module_no_subcommand' -c module -a 'append-path' --description 'Append value to environment variable'
