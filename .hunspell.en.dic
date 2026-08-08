@@ -318,6 +318,7 @@ cmdModulePath
 cmdModulePaths
 cmdModuleReset
 cmdModuleRestore
+cmdModuleSavelist
 cmdModuleSearch
 cmdModuleStash
 cmdModuleStashclear
