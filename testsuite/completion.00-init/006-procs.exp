@@ -97,6 +97,25 @@ proc completion_assert_only_known {got pattern known} {
    }
 }
 
+# assert at least one word in 'candidates' is present in the 'got' candidate
+# list; used where the exact expected word is not known in advance (eg
+# which of several plausible module names a fixture happens to offer), only
+# that completion offers a word of that kind at all. The test label is
+# built from the cmdline last passed to completion_<shell>_list plus the
+# candidate words looked for
+proc completion_assert_any {got candidates} {
+   global completion_last_cmdline
+
+   set label "'$completion_last_cmdline' completion contains any of $candidates"
+   foreach word $candidates {
+      if {$word in $got} {
+         pass $label
+         return
+      }
+   }
+   fail "$label (got: $got)"
+}
+
 # assert 'got' is exactly 'expected'; the test label is built from the
 # cmdline last passed to completion_<shell>_list/_inline plus the expected
 # value

@@ -21,10 +21,10 @@
 #			completes a filesystem directory path, 'unuse'
 #			lists/filters the enabled modulepaths, 'restore'
 #			lists/filters the saved collections, and every
-#			sub-command/switch/option Tab-completion proposes is
-#			checked against the ground truth fetched from
-#			'module help' (see 007-module_help.exp) -- neither
-#			less nor more
+#			sub-command/switch/option/argument-kind 'module' and
+#			'ml' Tab-completion proposes is checked against the
+#			ground truth fetched from 'module help' (see
+#			007-module_help.exp) -- neither less nor more
 #		}C%
 #
 ##############################################################################
@@ -332,6 +332,130 @@ foreach subcmd $help_subcmds {
 }
 
 completion_bash_close
+
+
+#
+# same ground truth, this time against 'ml': its per-sub-command dispatch
+# (_ml in init/bash_completion.in) mirrors 'module's case-for-case, so the
+# exact same fetched option sets apply to 'ml <sub-command> -<Tab><Tab>'
+#
+
+setenv_path_var MODULEPATH $modpath
+
+completion_bash_start
+
+foreach subcmd $help_subcmds {
+   if {$subcmd in {config}} {
+      continue
+   }
+   set expected {}
+   if {[info exists help_subcmd_opts($subcmd)]} {
+      set expected $help_subcmd_opts($subcmd)
+   }
+   if {[llength $expected] == 0} {
+      set got [completion_bash_inline "ml $subcmd -"]
+      completion_assert_eq $got "\a"
+   } else {
+      set got [completion_bash_list "ml $subcmd -"]
+      completion_assert_contains $got $expected
+      completion_assert_only_known $got {-*} $expected
+   }
+}
+
+completion_bash_close
+
+
+#
+# ground-truth check, per sub-command: 'module <sub-command> <Tab><Tab>'
+# must propose a candidate of the kind 'module help' documents as that
+# sub-command's positional argument, for the two kinds with fixture data
+# predictable enough to check for by name -- an available/loaded module
+# ('modulefile'/'modfile'/'mod1'/'mod2'/'mod' in the usage synopsis) or a
+# saved collection ('collection'/'coll'). The remaining kinds
+# (a filesystem directory, an arbitrary file, or nothing completable at
+# all -- a search string, a shell name, a stash collection name generated
+# with an unpredictable timestamp, ...) are not asserted on here: 'use' and
+# 'unuse' already get a dedicated, fixture-appropriate check of their own
+# earlier in this file, and the rest fall back to plain filename completion
+# of the working directory, which is not fixture data this testsuite
+# controls
+#
+
+setenv_path_var MODULEPATH $modpath
+setenv_loaded_module [list bar/1.0] [list $modpath/bar/1.0]
+
+completion_bash_start
+
+completion_bash_raw {module save foo}
+completion_bash_raw {module save fox}
+completion_bash_raw {module save bar1}
+
+foreach subcmd $help_subcmds {
+   ## 'list'/'savelist' take a search string filtering already-known state
+   ## (loaded modules / saved collections), not a name completion target:
+   ## their own completion only ever proposes their option flags, despite
+   ## their usage synopsis documenting a module/collection-shaped argument
+   if {$subcmd in {list savelist}} {
+      continue
+   }
+   if {![info exists help_subcmd_argtype($subcmd)]} {
+      continue
+   }
+   set argtype $help_subcmd_argtype($subcmd)
+   if {$argtype ni {module collection}} {
+      continue
+   }
+   set got [completion_bash_list "module $subcmd "]
+   if {$argtype eq {module}} {
+      ## covers every module-completion mechanism this fixture set can
+      ## produce: available modules not yet loaded (directory-style,
+      ## trailing '/'), available modules regardless of load state
+      ## (whatis/display/... style), and the one loaded module (flat
+      ## 'name/version', switch/unload style)
+      completion_assert_any $got {bar/ baz/ foo/ advvers/ flatlcompat bar/1.0}
+   } else {
+      completion_assert_any $got {foo fox bar1}
+   }
+}
+
+completion_bash_close
+unsetenv_loaded_module
+
+
+#
+# same per-sub-command argument-kind ground truth, this time against 'ml'
+#
+
+setenv_path_var MODULEPATH $modpath
+setenv_loaded_module [list bar/1.0] [list $modpath/bar/1.0]
+
+completion_bash_start
+
+completion_bash_raw {module save foo}
+completion_bash_raw {module save fox}
+completion_bash_raw {module save bar1}
+
+foreach subcmd $help_subcmds {
+   if {$subcmd in {list savelist}} {
+      continue
+   }
+   if {![info exists help_subcmd_argtype($subcmd)]} {
+      continue
+   }
+   set argtype $help_subcmd_argtype($subcmd)
+   if {$argtype ni {module collection}} {
+      continue
+   }
+   set got [completion_bash_list "ml $subcmd "]
+   if {$argtype eq {module}} {
+      completion_assert_any $got {bar/ baz/ foo/ advvers/ flatlcompat bar/1.0}
+   } else {
+      completion_assert_any $got {foo fox bar1}
+   }
+}
+
+completion_bash_close
+unsetenv_loaded_module
 
 
 #

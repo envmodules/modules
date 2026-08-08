@@ -16,10 +16,12 @@
 #   Comment:	%C{
 #			Parse the 'module help' usage message into the set of
 #			documented sub-commands, global switches and, for each
-#			sub-command, the option flags that apply to it, so
-#			completion tests can check that Tab-completion proposes
-#			exactly this set -- neither less nor more. Shell-agnostic:
-#			built once here and reused by every shell's test file
+#			sub-command, the option flags and expected positional
+#			argument kind (module, collection, directory, ...) that
+#			apply to it, so completion tests can check that
+#			Tab-completion proposes exactly this set -- neither
+#			less nor more. Shell-agnostic: built once here and
+#			reused by every shell's test file
 #		}C%
 #
 ##############################################################################
@@ -38,6 +40,30 @@ set help_subcmds {}
 # indexed by every alias name it goes by; a sub-command with no options at
 # all (eg 'purge') simply has no entry
 array set help_subcmd_opts {}
+
+# the kind of positional argument a sub-command's own usage synopsis
+# documents, indexed by every alias name it goes by: 'module' (a module
+# name/version, eg 'modulefile'/'modfile'/'mod1'/'mod2'/'mod'),
+# 'collection' (a saved collection name, eg 'collection'/'coll'), 'dir' (a
+# filesystem/modulepath directory, eg 'dir'/'modulepath'), 'stash' (a stash
+# collection name), 'file' (an arbitrary file, eg 'scriptfile'/
+# 'shellscript'), or 'freeform' for anything else (a search string, shell
+# name, variable name, config value, ...) or no argument at all -- neither
+# of which bash completion can meaningfully complete against, so no
+# candidate beyond the sub-command's own options is expected there
+array set help_subcmd_argtype {}
+
+proc completion_help_classify_argtype {word} {
+   switch -glob -- $word {
+      modulepath { return dir }
+      mod* { return module }
+      coll* { return collection }
+      dir { return dir }
+      stash { return stash }
+      scriptfile - shellscript { return file }
+      default { return freeform }
+   }
+}
 
 # short and long forms of the global switches listed under 'Options:' --
 # these apply regardless of sub-command, and are what a bare
@@ -98,6 +124,7 @@ proc completion_help_resolve_long {short_flag subcmd_name} {
 
 set section none
 set cur_names {}
+set cur_argtype_set 0
 
 # state for the Switches: entry currently being accumulated -- its
 # description can wrap over several lines, possibly carrying the "(on 'x'
@@ -154,16 +181,35 @@ foreach line [split $help_output "\n"] {
       if {[string range $line 0 35] eq [string repeat { } 36]} {
          continue
       }
+      set remainder $line
       if {[regexp {^  ([A-Za-z][A-Za-z0-9_-]*(?: \| [A-Za-z][A-Za-z0-9_-]*)*)} $line all names]} {
          # a new sub-command entry: remember its alias names, so option
          # tokens on any wrapped usage-synopsis continuation line (indented
          # less than the description column) still get attributed to it
          set cur_names [regexp -all -inline {[A-Za-z][A-Za-z0-9_-]*} $names]
          foreach n $cur_names { lappend help_subcmds $n }
+         set cur_argtype_set 0
+         set remainder [string range $line [string length $all] end]
       }
       set opts [completion_help_extract_opts $line]
       foreach n $cur_names {
          foreach o $opts { lappend help_subcmd_opts($n) $o }
+      }
+      if {!$cur_argtype_set} {
+         # strip every option bracket (content starting with '-'), so the
+         # first word left over is the positional argument's own name (eg
+         # 'modulefile' out of '[-i] [modulefile ...]') rather than an
+         # option's; a sub-command with no positional argument at all
+         # leaves only its description text here, whose first word never
+         # matches a known keyword and safely falls back to 'freeform' --
+         # the same "nothing specific to complete" classification a real
+         # freeform argument gets
+         set stripped [regsub -all {\[-[^\]]*\]} $remainder {}]
+         if {[regexp {[A-Za-z][A-Za-z0-9_-]*} $stripped word]} {
+            set argtype [completion_help_classify_argtype $word]
+            foreach n $cur_names { set help_subcmd_argtype($n) $argtype }
+            set cur_argtype_set 1
+         }
       }
    } elseif {$section eq {options}} {
       if {[string index $line 2] ne {-}} { continue }
