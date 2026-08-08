@@ -2069,9 +2069,12 @@ Collection of modules handling commands:
   stashlist [-t|-l|-j]              List all stash collections
 
 Environment direct handling commands:
-  prepend-path [-d c] var val [...] Prepend value to environment variable
-  append-path [-d c] var val [...]  Append value to environment variable
-  remove-path [-d c] var val [...]  Remove value from environment variable
+  prepend-path [-d c] [--duplicates] var val [...]
+                                    Prepend value to environment variable
+  append-path [-d c] [--duplicates] var val [...]
+                                    Append value to environment variable
+  remove-path [-d c] [--index] var val [...]
+                                    Remove value from environment variable
 
 Module cache handling commands:
   cachebuild      [modulepath ...]  Create cache file for modulepath(s)
