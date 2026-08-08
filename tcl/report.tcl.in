@@ -2024,7 +2024,7 @@ Loading / Unloading commands:
                                     Load modfile(s), no complain if not found
   add-any | load-any [-f] [-i] [--auto|--no-auto] [--tag=LIST] modfile [...]
                                     Load first available modulefile in list
-  rm | remove | unload [-f] [-i] [--auto|--no-auto] modulefile [...]
+  rm | remove | delete | unload [-f] [-i] [--auto|--no-auto] modulefile [...]
                                     Remove modulefile(s)
   purge                             Unload all loaded modulefiles
   reload | update                   Unload then load all loaded modulefiles
