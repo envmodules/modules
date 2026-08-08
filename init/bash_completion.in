@@ -113,8 +113,6 @@ _module() {
                     COMPREPLY=( $(compgen -W "@comp_path_opts@" -- "$cur") );;
     remove-path)
                     COMPREPLY=( $(compgen -W "@comp_rm_path_opts@" -- "$cur") );;
-    initadd|initclear|initlist|initprepend|initrm)
-                    ;;
     *)  if test "$COMP_CWORD" -gt 2
         then
             _module_long_arg_list "$cur"
@@ -176,8 +174,6 @@ if type -t ml >/dev/null; then
                         COMPREPLY=( $(compgen -W "@comp_path_opts@" -- "$cur") );;
         remove-path)
                         COMPREPLY=( $(compgen -W "@comp_rm_path_opts@" -- "$cur") );;
-        initadd|initclear|initlist|initprepend|initrm)
-                        ;;
         *)  if test "$COMP_CWORD" -gt 2
             then
                 _module_long_arg_list "$cur"

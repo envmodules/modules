@@ -83,11 +83,6 @@ complete module 'C,/*,f,' 'C,.*,f,' 'C,~/*,f,' \
         'n/edit/`_module_avail`/' \
         'n/sh-to-mod/n/' \
         'n/source/n/' \
-        'n/initadd/n/' \
-        'n/initprepend/n/' \
-        'n/initrm/n/' \
-        'n/initlist/n/' \
-        'n/initclear/n/' \
         "n/append-path/(@comp_path_opts@)/" \
         "n/prepend-path/(@comp_path_opts@)/" \
         "n/remove-path/(@comp_rm_path_opts@)/" \
