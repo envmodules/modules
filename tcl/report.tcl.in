@@ -2014,7 +2014,7 @@ See 'module --help' to get available commands and options.}
 
 proc reportUsage {} {
    reportVersion
-   ##nagelfar ignore #111 Too long line
+   ##nagelfar ignore #141 Too long line
    report {Usage: module [options] [command] [args ...]
 
 Loading / Unloading commands:
@@ -2034,16 +2034,18 @@ Loading / Unloading commands:
   reset                             Restore initial environment
 
 Listing / Searching commands:
-  list   [-a] [-t|-l|-j] [-S|-C] [mod ...]
+  list   [-a] [-t|-l|-j] [-S|-C] [-o LIST] [mod ...]
                                     List all or matching loaded modules
-  avail  [-a] [-t|-l|-j] [-S|-C] [-d|-L] [--indepth|--no-indepth] [mod ...]
+  avail  [-a] [-t|-l|-j] [-S|-C] [-d|-L] [-o LIST]
+         [-i] [--indepth|--no-indepth] [mod ...]
                                     List all or matching available modules
   aliases         [-a]              List all module aliases
   whatis [-a] [-i] [-j] [modulefile ...]
                                     Print whatis information of modulefile(s)
   apropos | keyword | search [-a] [-j] str
                                     Search all name and whatis containing str
-  spider [-a] [-t|-l|-j] [-S|-C] [-d|-L] [--indepth|--no-indepth] [mod ...]
+  spider [-a] [-t|-l|-j] [-S|-C] [-d|-L] [-o LIST]
+         [-i] [--indepth|--no-indepth] [mod ...]
                                     Scan all modulepaths and list all or
                                     matching available modules
   is-loaded  [-i] [modulefile ...]  Test if any of the modulefile(s) are loaded
@@ -2064,7 +2066,7 @@ Collection of modules handling commands:
   stashrm         [stash]           Remove stash collection
   stashshow       [stash]           Display information about stash collection
   stashclear                        Remove all stash collections
-  stashlist                         List all stash collections
+  stashlist [-t|-l|-j]              List all stash collections
 
 Environment direct handling commands:
   prepend-path [-d c] var val [...] Prepend value to environment variable
