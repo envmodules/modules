@@ -1,0 +1,215 @@
+##############################################################################
+#   Modules Revision 3.0
+#   Providing a flexible user environment
+#
+#   File:		completion.00-init/%M%
+#   Revision:		%I%
+#   First Edition:	2026/08/08
+#   Last Mod.:		%U%, %G%
+#
+#   Authors:		Xavier Delaruelle, xavier.delaruelle@cea.fr
+#
+#   Description:	Fetch ground-truth completion data from 'module help'
+#   Command:
+#   Sub-Command:
+#
+#   Comment:	%C{
+#			Parse the 'module help' usage message into the set of
+#			documented sub-commands, global switches and, for each
+#			sub-command, the option flags that apply to it, so
+#			completion tests can check that Tab-completion proposes
+#			exactly this set -- neither less nor more. Shell-agnostic:
+#			built once here and reused by every shell's test file
+#		}C%
+#
+##############################################################################
+
+if {$verbose} {
+   send_user "\tParsing 'module help' output ...\n"
+}
+
+catch {exec $TCLSH $MODULECMD bash help} help_output
+
+# every documented sub-command name (aliases counted separately, eg 'add'
+# and 'load' on the same usage line both end up in this list)
+set help_subcmds {}
+
+# option flags (short and long forms) that apply to a given sub-command,
+# indexed by every alias name it goes by; a sub-command with no options at
+# all (eg 'purge') simply has no entry
+array set help_subcmd_opts {}
+
+# short and long forms of the global switches listed under 'Options:' --
+# these apply regardless of sub-command, and are what a bare
+# 'module -<Tab>' (no sub-command typed yet) proposes
+set help_switches {}
+
+# 'Switches:' section entries, keyed by short form: switch_long(-x) is a
+# list of {longform annotated_subcmds} pairs. Most short forms only ever
+# mean one thing (eg '-f' is always '--force'), but a couple are reused
+# with a different meaning on a specific sub-command (eg '-a' is '--all'
+# almost everywhere but '--append' on 'use', '-d' is '--default' for
+# avail/spider but '--delim' for the *-path commands) -- disambiguated
+# below using the "... (on 'x' sub-command)" annotation those entries carry
+array set switch_long {}
+
+# extract every '-'-prefixed token from a line, only counting tokens that
+# start a new word (preceded by line start, a space, '[' or '|') so a hyphen
+# embedded in a plain word (eg 'add-any') is never mistaken for an option. A
+# token immediately glued to '=' or '[=' (eg '--output=LIST',
+# '--color[=WHEN]') yields both the bare and the '=' form, since bash
+# completion offers both
+proc completion_help_extract_opts {line} {
+   set opts {}
+   set matches [regexp -all -inline -- {(^|[ \[|])(-{1,2}[A-Za-z][A-Za-z-]*)(=|\[=)?} $line]
+   foreach {whole bound tok eq} $matches {
+      lappend opts $tok
+      if {$eq ne {}} { lappend opts "${tok}=" }
+   }
+   return $opts
+}
+
+# resolve a short flag used by a given sub-command to its long form(s) via
+# the Switches: table built while parsing
+proc completion_help_resolve_long {short_flag subcmd_name} {
+   global switch_long
+
+   if {![info exists switch_long($short_flag)]} {
+      return {}
+   }
+   set candidates $switch_long($short_flag)
+   if {[llength $candidates] == 1} {
+      return [lindex $candidates 0 0]
+   }
+   foreach candidate $candidates {
+      lassign $candidate long annotated_subcmds
+      if {$subcmd_name in $annotated_subcmds} {
+         return $long
+      }
+   }
+   foreach candidate $candidates {
+      lassign $candidate long annotated_subcmds
+      if {[llength $annotated_subcmds] == 0} {
+         return $long
+      }
+   }
+   return {}
+}
+
+set section none
+set cur_names {}
+
+# state for the Switches: entry currently being accumulated -- its
+# description can wrap over several lines, possibly carrying the "(on 'x'
+# sub-command)" annotation on any of them
+set sw_short {}
+set sw_long {}
+set sw_desc {}
+
+proc completion_help_flush_switch {} {
+   global sw_short sw_long sw_desc switch_long
+
+   if {$sw_short eq {} && [llength $sw_long] == 0} {
+      return
+   }
+   set annotated_subcmds {}
+   if {[string match {*sub-command*} $sw_desc]} {
+      foreach {whole name} [regexp -all -inline {'([A-Za-z][A-Za-z0-9_-]*)'} $sw_desc] {
+         lappend annotated_subcmds $name
+      }
+   }
+   if {$sw_short ne {}} {
+      lappend switch_long($sw_short) [list $sw_long $annotated_subcmds]
+   }
+   set sw_short {}
+   set sw_long {}
+   set sw_desc {}
+}
+
+foreach line [split $help_output "\n"] {
+   if {[regexp {^[A-Za-z][^:]*:$} $line]} {
+      if {$section eq {switches}} { completion_help_flush_switch }
+      if {[string match {*Options:} $line]} {
+         set section options
+      } elseif {[string match {*Switches:} $line]} {
+         set section switches
+      } elseif {[regexp {^[A-Za-z].* commands:$} $line]} {
+         set section subcmds
+      } else {
+         set section none
+      }
+      set cur_names {}
+      continue
+   }
+   if {[string trim $line] eq {}} {
+      if {$section eq {switches}} { completion_help_flush_switch }
+      set cur_names {}
+      continue
+   }
+
+   if {$section eq {subcmds}} {
+      # a plain description-continuation line (36-space indent, matching
+      # the column every sub-command's description is aligned to) carries
+      # no names or options of its own
+      if {[string range $line 0 35] eq [string repeat { } 36]} {
+         continue
+      }
+      if {[regexp {^  ([A-Za-z][A-Za-z0-9_-]*(?: \| [A-Za-z][A-Za-z0-9_-]*)*)} $line all names]} {
+         # a new sub-command entry: remember its alias names, so option
+         # tokens on any wrapped usage-synopsis continuation line (indented
+         # less than the description column) still get attributed to it
+         set cur_names [regexp -all -inline {[A-Za-z][A-Za-z0-9_-]*} $names]
+         foreach n $cur_names { lappend help_subcmds $n }
+      }
+      set opts [completion_help_extract_opts $line]
+      foreach n $cur_names {
+         foreach o $opts { lappend help_subcmd_opts($n) $o }
+      }
+   } elseif {$section eq {options}} {
+      if {[string index $line 2] ne {-}} { continue }
+      foreach tok [completion_help_extract_opts $line] {
+         lappend help_switches $tok
+      }
+   } elseif {$section eq {switches}} {
+      # a new entry starts at a line indented by exactly 2 spaces;
+      # anything indented further is a continuation of the current entry's
+      # description
+      if {[string range $line 0 1] eq {  } && [string index $line 2] ne { }} {
+         completion_help_flush_switch
+         foreach t [completion_help_extract_opts $line] {
+            if {[string match {--*} $t]} {
+               lappend sw_long $t
+            } elseif {$sw_short eq {}} {
+               set sw_short $t
+            }
+         }
+      }
+      append sw_desc { } [string trim $line]
+   }
+}
+if {$section eq {switches}} { completion_help_flush_switch }
+
+set help_subcmds [lsort -unique $help_subcmds]
+set help_switches [lsort -unique $help_switches]
+
+# combine each sub-command's short-form options (as documented in its own
+# usage synopsis) with their resolved long form(s), plus whichever tokens
+# were already long-form only (eg '--auto', '--tag=LIST')
+foreach n [array names help_subcmd_opts] {
+   set full {}
+   foreach tok [lsort -unique $help_subcmd_opts($n)] {
+      lappend full $tok
+      if {![string match {--*} $tok]} {
+         foreach long [completion_help_resolve_long $tok $n] {
+            lappend full $long
+         }
+      }
+   }
+   set help_subcmd_opts($n) [lsort -unique $full]
+}
+
+if {$verbose > 1} {
+   send_user "\tfetched [llength $help_subcmds] sub-commands, [llength $help_switches] switches\n"
+}
+
+# vim:set tabstop=3 shiftwidth=3 expandtab autoindent:

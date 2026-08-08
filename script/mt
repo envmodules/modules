@@ -107,7 +107,7 @@ if [ $# -gt 0 ]; then
    elif [ "$1" = "comp" ]; then
       target='testcompletion'
       testserie='completion'
-      setuptestfiles=(00/005 00/006 00/010 00/011 00/020)
+      setuptestfiles=(00/005 00/006 00/007 00/010 00/011 00/020)
       shift
    fi
 fi
