@@ -2123,6 +2123,13 @@ Switches:
   --tag=LIST      Apply tag to loading module on 'load', 'try-load', 'load-any'
                   or 'switch' sub-commands (LIST is made of tag names
                   separated by ':')
+  -d C | --delim C
+                  Set delimiter character instead of ':' (on 'prepend-path',
+                  'append-path' or 'remove-path' sub-commands)
+  --duplicates    Allow duplicate entries (on 'prepend-path' or 'append-path'
+                  sub-commands)
+  --index         Given value is an index in the variable's list, instead of
+                  a value to look up (on 'remove-path' sub-command)
 
 Options:
   -h | --help     This usage info
