@@ -2121,9 +2121,6 @@ Switches:
   --tag=LIST      Apply tag to loading module on 'load', 'try-load', 'load-any'
                   or 'switch' sub-commands (LIST is made of tag names
                   separated by ':')
-  --ignore-cache  Ignore module cache
-  --ignore-user-rc
-                  Skip evaluation of user-specific module rc file
 
 Options:
   -h | --help     This usage info
@@ -2141,7 +2138,10 @@ Options:
   --color[=WHEN]  Colorize the output; WHEN can be 'always' (default if
                   omitted), 'auto' or 'never'
   -w COLS | --width=COLS
-                  Set output width to COLS columns.}
+                  Set output width to COLS columns.
+  --ignore-cache  Ignore module cache
+  --ignore-user-rc
+                  Skip evaluation of user-specific module rc file}
 }
 
 # create appropriate message and kind of report when a requirement is not
