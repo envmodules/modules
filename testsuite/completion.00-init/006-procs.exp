@@ -1,0 +1,90 @@
+##############################################################################
+#   Modules Revision 3.0
+#   Providing a flexible user environment
+#
+#   File:		completion.00-init/%M%
+#   Revision:		%I%
+#   First Edition:	2026/08/07
+#   Last Mod.:		%U%, %G%
+#
+#   Authors:		Xavier Delaruelle, xavier.delaruelle@cea.fr
+#
+#   Description:	Test procedures
+#   Command:
+#   Sub-Command:
+#
+#   Comment:	%C{
+#			Defines shell-agnostic test procedures shared by every
+#			shell's completion tests: a shell-specific
+#			completion_<shell>_list procedure is expected to
+#			record the cmdline it was passed in
+#			completion_last_cmdline, which the assert procedures
+#			below use to build their test label
+#		}C%
+#
+##############################################################################
+
+# prompt used as a distinctive sentinel by every shell-specific driver, to
+# reliably tell apart the shell's own output from the test session's
+set completion_prompt {MODULESTEST> }
+
+# escape a string so it is safe to embed in a Tcl regexp as a literal
+proc completion_re_escape {str} {
+   return [regsub -all {[][$.+?*\\()&|^{}]} $str {\\&}]
+}
+
+# assert every word in 'needed' is present in the 'got' candidate list; the
+# test label is built from the cmdline last passed to completion_<shell>_list
+# plus the words looked for
+proc completion_assert_contains {got needed} {
+   global completion_last_cmdline
+
+   set label "'$completion_last_cmdline' completion contains $needed"
+   set missing {}
+   foreach word $needed {
+      if {$word ni $got} {
+         lappend missing $word
+      }
+   }
+   if {[llength $missing]} {
+      fail "$label (missing: $missing) (got: $got)"
+   } else {
+      pass $label
+   }
+}
+
+# assert no word in 'unwanted' is present in the 'got' candidate list; the
+# test label is built from the cmdline last passed to completion_<shell>_list
+# plus the words that must not appear
+proc completion_assert_not_contains {got unwanted} {
+   global completion_last_cmdline
+
+   set label "'$completion_last_cmdline' completion excludes $unwanted"
+   set found {}
+   foreach word $unwanted {
+      if {$word in $got} {
+         lappend found $word
+      }
+   }
+   if {[llength $found]} {
+      fail "$label (unexpected: $found) (got: $got)"
+   } else {
+      pass $label
+   }
+}
+
+# assert 'got' is exactly 'expected'; the test label is built from the
+# cmdline last passed to completion_<shell>_list/_inline plus the expected
+# value
+proc completion_assert_eq {got expected} {
+   global completion_last_cmdline
+
+   set label "'$completion_last_cmdline' completion inserts '$expected'"
+   if {$got ne $expected} {
+      fail "$label (got: '$got')"
+   } else {
+      pass $label
+   }
+}
+
+# vim:set tabstop=3 shiftwidth=3 expandtab autoindent:

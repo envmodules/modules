@@ -32,6 +32,7 @@ Test suites:
   cov             Coverage mode of modulecmd.tcl testsuite
   install         Test Modules installation
   lint            Lint script files of this repository
+  comp            Test shell completion scripts
 
 Select parts of testsuite:
   serienum        Identification number of testsuite directory containing a
@@ -46,6 +47,7 @@ Examples:
   $0
   $0 quick
   $0 lint
+  $0 comp
   $0 50/37 61 70/{290,440}
 "
 }
@@ -101,6 +103,11 @@ if [ $# -gt 0 ]; then
       target='testlint'
       testserie='lint'
       setuptestfiles=(00/005 00/006 00/011)
+      shift
+   elif [ "$1" = "comp" ]; then
+      target='testcompletion'
+      testserie='completion'
+      setuptestfiles=(00/005 00/006 00/010 00/011 00/020)
       shift
    fi
 fi

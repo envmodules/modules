@@ -190,6 +190,11 @@ Modules 5.7.0 (not yet released)
 * Doc: add :ref:`add-new-hook-event` guide describing how to contribute a
   new hook event.
 * Doc: add :ref:`sync-remote-appdir` cookbook recipe.
+* Testsuite: add *completion* testsuite to validate shell Tab completion of
+  this project. This testsuite can be invoked with ``make testcompletion`` or
+  ``script/mt comp``. It drives a real bash session through
+  `Expect <http://expect.sourceforge.net/>`_ to press the Tab key against the
+  built shell completion script and check the resulting candidate list.
 
 
 .. _5.6 release notes:

@@ -1,0 +1,197 @@
+##############################################################################
+#   Modules Revision 3.0
+#   Providing a flexible user environment
+#
+#   File:		completion.00-init/%M%
+#   Revision:		%I%
+#   First Edition:	2026/08/07
+#   Last Mod.:		%U%, %G%
+#
+#   Authors:		Xavier Delaruelle, xavier.delaruelle@cea.fr
+#
+#   Description:	Test procedures
+#   Command:
+#   Sub-Command:
+#
+#   Comment:	%C{
+#			Defines the test procedures driving a real bash pty to
+#			exercise the module/ml Tab completion script exactly
+#			as a user pressing Tab would, then collect the
+#			resulting candidate word list. Other shells get their
+#			own completion_<shell>_{start,raw,list,close} set,
+#			since how a shell is scripted into pty interactive
+#			completion differs from one to the next
+#		}C%
+#
+##############################################################################
+
+# start a fresh bash session with the completion script under test sourced
+# and 'module'/'ml' completion registered, ready to accept commands
+proc completion_bash_start {} {
+   global bashbin bashcompletion completion_prompt completion_bash_spawn_id
+   global TCLSH MODULECMD verbose
+
+   if {$verbose > 1} {
+      send_user "\tStarting bash for completion test\n"
+   }
+
+   spawn $bashbin --norc --noprofile
+   set completion_bash_spawn_id $spawn_id
+
+   # a narrow (default 80-column) pty can make a long completed line wrap,
+   # which makes readline redraw it with extra escape sequences that can be
+   # mistaken for stray inserted characters (e.g. a trailing space) by
+   # anything matching on raw output; go wide enough that no cmdline used
+   # in these tests is ever at risk of wrapping
+   stty rows 40 columns 500 < $spawn_out(slave,name)
+
+   set spawn_id $completion_bash_spawn_id
+   expect {
+      -re {[$#] $} {}
+      timeout { unresolved {completion bash did not start}; return }
+   }
+
+   # switch to a known, distinctive prompt first (matched with the default
+   # shell prompt pattern, since completion_bash_raw's own matching only
+   # works once this prompt is in effect); every setup command after this
+   # point goes through completion_bash_raw
+   send -- "bind 'set enable-bracketed-paste off' 2>/dev/null\r"
+   expect -re {[$#] $}
+   # readline asks "Display all N possibilities?" instead of listing outright
+   # once matches exceed this threshold (100 by default); some completions
+   # here (e.g. bare 'ml') list every sub-command and go well past it
+   send -- "bind 'set completion-query-items 0'\r"
+   expect -re {[$#] $}
+   send -- "unset PROMPT_COMMAND\r"
+   expect -re {[$#] $}
+   send -- "PS1='$completion_prompt'\r"
+   expect {
+      -re "$completion_prompt\$" {}
+      timeout { unresolved {completion bash prompt setup timed out}; return }
+   }
+
+   # a real 'module' command is needed since the completion script shells
+   # out to it (module avail/spider) to list candidate module names
+   completion_bash_raw "eval \"\$('$TCLSH' '$MODULECMD' bash autoinit)\""
+   completion_bash_raw "source '$bashcompletion'"
+   completion_bash_raw {complete -o default -F _module module}
+   completion_bash_raw {type -t _ml >/dev/null 2>&1 && complete -o default -F _ml ml}
+}
+
+# send a line to the completion bash session and wait for the next prompt;
+# used for setup commands whose output is not asserted on
+proc completion_bash_raw {line} {
+   global completion_bash_spawn_id completion_prompt verbose
+
+   set spawn_id $completion_bash_spawn_id
+   send -- "$line\r"
+   expect {
+      -re "\r\n$completion_prompt\$" {}
+      timeout { unresolved "completion setup command timed out: $line" }
+   }
+   if {$verbose > 1} {
+      send_user "\tcompletion> $line\n"
+   }
+}
+
+# send a partial command line followed by a double-Tab (forcing readline to
+# list every ambiguous match), and return the sorted, de-duplicated list of
+# candidate words readline displayed. cmdline must be a prefix that has no
+# unique completion (e.g. ends with a space) so the listing always fires
+proc completion_bash_list {cmdline} {
+   global completion_bash_spawn_id completion_prompt completion_last_cmdline
+   global verbose
+
+   set completion_last_cmdline $cmdline
+   set spawn_id $completion_bash_spawn_id
+   set recmdline [completion_re_escape $cmdline]
+   set reprompt [completion_re_escape $completion_prompt]
+
+   send -- "$cmdline\t\t"
+   set candidates {}
+   expect {
+      -re "\r\n(.*)\r\n$reprompt$recmdline\$" {
+         set candidates $expect_out(1,string)
+      }
+      timeout {
+         unresolved "completion listing timed out for '$cmdline'"
+      }
+   }
+   if {$verbose > 1} {
+      send_user "\tcompletion raw listing for '$cmdline':\n$candidates\n"
+   }
+
+   # clear the (uncompleted) input line so the session is ready to reuse.
+   # readline redraws a cleared line via cursor-movement escapes rather than
+   # reprinting the prompt text, so submit the now-empty line to force a
+   # real newline + fresh prompt we can reliably match on
+   send -- "\025\r"
+   expect -re "\r\n$reprompt\$"
+
+   # collapse the multi-column listing into a flat, sorted word list
+   set words {}
+   foreach word [split $candidates] {
+      if {$word ne {}} {
+         lappend words $word
+      }
+   }
+   return [lsort -unique $words]
+}
+
+# send a partial command line followed by a single Tab, and return the text
+# readline inserted inline (no listing involved). Used to check unique,
+# unambiguous completions -- e.g. that a directory-style entry gets
+# completed with a trailing '/' and no trailing space (see
+# 'compopt -o nospace' in init/bash_completion). cmdline must be a prefix
+# with exactly one match, otherwise the single Tab may ring the bell instead
+# of inserting text, or extend by less than a full match
+proc completion_bash_inline {cmdline} {
+   global completion_bash_spawn_id completion_prompt completion_last_cmdline
+   global verbose
+
+   set completion_last_cmdline $cmdline
+   set spawn_id $completion_bash_spawn_id
+   set recmdline [completion_re_escape $cmdline]
+   set reprompt [completion_re_escape $completion_prompt]
+
+   send -- "$cmdline\t"
+   # let every byte readline is going to insert land in the pty buffer
+   # before reading it: an 'expect' pattern ending in a lazy '(.*)$' would
+   # otherwise match the instant the plain cmdline echo arrives, racing
+   # ahead of e.g. a trailing space that is still in flight
+   after 300
+   set suffix {}
+   expect {
+      -re "${recmdline}(.*)\$" {
+         set suffix $expect_out(1,string)
+      }
+      timeout {
+         unresolved "completion inline insert timed out for '$cmdline'"
+      }
+   }
+   if {$verbose > 1} {
+      send_user "\tcompletion inline insert for '$cmdline': \[$suffix\]\n"
+   }
+
+   # clear the (possibly completed) input line so the session is ready to
+   # reuse, same technique as completion_bash_list
+   send -- "\025\r"
+   expect -re "\r\n$reprompt\$"
+
+   return $suffix
+}
+
+proc completion_bash_close {} {
+   global completion_bash_spawn_id
+
+   if {[info exists completion_bash_spawn_id]} {
+      set spawn_id $completion_bash_spawn_id
+      catch {send -- "exit\r"}
+      catch {expect eof}
+      catch {close -i $completion_bash_spawn_id}
+      catch {wait -i $completion_bash_spawn_id}
+      unset completion_bash_spawn_id
+   }
+}
+
+# vim:set tabstop=3 shiftwidth=3 expandtab autoindent:

@@ -11,6 +11,8 @@
 /install.sum
 /lint.log
 /lint.sum
+/completion.log
+/completion.sum
 /icdiff
 /.noicdiff
 /miniconda3
@@ -54,6 +56,8 @@
 /testsuite/example/initrc-1
 /testsuite/example/initrc
 /testsuite/.config
+/testsuite/completion-use-fixture
+/testsuite/completion-home
 /doc/build
 /doc/source/version.py
 /doc/demo/*/*.svg
