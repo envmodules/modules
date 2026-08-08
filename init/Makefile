@@ -124,6 +124,7 @@ comp_opts := -D -h -s -T -v -V -p -P -w $(comp_long_opts)
 comp_load_opts := --auto --no-auto --force -f --icase -i --tag --tag=
 comp_unload_opts := --auto --no-auto --force -f --icase -i
 comp_list_opts := -a -C -j -l -o -S -t --all --contains --json --long --output --output= --starts-with --terse
+comp_savelist_opts := -a -C -j -l -S -t --all --contains --json --long --starts-with --terse
 comp_stashlist_opts := -j -l -t --json --long --terse
 comp_clear_opts := --force -f
 comp_avail_opts := -a -C -d -i -j -L -l -o -S -t --all --contains --default --icase --json --latest --long --output --output= --starts-with --terse --indepth --no-indepth
@@ -155,6 +156,7 @@ sed -e 's|@prefix@|$(prefix)|g' \
 	-e 's|@comp_load_opts@|$(comp_load_opts)|g' \
 	-e 's|@comp_unload_opts@|$(comp_unload_opts)|g' \
 	-e 's|@comp_list_opts@|$(comp_list_opts)|g' \
+	-e 's|@comp_savelist_opts@|$(comp_savelist_opts)|g' \
 	-e 's|@comp_stashlist_opts@|$(comp_stashlist_opts)|g' \
 	-e 's|@comp_clear_opts@|$(comp_clear_opts)|g' \
 	-e 's|@comp_avail_opts@|$(comp_avail_opts)|g' \
