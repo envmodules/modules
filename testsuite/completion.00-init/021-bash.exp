@@ -20,7 +20,11 @@
 #			lists loaded modules among the option flags, 'use'
 #			completes a filesystem directory path, 'unuse'
 #			lists/filters the enabled modulepaths, 'restore'
-#			lists/filters the saved collections
+#			lists/filters the saved collections, and every
+#			sub-command/switch/option Tab-completion proposes is
+#			checked against the ground truth fetched from
+#			'module help' (see 007-module_help.exp) -- neither
+#			less nor more
 #		}C%
 #
 ##############################################################################
@@ -252,6 +256,80 @@ completion_assert_not_contains $got {bar1}
 ## collection candidate is not a directory-style entry
 set got [completion_bash_inline {module restore ba}]
 completion_assert_eq $got {r1 }
+
+completion_bash_close
+
+
+#
+# ground-truth check against 'module help' (see completion.00-init/
+# 007-module_help.exp): a bare 'module <Tab><Tab>' must propose exactly the
+# documented sub-commands plus the global switches, and 'module -<Tab><Tab>'
+# (isolating the switches from the sub-command names) must propose exactly
+# the documented switches
+#
+
+setenv_path_var MODULEPATH $modpath
+
+completion_bash_start
+
+set got [completion_bash_list {module }]
+set got_subcmds [lsearch -all -inline -not -regexp $got {^-}]
+completion_assert_contains $got_subcmds $help_subcmds
+completion_assert_only_known $got_subcmds {*} $help_subcmds
+
+set got [completion_bash_list {module -}]
+completion_assert_contains $got $help_switches
+completion_assert_only_known $got {-*} $help_switches
+
+completion_bash_close
+
+
+#
+# ground-truth check, per sub-command: 'module <sub-command> -<Tab><Tab>'
+# must propose exactly the option flags 'module help' documents for that
+# sub-command -- including none at all, for a sub-command that takes no
+# option
+#
+
+## typing '-' first, rather than double-Tab from a bare trailing space,
+## matters for two reasons: every option-bearing sub-command's own
+## completion helper (_module_avail, _module_not_yet_loaded, ...) skips
+## looking up real module/collection/modulepath candidates once the word
+## being completed starts with '-', isolating the option flags on their
+## own; and it sidesteps the common-prefix auto-extension trap (as with
+## "bar"/"ba" earlier in this file) that a bare trailing space hits for any
+## sub-command whose *entire* candidate set is option flags (which, unlike
+## module names, always share a leading '-') or modulepath-only entries
+## (which always share a leading '/') -- eg "module aliases <Tab><Tab>"
+## silently completes the shared '-' inline on the first Tab, leaving only
+## one Tab (a bell, no listing) for the second
+setenv_path_var MODULEPATH $modpath
+
+completion_bash_start
+
+foreach subcmd $help_subcmds {
+   ## 'config' completes configuration key names, not option flags
+   if {$subcmd in {config}} {
+      continue
+   }
+   set expected {}
+   if {[info exists help_subcmd_opts($subcmd)]} {
+      set expected $help_subcmd_opts($subcmd)
+   }
+   if {[llength $expected] == 0} {
+      ## nothing is expected to complete at all: a single Tab must insert
+      ## nothing but a bell (not even a directory-style default-completion
+      ## fallback match, since no file in the test run's working directory
+      ## starts with '-') -- readline rings the bell on any Tab that finds
+      ## zero completions, not just an ambiguous one
+      set got [completion_bash_inline "module $subcmd -"]
+      completion_assert_eq $got "\a"
+   } else {
+      set got [completion_bash_list "module $subcmd -"]
+      completion_assert_contains $got $expected
+      completion_assert_only_known $got {-*} $expected
+   }
+}
 
 completion_bash_close
 

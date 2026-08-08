@@ -637,7 +637,7 @@ Whichever files are selected, :file:`script/mt` always also runs the
 mandatory setup files for that tool (for ``modules``:
 ``00/005 00/006 00/010 00/050 00/060 00/080 00/085``; for ``install``:
 ``00/005 00/006 00/010 00/011``; for ``lint``: ``00/005 00/006 00/011``; for
-``completion``: ``00/005 00/006 00/010 00/011 00/020``), plus the
+``completion``: ``00/005 00/006 00/007 00/010 00/011 00/020``), plus the
 ``999-cleanup.exp`` of every selected series. Passing a bare series
 number always expands to every file in that directory, because several of
 those series are order-sensitive or enumerate a whole modulepath (see

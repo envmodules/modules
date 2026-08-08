@@ -73,6 +73,30 @@ proc completion_assert_not_contains {got unwanted} {
    }
 }
 
+# assert every word in 'got' matching 'pattern' (a Tcl 'string match' glob)
+# is a member of 'known'; used to check a candidate list holds no more than
+# the fetched, expected words of a given kind (eg no option flag beyond the
+# ones 'module help' documents) without having to also enumerate every other
+# kind of candidate that may legitimately appear (module names, collection
+# names, ...). The test label is built from the cmdline last passed to
+# completion_<shell>_list plus the pattern looked for
+proc completion_assert_only_known {got pattern known} {
+   global completion_last_cmdline
+
+   set label "'$completion_last_cmdline' completion has no unknown '$pattern' word"
+   set extra {}
+   foreach word $got {
+      if {[string match $pattern $word] && $word ni $known} {
+         lappend extra $word
+      }
+   }
+   if {[llength $extra]} {
+      fail "$label (unknown: $extra) (known: $known)"
+   } else {
+      pass $label
+   }
+}
+
 # assert 'got' is exactly 'expected'; the test label is built from the
 # cmdline last passed to completion_<shell>_list/_inline plus the expected
 # value

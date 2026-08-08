@@ -1073,7 +1073,7 @@ testlint: initdir modulecmd.tcl $(NAGELFAR) script/add.modules script/modulecmd
 	TESTSUITEDIR=`cd testsuite;pwd -P`; export TESTSUITEDIR; \
 	runtest --srcdir $$TESTSUITEDIR --objdir $$OBJDIR $(RUNTESTFLAGS) --tool lint $(RUNTESTFILES)
 
-testcompletion: initdir
+testcompletion: initdir $(MODULECMD)
 	TCLSH=$(TCLSH); export TCLSH; \
 	MODULECMD=$(MODULECMD); export MODULECMD; \
 	OBJDIR=`pwd -P`; export OBJDIR; \
