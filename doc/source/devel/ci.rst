@@ -28,6 +28,8 @@ Overview
     pull request.
 ``lint_tests.yaml``
     Static analysis (Nagelfar, ShellCheck). Runs on push, pull request.
+``completion_tests.yaml``
+    Interactive shell Tab-completion tests. Runs on push, pull request.
 ``differential_shellcheck.yml``
     ShellCheck diff annotations on the changed lines only. Runs on pull
     request (to ``main``).
@@ -128,6 +130,18 @@ Runs the ``lint`` DejaGnu tool (Nagelfar for Tcl files, ShellCheck for
 sh/bash/ksh scripts) via ``script/mt lint``, i.e. the same static analysis
 described as the ``lint`` tool in :doc:`testsuite`. On failure it uploads
 :file:`lint.log` as a build artifact.
+
+Completion (:file:`completion_tests.yaml`)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Runs the ``completion`` DejaGnu tool (real, Expect-driven Tab-key presses
+against the built :file:`init/bash_completion` script) via
+``script/mt comp``, i.e. the same interactive shell Tab-completion testing
+described as the ``completion`` tool in :doc:`testsuite`. Only needs the
+baseline packages (``bash``, ``expect-dev``, ``dejagnu``) rather than the
+full multi-shell set installed by :file:`linux_tests.yaml`, since the
+``completion.00-init`` layout currently covers bash only. On failure it
+uploads :file:`completion.log` as a build artifact.
 
 Differential ShellCheck (:file:`differential_shellcheck.yml`)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
