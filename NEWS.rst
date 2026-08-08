@@ -195,6 +195,17 @@ Modules 5.7.0 (not yet released)
   ``script/mt comp``. It drives a real bash session through
   `Expect <http://expect.sourceforge.net/>`_ to press the Tab key against the
   built shell completion script and check the resulting candidate list.
+* Init: fix numerous inconsistencies between ``module help``'s usage message
+  and the option flags and positional arguments each sub-command actually
+  accepts, and between that usage message and what bash, fish, tcsh and zsh
+  Tab completion offer for each sub-command. Guarded against regressing with
+  a new ground-truth check in the *completion* testsuite that compares
+  ``module``/``ml`` Tab completion against the sub-commands, switches,
+  options and argument kinds parsed straight out of ``module help``.
+* Init: no longer offer the legacy :subcmd:`initadd`, :subcmd:`initclear`,
+  :subcmd:`initlist`, :subcmd:`initprepend` and :subcmd:`initrm`
+  sub-commands as Tab completion candidates (bash, fish, tcsh, zsh), since
+  ``module help`` does not document them.
 
 
 .. _5.6 release notes:
