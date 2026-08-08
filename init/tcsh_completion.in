@@ -58,7 +58,7 @@ complete module 'C,/*,f,' 'C,.*,f,' 'C,~/*,f,' \
         'n/is-loaded/`_module_avail; echo "@comp_mfile_opts@"`/' \
         'n/info-loaded/`_module_avail; echo "@comp_mfile_opts@"`/' \
         'n/restore/`_module_savelist`/' \
-        "n/savelist/(@comp_list_opts@)/" \
+        "n/savelist/(@comp_savelist_opts@)/" \
         'n/saveshow/`_module_savelist`/' \
         'n/describe/`_module_savelist`/' \
         'n/saverm/`_module_savelist`/' \

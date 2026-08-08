@@ -82,7 +82,8 @@ _module() {
     spider)         _module_comgen_words_and_files "@comp_avail_opts@ $(_module_spider "$cur")" "$cur";;
     edit)           _module_comgen_words_and_files "$(_module_avail "$cur")" "$cur";;
     aliases)  COMPREPLY=( $(compgen -W "@comp_aliases_opts@" -- "$cur") );;
-    list|savelist)  COMPREPLY=( $(compgen -W "@comp_list_opts@" -- "$cur") );;
+    list)  COMPREPLY=( $(compgen -W "@comp_list_opts@" -- "$cur") );;
+    savelist)  COMPREPLY=( $(compgen -W "@comp_savelist_opts@" -- "$cur") );;
     stashlist)  COMPREPLY=( $(compgen -W "@comp_stashlist_opts@" -- "$cur") );;
     stashpop|stashshow|stashrm)
                     COMPREPLY=( $(compgen -W "$(_module_stashlist)" -- "$cur") );;
@@ -147,7 +148,8 @@ if type -t ml >/dev/null; then
         spider)         _module_comgen_words_and_files "@comp_avail_opts@ $(_module_spider "$cur")" "$cur";;
         edit)           _module_comgen_words_and_files "$(_module_avail "$cur")" "$cur";;
         aliases)  COMPREPLY=( $(compgen -W "@comp_aliases_opts@" -- "$cur") );;
-        list|savelist)  COMPREPLY=( $(compgen -W "@comp_list_opts@" -- "$cur") );;
+        list)  COMPREPLY=( $(compgen -W "@comp_list_opts@" -- "$cur") );;
+        savelist)  COMPREPLY=( $(compgen -W "@comp_savelist_opts@" -- "$cur") );;
         stashlist)  COMPREPLY=( $(compgen -W "@comp_stashlist_opts@" -- "$cur") );;
         stashpop|stashshow|stashrm)
                     COMPREPLY=( $(compgen -W "$(_module_stashlist)" -- "$cur") );;
