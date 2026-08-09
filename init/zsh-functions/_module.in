@@ -151,7 +151,7 @@ _module() {
             'try-load:Attempt to load modulefile(s), no complain'
             'rm:Remove modulefile(s)'
             'remove:Remove modulefile(s)'
-            'del:Remove modulefile(s)'
+            'delete:Remove modulefile(s)'
             'unload:Remove modulefile(s)'
             'purge:Unload all loaded modulefiles'
             'reload:Unload then load all loaded modulefiles'
@@ -307,7 +307,7 @@ _module() {
                _alternative 'avail-colls:collections:{_module_saved_colls}' \
                   && ret=0
                ;;
-            (rm|del|remove|unload)
+            (rm|delete|remove|unload)
                _arguments \
                   '--auto[Enable automated module handling mode]' \
                   '--no-auto[Disable automated module handling mode]' \

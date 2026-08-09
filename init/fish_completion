@@ -2,7 +2,7 @@
 
 function __fish_module_no_subcommand --description 'Test if modulecmd has yet to be given the subcommand'
    for i in (commandline -opc)
-      if contains -- $i add add-any load load-any try-add try-load rm remove del unload swap switch show display lint list avail is-loaded is-saved is-used is-avail info-loaded aliases use unuse refresh reload purge source whatis apropos keyword search test save reset restore saverm saveshow savelist stash stashclear stashlist stashpop stashrm stashshow path paths append-path prepend-path remove-path clear config sh-to-mod edit state mod-to-sh cachebuild cacheclear spider update disable describe
+      if contains -- $i add add-any load load-any try-add try-load rm remove delete unload swap switch show display lint list avail is-loaded is-saved is-used is-avail info-loaded aliases use unuse refresh reload purge source whatis apropos keyword search test save reset restore saverm saveshow savelist stash stashclear stashlist stashpop stashrm stashshow path paths append-path prepend-path remove-path clear config sh-to-mod edit state mod-to-sh cachebuild cacheclear spider update disable describe
          return 1
       end
    end
@@ -29,7 +29,7 @@ end
 
 function __fish_module_use_list --description 'Test if module command should have loaded packages as potential completion'
    for i in (commandline -opc)
-      if contains -- $i swap switch rm remove del unload
+      if contains -- $i swap switch rm remove delete unload
          return 0
       end
    end
@@ -85,7 +85,7 @@ complete -f -n '__fish_module_no_subcommand' -c module -a 'is-avail' --descripti
 complete -f -n '__fish_module_no_subcommand' -c module -a 'add load' --description 'Load modulefile(s)'
 complete -f -n '__fish_module_no_subcommand' -c module -a 'add-any load-any' --description 'Load first available modulefile in list'
 complete -f -n '__fish_module_no_subcommand' -c module -a 'try-add try-load' --description 'Attempt to load modulefile(s), no complain'
-complete -f -n '__fish_module_no_subcommand' -c module -a 'rm remove del unload' --description 'Remove modulefile(s)'
+complete -f -n '__fish_module_no_subcommand' -c module -a 'rm remove delete unload' --description 'Remove modulefile(s)'
 complete -f -n '__fish_module_no_subcommand' -c module -a 'swap switch' --description 'Unload mod1 and load mod2'
 complete -f -n '__fish_module_no_subcommand' -c module -a 'show display' --description 'Display information about modulefile(s)'
 complete -f -n '__fish_module_no_subcommand' -c module -a 'list' --description 'List loaded modules'

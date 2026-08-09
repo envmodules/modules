@@ -63,7 +63,7 @@ _module_long_arg_list() {
         add|load)
             _module_comgen_words_and_files "$(_module_not_yet_loaded "$cur")" "$cur"
             break;;
-        rm|del|remove|unload|switch|swap)
+        rm|delete|remove|unload|switch|swap)
             COMPREPLY=( $(IFS=: compgen -W "${LOADEDMODULES}" -- "$cur") )
             break;;
         esac
@@ -90,7 +90,7 @@ _module() {
     clear)  COMPREPLY=( $(compgen -W "@comp_clear_opts@" -- "$cur") );;
     restore|save|saveshow|describe|saverm|disable|is-saved)
                     COMPREPLY=( $(compgen -W "$(_module_savelist)" -- "$cur") );;
-    rm|del|remove|unload)
+    rm|delete|remove|unload)
                     COMPREPLY=( $(compgen -W "@comp_unload_opts@ ${LOADEDMODULES//:/ }" -- "$cur") );;
     switch|swap)    COMPREPLY=( $(compgen -W "@comp_load_opts@ ${LOADEDMODULES//:/ }" -- "$cur") );;
     unuse|is-used)  COMPREPLY=( $(IFS=: compgen -W "${MODULEPATH}" -- "$cur") );;
@@ -156,7 +156,7 @@ if type -t ml >/dev/null; then
         clear)  COMPREPLY=( $(compgen -W "@comp_clear_opts@" -- "$cur") );;
         restore|save|saveshow|describe|saverm|disable|is-saved)
                         COMPREPLY=( $(compgen -W "$(_module_savelist)" -- "$cur") );;
-        rm|del|remove|unload)
+        rm|delete|remove|unload)
                         COMPREPLY=( $(compgen -W "@comp_unload_opts@ ${LOADEDMODULES//:/ }" -- "$cur") );;
         switch|swap)    COMPREPLY=( $(compgen -W "@comp_load_opts@ ${LOADEDMODULES//:/ }" -- "$cur") );;
         unuse|is-used)  COMPREPLY=( $(IFS=: compgen -W "${MODULEPATH}" -- "$cur") );;
