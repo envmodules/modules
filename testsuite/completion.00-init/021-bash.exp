@@ -20,11 +20,13 @@
 #			lists loaded modules among the option flags, 'use'
 #			completes a filesystem directory path, 'unuse'
 #			lists/filters the enabled modulepaths, 'restore'
-#			lists/filters the saved collections, and every
+#			lists/filters the saved collections, 'config' lists
+#			every configuration option name, and every
 #			sub-command/switch/option/argument-kind 'module' and
 #			'ml' Tab-completion proposes is checked against the
 #			ground truth fetched from 'module help' (see
-#			007-module_help.exp) -- neither less nor more
+#			007-module_help.exp) and 'module config' (see
+#			008-module_config.exp) -- neither less nor more
 #		}C%
 #
 ##############################################################################
@@ -308,10 +310,6 @@ setenv_path_var MODULEPATH $modpath
 completion_bash_start
 
 foreach subcmd $help_subcmds {
-   ## 'config' completes configuration key names, not option flags
-   if {$subcmd in {config}} {
-      continue
-   }
    set expected {}
    if {[info exists help_subcmd_opts($subcmd)]} {
       set expected $help_subcmd_opts($subcmd)
@@ -325,7 +323,15 @@ foreach subcmd $help_subcmds {
       set got [completion_bash_inline "module $subcmd -"]
       completion_assert_eq $got "\a"
    } else {
-      set got [completion_bash_list "module $subcmd -"]
+      ## 'config' is the only sub-command whose every option is long-form
+      ## only ('--dump-state'/'--reset', no '-x' short forms): from a
+      ## single '-' they still share one more '-' as a common prefix,
+      ## which the first Tab would silently auto-insert (the same
+      ## auto-extension trap as "bar"/"ba" earlier in this file), leaving
+      ## only one Tab for the double-Tab below -- type that second '-'
+      ## already, like every other sub-command's full common prefix here
+      set dash [expr {$subcmd eq {config} ? {--} : {-}}]
+      set got [completion_bash_list "module $subcmd $dash"]
       completion_assert_contains $got $expected
       completion_assert_only_known $got {-*} $expected
    }
@@ -345,9 +351,6 @@ setenv_path_var MODULEPATH $modpath
 completion_bash_start
 
 foreach subcmd $help_subcmds {
-   if {$subcmd in {config}} {
-      continue
-   }
    set expected {}
    if {[info exists help_subcmd_opts($subcmd)]} {
       set expected $help_subcmd_opts($subcmd)
@@ -356,7 +359,8 @@ foreach subcmd $help_subcmds {
       set got [completion_bash_inline "ml $subcmd -"]
       completion_assert_eq $got "\a"
    } else {
-      set got [completion_bash_list "ml $subcmd -"]
+      set dash [expr {$subcmd eq {config} ? {--} : {-}}]
+      set got [completion_bash_list "ml $subcmd $dash"]
       completion_assert_contains $got $expected
       completion_assert_only_known $got {-*} $expected
    }
@@ -398,6 +402,17 @@ foreach subcmd $help_subcmds {
    if {$subcmd in {list savelist}} {
       continue
    }
+   if {$subcmd eq {config}} {
+      ## 'config' takes a configuration option name, not a module or
+      ## collection: check it against the ground truth fetched from
+      ## 'module config' (see 008-module_config.exp), plus the two real
+      ## flags mixed into the same candidate list -- neither less nor more
+      set got [completion_bash_list "module $subcmd "]
+      completion_assert_contains $got $config_opts
+      completion_assert_only_known $got {*} [concat $config_opts\
+         $help_subcmd_opts(config)]
+      continue
+   }
    if {![info exists help_subcmd_argtype($subcmd)]} {
       continue
    }
@@ -437,6 +452,13 @@ completion_bash_raw {module save bar1}
 
 foreach subcmd $help_subcmds {
    if {$subcmd in {list savelist}} {
+      continue
+   }
+   if {$subcmd eq {config}} {
+      set got [completion_bash_list "ml $subcmd "]
+      completion_assert_contains $got $config_opts
+      completion_assert_only_known $got {*} [concat $config_opts\
+         $help_subcmd_opts(config)]
       continue
    }
    if {![info exists help_subcmd_argtype($subcmd)]} {

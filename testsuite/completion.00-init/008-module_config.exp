@@ -1,0 +1,49 @@
+##############################################################################
+#   Modules Revision 3.0
+#   Providing a flexible user environment
+#
+#   File:		completion.00-init/%M%
+#   Revision:		%I%
+#   First Edition:	2026/08/10
+#   Last Mod.:		%U%, %G%
+#
+#   Authors:		Xavier Delaruelle, xavier.delaruelle@cea.fr
+#
+#   Description:	Fetch ground-truth completion data from 'module config'
+#   Command:
+#   Sub-Command:
+#
+#   Comment:	%C{
+#			Parse the 'module config' output into the set of every
+#			existing configuration option name, so completion tests
+#			can check that the 'config' sub-command's Tab-completion
+#			proposes exactly this set -- neither less nor more.
+#			Shell-agnostic: built once here and reused by every
+#			shell's test file
+#		}C%
+#
+##############################################################################
+
+if {$verbose} {
+   send_user "\tParsing 'module config' output ...\n"
+}
+
+catch {exec $TCLSH $MODULECMD bash config --color=never} config_output
+
+# every existing configuration option name, as reported by 'module config'
+# (one per line, name in the first column, followed by its current value)
+set config_opts {}
+
+foreach line [split $config_output \n] {
+   if {[regexp {^([a-z][a-z0-9_]*)\s} $line -> name]} {
+      lappend config_opts $name
+   }
+}
+
+set config_opts [lsort -unique $config_opts]
+
+if {$verbose > 1} {
+   send_user "\tfetched [llength $config_opts] configuration option names\n"
+}
+
+# vim:set tabstop=3 shiftwidth=3 expandtab autoindent:
