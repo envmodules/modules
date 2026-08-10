@@ -1891,6 +1891,10 @@ Module Sub-Commands
        *Value* prefixes ``+`` and ``-`` added to append and subtract elements
        to list-value options
 
+.. subcmd:: delete [--auto|--no-auto] [-f] modulefile...
+
+ See :subcmd:`unload`.
+
 .. subcmd:: describe [collection]
 
  See :subcmd:`saveshow`.
@@ -2413,6 +2417,10 @@ Module Sub-Commands
 
     .. versionchanged:: 5.4
        Option :option:`--force`/:option:`-f` added
+
+.. subcmd:: remove [--auto|--no-auto] [-f] modulefile...
+
+ See :subcmd:`unload`.
 
 .. subcmd:: remove-path [options] variable value...
 
@@ -3072,11 +3080,12 @@ Module Sub-Commands
 
     .. versionadded:: 5.6
 
-.. subcmd:: use [-a|--append] directory...
+.. subcmd:: use [-a|--append|-p|--prepend] directory...
 
  Prepend one or more *directories* to the :envvar:`MODULEPATH` environment
- variable. The ``--append`` flag will append the *directory* to
- :envvar:`MODULEPATH`.
+ variable. The ``--append``/``-a`` flag will append the *directory* to
+ :envvar:`MODULEPATH` instead. The ``--prepend``/``-p`` flag explicitly
+ requests the default prepend behavior.
 
  When *directory* is already defined in :envvar:`MODULEPATH`, it is not added
  again or moved at the end or at the beginning of the environment variable.
