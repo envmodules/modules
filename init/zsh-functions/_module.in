@@ -282,6 +282,8 @@ _module() {
                   '--terse:Display output in terse format'
                   '-j:Display output in JSON format'
                   '--json:Display output in JSON format'
+                  '-a:Include hidden modules in search'
+                  '--all:Include hidden modules in search'
                   '-S:Search modules whose name begins with query string'
                   '--starts-with:Search modules whose name begins with query string'
                   '-C:Search modules whose name contains query string'
