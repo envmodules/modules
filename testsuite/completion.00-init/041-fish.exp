@@ -1,0 +1,380 @@
+##############################################################################
+#   Modules Revision 3.0
+#   Providing a flexible user environment
+#
+#   File:		completion.00-init/%M%
+#   Revision:		%I%
+#   First Edition:	2026/08/11
+#   Last Mod.:		%U%, %G%
+#
+#   Authors:		Xavier Delaruelle, xavier.delaruelle@cea.fr
+#
+#   Description:	Testuite testsequence
+#   Command:		avail, load, unload, use, unuse, restore
+#   Sub-Command:
+#
+#   Comment:	%C{
+#			Check fish Tab completion: mirrors 021-bash.exp /
+#			031-zsh.exp (see 021-bash.exp for the full rationale of
+#			each check) as closely as fish's own completion script
+#			allows, with every completion_bash_*/completion_zsh_*
+#			call replaced by its completion_fish_* counterpart, and
+#			the following deviations, all driven by genuine
+#			differences between init/fish_completion and its bash/
+#			zsh counterparts (see 040-fish-procs.exp's header for
+#			the differences in fish's own Tab-key behavior instead):
+#			 - init/fish_completion has no 'ml' support at all (no
+#			   'complete -c ml' of its own), so every section
+#			   mirroring 'ml' behavior in 021-bash.exp is dropped
+#			 - init/fish_completion does not gate its option flags
+#			   by sub-command at all: every 'complete -c module
+#			   -s/-l ...' line applies unconditionally, so
+#			   'module <sub-command> -<Tab>' always proposes the
+#			   exact same full set of flags -- both the global ones
+#			   and every other sub-command's own documented extras
+#			   (eg 'avail's '--all'/'--terse' show up right alongside
+#			   'load's '--force') -- rather than just the subset
+#			   'module help' documents for that particular
+#			   sub-command; so unlike 021-bash.exp/031-zsh.exp, this
+#			   file has no per-sub-command option ground-truth
+#			   section (only 'config' still gets one, its own option
+#			   *names* rather than flags being unaffected by this).
+#			   The one ground-truth check this file keeps for flags
+#			   at all -- a bare 'module -<Tab>' -- is checked against
+#			   the union of every sub-command's documented options
+#			   ($help_switches plus every $help_subcmd_opts(*) entry)
+#			   rather than just $help_switches (the global
+#			   'Options:' section alone), to match this lack of
+#			   gating; the 'module avail'/'module load'/
+#			   'module unload' checks earlier only look for a small
+#			   illustrative subset of flags, same as
+#			   021-bash.exp/031-zsh.exp, so they are unaffected
+#			 - init/fish_completion also has no '-h'/'--help'
+#			   completion at all (no 'complete -c module -s h -l
+#			   help' line, unlike every other documented global
+#			   switch) -- filtered out of the fetched ground truth
+#			   before comparing against what fish actually proposes
+#			 - 'unuse' is not covered by any of the fish completion
+#			   script's own '__fish_module_use_*' predicates (unlike
+#			   'use', which is): Tab-completion here falls through
+#			   entirely to fish's own default filename completion,
+#			   so it never proposes the enabled modulepaths
+#			   themselves the way 021-bash.exp/031-zsh.exp expect
+#			 - like zsh's own _module.in, module names and option
+#			   flags are two mutually exclusive candidate sets, only
+#			   one of which is shown at a time depending on whether
+#			   the word being completed starts with '-' -- so a bare
+#			   trailing-space listing only ever shows one set, same
+#			   as 031-zsh.exp
+#		}C%
+#
+##############################################################################
+
+
+#
+# module names and option flags each get listed on Tab completion, but
+# (like zsh) not mixed together in the same listing: which set shows up
+# depends on whether the word being completed starts with '-'
+#
+
+setenv_path_var MODULEPATH $modpath
+
+completion_fish_start
+
+set got [completion_fish_list {module avail }]
+completion_assert_contains $got {advvers/ bar/ baz/ foo/}
+
+set got [completion_fish_list {module avail -}]
+completion_assert_contains $got {--all --icase --terse}
+
+set got [completion_fish_list {module load }]
+completion_assert_contains $got {advvers/ bar/ baz/ foo/}
+
+set got [completion_fish_list {module load -}]
+completion_assert_contains $got {--force -f --icase}
+
+## "ba" is the common prefix of bar/ and baz/: a single Tab from "b" must
+## auto-insert the "a" inline -- fish, like zsh, does not additionally ring
+## a bell just because the completion remains ambiguous beyond it (see
+## 040-fish-procs.exp's header: fish gives no audible/visible feedback for
+## this over a plain pty at all)
+set got [completion_fish_inline {module load b}]
+completion_assert_eq $got {a}
+
+## typed prefix is "ba", the full common prefix of bar/ and baz/: fish
+## auto-inserts any *further* common prefix on the Tab, which would eat the
+## one Tab the list check below relies on to show a real listing instead of
+## silently completing further
+set got [completion_fish_list {module load ba}]
+completion_assert_contains $got {bar/ baz/}
+completion_assert_not_contains $got {foo/ advvers/}
+
+## "bar" uniquely matches the "bar/" module category: a single Tab must
+## complete it inline with a trailing '/' and no trailing space (so typing
+## can continue straight into a version), per the directory-style handling
+## in _module_avail_mods
+set got [completion_fish_inline {module load bar}]
+completion_assert_eq $got {/}
+
+## from "bar/", a Tab must list the versions available under it
+set got [completion_fish_list {module load bar/}]
+completion_assert_contains $got {bar/1.0 bar/2.0}
+
+## "flatlcompat" is a single, versionless module (no further completion
+## possible beneath it, so unlike "bar" above it does not end in '/'): a
+## single Tab must complete it inline, with a trailing space since it is
+## not a directory-style entry
+set got [completion_fish_inline {module load fl}]
+completion_assert_eq $got {atlcompat }
+
+completion_fish_close
+
+
+#
+# 'unload' lists the currently loaded modules (mutually exclusive with the
+# option flags, same as avail/load above), and lists/completes them on the
+# typed prefix like any other candidate list
+#
+
+setenv_loaded_module [list bar/1.0 baz/1.0 foo/1.0]\
+   [list $modpath/bar/1.0 $modpath/baz/1.0 $modpath/foo/1.0]
+
+completion_fish_start
+
+set got [completion_fish_list {module unload }]
+completion_assert_contains $got {bar/1.0 baz/1.0 foo/1.0}
+
+set got [completion_fish_list {module unload -}]
+completion_assert_contains $got {--force -f --icase}
+
+## "ba" is the common prefix of bar/1.0 and baz/1.0: a single Tab from "b"
+## must auto-insert the "a" inline, with no audible/visible feedback (see
+## 040-fish-procs.exp's header)
+set got [completion_fish_inline {module unload b}]
+completion_assert_eq $got {a}
+
+## from "ba", nothing more can be auto-inserted (bar/1.0 and baz/1.0
+## diverge right there), so a Tab must list just the two matching loaded
+## modules, not foo/1.0
+set got [completion_fish_list {module unload ba}]
+completion_assert_contains $got {bar/1.0 baz/1.0}
+completion_assert_not_contains $got {foo/1.0}
+
+## "foo/1.0" is the only loaded module starting with "f": a single Tab must
+## complete the rest of it inline, with a trailing space since a
+## loaded-module candidate is not a directory-style entry
+set got [completion_fish_inline {module unload f}]
+completion_assert_eq $got {oo/1.0 }
+
+completion_fish_close
+unsetenv_loaded_module
+
+
+#
+# 'use' completes a filesystem directory path, falling through to fish's
+# own default filename completion -- there is no fish equivalent of bash's
+# 'complete -o default' registration, but 'use' is also not covered by any
+# of init/fish_completion's own '__fish_module_use_*' predicates, so
+# nothing in the completion script intercepts it either way
+#
+
+set usedir "$env(TESTSUITEDIR)/completion-use-fixture"
+file delete -force $usedir
+file mkdir $usedir
+
+completion_fish_start
+
+## drop the last 3 characters of the fixture dir name ("ure"): a single Tab
+## must complete them back plus a trailing '/', with no trailing space,
+## exactly like the "bar" -> "bar/" case above
+set got [completion_fish_inline "module use [string range $usedir 0 end-3]"]
+completion_assert_eq $got {ure/}
+
+completion_fish_close
+file delete -force $usedir
+
+
+#
+# 'unuse' is not covered by any '__fish_module_use_*' predicate (see this
+# file's header): Tab-completion here falls through to plain filename
+# completion of the working directory, the same fallback 'use' relies on
+# above, and never proposes the enabled modulepaths themselves
+#
+
+setenv_path_var MODULEPATH $modpath "$env(TESTSUITEDIR)/modulefiles.4" /tmp
+
+completion_fish_start
+
+set got [completion_fish_list {module unuse }]
+completion_assert_not_contains $got [list $modpath "$env(TESTSUITEDIR)/modulefiles.4" /tmp]
+
+completion_fish_close
+
+
+#
+# 'restore' lists the saved collections, and filters them on the typed
+# prefix like any other candidate list
+#
+
+setenv_path_var MODULEPATH $modpath
+
+completion_fish_start
+
+completion_fish_raw {module save foo}
+completion_fish_raw {module save fox}
+completion_fish_raw {module save bar1}
+
+set got [completion_fish_list {module restore }]
+completion_assert_contains $got {foo fox bar1}
+
+## "fo" is the common prefix of foo/fox: a single Tab from "f" must
+## auto-insert the "o" inline, with no audible/visible feedback (see
+## 040-fish-procs.exp's header)
+set got [completion_fish_inline {module restore f}]
+completion_assert_eq $got {o}
+
+## from "fo", nothing more can be auto-inserted (foo/fox diverge right
+## there), so a Tab must list just the two matching collections
+set got [completion_fish_list {module restore fo}]
+completion_assert_contains $got {foo fox}
+completion_assert_not_contains $got {bar1}
+
+## "bar1" is the only collection starting with "ba": a single Tab must
+## complete the rest of it inline, with a trailing space since a
+## collection candidate is not a directory-style entry
+set got [completion_fish_inline {module restore ba}]
+completion_assert_eq $got {r1 }
+
+completion_fish_close
+
+
+#
+# ground-truth check against 'module help' (see completion.00-init/
+# 007-module_help.exp): a bare 'module <Tab>' must propose exactly the
+# documented sub-commands, and 'module -<Tab>' must propose exactly the
+# documented switches -- like the avail/load/unload checks above, these are
+# two mutually exclusive candidate sets in fish, so each gets its own Tab.
+# Since init/fish_completion does not gate its option flags by sub-command
+# (see this file's header), 'module -<Tab>' is checked against every
+# documented option this testsuite knows about -- $help_switches (the
+# global 'Options:' section) *and* every sub-command's own extras
+# ($help_subcmd_opts(*)) -- combined into one set, minus '-h'/'--help'
+# (fish proposes neither, another gap noted in this file's header). Two
+# groups of sub-command-specific options are excluded from this union:
+# 'config''s own '--dump-state'/'--reset' (real flags, but only declared in
+# its own dedicated, gated completion entry, not the unconditional block
+# every other flag comes from) and the '*-path' commands'
+# '--delim'/'--duplicates'/'--index' (not declared anywhere in the
+# completion script at all -- a further, narrower gap than the 'ml'/'-h'/
+# 'unuse' ones already noted in this file's header, not broad enough to
+# warrant its own bullet there)
+#
+
+setenv_path_var MODULEPATH $modpath
+
+set fish_all_opts $help_switches
+foreach n [array names help_subcmd_opts] {
+   if {$n in {config append-path prepend-path remove-path}} {
+      continue
+   }
+   foreach o $help_subcmd_opts($n) { lappend fish_all_opts $o }
+}
+set fish_all_opts [lsort -unique [lsearch -all -inline -not -exact\
+   [lsearch -all -inline -not -exact $fish_all_opts -h] --help]]
+
+completion_fish_start
+
+set got [completion_fish_list {module }]
+completion_assert_contains $got $help_subcmds
+completion_assert_only_known $got {*} $help_subcmds
+
+set got [completion_fish_list {module -}]
+completion_assert_contains $got $fish_all_opts
+completion_assert_only_known $got {-*} $fish_all_opts
+
+completion_fish_close
+
+
+#
+# unlike 021-bash.exp/031-zsh.exp, there is no per-sub-command option
+# ground-truth section here: init/fish_completion does not gate its option
+# flags by sub-command at all (see this file's header), so
+# 'module <sub-command> -<Tab>' always proposes the same full $fish_all_opts
+# set checked above, for every sub-command alike
+#
+
+
+#
+# ground-truth check, per sub-command: 'module <sub-command> <Tab>' must
+# propose a candidate of the kind 'module help' documents as that
+# sub-command's positional argument, for the two kinds with fixture data
+# predictable enough to check for by name -- an available/loaded module
+# ('modulefile'/'modfile'/'mod1'/'mod2'/'mod' in the usage synopsis) or a
+# saved collection ('collection'/'coll'). The remaining kinds (a filesystem
+# directory, an arbitrary file, or nothing completable at all -- a search
+# string, a shell name, a stash collection name generated with an
+# unpredictable timestamp, ...) are not asserted on here: 'use' and 'unuse'
+# already get a dedicated, fixture-appropriate check of their own earlier
+# in this file, and the rest fall back to fish's own directory/file
+# completion, which is not fixture data this testsuite controls
+#
+
+setenv_path_var MODULEPATH $modpath
+setenv_loaded_module [list bar/1.0] [list $modpath/bar/1.0]
+
+completion_fish_start
+
+completion_fish_raw {module save foo}
+completion_fish_raw {module save fox}
+completion_fish_raw {module save bar1}
+
+foreach subcmd $help_subcmds {
+   ## 'list'/'savelist' take a search string filtering already-known state
+   ## (loaded modules / saved collections), not a name completion target:
+   ## their own completion only ever proposes their option flags, despite
+   ## their usage synopsis documenting a module/collection-shaped argument
+   if {$subcmd in {list savelist}} {
+      continue
+   }
+   if {$subcmd eq {config}} {
+      ## 'config' takes a configuration option name, not a module or
+      ## collection: check it against the ground truth fetched from
+      ## 'module config' (see 008-module_config.exp), plus the two real
+      ## flags mixed into the same candidate list -- neither less nor more
+      set got [completion_fish_list "module $subcmd "]
+      completion_assert_contains $got $config_opts
+      completion_assert_only_known $got {*} [concat $config_opts\
+         $help_subcmd_opts(config)]
+      continue
+   }
+   if {![info exists help_subcmd_argtype($subcmd)]} {
+      continue
+   }
+   set argtype $help_subcmd_argtype($subcmd)
+   if {$argtype ni {module collection}} {
+      continue
+   }
+   set got [completion_fish_list "module $subcmd "]
+   if {$argtype eq {module}} {
+      ## covers every module-completion mechanism this fixture set can
+      ## produce: available modules not yet loaded (directory-style,
+      ## trailing '/'), available modules regardless of load state
+      ## (whatis/display/... style), and the one loaded module (flat
+      ## 'name/version', switch/unload style)
+      completion_assert_any $got {bar/ baz/ foo/ advvers/ flatlcompat bar/1.0}
+   } else {
+      completion_assert_any $got {foo fox bar1}
+   }
+}
+
+completion_fish_close
+unsetenv_loaded_module
+
+
+#
+#  Cleanup
+#
+
+reset_test_env
+
+# vim:set tabstop=3 shiftwidth=3 expandtab autoindent:
