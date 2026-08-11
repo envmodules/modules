@@ -48,7 +48,7 @@ DejaGnu tools:
     tools) to press Tab against the built shell completion script and check
     that the resulting candidate list holds the expected module names and
     option flags. Driven by the :file:`completion.00-init` directory;
-    currently covers bash and zsh, see `completion.00-init layout`_.
+    currently covers bash, zsh and fish, see `completion.00-init layout`_.
 
 Each tool corresponds to one Makefile target (``test``, ``testinstall``,
 ``testlint``, ``testcompletion``, see `Running the testsuite`_) and to one
@@ -163,8 +163,9 @@ plus one extra layer, since driving real Tab-key completion is inherently
 shell-specific in a way none of the other three tools are:
 
 - ``005-init_ts.exp`` / ``006-procs.exp`` / ``010-environ.exp`` /
-  ``011-save_test_env.exp`` set up paths (the ``bash`` and ``zsh`` binaries,
-  the built :file:`init/bash_completion` and :file:`init/zsh-functions/_module`
+  ``011-save_test_env.exp`` set up paths (the ``bash``, ``zsh`` and ``fish``
+  binaries, the built :file:`init/bash_completion`,
+  :file:`init/zsh-functions/_module` and :file:`init/fish_completion`
   scripts, a clean fixture modulepath), the shell-agnostic assert procedures
   (``completion_assert_contains``, ``completion_assert_not_contains``,
   ``completion_assert_eq``), and the clean baseline environment/
@@ -182,9 +183,13 @@ shell-specific in a way none of the other three tools are:
   cmdline they were passed into the shared ``completion_last_cmdline``
   variable, which the generic assert procedures use to build their test
   label.
-- ``0NN-<shell>.exp`` (e.g. ``021-bash.exp``, ``031-zsh.exp``) holds the
-  actual test cases for that shell, calling only its own
-  ``completion_<shell>_*`` procs plus the shared asserts.
+- ``0NN-<shell>.exp`` (e.g. ``021-bash.exp``, ``031-zsh.exp``,
+  ``041-fish.exp``) holds the actual test cases for that shell, calling only
+  its own ``completion_<shell>_*`` procs plus the shared asserts. A shell
+  whose completion script covers less ground than the others (e.g. fish's
+  has no ``ml`` support and does not gate its option flags by sub-command)
+  documents each such gap in its own file's header instead of forcing every
+  file to test the same thing.
 
 Adding a new shell means adding its own ``completion_<shell>_*`` procs file
 and test file; nothing in ``006-procs.exp`` needs to change.
@@ -638,8 +643,8 @@ mandatory setup files for that tool (for ``modules``:
 ``00/005 00/006 00/010 00/050 00/060 00/080 00/085``; for ``install``:
 ``00/005 00/006 00/010 00/011``; for ``lint``: ``00/005 00/006 00/011``; for
 ``completion``: ``00/005 00/006 00/007 00/008 00/010 00/011 00/020
-00/030``), plus the ``999-cleanup.exp`` of every selected series. Passing a
-bare series
+00/030 00/040``), plus the ``999-cleanup.exp`` of every selected series.
+Passing a bare series
 number always expands to every file in that directory, because several of
 those series are order-sensitive or enumerate a whole modulepath (see
 `Adding new test fixtures`_). The collection series (``61``) is one such
