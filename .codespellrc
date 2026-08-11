@@ -4,7 +4,9 @@
 # ignore variable names used in code: desig, matchin, compre, invers, compileTime, seh
 # ignore words added to spell check dictionary: lod, nd
 # ignore command names used in code: uncomplete
-ignore-words-list = ans,ot,ue,fo,haa,varius,ure,tthe,tbe,nin,desig,matchin,compre,invers,compiletime,seh,lod,nd,uncomplete
+# ignore hyphenated wording already used throughout Tab completion option
+# descriptions: By-pass
+ignore-words-list = ans,ot,ue,fo,haa,varius,ure,tthe,tbe,nin,desig,matchin,compre,invers,compiletime,seh,lod,nd,uncomplete,by-pass
 # skip git repository internal content
 # skip generated content: ChangeLog.gz, doc/build, modulecmd*.tcl, modules.sum
 #   modules.log, lib/config.sub, lib/config.guess, lib/config.status, lib/configure,

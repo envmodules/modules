@@ -297,7 +297,12 @@ _module() {
                   '(-t --terse)'{-t,--terse}'[Display output in terse format]' \
                   '(-j --json)'{-j,--json}'[Display output in JSON format]' && ret=0
                ;;
-            (stashpop|stashshow|stashrm)
+            (stashpop)
+               _arguments \
+                  '(-f --force)'{-f,--force}'[By-pass dependency consistency]' \
+                  '*::stash:{_module_stash_colls}' && ret=0
+               ;;
+            (stashshow|stashrm)
                _alternative 'avail-stashs:collections:{_module_stash_colls}' \
                   && ret=0
                ;;
@@ -305,7 +310,12 @@ _module() {
                _arguments \
                   '(-f --force)'{-f,--force}'[Skip confirmation dialog]' && ret=0
                ;;
-            (restore|save|saveshow|describe|saverm|disable|is-saved)
+            (restore)
+               _arguments \
+                  '(-f --force)'{-f,--force}'[By-pass dependency consistency]' \
+                  '*::collection:{_module_saved_colls}' && ret=0
+               ;;
+            (save|saveshow|describe|saverm|disable|is-saved)
                _alternative 'avail-colls:collections:{_module_saved_colls}' \
                   && ret=0
                ;;
@@ -316,6 +326,22 @@ _module() {
                   '(-f --force)'{-f,--force}'[By-pass dependency consistency]' \
                   '(-i --icase)'{-i,--icase}'[Case insensitive match]' \
                   '*::modulefile:_module_loaded_mods' && ret=0
+               ;;
+            (purge)
+               _arguments \
+                  '(-f --force)'{-f,--force}'[By-pass dependency consistency]' && ret=0
+               ;;
+            (reload|update)
+               _arguments \
+                  '(-f --force)'{-f,--force}'[By-pass dependency consistency]' && ret=0
+               ;;
+            (reset)
+               _arguments \
+                  '(-f --force)'{-f,--force}'[By-pass dependency consistency]' && ret=0
+               ;;
+            (stash)
+               _arguments \
+                  '(-f --force)'{-f,--force}'[By-pass dependency consistency]' && ret=0
                ;;
             (switch|swap)
                _arguments \
