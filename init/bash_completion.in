@@ -118,7 +118,11 @@ _module() {
     reload|update)  COMPREPLY=( $(compgen -W "@comp_reload_opts@" -- "$cur") );;
     reset)  COMPREPLY=( $(compgen -W "@comp_reset_opts@" -- "$cur") );;
     stash)  COMPREPLY=( $(compgen -W "@comp_stash_opts@" -- "$cur") );;
-    -h|--help|-V|--version|--dumpname|refresh|sh-to-mod|source|state|stashclear|cacheclear)
+    source)  case "$cur" in
+                -*) COMPREPLY=( $(compgen -W "@comp_source_opts@" -- "$cur") );;
+                *)  ;;               # let readline handle the completion
+            esac;;
+    -h|--help|-V|--version|--dumpname|refresh|sh-to-mod|state|stashclear|cacheclear)
                     ;;
     append-path|prepend-path)
                     COMPREPLY=( $(compgen -W "@comp_path_opts@" -- "$cur") );;
@@ -190,6 +194,10 @@ if type -t ml >/dev/null; then
         reload|update)  COMPREPLY=( $(compgen -W "@comp_reload_opts@" -- "$cur") );;
         reset)  COMPREPLY=( $(compgen -W "@comp_reset_opts@" -- "$cur") );;
         stash)  COMPREPLY=( $(compgen -W "@comp_stash_opts@" -- "$cur") );;
+        source)  case "$cur" in
+                    -*) COMPREPLY=( $(compgen -W "@comp_source_opts@" -- "$cur") );;
+                    *)  ;;               # let readline handle the completion
+                esac;;
         -h|--help|-V|--version|--dumpname|refresh|sh-to-mod|state|stashclear|cacheclear)
                         ;;
         append-path|prepend-path)
