@@ -1,0 +1,376 @@
+##############################################################################
+#   Modules Revision 3.0
+#   Providing a flexible user environment
+#
+#   File:		completion.00-init/%M%
+#   Revision:		%I%
+#   First Edition:	2026/08/10
+#   Last Mod.:		%U%, %G%
+#
+#   Authors:		Xavier Delaruelle, xavier.delaruelle@cea.fr
+#
+#   Description:	Test procedures
+#   Command:
+#   Sub-Command:
+#
+#   Comment:	%C{
+#			Defines the test procedures driving a real zsh pty to
+#			exercise the module Tab completion script exactly as a
+#			user pressing Tab would, then collect the resulting
+#			candidate word list. This mirrors 020-bash-procs.exp's
+#			completion_bash_{start,raw,list,close} set (see that
+#			file's header for why each shell gets its own), but
+#			the zsh line editor (zle) redraws candidates through a
+#			completely different byte stream than readline, so the
+#			raw-output parsing below is specific to zsh: no bell
+#			is rung when a Tab silently extends the typed word to
+#			a longer (still ambiguous) common prefix -- unlike
+#			readline, only a Tab that cannot insert anything at
+#			all rings the bell -- and every candidate list is
+#			preceded by a cursor-up escape sequence that this file
+#			uses as the reliable end-of-list marker, plus (for
+#			option flags, which zsh's _arguments lists one per
+#			line together with a "-- description" suffix, unlike
+#			bash's bare compgen listing) a per-line " -- " cut
+#			that drops the description text before it can pollute
+#			the candidate word list
+#		}C%
+#
+##############################################################################
+
+# tail pattern matching zero or more trailing ANSI CSI escape sequences (eg
+# the bracketed-paste mode toggle zle emits right after redrawing a prompt);
+# folded into every prompt-wait regexp below since such sequences may or may
+# not have landed in the read buffer yet by the time the prompt text itself
+# is matched
+set completion_zsh_csitail {(\x1b\[[0-9;?]*[a-zA-Z])*}
+
+# start a fresh zsh session with the completion script under test wired into
+# FPATH and 'module' completion registered (via the script's own '#compdef
+# module' pragma, picked up by compinit), ready to accept commands
+proc completion_zsh_start {} {
+   global zshbin zshcompletion completion_prompt completion_zsh_spawn_id
+   global completion_zsh_csitail TCLSH MODULECMD verbose
+
+   if {$verbose > 1} {
+      send_user "\tStarting zsh for completion test\n"
+   }
+
+   spawn $zshbin -f
+   set completion_zsh_spawn_id $spawn_id
+
+   # Expect's default 'match_max' (2000 bytes) truncates (silently drops
+   # the oldest bytes of) any read buffer that grows past it before a
+   # pattern matches -- a real risk here: a wide pty (see below) pads every
+   # candidate line out to the terminal width, so even a modest listing of
+   # option flags with descriptions is several thousand bytes: raise it
+   # well past the largest listing this file can produce (module bare
+   # 'module ', dozens of sub-commands, still under it)
+   match_max -i $completion_zsh_spawn_id 100000
+
+   # a narrow (default 80-column) pty can make a long completed line wrap,
+   # which makes zle redraw it with extra escape sequences that can be
+   # mistaken for stray inserted characters (e.g. a trailing space) by
+   # anything matching on raw output; go wide enough that no cmdline used
+   # in these tests is ever at risk of wrapping
+   stty rows 40 columns 500 < $spawn_out(slave,name)
+
+   set spawn_id $completion_zsh_spawn_id
+   expect {
+      -re {[%#] } {}
+      timeout { unresolved {completion zsh did not start}; return }
+   }
+
+   # every wait up to (not including) the PS1 change below deliberately
+   # does not anchor on end-of-buffer ('$'): zsh's stock, unconfigured
+   # prompt is still followed by a bracketed-paste-mode escape sequence
+   # (until the first command below disables it) that may or may not have
+   # already landed in the read buffer by the time the prompt text itself
+   # is matched, same problem completion_zsh_csitail works around further
+   # down -- except here that toggle has not been disabled yet, so its
+   # exact tail length cannot be predicted; every setup command after this
+   # point goes through completion_zsh_raw, which matches on the
+   # (by-then-custom) prompt plus completion_zsh_csitail
+   send -- "zle_bracketed_paste=()\r"
+   expect -re {[%#] }
+   # zsh pads the line with reverse-video spaces (ending in a highlighted
+   # '%') before any prompt whose previous line did not end with a newline,
+   # to visually flag the truncation -- since every command here is sent
+   # terminated with a bare '\r', that marker would otherwise appear before
+   # every single prompt redraw
+   send -- "unsetopt PROMPT_SP PROMPT_CR\r"
+   expect -re {[%#] }
+   send -- "PROMPT_EOL_MARK=''\r"
+   expect -re {[%#] }
+   # zle asks "Do you wish to see all N possibilities (M lines)?" instead
+   # of listing outright once matches exceed this threshold (100 by
+   # default; 0 instead falls back to comparing against the terminal
+   # size, which a mere 40-row pty would still trip for a long listing);
+   # some completions here (e.g. bare 'module', dozens of sub-commands)
+   # go well past the default
+   send -- "LISTMAX=100000\r"
+   expect -re {[%#] }
+   # avoid filename-completion color codes (eg from a LS_COLORS inherited
+   # from the invoking terminal) getting mixed into the raw output the
+   # 'use' directory-completion test parses
+   send -- "unset LS_COLORS\r"
+   expect -re {[%#] }
+   send -- "PS1='$completion_prompt'\r"
+   expect {
+      -re "$completion_prompt$completion_zsh_csitail\$" {}
+      timeout { unresolved {completion zsh prompt setup timed out}; return }
+   }
+
+   completion_zsh_raw {zstyle ':completion:*' list-colors ''}
+   # put the built completion script's directory at the front of FPATH and
+   # load it; compinit registers 'module' completion itself, from the
+   # script's own '#compdef module' pragma -- '-u' skips the
+   # owner/group-writability check compinit would otherwise run on every
+   # function file found on FPATH, which would need real ownership of the
+   # (sandboxed, throwaway) test tree to pass
+   completion_zsh_raw "fpath=('[file dirname $zshcompletion]' \$fpath)"
+   completion_zsh_raw {autoload -Uz compinit}
+   completion_zsh_raw {compinit -u}
+   # a real 'module' command is needed since the completion script shells
+   # out to it (module avail/spider) to list candidate module names
+   completion_zsh_raw "eval \"\$('$TCLSH' '$MODULECMD' zsh autoinit)\""
+}
+
+# send a line to the completion zsh session and wait for the next prompt;
+# used for setup commands whose output is not asserted on
+proc completion_zsh_raw {line} {
+   global completion_zsh_spawn_id completion_prompt completion_zsh_csitail
+   global verbose
+
+   set spawn_id $completion_zsh_spawn_id
+   send -- "$line\r"
+   expect {
+      -re "\r\n$completion_zsh_csitail$completion_prompt$completion_zsh_csitail\$" {}
+      timeout { unresolved "completion setup command timed out: $line" }
+   }
+   if {$verbose > 1} {
+      send_user "\tcompletion> $line\n"
+   }
+}
+
+# strip every ANSI CSI escape sequence from a chunk of raw zle output; used
+# by both completion_zsh_list and completion_zsh_inline once the byte range
+# of interest has been isolated
+proc completion_zsh_strip_csi {str} {
+   return [regsub -all {\x1b\[[0-9;?]*[a-zA-Z]} $str {}]
+}
+
+# clean up the text zle inserted right after a cmdline's echo: drop the
+# cursor-left/spaces/cursor-left triplet zle uses to erase whatever longer
+# text (eg a prior candidate, or the old end of the line) used to occupy
+# the redrawn region, then strip any other escape sequence and the
+# trailing carriage returns coming from zle's redraw -- a real bell
+# character, if present, is deliberately left untouched. Used by both
+# completion_zsh_inline and completion_zsh_list's single-candidate fallback
+proc completion_zsh_clean_suffix {suffix} {
+   regsub -all {\x1b\[[0-9]*D[ ]*\x1b\[[0-9]*D} $suffix {} suffix
+   set suffix [completion_zsh_strip_csi $suffix]
+   regsub -all {[\r\x08]} $suffix {} suffix
+   return $suffix
+}
+
+# send a partial command line followed by a double-Tab (the first Tab
+# silently inserts any further common prefix zsh can determine and rings the
+# bell only if that leaves the completion still ambiguous; the second Tab is
+# what makes zle list every ambiguous match, per the 'AUTO_MENU' option this
+# also puts zle into menu-selection -- inserting the first listed candidate
+# inline -- but that is discarded here along with the rest of the line by
+# the trailing ^U), and return the sorted, de-duplicated list of candidate
+# words zle displayed. Unlike bash, where an option-bearing sub-command's
+# candidate set always includes its option flags alongside its
+# modulefile/collection candidates (so it is never accidentally a single
+# candidate), zsh's _module.in offers only one of the two at a time (gated
+# on whether the word being completed starts with '-', same as bash's own
+# _module_avail() internally does for its half) -- so a cmdline whose
+# non-flag candidate set genuinely has only one member (eg a sub-command
+# ground-truth check against a fixture with only one loaded module) hits a
+# unique completion instead of a listing; that case is detected by the
+# absence of the epilogue marker below and handled by reconstructing the
+# single candidate from the inline insertion instead, the same way
+# completion_zsh_inline does
+proc completion_zsh_list {cmdline} {
+   global completion_zsh_spawn_id completion_prompt completion_last_cmdline
+   global completion_zsh_csitail verbose
+
+   set completion_last_cmdline $cmdline
+   set spawn_id $completion_zsh_spawn_id
+   set recmdline [completion_re_escape $cmdline]
+
+   send -- "$cmdline\t\t"
+   # let the whole candidate block land in the pty buffer -- and zle
+   # finish drawing it -- before sending the cleanup '^U' below: sending
+   # it while zle is still mid-redraw (eg still waiting on a 'module
+   # avail'/'module spider' subprocess for some other, slower candidate
+   # set) corrupts the redraw (observed as entire leading rows of an
+   # otherwise-fine listing going missing), and interactively this margin
+   # is comfortable, but on a loaded machine it can be tight
+   after 1500
+   # clear the (uncompleted, possibly menu-selected, or already-unique)
+   # input line so the session is ready to reuse; capture everything from
+   # right after the Tabs through this cleanup in one shot, rather than
+   # trying to spot where the listing itself ends on its own -- a listing
+   # taller than the pty scrolls it, and a scrolled listing has no reliable
+   # "done" marker of its own (no cursor-up-N is emitted: there is nothing
+   # above the top row left to return the cursor to)
+   send -- "\025\r"
+   set buffer {}
+   expect {
+      -re "(?s)(.*)\r\n$completion_zsh_csitail$completion_prompt$completion_zsh_csitail\$" {
+         set buffer $expect_out(1,string)
+      }
+      timeout {
+         unresolved "completion listing timed out for '$cmdline'"
+         return {}
+      }
+   }
+   if {$verbose > 1} {
+      send_user "\tcompletion raw listing for '$cmdline':\n$buffer\n"
+   }
+
+   # the captured text starts with the raw echo of $cmdline plus the first
+   # Tab's response (a bell, or a silently inserted common-prefix
+   # extension) -- neither of which is candidate data -- followed by a
+   # real newline, then (if the completion was ambiguous) the actual
+   # multi-column (or, for option flags, one-per-line) listing. A listing
+   # short enough to fit in the pty ends in zle's 'sgr0/rmso/rmul'-alike
+   # epilogue right before it repaints the cmdline (auto-menu-selected
+   # onto its first candidate) and, after this proc's own '^U', the
+   # prompt -- a more reliable end-of-listing marker than a cursor-up-N
+   # escape sequence, which is only emitted in this same case. A listing
+   # too tall for the pty (eg bare 'module', enough sub-commands to
+   # scroll even a generously-tall terminal) instead just ends the
+   # captured text outright, with neither marker: zle leaves it as the
+   # last thing printed rather than trying to redraw a cmdline that has
+   # scrolled off
+   set epilogue {\x1b\[0m\x1b\[27m\x1b\[24m}
+   set cmdstart [string first $cmdline $buffer]
+   if {$cmdstart == -1} {
+      set cmdstart 0
+   }
+   set nl [string first "\n" $buffer $cmdstart]
+   # this exact epilogue also prefixes every ordinary prompt redraw (eg the
+   # fresh prompt this proc's own '^U' produces), so search for it starting
+   # only from the real listing's start, not from the top of the buffer --
+   # otherwise a straggler byte or two of the *previous* completion_zsh_list/
+   # _inline call's own prompt redraw, still in flight when this call's
+   # Tabs were sent and thus prepended ahead of $cmdstart, would match here
+   # first and be mistaken for this listing's own end
+   set have_epilogue [expr {$nl != -1\
+      && [regexp -indices -start $nl -- $epilogue $buffer epi_range]}]
+
+   if {$have_epilogue} {
+      lassign $epi_range epi_start epi_end
+      set listing [string range $buffer $nl+1 $epi_start-1]
+   } elseif {$nl != -1 && [string first "\n" $buffer $nl+1] != -1} {
+      # no epilogue, but more than one line of content followed the echo:
+      # a scrolled, too-tall-for-the-pty listing (see above) rather than a
+      # single-candidate insertion, which never spans more than one line
+      set listing [string range $buffer $nl+1 end]
+   } else {
+      # neither: the second Tab found a single, already-unique candidate
+      # and inserted it inline instead of listing anything (see this
+      # proc's header); reconstruct that one candidate from the inline
+      # insertion. When the sub-command accepts more than one modulefile
+      # (eg 'unload'/'delete'), that second Tab can go on to immediately
+      # re-trigger completion for the (again unique) next argument too,
+      # duplicating the same word right after itself -- split on
+      # whitespace and de-duplicate rather than returning that whole
+      # blob as one candidate
+      set suffix {}
+      regexp "(?s)${recmdline}(.*)" $buffer -> suffix
+      set suffix [string trim [completion_zsh_clean_suffix $suffix]]
+      if {$suffix eq {} || $suffix eq "\a"} {
+         return {}
+      }
+      return [lsort -unique [split $suffix]]
+   }
+
+   set listing [completion_zsh_strip_csi $listing]
+
+   # collapse the listing into a flat, sorted word list: a plain line (eg a
+   # module/collection/modulepath candidate) is split as-is, while a line
+   # zsh's _arguments describes (eg an option flag) has its trailing
+   # '-- description text' cut off first, since that description is made of
+   # ordinary words that would otherwise pollute the candidate list
+   set words {}
+   foreach line [split $listing "\r\n"] {
+      set sep [string first { -- } $line]
+      if {$sep != -1} {
+         set line [string range $line 0 $sep-1]
+      }
+      foreach word [split $line] {
+         if {$word ne {}} {
+            lappend words $word
+         }
+      }
+   }
+   return [lsort -unique $words]
+}
+
+# send a partial command line followed by a single Tab, and return the text
+# zle inserted inline (no listing involved) -- a bell ('\a') if nothing at
+# all could be completed, otherwise the extra characters zle appended (which
+# may itself be just a further common-prefix extension, silently, with no
+# bell, if the completion remains ambiguous beyond it -- unlike readline,
+# see this file's header). Used to check unique, unambiguous completions --
+# eg that a directory-style entry gets completed with a trailing '/' and no
+# trailing space. cmdline must be a prefix with exactly one match, or with a
+# common prefix short enough that no further Tab is needed to reach it,
+# otherwise a single Tab may extend by less than a full match
+proc completion_zsh_inline {cmdline} {
+   global completion_zsh_spawn_id completion_prompt completion_last_cmdline
+   global completion_zsh_csitail verbose
+
+   set completion_last_cmdline $cmdline
+   set spawn_id $completion_zsh_spawn_id
+   set recmdline [completion_re_escape $cmdline]
+
+   send -- "$cmdline\t"
+   # let every byte zle is going to redraw land in the pty buffer before
+   # reading it: an 'expect' pattern ending in a lazy '(.*)$' would
+   # otherwise match the instant the plain cmdline echo arrives, racing
+   # ahead of e.g. a trailing space that is still in flight
+   after 300
+   set suffix {}
+   expect {
+      -re "(?s)${recmdline}(.*)\$" {
+         set suffix $expect_out(1,string)
+      }
+      timeout {
+         unresolved "completion inline insert timed out for '$cmdline'"
+      }
+   }
+
+   # clear the (possibly completed) input line so the session is ready to
+   # reuse, same technique as completion_zsh_list
+   send -- "\025\r"
+   expect -re "\r\n$completion_zsh_csitail$completion_prompt$completion_zsh_csitail\$"
+
+   set suffix [completion_zsh_clean_suffix $suffix]
+
+   if {$verbose > 1} {
+      send_user "\tcompletion inline insert for '$cmdline': \[$suffix\]\n"
+   }
+
+   return $suffix
+}
+
+proc completion_zsh_close {} {
+   global completion_zsh_spawn_id
+
+   if {[info exists completion_zsh_spawn_id]} {
+      set spawn_id $completion_zsh_spawn_id
+      catch {send -- "exit\r"}
+      catch {expect eof}
+      catch {close -i $completion_zsh_spawn_id}
+      catch {wait -i $completion_zsh_spawn_id}
+      unset completion_zsh_spawn_id
+   }
+}
+
+# vim:set tabstop=3 shiftwidth=3 expandtab autoindent:
