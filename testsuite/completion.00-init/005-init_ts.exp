@@ -53,6 +53,18 @@ if {![file exists $bashcompletion]} {
    unsupported "completion script not found: $bashcompletion (run 'make initdir' first)"
 }
 
+# a zsh binary is required to drive interactive completion tests
+set zshbin [find_bin zsh]
+if {$zshbin eq {}} {
+   unsupported {no zsh binary found to drive completion tests}
+}
+
+# built zsh completion script under test
+set zshcompletion "$env(OBJDIR)/init/zsh-functions/_module"
+if {![file exists $zshcompletion]} {
+   unsupported "completion script not found: $zshcompletion (run 'make initdir' first)"
+}
+
 # clean modulefile fixture tree: unlike testsuite/modulefiles, this one holds
 # no modulefile deliberately broken to exercise error paths, which would get
 # in the way of straightforward completion listing checks

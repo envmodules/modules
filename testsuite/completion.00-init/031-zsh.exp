@@ -1,0 +1,402 @@
+##############################################################################
+#   Modules Revision 3.0
+#   Providing a flexible user environment
+#
+#   File:		completion.00-init/%M%
+#   Revision:		%I%
+#   First Edition:	2026/08/10
+#   Last Mod.:		%U%, %G%
+#
+#   Authors:		Xavier Delaruelle, xavier.delaruelle@cea.fr
+#
+#   Description:	Testuite testsequence
+#   Command:		avail, load, unload, use, unuse, restore
+#   Sub-Command:
+#
+#   Comment:	%C{
+#			Check zsh Tab completion: mirrors 021-bash.exp (see
+#			that file for the full rationale of each check), with
+#			every completion_bash_* call replaced by its
+#			completion_zsh_* counterpart -- and two kinds of
+#			deviation from bash's expectations, both driven by
+#			genuine differences in the two shells' completion
+#			systems (readline vs zle), not by test bugs:
+#			 - zsh does not ring the bell when a Tab silently
+#			   extends the typed word to a longer, still-ambiguous
+#			   common prefix (only a Tab that cannot insert
+#			   anything at all rings the bell), so every such case
+#			   drops the leading "\a" bash expects
+#			 - init/zsh-functions/_module.in has no 'ml' support
+#			   at all (only '#compdef module'), so every section
+#			   mirroring 'ml' behavior in 021-bash.exp is dropped;
+#			   and its avail/load completion offers modulefile
+#			   candidates and option flags as two mutually
+#			   exclusive sets gated on whether the word being
+#			   completed starts with '-', same as bash's own
+#			   _module_avail() internally does for the modules
+#			   half -- but unlike bash, which always mixes its
+#			   @comp_*_opts@ flags into the candidate set
+#			   regardless of prefix, so a bare trailing-space
+#			   listing here only ever shows one set at a time
+#		}C%
+#
+##############################################################################
+
+# _module.in declares its mandatory-argument options zsh '_arguments' style
+# ('--tag=[...]', '--color=[...]', ..., meaning "takes a value attached
+# with an '='"), and zsh's own listing shows the bare option name it will
+# insert rather than that spec syntax -- so it offers eg '--tag', not the
+# module-help-documented '--tag=' the ground truth in $help_subcmd_opts /
+# $help_switches otherwise matches verbatim
+proc completion_zsh_expected_opts {opts} {
+   set out {}
+   foreach tok $opts {
+      if {[string index $tok end] eq {=}} {
+         set tok [string range $tok 0 end-1]
+      }
+      lappend out $tok
+   }
+   return $out
+}
+
+
+#
+# module names and option flags each get listed on Tab completion, but
+# (unlike bash) not mixed together in the same listing: which set shows up
+# depends on whether the word being completed starts with '-'
+#
+
+setenv_path_var MODULEPATH $modpath
+
+completion_zsh_start
+
+set got [completion_zsh_list {module avail }]
+completion_assert_contains $got {advvers/ bar/ baz/ foo/}
+
+set got [completion_zsh_list {module avail -}]
+completion_assert_contains $got {--all --icase --terse}
+
+set got [completion_zsh_list {module load }]
+completion_assert_contains $got {advvers/ bar/ baz/ foo/}
+
+set got [completion_zsh_list {module load -}]
+completion_assert_contains $got {--force -f --icase}
+
+## "ba" is the common prefix of bar/ and baz/: a single Tab from "b" must
+## auto-insert the "a" inline -- with no bell, unlike bash, since zle only
+## beeps when nothing at all can be inserted (see this file's header)
+set got [completion_zsh_inline {module load b}]
+completion_assert_eq $got {a}
+
+## typed prefix is "ba", the full common prefix of bar/ and baz/: zle
+## auto-inserts any *further* common prefix on the first Tab, which would
+## eat one of the two Tabs the double-Tab below relies on to list matches
+## instead of just ringing the bell
+set got [completion_zsh_list {module load ba}]
+completion_assert_contains $got {bar/ baz/}
+completion_assert_not_contains $got {foo/ advvers/}
+
+## "bar" uniquely matches the "bar/" module category: a single Tab must
+## complete it inline with a trailing '/' and no trailing space (so typing
+## can continue straight into a version), per the '_files -/'-alike nospace
+## logic in _module_avail_mods
+set got [completion_zsh_inline {module load bar}]
+completion_assert_eq $got {/}
+
+## from "bar/", double-Tab must list the versions available under it
+set got [completion_zsh_list {module load bar/}]
+completion_assert_contains $got {bar/1.0 bar/2.0}
+
+## "flatlcompat" is a single, versionless module (no further completion
+## possible beneath it, so unlike "bar" above it does not end in '/'): a
+## single Tab must complete it inline, with a trailing space since it is
+## not a directory-style entry
+set got [completion_zsh_inline {module load fl}]
+completion_assert_eq $got {atlcompat }
+
+completion_zsh_close
+
+
+#
+# 'unload' lists the currently loaded modules alongside the option flags
+# (mutually exclusive by leading '-', same as avail/load above), and
+# lists/completes them on the typed prefix like any other candidate list
+#
+
+setenv_loaded_module [list bar/1.0 baz/1.0 foo/1.0]\
+   [list $modpath/bar/1.0 $modpath/baz/1.0 $modpath/foo/1.0]
+
+completion_zsh_start
+
+set got [completion_zsh_list {module unload }]
+completion_assert_contains $got {bar/1.0 baz/1.0 foo/1.0}
+
+set got [completion_zsh_list {module unload -}]
+completion_assert_contains $got {--force -f --icase}
+
+## "ba" is the common prefix of bar/1.0 and baz/1.0: a single Tab from "b"
+## must auto-insert the "a" inline, with no bell (see this file's header)
+set got [completion_zsh_inline {module unload b}]
+completion_assert_eq $got {a}
+
+## from "ba", nothing more can be auto-inserted (bar/1.0 and baz/1.0
+## diverge right there), so a double-Tab must list just the two matching
+## loaded modules, not foo/1.0
+set got [completion_zsh_list {module unload ba}]
+completion_assert_contains $got {bar/1.0 baz/1.0}
+completion_assert_not_contains $got {foo/1.0}
+
+## "foo/1.0" is the only loaded module starting with "f": a single Tab must
+## complete the rest of it inline, with a trailing space since a
+## loaded-module candidate is not a directory-style entry
+set got [completion_zsh_inline {module unload f}]
+completion_assert_eq $got {oo/1.0 }
+
+completion_zsh_close
+unsetenv_loaded_module
+
+
+#
+# 'use' completes a filesystem directory path, through _module.in's own
+# '_files -/' action rather than a fallback to some outer default completer
+# (there is no zsh equivalent of bash's 'complete -o default' registration
+# -- the completion script itself must handle every sub-command, 'use'
+# included)
+#
+
+set usedir "$env(TESTSUITEDIR)/completion-use-fixture"
+file delete -force $usedir
+file mkdir $usedir
+
+completion_zsh_start
+
+## drop the last 3 characters of the fixture dir name ("ure"): a single Tab
+## must complete them back plus a trailing '/', with no trailing space,
+## exactly like the "bar" -> "bar/" case above
+set got [completion_zsh_inline "module use [string range $usedir 0 end-3]"]
+completion_assert_eq $got {ure/}
+
+completion_zsh_close
+file delete -force $usedir
+
+
+#
+# 'unuse' lists the currently enabled modulepaths, and filters them on the
+# typed prefix like any other candidate list
+#
+
+setenv_path_var MODULEPATH $modpath "$env(TESTSUITEDIR)/modulefiles.4" /tmp
+
+completion_zsh_start
+
+## all three modulepaths are absolute, so they all share a leading '/':
+## type it explicitly, otherwise zle auto-inserts that one-character common
+## prefix on the first Tab and the double-Tab below would only ring the
+## bell instead of listing (same trap as the "bar"/"ba" cases above)
+set got [completion_zsh_list {module unuse /}]
+completion_assert_contains $got [list $modpath "$env(TESTSUITEDIR)/modulefiles.4" /tmp]
+
+## $modpath and modulefiles.4 share the ".../modulefiles." prefix, diverging
+## only on the trailing version digit: typing that full common prefix (so
+## the first Tab has nothing left to auto-insert) and double-Tab must list
+## only the two matching modulepaths, not the unrelated /tmp entry
+set got [completion_zsh_list "module unuse $env(TESTSUITEDIR)/modulefiles."]
+completion_assert_contains $got [list $modpath "$env(TESTSUITEDIR)/modulefiles.4"]
+completion_assert_not_contains $got {/tmp}
+
+completion_zsh_close
+
+
+#
+# with only one modulepath left matching a typed prefix, a single Tab must
+# complete the whole rest of it inline -- unlike the module-name case, a
+# modulepath candidate is not a directory-style entry, so (still unlike
+# "bar" -> "bar/" above) a trailing space is expected after it
+#
+
+setenv_path_var MODULEPATH "$env(TESTSUITEDIR)/modulefiles.4" /tmp
+
+completion_zsh_start
+
+set got [completion_zsh_inline "module unuse $env(TESTSUITEDIR)/module"]
+completion_assert_eq $got {files.4 }
+
+completion_zsh_close
+
+
+#
+# 'restore' lists the saved collections, and filters them on the typed
+# prefix like any other candidate list
+#
+
+setenv_path_var MODULEPATH $modpath
+
+completion_zsh_start
+
+completion_zsh_raw {module save foo}
+completion_zsh_raw {module save fox}
+completion_zsh_raw {module save bar1}
+
+set got [completion_zsh_list {module restore }]
+completion_assert_contains $got {foo fox bar1}
+
+## "fo" is the common prefix of foo/fox: a single Tab from "f" must
+## auto-insert the "o" inline, with no bell (see this file's header)
+set got [completion_zsh_inline {module restore f}]
+completion_assert_eq $got {o}
+
+## from "fo", nothing more can be auto-inserted (foo/fox diverge right
+## there), so a double-Tab must list just the two matching collections
+set got [completion_zsh_list {module restore fo}]
+completion_assert_contains $got {foo fox}
+completion_assert_not_contains $got {bar1}
+
+## "bar1" is the only collection starting with "ba": a single Tab must
+## complete the rest of it inline, with a trailing space since a
+## collection candidate is not a directory-style entry
+set got [completion_zsh_inline {module restore ba}]
+completion_assert_eq $got {r1 }
+
+completion_zsh_close
+
+
+#
+# ground-truth check against 'module help' (see completion.00-init/
+# 007-module_help.exp): a bare 'module <Tab><Tab>' must propose exactly the
+# documented sub-commands, and 'module -<Tab><Tab>' must propose exactly the
+# documented switches
+#
+
+setenv_path_var MODULEPATH $modpath
+
+completion_zsh_start
+
+set got [completion_zsh_list {module }]
+set got_subcmds [lsearch -all -inline -not -regexp $got {^-}]
+completion_assert_contains $got_subcmds $help_subcmds
+completion_assert_only_known $got_subcmds {*} $help_subcmds
+
+set got [completion_zsh_list {module -}]
+set zsh_help_switches [completion_zsh_expected_opts $help_switches]
+completion_assert_contains $got $zsh_help_switches
+completion_assert_only_known $got {-*} $zsh_help_switches
+
+completion_zsh_close
+
+
+#
+# ground-truth check, per sub-command: 'module <sub-command> -<Tab><Tab>'
+# must propose exactly the option flags 'module help' documents for that
+# sub-command -- including none at all, for a sub-command that takes no
+# option
+#
+
+setenv_path_var MODULEPATH $modpath
+
+completion_zsh_start
+
+foreach subcmd $help_subcmds {
+   set expected {}
+   if {[info exists help_subcmd_opts($subcmd)]} {
+      set expected $help_subcmd_opts($subcmd)
+   }
+   set expected [completion_zsh_expected_opts $expected]
+   if {[llength $expected] == 0} {
+      ## nothing is expected to complete at all: a single Tab must insert
+      ## nothing but a bell -- unlike the ambiguous-but-something-to-insert
+      ## cases above, zle does still beep here, since it has genuinely
+      ## nothing to insert
+      set got [completion_zsh_inline "module $subcmd -"]
+      completion_assert_eq $got "\a"
+   } else {
+      ## 'config' is the only sub-command whose every option is long-form
+      ## only ('--dump-state'/'--reset', no '-x' short forms): from a
+      ## single '-' they still share one more '-' as a common prefix, which
+      ## the first Tab would silently auto-insert (the same auto-extension
+      ## trap as "bar"/"ba" earlier in this file), leaving only one Tab for
+      ## the double-Tab below -- type that second '-' already, like every
+      ## other sub-command's full common prefix here
+      set dash [expr {$subcmd eq {config} ? {--} : {-}}]
+      set got [completion_zsh_list "module $subcmd $dash"]
+      completion_assert_contains $got $expected
+      completion_assert_only_known $got {-*} $expected
+   }
+}
+
+completion_zsh_close
+
+
+#
+# ground-truth check, per sub-command: 'module <sub-command> <Tab><Tab>'
+# must propose a candidate of the kind 'module help' documents as that
+# sub-command's positional argument, for the two kinds with fixture data
+# predictable enough to check for by name -- an available/loaded module
+# ('modulefile'/'modfile'/'mod1'/'mod2'/'mod' in the usage synopsis) or a
+# saved collection ('collection'/'coll'). The remaining kinds (a filesystem
+# directory, an arbitrary file, or nothing completable at all -- a search
+# string, a shell name, a stash collection name generated with an
+# unpredictable timestamp, ...) are not asserted on here: 'use' and 'unuse'
+# already get a dedicated, fixture-appropriate check of their own earlier
+# in this file, and the rest fall back to _module.in's own directory/file
+# completion, which is not fixture data this testsuite controls
+#
+
+setenv_path_var MODULEPATH $modpath
+setenv_loaded_module [list bar/1.0] [list $modpath/bar/1.0]
+
+completion_zsh_start
+
+completion_zsh_raw {module save foo}
+completion_zsh_raw {module save fox}
+completion_zsh_raw {module save bar1}
+
+foreach subcmd $help_subcmds {
+   ## 'list'/'savelist' take a search string filtering already-known state
+   ## (loaded modules / saved collections), not a name completion target:
+   ## their own completion only ever proposes their option flags, despite
+   ## their usage synopsis documenting a module/collection-shaped argument
+   if {$subcmd in {list savelist}} {
+      continue
+   }
+   if {$subcmd eq {config}} {
+      ## 'config' takes a configuration option name, not a module or
+      ## collection: check it against the ground truth fetched from
+      ## 'module config' (see 008-module_config.exp), plus the two real
+      ## flags mixed into the same candidate list -- neither less nor more
+      set got [completion_zsh_list "module $subcmd "]
+      completion_assert_contains $got $config_opts
+      completion_assert_only_known $got {*} [concat $config_opts\
+         $help_subcmd_opts(config)]
+      continue
+   }
+   if {![info exists help_subcmd_argtype($subcmd)]} {
+      continue
+   }
+   set argtype $help_subcmd_argtype($subcmd)
+   if {$argtype ni {module collection}} {
+      continue
+   }
+   set got [completion_zsh_list "module $subcmd "]
+   if {$argtype eq {module}} {
+      ## covers every module-completion mechanism this fixture set can
+      ## produce: available modules not yet loaded (directory-style,
+      ## trailing '/'), available modules regardless of load state
+      ## (whatis/display/... style), and the one loaded module (flat
+      ## 'name/version', switch/unload style)
+      completion_assert_any $got {bar/ baz/ foo/ advvers/ flatlcompat bar/1.0}
+   } else {
+      completion_assert_any $got {foo fox bar1}
+   }
+}
+
+completion_zsh_close
+unsetenv_loaded_module
+
+
+#
+#  Cleanup
+#
+
+reset_test_env
+
+# vim:set tabstop=3 shiftwidth=3 expandtab autoindent:

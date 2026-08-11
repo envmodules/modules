@@ -340,6 +340,7 @@ commandname
 compA
 compB
 compat
+compdef
 completionhome
 compilerTag
 compopt
@@ -945,6 +946,7 @@ xrdb
 xtrace
 zA
 zipball
+zle
 zlogin
 zsh
 zshcompletiondir
