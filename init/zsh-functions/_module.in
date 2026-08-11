@@ -349,7 +349,6 @@ _module() {
             (is-avail)
                _arguments \
                   '(-i --icase)'{-i,--icase}'[Case insensitive match]' \
-                  '(-a --all)'{-a,--all}'[Include hidden modules in search]' \
                   "*::modulefile:{_module_avail_mods $cur}" && ret=0
                ;;
             (whatis)

@@ -2049,8 +2049,7 @@ Listing / Searching commands:
                                     Scan all modulepaths and list all or
                                     matching available modules
   is-loaded  [-i] [modulefile ...]  Test if any of the modulefile(s) are loaded
-  is-avail   [-a] [-i] modulefile [...]
-                                    Is any of the modulefile(s) available
+  is-avail   [-i] modulefile [...]  Is any of the modulefile(s) available
   info-loaded   [-i] modulefile     Get full name of matching loaded module(s)
 
 Collection of modules handling commands:
