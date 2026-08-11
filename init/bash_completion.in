@@ -85,10 +85,12 @@ _module() {
     list)  COMPREPLY=( $(compgen -W "@comp_list_opts@" -- "$cur") );;
     savelist)  COMPREPLY=( $(compgen -W "@comp_savelist_opts@" -- "$cur") );;
     stashlist)  COMPREPLY=( $(compgen -W "@comp_stashlist_opts@" -- "$cur") );;
-    stashpop|stashshow|stashrm)
+    stashpop)  COMPREPLY=( $(compgen -W "@comp_stashpop_opts@ $(_module_stashlist)" -- "$cur") );;
+    stashshow|stashrm)
                     COMPREPLY=( $(compgen -W "$(_module_stashlist)" -- "$cur") );;
     clear)  COMPREPLY=( $(compgen -W "@comp_clear_opts@" -- "$cur") );;
-    restore|save|saveshow|describe|saverm|disable|is-saved)
+    restore)  COMPREPLY=( $(compgen -W "@comp_restore_opts@ $(_module_savelist)" -- "$cur") );;
+    save|saveshow|describe|saverm|disable|is-saved)
                     COMPREPLY=( $(compgen -W "$(_module_savelist)" -- "$cur") );;
     rm|delete|remove|unload)
                     COMPREPLY=( $(compgen -W "@comp_unload_opts@ ${LOADEDMODULES//:/ }" -- "$cur") );;
@@ -112,7 +114,11 @@ _module() {
     apropos|keyword|search)
                     COMPREPLY=( $(compgen -W "@comp_search_opts@" -- "$cur") );;
     config|--reset) COMPREPLY=( $(compgen -W "@comp_config_opts@" -- "$cur") );;
-    -h|--help|-V|--version|--dumpname|purge|refresh|reload|sh-to-mod|source|state|reset|stash|stashclear|cacheclear|update)
+    purge)  COMPREPLY=( $(compgen -W "@comp_purge_opts@" -- "$cur") );;
+    reload|update)  COMPREPLY=( $(compgen -W "@comp_reload_opts@" -- "$cur") );;
+    reset)  COMPREPLY=( $(compgen -W "@comp_reset_opts@" -- "$cur") );;
+    stash)  COMPREPLY=( $(compgen -W "@comp_stash_opts@" -- "$cur") );;
+    -h|--help|-V|--version|--dumpname|refresh|sh-to-mod|source|state|stashclear|cacheclear)
                     ;;
     append-path|prepend-path)
                     COMPREPLY=( $(compgen -W "@comp_path_opts@" -- "$cur") );;
@@ -151,10 +157,12 @@ if type -t ml >/dev/null; then
         list)  COMPREPLY=( $(compgen -W "@comp_list_opts@" -- "$cur") );;
         savelist)  COMPREPLY=( $(compgen -W "@comp_savelist_opts@" -- "$cur") );;
         stashlist)  COMPREPLY=( $(compgen -W "@comp_stashlist_opts@" -- "$cur") );;
-        stashpop|stashshow|stashrm)
+        stashpop)  COMPREPLY=( $(compgen -W "@comp_stashpop_opts@ $(_module_stashlist)" -- "$cur") );;
+        stashshow|stashrm)
                     COMPREPLY=( $(compgen -W "$(_module_stashlist)" -- "$cur") );;
         clear)  COMPREPLY=( $(compgen -W "@comp_clear_opts@" -- "$cur") );;
-        restore|save|saveshow|describe|saverm|disable|is-saved)
+        restore)  COMPREPLY=( $(compgen -W "@comp_restore_opts@ $(_module_savelist)" -- "$cur") );;
+        save|saveshow|describe|saverm|disable|is-saved)
                         COMPREPLY=( $(compgen -W "$(_module_savelist)" -- "$cur") );;
         rm|delete|remove|unload)
                         COMPREPLY=( $(compgen -W "@comp_unload_opts@ ${LOADEDMODULES//:/ }" -- "$cur") );;
@@ -178,7 +186,11 @@ if type -t ml >/dev/null; then
         apropos|keyword|search)
                         COMPREPLY=( $(compgen -W "@comp_search_opts@" -- "$cur") );;
         config|--reset) COMPREPLY=( $(compgen -W "@comp_config_opts@" -- "$cur") );;
-        -h|--help|-V|--version|--dumpname|purge|refresh|reload|sh-to-mod|source|state|reset|stash|stashclear|cacheclear|update)
+        purge)  COMPREPLY=( $(compgen -W "@comp_purge_opts@" -- "$cur") );;
+        reload|update)  COMPREPLY=( $(compgen -W "@comp_reload_opts@" -- "$cur") );;
+        reset)  COMPREPLY=( $(compgen -W "@comp_reset_opts@" -- "$cur") );;
+        stash)  COMPREPLY=( $(compgen -W "@comp_stash_opts@" -- "$cur") );;
+        -h|--help|-V|--version|--dumpname|refresh|sh-to-mod|state|stashclear|cacheclear)
                         ;;
         append-path|prepend-path)
                         COMPREPLY=( $(compgen -W "@comp_path_opts@" -- "$cur") );;

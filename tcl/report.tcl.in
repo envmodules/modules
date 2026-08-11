@@ -2026,12 +2026,12 @@ Loading / Unloading commands:
                                     Load first available modulefile in list
   rm | remove | delete | unload [-f] [-i] [--auto|--no-auto] modulefile [...]
                                     Remove modulefile(s)
-  purge                             Unload all loaded modulefiles
-  reload | update                   Unload then load all loaded modulefiles
+  purge [-f]                        Unload all loaded modulefiles
+  reload | update [-f]              Unload then load all loaded modulefiles
   switch | swap [-f] [-i] [--auto|--no-auto] [--tag=LIST] [mod1] mod2
                                     Unload mod1 and load mod2
   refresh                           Refresh loaded module volatile components
-  reset                             Restore initial environment
+  reset [-f]                        Restore initial environment
 
 Listing / Searching commands:
   list   [-a] [-t|-l|-j] [-S|-C] [-o LIST] [mod ...]
@@ -2054,14 +2054,14 @@ Listing / Searching commands:
 
 Collection of modules handling commands:
   save            [collection|file] Save current module list to collection
-  restore         [collection|file] Restore module list from collection or file
+  restore  [-f]   [collection|file] Restore module list from collection or file
   saverm | disable     [collection] Remove saved collection
   saveshow | describe   [coll|file] Display information about collection
   savelist  [-a] [-t|-l|-j] [-S|-C] [collection ...]
                                     List all or matching saved collections
   is-saved        [collection ...]  Test if any of the collection(s) exists
-  stash                             Save current environment and reset
-  stashpop        [stash]           Restore then remove stash collection
+  stash [-f]                        Save current environment and reset
+  stashpop [-f]   [stash]           Restore then remove stash collection
   stashrm         [stash]           Remove stash collection
   stashshow       [stash]           Display information about stash collection
   stashclear                        Remove all stash collections

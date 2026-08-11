@@ -136,6 +136,12 @@ comp_use_opts := -a --append -p --prepend
 comp_isavail_opts := -i --icase
 comp_lint_opts := -a -i --all --icase
 comp_modtosh_opts := --auto --no-auto --force -f --icase -i
+comp_purge_opts := --force -f
+comp_reload_opts := --force -f
+comp_reset_opts := --force -f
+comp_restore_opts := --force -f
+comp_stash_opts := --force -f
+comp_stashpop_opts := --force -f
 comp_path_opts := -d --delim --duplicates
 comp_rm_path_opts := -d --delim --index
 comp_config_opts := --dump-state --reset abort_on_error advanced_version_spec auto_handling avail_indepth avail_output avail_terse_output cache_buffer_bytes cache_expiry_secs collection_pin_version collection_pin_tag collection_target color colors conflict_unload contact csh_limit domainname editor extended_default extra_siteconfig hide_auto_loaded home icase ignore_cache ignore_user_rc ignored_dirs implicit_default implicit_requirement init_envvars info_extension linked_envvars list_output list_terse_output locked_configs logged_events logger mcookie_check mcookie_version_check ml nearly_forbidden_days non_exportable_tags pager paginate path_entry_reorder protected_envvars quarantine_support rcfile redirect_output require_via reset_target_state run_quarantine search_match set_shell_startup shells_with_ksh_fpath silent_shell_debug siteconfig source_cache spider_indepth spider_output spider_terse_output sticky_purge tag_abbrev tag_color_name tcl_ext_lib tcl_linter term_background term_width unique_name_loaded unload_match_order variant_shortcut verbosity wa_277
@@ -168,6 +174,12 @@ sed -e 's|@prefix@|$(prefix)|g' \
 	-e 's|@comp_isavail_opts@|$(comp_isavail_opts)|g' \
 	-e 's|@comp_lint_opts@|$(comp_lint_opts)|g' \
 	-e 's|@comp_modtosh_opts@|$(comp_modtosh_opts)|g' \
+	-e 's|@comp_purge_opts@|$(comp_purge_opts)|g' \
+	-e 's|@comp_reload_opts@|$(comp_reload_opts)|g' \
+	-e 's|@comp_reset_opts@|$(comp_reset_opts)|g' \
+	-e 's|@comp_restore_opts@|$(comp_restore_opts)|g' \
+	-e 's|@comp_stash_opts@|$(comp_stash_opts)|g' \
+	-e 's|@comp_stashpop_opts@|$(comp_stashpop_opts)|g' \
 	-e 's|@comp_path_opts@|$(comp_path_opts)|g' \
 	-e 's|@comp_rm_path_opts@|$(comp_rm_path_opts)|g' \
 	-e 's|@comp_config_opts@|$(comp_config_opts)|g' \
