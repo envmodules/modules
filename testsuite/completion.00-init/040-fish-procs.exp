@@ -1,0 +1,331 @@
+##############################################################################
+#   Modules Revision 3.0
+#   Providing a flexible user environment
+#
+#   File:		completion.00-init/%M%
+#   Revision:		%I%
+#   First Edition:	2026/08/11
+#   Last Mod.:		%U%, %G%
+#
+#   Authors:		Xavier Delaruelle, xavier.delaruelle@cea.fr
+#
+#   Description:	Test procedures
+#   Command:
+#   Sub-Command:
+#
+#   Comment:	%C{
+#			Defines the test procedures driving a real fish shell in
+#			a pty to exercise the module Tab completion script
+#			exactly as a user pressing Tab would, then collect the
+#			resulting candidate word list. This mirrors
+#			020-bash-procs.exp's completion_bash_{start,raw,list,
+#			close} set (see that file's header for why each shell
+#			gets its own), but fish's line editor differs from both
+#			readline and zle in ways that shape almost every proc
+#			below:
+#			 - on startup, a modern fish queries the terminal for
+#			   its capabilities (primary device attributes,
+#			   background color, cursor position, kitty keyboard
+#			   protocol support, ...) and blocks waiting for a
+#			   reply -- for the primary device attributes query,
+#			   for up to 10 real seconds before giving up. A pty
+#			   driven by Expect never answers these, so every proc
+#			   that reads from the fish session folds in a
+#			   'completion_fish_query_responder' branch that
+#			   answers each such query the instant it appears (a
+#			   real terminal emulator would do the same), and fish
+#			   re-issues at least the cursor-position query on
+#			   every single prompt redraw, not just once at startup
+#			 - a single Tab is fish's equivalent of bash/zsh's
+#			   double-Tab: it both extends the typed word to the
+#			   longest common prefix (if any) *and* shows the full
+#			   candidate pager below the cmdline in the same
+#			   keypress, collapsing it back via one '\x1b[A'
+#			   (cursor-up) escape sequence per pager row once done
+#			   -- unlike zsh's own double-Tab, it does not also
+#			   auto-select/insert the first candidate when there is
+#			   no further common prefix to extend into; the typed
+#			   word is left exactly as-is, same as bash
+#			 - fish echoes a command line back keystroke-by-keystroke
+#			   (here: word-by-word, since this file sends a whole
+#			   cmdline in one 'send') as it is typed, each echo
+#			   wrapped in its own cursor-positioning escape
+#			   sequences, rather than readline/zle's single redraw
+#			   once done; the *only* reliable way to recover the
+#			   final, settled state of the line is to take the
+#			   *last* place in the raw output where the typed
+#			   cmdline text appears, not the first -- earlier
+#			   occurrences are just intermediate echo frames
+#			 - candidate names fish shows with a '--description'
+#			   (eg every sub-command name, every option flag) get
+#			   rendered by the pager as "name  (description text)",
+#			   several such pairs packed per row -- the
+#			   parenthesized part must be stripped before the
+#			   listing can be split into plain candidate words, and
+#			   since a description can itself legitimately contain
+#			   one level of parentheses (eg "(Load modulefile(s))"),
+#			   a plain 'no parenthesis inside' pattern is not
+#			   enough
+#		}C%
+#
+##############################################################################
+
+# terminal-capability queries fish issues that this pty never gets asked by
+# a real terminal to answer on its own -- reply to each the instant it
+# appears, exactly as a real terminal emulator would, so fish never blocks
+# waiting on one. Folded into every 'expect' below that reads from the fish
+# session via 'exp_continue', since fish re-issues at least the cursor
+# position query on every single prompt redraw, not just once at startup
+proc completion_fish_query_responder {} {
+   return {
+      -re {\x1b\[6n} { send -- "\x1b\[1;1R"; exp_continue }
+      -re {\x1b\[0c} { send -- "\x1b\[?1;2c"; exp_continue }
+      -re {\x1b\]11;\?} { send -- "\x1b]11;rgb:0000/0000/0000\x1b\\"; exp_continue }
+      -re {\x1b\[\?u} { send -- "\x1b\[?0u"; exp_continue }
+   }
+}
+
+# marker fish emits once a prompt has finished (re)drawing and is ready to
+# accept input -- the OSC 133 "prompt end" marker, followed by a clear-to-
+# end-of-line and a cursor-forward repositioning; appears after every fresh
+# prompt, whether the still-default one (early in completion_fish_start,
+# before the custom prompt below is installed) or the custom one, so it is
+# used throughout as the one 'ready' signal to wait on
+set completion_fish_promptready {\x1b\]133;B(\x07|\x1b\\)\x1b\[K\r\x1b\[[0-9]*C}
+
+# wait for the fish session to reach a freshly drawn, ready prompt,
+# answering any terminal-capability query fish asks along the way
+proc completion_fish_wait_ready {{tout 10}} {
+   global completion_fish_spawn_id completion_fish_promptready
+
+   set spawn_id $completion_fish_spawn_id
+   set old_timeout $::timeout
+   set ::timeout $tout
+   set ok 1
+   expect {*}[completion_fish_query_responder] -re $completion_fish_promptready {} \
+      timeout { set ok 0 }
+   set ::timeout $old_timeout
+   return $ok
+}
+
+# start a fresh fish session with the completion script under test sourced;
+# 'TERM' is set to a capable value (rather than 'dumb', which silences the
+# terminal-capability queries but also disables the candidate pager this
+# file's checks rely on) and every such query is answered as soon as it is
+# asked (see completion_fish_query_responder), so startup never hits fish's
+# up-to-10-second wait for a reply that would otherwise never come
+proc completion_fish_start {} {
+   global fishbin fishcompletion completion_prompt completion_fish_spawn_id
+   global TCLSH MODULECMD verbose
+
+   if {$verbose > 1} {
+      send_user "\tStarting fish for completion test\n"
+   }
+
+   spawn env TERM=xterm-256color $fishbin --no-config
+   set completion_fish_spawn_id $spawn_id
+
+   # a narrow (default 80-column) pty can make a long completed line wrap,
+   # which makes fish redraw it with extra escape sequences that can be
+   # mistaken for stray inserted characters (e.g. a trailing space) by
+   # anything matching on raw output; go wide enough that no cmdline used
+   # in these tests is ever at risk of wrapping
+   stty rows 40 columns 500 < $spawn_out(slave,name)
+
+   if {![completion_fish_wait_ready 10]} {
+      unresolved {completion fish did not start}
+      return
+   }
+
+   # every setup command after this point goes through completion_fish_raw
+   completion_fish_raw {set -g fish_greeting ''}
+   completion_fish_raw "function fish_prompt; echo -n '$completion_prompt'; end"
+   # a real 'module' command is needed since the completion script shells
+   # out to it (module avail/spider) to list candidate module names
+   completion_fish_raw "source '$fishcompletion'"
+   completion_fish_raw "'$TCLSH' '$MODULECMD' fish autoinit | source -"
+
+   # neutralize any *other* 'module' completion fish can reach on this
+   # machine (eg from a system package -- 'environment-modules' on Fedora
+   # installs its own, older completions/module.fish into fish's vendor
+   # completions directory, a fixed location outside this testsuite's
+   # control that plain sandboxing -- '--no-config', a scratch $HOME --
+   # cannot hide from fish). Once 'module' resolves to a real command (the
+   # autoinit call just above defines it as a fish function), fish
+   # autoloads a same-named completions/module.fish -- if one exists
+   # anywhere on its search path -- the first time completion is attempted
+   # for it, regardless of the manual registrations from the 'source'
+   # above, potentially clobbering them with whatever that other version
+   # defines instead (observed: an older release's renamed sub-command,
+   # 'del' for today's 'delete', showing up alongside/instead of the
+   # built one under test). This autoload only ever happens once per
+   # session, though, so it is deliberately triggered and absorbed right
+   # here with a throwaway completion attempt, its result erased, and the
+   # script under test re-sourced fresh -- every real Tab-completion
+   # attempt later in this session then only ever sees that
+   completion_fish_raw {complete -C'module ' > /dev/null}
+   completion_fish_raw {complete -e -c module}
+   completion_fish_raw "source '$fishcompletion'"
+}
+
+# send a line to the completion fish session and wait for the next ready
+# prompt; used for setup commands whose output is not asserted on
+proc completion_fish_raw {line} {
+   global completion_fish_spawn_id verbose
+
+   set spawn_id $completion_fish_spawn_id
+   send -- "$line\r"
+   if {![completion_fish_wait_ready 8]} {
+      unresolved "completion setup command timed out: $line"
+   }
+   if {$verbose > 1} {
+      send_user "\tcompletion> $line\n"
+   }
+}
+
+# read back everything the fish session produces until it falls quiet for
+# 'idle_ms' (answering any terminal-capability query along the way), and
+# return it all concatenated. A single fixed 'after N; read once' does not
+# scale across every listing this file captures: a small candidate list
+# renders near-instantly, while a wide, tall one (eg every sub-command name
+# plus its description) takes long enough to stream out that a delay sized
+# for the former still catches the latter mid-render, silently truncating
+# it -- so this instead loops reading whatever has arrived, each time
+# resetting the wait, until a whole 'idle_ms' window passes with nothing
+# new; capped by an overall iteration count as a safety net against an
+# unrecognized, endlessly-repeating query this proc does not know how to
+# answer ever leaving it live-locked
+proc completion_fish_read_quiet {{idle_ms 1000}} {
+   global completion_fish_spawn_id
+
+   set spawn_id $completion_fish_spawn_id
+   set old_timeout $::timeout
+   set ::timeout [expr {$idle_ms / 1000.0}]
+   set buf {}
+   set iterations 0
+   while {[incr iterations] <= 200} {
+      expect {*}[completion_fish_query_responder] \
+         -re {(?s).+} { append buf $expect_out(buffer) } \
+         timeout { break }
+   }
+   set ::timeout $old_timeout
+   return $buf
+}
+
+# send a partial command line followed by a single Tab (fish's own
+# equivalent of bash/zsh's double-Tab, see this file's header), let any
+# subprocess-backed candidate generation (eg 'module avail') finish
+# rendering, read back everything fish produced in response, and finally
+# clear the line so the session is ready to reuse
+proc completion_fish_capture {cmdline} {
+   global completion_fish_spawn_id completion_last_cmdline verbose
+
+   set completion_last_cmdline $cmdline
+   set spawn_id $completion_fish_spawn_id
+
+   send -- $cmdline
+   send -- "\t"
+   set buf [completion_fish_read_quiet]
+   if {$verbose > 1} {
+      send_user "\tcompletion raw output for '$cmdline': [string map {\x1b ESC} $buf]\n"
+   }
+
+   # clear the (uncompleted or already-completed) input line so the
+   # session is ready to reuse
+   send -- "\x15\r"
+   completion_fish_wait_ready 5
+
+   return $buf
+}
+
+# strip every '(...)' description fish's pager prints next to a candidate
+# declared with '--description' (eg sub-command names, option flags); a
+# description can itself carry one level of nested parentheses (eg
+# "(Load modulefile(s))"), so a plain 'no paren inside' pattern is not
+# enough -- this handles exactly one level, which covers every description
+# in the completion script under test
+proc completion_fish_strip_descriptions {text} {
+   return [regsub -all {\((?:[^()]|\([^()]*\))*\)} $text {}]
+}
+
+# locate, in a completion_fish_capture buffer, the *last* place the typed
+# cmdline text appears followed by plain (non-escape, non-CR) characters --
+# fish echoes the cmdline back piecemeal as it is typed (see this file's
+# header), so only the last such occurrence reflects the final, settled
+# state of the line; a bare '\r' is excluded from that run too, since fish
+# emits one right after the settled text to return the cursor to column 0
+# before repositioning it with a following cursor-forward escape -- left
+# in, it would be mistaken for part of the inserted suffix itself. Returns
+# the run of characters right after the last occurrence (empty if the
+# cmdline never appears followed by anything, ie nothing was inserted)
+proc completion_fish_extract_suffix {buf cmdline} {
+   set recmdline [completion_re_escape $cmdline]
+   set matches [regexp -all -inline -- "${recmdline}(\[^\x1b\r\]*)" $buf]
+   if {[llength $matches] == 0} {
+      return {}
+   }
+   return [lindex $matches end]
+}
+
+# send a partial command line followed by a single Tab, and return the
+# sorted, de-duplicated list of candidate words fish's pager displayed. A
+# listing is preceded by a real newline (fish moves to a fresh line to
+# print the pager below the cmdline) and collapsed back via one '\x1b[A'
+# (cursor-up) escape per pager row right after; a cmdline whose candidate
+# set has only one member never shows this -- Tab completes it inline
+# instead, exactly like completion_fish_inline -- so that case is detected
+# by the absence of this marker and handled by reconstructing the single
+# candidate from the inline insertion instead, the same way
+# completion_zsh_list's own single-candidate fallback does
+proc completion_fish_list {cmdline} {
+   set buf [completion_fish_capture $cmdline]
+
+   if {[regexp {(?s)\n(.*?)(?:\x1b\[A)+} $buf -> listing]} {
+      set listing [completion_fish_strip_descriptions $listing]
+      set words {}
+      foreach word [split $listing] {
+         if {$word ne {}} {
+            lappend words $word
+         }
+      }
+      return [lsort -unique $words]
+   }
+
+   set suffix [string trim [completion_fish_extract_suffix $buf $cmdline]]
+   if {$suffix eq {}} {
+      return {}
+   }
+   return [lsort -unique [split $suffix]]
+}
+
+# send a partial command line followed by a single Tab, and return the text
+# fish inserted inline -- the empty string if nothing at all could be
+# completed (fish gives no equivalent of readline/zle's audible bell over a
+# plain pty for this case, so unlike completion_bash_inline/
+# completion_zsh_inline there is no "\a" to check for here). Used to check
+# unique, unambiguous completions -- eg that a directory-style entry gets
+# completed with a trailing '/' and no trailing space. cmdline must be a
+# prefix with exactly one match, or with a common prefix short enough that
+# no further Tab is needed to reach it, otherwise the single Tab may extend
+# by less than a full match (leaving the ambiguous set to still be shown by
+# the pager, harmless here since only the text right after the cmdline is
+# read back, not whether a listing also appeared)
+proc completion_fish_inline {cmdline} {
+   set buf [completion_fish_capture $cmdline]
+   return [completion_fish_extract_suffix $buf $cmdline]
+}
+
+proc completion_fish_close {} {
+   global completion_fish_spawn_id
+
+   if {[info exists completion_fish_spawn_id]} {
+      set spawn_id $completion_fish_spawn_id
+      catch {send -- "exit\r"}
+      catch {expect eof}
+      catch {close -i $completion_fish_spawn_id}
+      catch {wait -i $completion_fish_spawn_id}
+      unset completion_fish_spawn_id
+   }
+}
+
+# vim:set tabstop=3 shiftwidth=3 expandtab autoindent:

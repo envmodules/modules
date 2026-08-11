@@ -65,6 +65,18 @@ if {![file exists $zshcompletion]} {
    unsupported "completion script not found: $zshcompletion (run 'make initdir' first)"
 }
 
+# a fish binary is required to drive interactive completion tests
+set fishbin [find_bin fish]
+if {$fishbin eq {}} {
+   unsupported {no fish binary found to drive completion tests}
+}
+
+# built fish completion script under test
+set fishcompletion "$env(OBJDIR)/init/fish_completion"
+if {![file exists $fishcompletion]} {
+   unsupported "completion script not found: $fishcompletion (run 'make initdir' first)"
+}
+
 # clean modulefile fixture tree: unlike testsuite/modulefiles, this one holds
 # no modulefile deliberately broken to exercise error paths, which would get
 # in the way of straightforward completion listing checks
