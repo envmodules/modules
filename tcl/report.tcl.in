@@ -2090,7 +2090,8 @@ Other commands:
   path       [-i] modulefile        Print modulefile path
   paths      [-i] modulefile        Print path of matching available modules
   clear           [-f]              Reset Modules-specific runtime information
-  source          scriptfile [...]  Execute scriptfile(s)
+  source [--auto|--no-auto] [-f] scriptfile [...]
+                                    Execute scriptfile(s)
   config [--dump-state|name [val]|--reset name]
                                     Display or set Modules configuration
   state           [name]            Display Modules state

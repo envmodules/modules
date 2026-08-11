@@ -427,6 +427,13 @@ _module() {
                   '(-i --icase)'{-i,--icase}'[Case insensitive match]' \
                   "*::modulefile:{_module_notloaded_mods $cur}" && ret=0
                ;;
+            (source)
+               _arguments \
+                  '--auto[Enable automated module handling mode]' \
+                  '--no-auto[Disable automated module handling mode]' \
+                  '(-f --force)'{-f,--force}'[By-pass dependency consistency]' \
+                  '*:scriptfile:_files' && ret=0
+               ;;
          esac
          ;;
    esac
