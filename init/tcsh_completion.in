@@ -33,7 +33,7 @@ alias _module_not_yet_loaded '\\
 alias _module_modulepath 'echo ${MODULEPATH} | sed '"'"'s/:/\n/g;'"'"' '
 
 complete module 'C,/*,f,' 'C,.*,f,' 'C,~/*,f,' \
-        'n/help/`_module_avail`/' \
+        'n/help/`_module_avail; echo "@comp_mfile_opts@"`/' \
         'n/add/`_module_not_yet_loaded; echo "@comp_load_opts@"`/' \
         'n/load/`_module_not_yet_loaded; echo "@comp_load_opts@"`/' \
         'n/add-any/`_module_not_yet_loaded; echo "@comp_load_opts@"`/' \
