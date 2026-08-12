@@ -263,13 +263,34 @@ proc completion_zsh_list {cmdline} {
    set have_epilogue [expr {$nl != -1\
       && [regexp -indices -start $nl -- $epilogue $buffer epi_range]}]
 
+   # the escape sequences that epilogue matches are only emitted when the
+   # pty has standout/underline capability in the first place -- on a pty
+   # with none (eg observed on GitHub Actions' own runners), the exact same
+   # auto-menu-selected redraw happens with no escape sequences around it
+   # at all, just a bare bell plus plain erase-and-reprint. Since that
+   # redraw always re-echoes the prompt immediately followed by $cmdline
+   # verbatim (eg 'module -' becoming 'MODULESTEST> module --color=',
+   # 'module ' becoming "MODULESTEST> module \x07aliases"), that pair
+   # reappearing anywhere after the listing starts is a reliable,
+   # escape-sequence-independent fallback signal for the exact same
+   # end-of-listing boundary -- matching on the prompt too, not just
+   # $cmdline alone, keeps this from cutting the listing short if some
+   # candidate or description text happens to itself contain $cmdline as a
+   # substring (eg $cmdline "module " inside a "-- ... module list ..."
+   # description)
+   set reecho [string first "$completion_prompt$cmdline" $buffer\
+      [expr {$nl + 1}]]
+
    if {$have_epilogue} {
       lassign $epi_range epi_start epi_end
       set listing [string range $buffer $nl+1 $epi_start-1]
+   } elseif {$nl != -1 && $reecho != -1} {
+      set listing [string range $buffer $nl+1 $reecho-1]
    } elseif {$nl != -1 && [string first "\n" $buffer $nl+1] != -1} {
-      # no epilogue, but more than one line of content followed the echo:
-      # a scrolled, too-tall-for-the-pty listing (see above) rather than a
-      # single-candidate insertion, which never spans more than one line
+      # no epilogue and no cmdline re-echo either, but more than one line
+      # of content followed the echo: a scrolled, too-tall-for-the-pty
+      # listing (see above) rather than a single-candidate insertion,
+      # which never spans more than one line
       set listing [string range $buffer $nl+1 end]
    } else {
       # neither: the second Tab found a single, already-unique candidate
