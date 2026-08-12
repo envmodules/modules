@@ -192,9 +192,10 @@ Modules 5.7.0 (not yet released)
 * Doc: add :ref:`sync-remote-appdir` cookbook recipe.
 * Testsuite: add *completion* testsuite to validate shell Tab completion of
   this project. This testsuite can be invoked with ``make testcompletion`` or
-  ``script/mt comp``. It drives a real bash, zsh or fish session through
-  `Expect <http://expect.sourceforge.net/>`_ to press the Tab key against the
-  built shell completion script and check the resulting candidate list.
+  ``script/mt comp``. It drives a real bash, zsh, fish or tcsh session
+  through `Expect <http://expect.sourceforge.net/>`_ to press the Tab key
+  against the built shell completion script and check the resulting
+  candidate list.
 * Init: fix numerous inconsistencies between ``module help``'s usage message
   and the option flags and positional arguments each sub-command actually
   accepts, and between that usage message and what bash, fish, tcsh and zsh
