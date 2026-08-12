@@ -1,0 +1,33 @@
+##############################################################################
+#   Modules Revision 3.0
+#   Providing a flexible user environment
+#
+#   File:		completion.00-init/%M%
+#   Revision:		%I%
+#   First Edition:	2026/08/13
+#   Last Mod.:		%U%, %G%
+#
+#   Authors:		Xavier Delaruelle, xavier.delaruelle@cea.fr
+#
+#   Description:	Testuite testsequence
+#   Command:
+#   Sub-Command:
+#
+#   Comment:	%C{
+#			Cleans out after end of all completion tests
+#		}C%
+#
+##############################################################################
+
+# remove the sandboxed $HOME created once for the whole completion series
+# (see 005-init_ts.exp/010-environ.exp) -- every completion_<shell>_start
+# session keeps using it as $HOME right up through the last test file, so
+# it can only be deleted here, once nothing in the series needs it anymore.
+# This also removes the tcsh completion script rewritten for testing under
+# it (see 005-init_ts.exp's comment on 'tcshcompletion')
+if {$verbose} {
+   send_user "\tDeleting $completionhome\n"
+}
+file delete -force $completionhome
+
+# vim:set tabstop=3 shiftwidth=3 expandtab autoindent:
