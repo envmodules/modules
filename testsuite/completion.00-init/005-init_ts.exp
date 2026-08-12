@@ -77,6 +77,18 @@ if {![file exists $fishcompletion]} {
    unsupported "completion script not found: $fishcompletion (run 'make initdir' first)"
 }
 
+# a tcsh binary is required to drive interactive completion tests
+set tcshbin [find_bin tcsh]
+if {$tcshbin eq {}} {
+   unsupported {no tcsh binary found to drive completion tests}
+}
+
+# built tcsh completion script under test
+set tcshcompletion_src "$env(OBJDIR)/init/tcsh_completion"
+if {![file exists $tcshcompletion_src]} {
+   unsupported "completion script not found: $tcshcompletion_src (run 'make initdir' first)"
+}
+
 # clean modulefile fixture tree: unlike testsuite/modulefiles, this one holds
 # no modulefile deliberately broken to exercise error paths, which would get
 # in the way of straightforward completion listing checks
@@ -88,5 +100,25 @@ set modpath "$env(TESTSUITEDIR)/modulefiles.3"
 set completionhome "$env(TESTSUITEDIR)/completion-home"
 file delete -force $completionhome
 file mkdir $completionhome
+
+# unlike the other shells' completion scripts, init/tcsh_completion.in does
+# not shell out to the 'module' command itself to fetch candidates: it bakes
+# an absolute '@TCLSH@ "@libexecdir@/modulecmd.tcl"' invocation into every
+# alias (_module_avail, _module_loaded, ...) at './configure' time, pointing
+# at whatever install prefix this tree happened to be configured with --
+# unrelated to (and, in a plain dev checkout, nonexistent relative to) the
+# $TCLSH/$MODULECMD this testsuite actually runs against. Rewrite just that
+# hardcoded interpreter invocation to route through the test's own
+# $TCLSH/$MODULECMD instead, leaving the real 'complete module ...'/
+# 'complete ml ...' registration under test completely untouched
+set tcshcompletion "$completionhome/tcsh_completion"
+set in [open $tcshcompletion_src r]
+set tcshcompletion_content [read $in]
+close $in
+set tcshcompletion_content [regsub -all {[^ \t\n]*tclsh "[^"]*modulecmd\.tcl"}\
+   $tcshcompletion_content "'$TCLSH' '$MODULECMD'"]
+set out [open $tcshcompletion w]
+puts -nonewline $out $tcshcompletion_content
+close $out
 
 # vim:set tabstop=3 shiftwidth=3 expandtab autoindent:
