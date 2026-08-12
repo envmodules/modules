@@ -1,0 +1,262 @@
+##############################################################################
+#   Modules Revision 3.0
+#   Providing a flexible user environment
+#
+#   File:		completion.00-init/%M%
+#   Revision:		%I%
+#   First Edition:	2026/08/12
+#   Last Mod.:		%U%, %G%
+#
+#   Authors:		Xavier Delaruelle, xavier.delaruelle@cea.fr
+#
+#   Description:	Test procedures
+#   Command:
+#   Sub-Command:
+#
+#   Comment:	%C{
+#			Defines the test procedures driving a real tcsh pty to
+#			exercise the module Tab completion script exactly as a
+#			user pressing Tab would, then collect the resulting
+#			candidate word list. This mirrors 020-bash-procs.exp's
+#			completion_bash_{start,raw,list,close} set (see that
+#			file's header for why each shell gets its own), but
+#			tcsh's own line editor differs from readline/zle/fish's
+#			line editor in ways that shape almost every proc below:
+#			 - Tab (bound to 'complete-word') only ever extends the
+#			   typed word to the longest common prefix it can
+#			   determine, ringing the bell whenever the result is
+#			   still ambiguous -- even when it did insert further
+#			   characters, unlike bash (which stays silent once it
+#			   reaches a directory-style '/' boundary) but like
+#			   bash otherwise (eg still ambiguous after inserting
+#			   as much of a common prefix as it can)
+#			 - listing every ambiguous match is not a second Tab
+#			   away (pressing Tab again once nothing more can be
+#			   inserted just rings the bell again): it is bound to
+#			   a separate key, Ctrl-D ('delete-char-or-list-or-eof',
+#			   which lists instead of deleting when the cursor is
+#			   at the end of a non-empty line). Unlike Tab, Ctrl-D
+#			   never edits the line -- it always lists every
+#			   candidate matching the word exactly as currently
+#			   typed, be there one or many -- so, unlike bash/zsh/
+#			   fish's double/single-Tab convention,
+#			   completion_tcsh_list below sends no Tab at all, only
+#			   Ctrl-D: sending one first would risk its own
+#			   common-prefix auto-extension silently eating part of
+#			   the ambiguity a test cmdline is relying on, the same
+#			   trap bash/zsh/fish's own header comments have to
+#			   route around by choosing cmdline prefixes carefully
+#			   -- Ctrl-D alone sidesteps it entirely, and also means
+#			   this file needs no bash/zsh-style workaround for
+#			   'module config -<Tab>' silently auto-extending to
+#			   '--' before a listing can be requested. When the
+#			   typed word matches zero candidates, Ctrl-D prints
+#			   nothing at all -- not even a bell -- so
+#			   completion_tcsh_list matches that case separately
+#			   and returns an empty list, rather than the listing
+#			   block every other outcome produces
+#			 - every submitted command line (a real Enter, not a
+#			   Tab/Ctrl-D) echoes back followed by a doubled '\r'
+#			   before the '\n', rather than a plain '\r\n' -- folded
+#			   into every regexp below that waits on one
+#			 - killing the (uncompleted or already-completed) input
+#			   line with Ctrl-U redraws via a cursor-column-position
+#			   plus clear-to-end-of-line escape sequence, rather
+#			   than reprinting the prompt text the way bash's
+#			   readline does -- so, like zsh, this file submits the
+#			   now-empty line afterwards to force a real newline and
+#			   a fresh, reliably matchable prompt
+#			 - init/tcsh_completion.in does not shell out to the
+#			   'module' command itself the way bash/zsh do to fetch
+#			   candidates: its own aliases (_module_avail,
+#			   _module_loaded, ...) invoke modulecmd.tcl directly,
+#			   through an absolute interpreter path baked in at
+#			   './configure' time -- see 005-init_ts.exp's comment
+#			   on 'tcshcompletion' for how that one hardcoded
+#			   invocation gets rewritten to route through this
+#			   testsuite's own $TCLSH/$MODULECMD before
+#			   completion_tcsh_start ever sources it below
+#		}C%
+#
+##############################################################################
+
+# start a fresh tcsh session with the completion script under test sourced
+# and 'module'/'ml' completion registered, ready to accept commands
+proc completion_tcsh_start {} {
+   global tcshbin tcshcompletion completion_prompt completion_tcsh_spawn_id
+   global TCLSH MODULECMD verbose
+
+   if {$verbose > 1} {
+      send_user "\tStarting tcsh for completion test\n"
+   }
+
+   spawn $tcshbin -f
+   set completion_tcsh_spawn_id $spawn_id
+
+   # a listing as wide as the biggest fixture (eg bare 'module avail',
+   # hundreds of module names) easily exceeds Expect's default 'match_max'
+   # (2000 bytes), which silently drops the oldest bytes of the read buffer
+   # once it fills before a pattern matches -- raise it well past the
+   # largest listing this file can produce
+   match_max -i $completion_tcsh_spawn_id 200000
+
+   # a narrow (default 80-column) pty can make a long completed line wrap,
+   # which makes tcsh redraw it with extra escape sequences that can be
+   # mistaken for stray inserted characters (e.g. a trailing space) by
+   # anything matching on raw output; go wide enough that no cmdline used
+   # in these tests is ever at risk of wrapping
+   stty rows 40 columns 500 < $spawn_out(slave,name)
+
+   set spawn_id $completion_tcsh_spawn_id
+   expect {
+      -re {[>%#] $} {}
+      timeout { unresolved {completion tcsh did not start}; return }
+   }
+
+   # switch to a known, distinctive prompt first (matched with the default
+   # shell prompt pattern, since completion_tcsh_raw's own matching only
+   # works once this prompt is in effect); every setup command after this
+   # point goes through completion_tcsh_raw
+   send -- "set prompt='$completion_prompt'\r"
+   expect {
+      -re "$completion_prompt\$" {}
+      timeout { unresolved {completion tcsh prompt setup timed out}; return }
+   }
+
+   # a real 'module' command is needed since the completion script's own
+   # aliases shell out to modulecmd.tcl (see this file's header) to list
+   # candidate module names
+   completion_tcsh_raw "eval \"\`'$TCLSH' '$MODULECMD' tcsh autoinit\`\""
+   completion_tcsh_raw "source '$tcshcompletion'"
+}
+
+# send a line to the completion tcsh session and wait for the next prompt;
+# used for setup commands whose output is not asserted on
+proc completion_tcsh_raw {line} {
+   global completion_tcsh_spawn_id completion_prompt verbose
+
+   set spawn_id $completion_tcsh_spawn_id
+   send -- "$line\r"
+   expect {
+      -re "\r+\n$completion_prompt\$" {}
+      timeout { unresolved "completion setup command timed out: $line" }
+   }
+   if {$verbose > 1} {
+      send_user "\tcompletion> $line\n"
+   }
+}
+
+# send a partial command line followed by Ctrl-D (tcsh's 'list-choices'
+# binding, see this file's header), and return the sorted, de-duplicated
+# list of candidate words tcsh displayed
+proc completion_tcsh_list {cmdline} {
+   global completion_tcsh_spawn_id completion_prompt completion_last_cmdline
+   global verbose
+
+   set completion_last_cmdline $cmdline
+   set spawn_id $completion_tcsh_spawn_id
+   set recmdline [completion_re_escape $cmdline]
+   set reprompt [completion_re_escape $completion_prompt]
+
+   send -- "$cmdline"
+   send -- "\x04"
+   # let any subprocess-backed candidate generation (eg 'module avail')
+   # finish rendering before reading it back -- generous, like zsh's own
+   # equivalent wait, since this can shell out to modulecmd.tcl
+   after 1500
+   set candidates {}
+   expect {
+      -re "(?s)\r+\n(.*)\r+\n$reprompt$recmdline\$" {
+         set candidates $expect_out(1,string)
+      }
+      -re "\r+\n$reprompt$recmdline\$" {
+         # zero matching candidates: unlike every other case, Ctrl-D prints
+         # nothing at all here -- no listing line, not even a bell -- so
+         # there is no listing block for the pattern above to capture
+         # between the echoed cmdline and the redrawn prompt
+      }
+      timeout {
+         unresolved "completion listing timed out for '$cmdline'"
+      }
+   }
+   if {$verbose > 1} {
+      send_user "\tcompletion raw listing for '$cmdline':\n$candidates\n"
+   }
+
+   # clear the (untouched -- Ctrl-D never edits the line) input line so the
+   # session is ready to reuse; tcsh's Ctrl-U redraws via a cursor-column-
+   # position plus clear-to-end-of-line escape rather than reprinting the
+   # prompt text (see this file's header), so submit the now-empty line to
+   # force a real newline + fresh prompt we can reliably match on
+   send -- "\x15\r"
+   expect -re "\r+\n$reprompt\$"
+
+   # collapse the multi-column listing into a flat, sorted word list
+   set words {}
+   foreach word [split $candidates] {
+      if {$word ne {}} {
+         lappend words $word
+      }
+   }
+   return [lsort -unique $words]
+}
+
+# send a partial command line followed by a single Tab, and return the text
+# tcsh inserted inline -- a bell ('\a') if the result is still ambiguous
+# (whether or not further characters got inserted alongside it, see this
+# file's header) or nothing at all could be completed, otherwise the extra
+# characters tcsh appended. Used to check unique, unambiguous completions --
+# eg that a directory-style entry gets completed with a trailing '/' and no
+# trailing space. cmdline must be a prefix with exactly one match, or with a
+# common prefix short enough that no further Tab is needed to reach it,
+# otherwise a single Tab may extend by less than a full match
+proc completion_tcsh_inline {cmdline} {
+   global completion_tcsh_spawn_id completion_prompt completion_last_cmdline
+   global verbose
+
+   set completion_last_cmdline $cmdline
+   set spawn_id $completion_tcsh_spawn_id
+   set recmdline [completion_re_escape $cmdline]
+   set reprompt [completion_re_escape $completion_prompt]
+
+   send -- "$cmdline\t"
+   # let every byte tcsh is going to insert land in the pty buffer before
+   # reading it: an 'expect' pattern ending in a lazy '(.*)$' would
+   # otherwise match the instant the plain cmdline echo arrives, racing
+   # ahead of e.g. a trailing space that is still in flight
+   after 300
+   set suffix {}
+   expect {
+      -re "${recmdline}(.*)\$" {
+         set suffix $expect_out(1,string)
+      }
+      timeout {
+         unresolved "completion inline insert timed out for '$cmdline'"
+      }
+   }
+   if {$verbose > 1} {
+      send_user "\tcompletion inline insert for '$cmdline': \[$suffix\]\n"
+   }
+
+   # clear the (possibly completed) input line so the session is ready to
+   # reuse, same technique as completion_tcsh_list
+   send -- "\x15\r"
+   expect -re "\r+\n$reprompt\$"
+
+   return $suffix
+}
+
+proc completion_tcsh_close {} {
+   global completion_tcsh_spawn_id
+
+   if {[info exists completion_tcsh_spawn_id]} {
+      set spawn_id $completion_tcsh_spawn_id
+      catch {send -- "exit\r"}
+      catch {expect eof}
+      catch {close -i $completion_tcsh_spawn_id}
+      catch {wait -i $completion_tcsh_spawn_id}
+      unset completion_tcsh_spawn_id
+   }
+}
+
+# vim:set tabstop=3 shiftwidth=3 expandtab autoindent:
