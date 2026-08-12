@@ -160,10 +160,11 @@ proc completion_tcsh_list {cmdline} {
 
    send -- "$cmdline"
    send -- "\x04"
-   # let any subprocess-backed candidate generation (eg 'module avail')
-   # finish rendering before reading it back -- generous, like zsh's own
-   # equivalent wait, since this can shell out to modulecmd.tcl
-   after 1500
+   # no fixed wait is needed before reading back the result, unlike zsh's
+   # own equivalent proc: tcsh cannot print anything -- not even a partial
+   # listing -- until the whole candidate set (however long that takes to
+   # generate, eg shelling out to modulecmd.tcl) is ready, so the 'expect'
+   # below already blocks for exactly as long as needed on its own
    set candidates {}
    expect {
       -re "(?s)\r+\n(.*)\r+\n$reprompt$recmdline\$" {
