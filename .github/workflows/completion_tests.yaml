@@ -20,7 +20,7 @@ jobs:
       - name: Install system packages
         run: |
           sudo apt-get -y update
-          sudo apt-get install -y expect-dev dejagnu python3-sphinx gzip bash tcl8.6 python3
+          sudo apt-get install -y expect-dev dejagnu python3-sphinx gzip bash zsh fish tcsh tcl8.6 python3
           # libtclenvmodules build requirements
           sudo apt-get install -y gcc autoconf tcl8.6-dev
       - name: Build Modules
