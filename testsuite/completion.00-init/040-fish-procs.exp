@@ -66,6 +66,18 @@
 #			   one level of parentheses (eg "(Load modulefile(s))"),
 #			   a plain 'no parenthesis inside' pattern is not
 #			   enough
+#			 - fish has no equivalent of bash/zsh/tcsh's own
+#			   distinctive custom $PS1-alike prompt to match on and
+#			   wait for: completion_fish_wait_ready instead waits for
+#			   the pty to simply fall quiet after a prompt (re)draw,
+#			   the same idle-quiet technique completion_fish_capture
+#			   uses to read back a completion listing (matching on
+#			   fish's own OSC 133 "prompt end" marker, emitted once a
+#			   prompt has finished drawing on releases that support
+#			   it under the running conditions, was tried first and
+#			   abandoned: fish 3.7, observed on a GitHub Actions
+#			   runner with no recognized terminal-program hint, never
+#			   emits it at all, no matter the prompt content)
 #		}C%
 #
 ##############################################################################
@@ -85,27 +97,24 @@ proc completion_fish_query_responder {} {
    }
 }
 
-# marker fish emits once a prompt has finished (re)drawing and is ready to
-# accept input -- the OSC 133 "prompt end" marker, followed by a clear-to-
-# end-of-line and a cursor-forward repositioning; appears after every fresh
-# prompt, whether the still-default one (early in completion_fish_start,
-# before the custom prompt below is installed) or the custom one, so it is
-# used throughout as the one 'ready' signal to wait on
-set completion_fish_promptready {\x1b\]133;B(\x07|\x1b\\)\x1b\[K\r\x1b\[[0-9]*C}
-
-# wait for the fish session to reach a freshly drawn, ready prompt,
-# answering any terminal-capability query fish asks along the way
-proc completion_fish_wait_ready {{tout 10}} {
-   global completion_fish_spawn_id completion_fish_promptready
+# wait for the fish session to fall quiet after a prompt (re)draw --
+# reusing the exact same idle-quiet technique completion_fish_capture
+# relies on to read back a completion listing (see completion_fish_read_
+# quiet's own header for why a fixed delay does not scale here either). An
+# earlier version of this proc instead matched on the OSC 133 "prompt end"
+# marker fish emits once a prompt has finished drawing, on releases that
+# support it under the running conditions -- but fish 3.7 (observed on a
+# GitHub Actions runner, no recognized terminal-program hint) never emits
+# it at all, no matter the prompt content, so that marker cannot be relied
+# on to even exist. Idle detection needs no such cooperation from fish
+# itself, at the cost of no longer being able to tell "fish is ready" apart
+# from "fish crashed and will never answer" -- a real difference in theory,
+# but nothing downstream of this proc treats them differently either way
+proc completion_fish_wait_ready {} {
+   global completion_fish_spawn_id
 
    set spawn_id $completion_fish_spawn_id
-   set old_timeout $::timeout
-   set ::timeout $tout
-   set ok 1
-   expect {*}[completion_fish_query_responder] -re $completion_fish_promptready {} \
-      timeout { set ok 0 }
-   set ::timeout $old_timeout
-   return $ok
+   completion_fish_read_quiet
 }
 
 # start a fresh fish session with the completion script under test sourced;
@@ -132,10 +141,7 @@ proc completion_fish_start {} {
    # in these tests is ever at risk of wrapping
    stty rows 40 columns 500 < $spawn_out(slave,name)
 
-   if {![completion_fish_wait_ready 10]} {
-      unresolved {completion fish did not start}
-      return
-   }
+   completion_fish_wait_ready
 
    # every setup command after this point goes through completion_fish_raw
    completion_fish_raw {set -g fish_greeting ''}
@@ -175,9 +181,7 @@ proc completion_fish_raw {line} {
 
    set spawn_id $completion_fish_spawn_id
    send -- "$line\r"
-   if {![completion_fish_wait_ready 8]} {
-      unresolved "completion setup command timed out: $line"
-   }
+   completion_fish_wait_ready
    if {$verbose > 1} {
       send_user "\tcompletion> $line\n"
    }
@@ -233,7 +237,7 @@ proc completion_fish_capture {cmdline} {
    # clear the (uncompleted or already-completed) input line so the
    # session is ready to reuse
    send -- "\x15\r"
-   completion_fish_wait_ready 5
+   completion_fish_wait_ready
 
    return $buf
 }
