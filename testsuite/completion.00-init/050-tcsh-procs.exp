@@ -117,9 +117,17 @@ proc completion_tcsh_start {} {
    # shell prompt pattern, since completion_tcsh_raw's own matching only
    # works once this prompt is in effect); every setup command after this
    # point goes through completion_tcsh_raw
+   #
+   # the command line setting it is itself 'set prompt='$completion_prompt''
+   # -- its own echoed-back input already contains that exact text, so a
+   # bare "$completion_prompt\$" pattern can match that echo mid-flight,
+   # before tcsh has even processed Enter, the moment a partial read
+   # happens to end right after it; require the same '\r+\n' fresh-line
+   # prefix completion_tcsh_raw's own matching below relies on, so this
+   # only matches the real prompt tcsh prints once the command is done
    send -- "set prompt='$completion_prompt'\r"
    expect {
-      -re "$completion_prompt\$" {}
+      -re "\r+\n$completion_prompt\$" {}
       timeout { unresolved {completion tcsh prompt setup timed out}; return }
    }
 
