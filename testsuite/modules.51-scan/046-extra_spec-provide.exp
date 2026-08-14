@@ -107,6 +107,14 @@ testouterr_cmd sh {avail -t provided-alias:foo} OK $tserr
 # info_extension tests
 #
 
+# info_extension is off by default, so a scanned "extensions" command
+# records a "provided-alias" element in addition to "provide"
+setenv_var TESTSUITE_PROVIDE extensions
+
+set tserr provide/1
+testouterr_cmd sh {avail -t provide provide:foo/1} OK $tserr
+testouterr_cmd sh {avail -t provide provided-alias:qux/1} OK $tserr
+
 setenv_var MODULES_INFO_EXTENSION 1
 
 setenv_var TESTSUITE_PROVIDE multiple
