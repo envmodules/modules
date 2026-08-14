@@ -589,6 +589,16 @@ lappend ans $vers_reportre
 testouterr_cmd_re sh -V OK [join $ans \n]
 unsetenv_var TESTSUITE_ENABLE_SITECONFIG_REDEFONTHEFLYPROCS
 
+# test redefinition of defineGetEqArrayKeyProc, called twice in a row with a
+# different implicit_default value each time, to demonstrate it renaming the
+# previously active variant back before renaming the new one in
+setenv_var TESTSUITE_ENABLE_SITECONFIG_REDEFGETEQARRAYKEYPROC 1
+set ans [list]
+lappend ans foo/1.0 foo/1.0 foo/1.0
+lappend ans $vers_reportre
+testouterr_cmd_re sh -V OK [join $ans \n]
+unsetenv_var TESTSUITE_ENABLE_SITECONFIG_REDEFGETEQARRAYKEYPROC
+
 # specific tests to improve formatErrStackTrace proc coverage
 setenv_var TESTSUITE_ENABLE_SITECONFIG_FORMATERRSTACKTRACE 1
 set ans [list]
