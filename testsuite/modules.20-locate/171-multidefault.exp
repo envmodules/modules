@@ -1,0 +1,78 @@
+##############################################################################
+#   Modules Revision 3.0
+#   Providing a flexible user environment
+#
+#   File:		modules.20-locate/%M%
+#   Revision:		%I%
+#   First Edition:	2026/08/14
+#   Last Mod.:		%U%, %G%
+#
+#   Authors:		Xavier Delaruelle, xavier.delaruelle@cea.fr
+#
+#   Description:	Testuite testsequence
+#   Command:		load, display
+#   Modulefiles:	loc_edm1
+#   Sub-Command:
+#
+#   Comment:	%C{
+#			Check that a partial version query resolved through the
+#			extended_default mechanism, which ends up matching several
+#			available versions, correctly prefers the version
+#			explicitly set as 'default' over the highest matching one,
+#			whether the implicit_default option is enabled or disabled
+#		}C%
+#
+##############################################################################
+
+# skip tests if extended_default or implicit_default option could not be
+# overridden
+if {[is_config_locked extended_default] || [is_config_locked\
+    implicit_default]} {
+    send_user "\tskipping tests as extended_default or implicit_default\
+        could not be overridden\n"
+} else {
+
+# use a dedicated modulepath so this new fixture does not affect other tests
+# that enumerate the whole content of the default modulepath
+setenv_path_var MODULEPATH $modpath.4
+
+setenv_var MODULES_EXTENDED_DEFAULT 1
+
+set module "loc_edm1"
+set module_default "$module/1.0.1"
+set modulefile_default "$modpath.4/$module_default"
+set modulefilere_default "$modpathre.4/$module_default"
+
+#
+# loc_edm1 holds two sibling versions, 1.0.1 and 1.0.2, with 1.0.1 explicitly
+# set as 'default' through a '.version' file. A partial version query like
+# '1.0' matches both versions through extended_default: the resolution must
+# pick the explicitly defined default (1.0.1) rather than 1.0.2, which would
+# be selected if only the highest matching version was considered. This must
+# hold whether implicit_default is enabled or disabled
+#
+
+foreach implicitdefault {1 0} {
+
+setenv_var MODULES_IMPLICIT_DEFAULT $implicitdefault
+
+set ans [list]
+lappend ans [list set __MODULES_LMALTNAME\
+    $module_default&$module/default&$module]
+lappend ans [list set _LMFILES_ $modulefile_default]
+lappend ans [list set LOADEDMODULES $module_default]
+
+test_cmd "sh" "load $module/1.0" $ans
+
+testouterr_cmd_re "sh" "display $module/1.0" "OK"\
+    "$modlin\n$modulefilere_default:\n\nmodule-whatis\\s+$module_default\n$modlin"
+
+}
+
+#
+# Cleanup
+#
+
+reset_test_env
+
+}
