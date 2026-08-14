@@ -218,6 +218,12 @@ set line_num [expr {[cmpversion $tclsh_version 8.6] == -1 ? 2 : 29}]
 set tserr [escre [msg_moderr {Invalid option '--unk'} {module-warn --message text --unk warn/1<EXM>} $mp/warn/.modulerc $line_num {  }]]
 testouterr_cmd_re bash {load warn/1} $ans $tserr
 
+setenv_var TESTSUITE_WARN rc_bad5
+
+set line_num [expr {[cmpversion $tclsh_version 8.6] == -1 ? 2 : 32}]
+set tserr [escre [msg_moderr {Missing value for '--message' option} {module-warn --message<EXM>} $mp/warn/.modulerc $line_num {  }]]
+testouterr_cmd_re bash {load warn/1} $ans $tserr
+
 setenv_var TESTSUITE_WARN mf_bad1
 set line_num [expr {[cmpversion $tclsh_version 8.6] == -1 ? 4 : 17}]
 set tserr [escre [msg_load warn/1 [msg_moderr {No message specified in argument} {module-warn<EXM>} $mp/warn/1 $line_num]]]
@@ -236,6 +242,11 @@ testouterr_cmd_re bash {load warn/1} ERR $tserr
 setenv_var TESTSUITE_WARN mf_bad4
 set line_num [expr {[cmpversion $tclsh_version 8.6] == -1 ? 4 : 26}]
 set tserr [escre [msg_load warn/1 [msg_moderr {Invalid option '--unk'} {module-warn --message text --unk warn/1<EXM>} $mp/warn/1 $line_num]]]
+testouterr_cmd_re bash {load warn/1} ERR $tserr
+
+setenv_var TESTSUITE_WARN mf_bad5
+set line_num [expr {[cmpversion $tclsh_version 8.6] == -1 ? 4 : 29}]
+set tserr [escre [msg_load warn/1 [msg_moderr {Missing value for '--message' option} {module-warn --message<EXM>} $mp/warn/1 $line_num]]]
 testouterr_cmd_re bash {load warn/1} ERR $tserr
 
 
