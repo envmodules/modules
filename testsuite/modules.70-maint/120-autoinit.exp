@@ -101,9 +101,9 @@ set tserr_initrc1_exinstalled [msg_load null]
 
 set lminit_modrc_exinstalled "module use --append $install_modulepath:module load null"
 set lminit_modrc1_exinstalled "module use --append $install_modulepath:module load null"
-set lminit_modspath_modrc1_exinstalled "module use --append $install_modulepath:module use --append $install_prefix/test/modulefiles:module use --append $install_prefix/test/etc:module load null"
+set lminit_modspath_modrc1_exinstalled "module use --append $install_modulepath:module use --append $install_prefix/test/modulefiles:module use --append $install_prefix/test/etc:module use --append $install_prefix/test/absent:module load null"
 set lminit_initrc_exinstalled "module use --append {$modpath wspace}:module use --append $modpath.deps:module load --tag=auto-loaded m1:module load m3:module load {space yc/4}"
-set lminit_modspath_exinstalled "module use --append $install_modulepath:module use --append $install_prefix/test/modulefiles:module use --append $install_prefix/test/etc"
+set lminit_modspath_exinstalled "module use --append $install_modulepath:module use --append $install_prefix/test/modulefiles:module use --append $install_prefix/test/etc:module use --append $install_prefix/test/absent"
 
 
 # check if stderr terminal attachment state is forced
@@ -1281,7 +1281,7 @@ if {(!$insmodspath || $modspath_exinstalled) && (!$insmodrc || $modrc_exinstalle
                         lappend ans [list set MODULES_CMD $modulecmd_path]
                         lappend ans [list set MODULES_AUTO_HANDLING 0]
                         lappend ans [list set MODULES_ML 0]
-                        lappend ans [list set MODULEPATH "$install_modulepath:$install_prefix/test/modulefiles:$install_prefix/test/etc"]
+                        lappend ans [list set MODULEPATH "$install_modulepath:$install_prefix/test/modulefiles:$install_prefix/test/etc:$install_prefix/test/absent"]
                         lappend ans [list set __MODULES_LMINIT $lminit_modspath_modrc1_exinstalled]
                         lappend ans [list set MODULES_SET_SHELL_STARTUP 0]
                         lappend ans [list set MODULES_SHELLS_WITH_KSH_FPATH "sh:bash"]
@@ -1312,7 +1312,7 @@ if {(!$insmodspath || $modspath_exinstalled) && (!$insmodrc || $modrc_exinstalle
                             lappend ans [list set FPATH $install_initdir/ksh-functions]
                         }
                         lappend ans [list set __MODULES_LMINIT $lminit_modspath_modrc1_exinstalled]
-                        lappend ans [list set MODULEPATH "$install_modulepath:$install_prefix/test/modulefiles:$install_prefix/test/etc"]
+                        lappend ans [list set MODULEPATH "$install_modulepath:$install_prefix/test/modulefiles:$install_prefix/test/etc:$install_prefix/test/absent"]
                         if {$install_versioning eq "y"} {
                             lappend ans [list set MODULE_VERSION "(.*)"]
                         }
@@ -1345,7 +1345,7 @@ if {(!$insmodspath || $modspath_exinstalled) && (!$insmodrc || $modrc_exinstalle
                         lappend ans [list set FPATH $install_initdir/ksh-functions]
                     }
                     lappend ans [list set __MODULES_LMINIT $lminit_modspath_exinstalled]
-                    lappend ans [list set MODULEPATH "$install_modulepath:$install_prefix/test/modulefiles:$install_prefix/test/etc"]
+                    lappend ans [list set MODULEPATH "$install_modulepath:$install_prefix/test/modulefiles:$install_prefix/test/etc:$install_prefix/test/absent"]
                     if {$install_versioning eq "y"} {
                         lappend ans [list set MODULE_VERSION "(.*)"]
                     }
@@ -2140,7 +2140,7 @@ if {$insmodspath && $modspath_exinstalled && $modspath eq "$install_etcdir/modul
     lappend ans [list set MODULESHOME $moduleshome]
     lappend ans [list set LOADEDMODULES ""]
     lappend ans [list set __MODULES_LMINIT $lminit_modspath_exinstalled]
-    lappend ans [list set MODULEPATH "$install_modulepath:$install_prefix/test/modulefiles:$install_prefix/test/etc"]
+    lappend ans [list set MODULEPATH "$install_modulepath:$install_prefix/test/modulefiles:$install_prefix/test/etc:$install_prefix/test/absent"]
     if {$install_versioning eq "y"} {
         lappend ans [list set MODULE_VERSION "(.*)"]
     }
