@@ -416,6 +416,44 @@ unsetenv_loaded_module
 unsetenv_var __MODULES_LMALTNAME
 
 
+# autosymbol name matches an explicit symbolic version that is itself
+# targeted by a module-forbid command coupled to a module-hide --hard one:
+# the entry already found (in error) for this name short-circuits autosymbol
+# creation, yet resolution to the forbidden module is still attempted
+#
+# uses modulefiles.4 rather than modulefiles.2, so this fixture does not show
+# up in the other tests that enumerate modulefiles.2's entire content
+
+set mp_saved $mp
+set mp "$modpath.4"
+setenv_path_var MODULEPATH $mp
+
+testouterr_cmd sh {avail -t autosym10@default} OK $mp:\nautosym10/2
+testouterr_cmd sh {avail -t autosym10@latest} OK {}
+testouterr_cmd sh {avail -t autosym10/latest} OK {}
+set ans [list]
+lappend ans [list set __MODULES_LMALTNAME autosym10/2&as|autosym10/latest&as|autosym10/default]
+lappend ans [list set _LMFILES_ $mp/autosym10/2]
+lappend ans [list set LOADEDMODULES autosym10/2]
+testouterr_cmd sh {load autosym10} $ans {}
+testouterr_cmd sh {load autosym10/default} $ans {}
+testouterr_cmd sh {load autosym10@latest} ERR [err_accessdenied autosym10/latest]
+testouterr_cmd sh {load autosym10/latest} ERR [err_accessdenied autosym10/latest]
+testouterr_cmd sh {whatis autosym10@latest} ERR [err_accessdenied autosym10/latest]
+testouterr_cmd sh {is-loaded autosym10/default} ERR {}
+testouterr_cmd sh {is-loaded autosym10@latest} ERR {}
+setenv_loaded_module [list autosym10/2] [list $mp/autosym10/2]
+setenv_var __MODULES_LMALTNAME autosym10/2&as|autosym10/latest&as|autosym10/default
+testouterr_cmd sh {is-loaded autosym10/default} OK {}
+testouterr_cmd sh {is-loaded autosym10@latest} OK {}
+testouterr_cmd sh {list} OK "$cur_loaded\n 1) autosym10/2"
+unsetenv_loaded_module
+unsetenv_var __MODULES_LMALTNAME
+
+set mp $mp_saved
+setenv_path_var MODULEPATH $mp
+
+
 # use in requirements
 
 set ans [list]

@@ -1,0 +1,4 @@
+#%Module
+module-version /2 latest
+module-forbid autosym10/latest
+module-hide --hard autosym10/latest
