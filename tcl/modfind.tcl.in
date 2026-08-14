@@ -3396,9 +3396,6 @@ proc getModules {dir {mod {}} {fetch_mtime 0} {search {}} {filter {}}} {
 
          # build module symbol list
          lappend versmod_list($versmod) $vers
-      # add global/user rc def to module symbol list in any cases
-      } elseif {!$add_rc_defs && [info exists g_rcVersion($vers)]} {
-         lappend versmod_list($versmod) $vers
       }
    }
 
