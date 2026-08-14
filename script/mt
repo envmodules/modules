@@ -33,6 +33,7 @@ Test suites:
   install         Test Modules installation
   lint            Lint script files of this repository
   comp            Test shell completion scripts
+  cook            Test the cookbook recipes documented in doc/source/cookbook
 
 Select parts of testsuite:
   serienum        Identification number of testsuite directory containing a
@@ -48,6 +49,7 @@ Examples:
   $0 quick
   $0 lint
   $0 comp
+  $0 cook
   $0 50/37 61 70/{290,440}
 "
 }
@@ -108,6 +110,11 @@ if [ $# -gt 0 ]; then
       target='testcompletion'
       testserie='completion'
       setuptestfiles=(00/005 00/006 00/007 00/008 00/010 00/011 00/020 00/030 00/040 00/050)
+      shift
+   elif [ "$1" = "cook" ]; then
+      target='testcookbook'
+      testserie='cookbook'
+      setuptestfiles=(00/005 00/006 00/010 00/011)
       shift
    fi
 fi

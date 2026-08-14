@@ -143,7 +143,7 @@ completes:
 
 .. parsed-literal::
 
-    :ps:`$` module load foo/2.1
+    :ps:`$` module load -v foo/2.1
     Syncing 'foo-2.1-build3' application directory from remote share...
     Loading :sgrhi:`foo/2.1`
 
@@ -167,7 +167,7 @@ either:
     :ps:`$` module avail foo
     --------------- :sgrdi:`/path/to/modulefiles` ---------------
     foo/2.1
-    :ps:`$` module load foo/2.1
+    :ps:`$` module load -v foo/2.1
     Loading :sgrhi:`foo/2.1`
 
 .. vim:set tabstop=2 shiftwidth=2 expandtab autoindent:

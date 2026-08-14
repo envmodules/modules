@@ -13,12 +13,12 @@ line tools. DejaGnu groups test files (``.exp``, for *expect script*) under a
 *tool*: a run of ``runtest --tool <name>`` sources every matching ``.exp``
 file it finds for that tool and reports a ``PASS``/``FAIL``/``XFAIL``/
 ``UNRESOLVED`` line for each individual check performed. Modules defines
-four tools, matched to four kinds of tests (see `Kinds of tests`_ below).
+five tools, matched to five kinds of tests (see `Kinds of tests`_ below).
 
 Kinds of tests
 --------------
 
-The testsuite exercises four different things, run as four separate
+The testsuite exercises five different things, run as five separate
 DejaGnu tools:
 
 ``modules``
@@ -51,10 +51,20 @@ DejaGnu tools:
     currently covers bash, zsh, fish and tcsh, see `completion.00-init
     layout`_.
 
+``cookbook``
+    Checks the recipes documented under :ref:`cookbook`: for each recipe
+    covered, builds a sandboxed fixture from the exact files it ships under
+    :file:`doc/example/` and drives it through the commands demonstrated in
+    the recipe's ``Usage example`` documentation, parsed straight out of
+    the recipe's ``.rst`` file rather than hand-copied (see
+    `cookbook.00-init layout`_). Driven by the :file:`cookbook.00-init`
+    directory.
+
 Each tool corresponds to one Makefile target (``test``, ``testinstall``,
-``testlint``, ``testcompletion``, see `Running the testsuite`_) and to one
-log file (:file:`modules.log`, :file:`install.log`, :file:`lint.log`,
-:file:`completion.log`) produced in the top build directory.
+``testlint``, ``testcompletion``, ``testcookbook``, see `Running the
+testsuite`_) and to one log file (:file:`modules.log`, :file:`install.log`,
+:file:`lint.log`, :file:`completion.log`, :file:`cookbook.log`) produced in
+the top build directory.
 
 Two additional run modes apply to the ``modules`` tool rather than adding a
 new one:
@@ -77,10 +87,11 @@ Test file directories
 
 Test files are grouped in numbered directories named
 ``<tool>.<serienum>-<topic>``, e.g. :file:`modules.50-cmds`,
-:file:`install.00-init`, :file:`lint.00-init`, :file:`completion.00-init`.
-The ``<tool>`` prefix ties the directory to one of the four DejaGnu tools
-above (DejaGnu only looks at directories whose prefix matches the ``--tool``
-given to ``runtest``); the two-digit ``<serienum>`` number fixes run order
+:file:`install.00-init`, :file:`lint.00-init`, :file:`completion.00-init`,
+:file:`cookbook.00-init`. The ``<tool>`` prefix ties the directory to one of
+the five DejaGnu tools above (DejaGnu only looks at directories whose
+prefix matches the ``--tool`` given to ``runtest``); the two-digit
+``<serienum>`` number fixes run order
 and is what you pass to :file:`script/mt` to select a whole directory (e.g.
 ``script/mt 50``); the ``<topic>`` suffix is just a human-readable label.
 
@@ -147,8 +158,9 @@ Current ``modules.*`` series, in run order:
 ``99-finish``
     Testsuite teardown (removes cache files created for the run)
 
-``install.00-init``, ``lint.00-init`` and ``completion.00-init`` are each a
-single series (those tools are much smaller and don't need topic splitting).
+``install.00-init``, ``lint.00-init``, ``completion.00-init`` and
+``cookbook.00-init`` are each a single series (those tools are much smaller
+and don't need topic splitting).
 
 Every series directory ends with a ``999-cleanup.exp`` file (see `Test file
 anatomy`_) and, for the ``modules`` tool, most series begin with a
@@ -198,6 +210,66 @@ shell-specific in a way none of the other three tools are:
 
 Adding a new shell means adding its own ``completion_<shell>_*`` procs file
 and test file; nothing in ``006-procs.exp`` needs to change.
+
+``cookbook.00-init`` layout
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``cookbook`` tool follows the common ``005``/``006``/``010``/``011``
+setup numbering (see `Test file anatomy`_ and `Base test procedures`_
+below), driving ``modulecmd.tcl`` directly through ``testouterr_cmd``/
+``testouterr_cmd_re`` exactly like the ``modules`` tool, plus one shared
+helper that is specific to this tool:
+
+- ``005-init_ts.exp`` defines ``cookbookdocdir``/``cookbookexampledir``
+  (pointing at :file:`doc/source/cookbook` and :file:`doc/example`), the
+  ``cookbooksandbox`` fixture root (recreated fresh for the whole run),
+  ``cookbook_read_example_file``/``cookbook_write_file`` (read a file
+  shipped under :file:`doc/example/<name>/`, applying a ``string map``
+  substitution list, and write it into the sandbox), and
+  ``cookbook_parse_transcript`` -- parses the ``.. parsed-literal::`` blocks
+  of a named section (e.g. ``Usage example``) of a recipe's ``.rst`` file
+  and returns the ordered list of ``{command output}`` pairs shown there,
+  role markup (``:sgrhi:`text``` and friends) stripped from the output, so
+  a recipe test file drives the exact command sequence its own
+  documentation demonstrates, in that order, and checks its own real output
+  is similar to the one illustrated -- instead of both being a hand-copied
+  duplicate that could silently drift from the documentation.
+  ``cookbook_output_re`` turns one such illustrated output into the regexp
+  a sandboxed run's real output is checked against: escaped as a literal,
+  except a run of ``-`` padding (widened to ``[-]+``, since its exact width
+  depends on terminal-width detection a non-tty test run does not have) and
+  whatever literal substrings the recipe test passes it to widen too (e.g.
+  a placeholder path mapped to the sandbox's real one).
+- ``006-procs.exp``/``010-environ.exp``/``011-save_test_env.exp`` set up
+  ``_test_sub``, a clean baseline environment (sandboxed ``$HOME``, no
+  color, deterministic ``avail``/``list`` output, ``MODULES_SITECONFIG``/
+  ``MODULES_TAG_ABBREV``/``MODULES_NON_EXPORTABLE_TAGS`` left unset so each
+  recipe states what it actually relies on), and the ``save_test_env``
+  checkpoint, exactly as for the other tools.
+- ``0NN-<recipe-name>.exp`` (e.g. ``020-sync-remote-appdir.exp``), named
+  after the recipe's own ``.rst`` file, holds one recipe's test: it checks
+  any external binary the recipe needs (``unsupported`` + ``return`` if
+  missing, e.g. ``rsync`` for ``sync-remote-appdir``), builds a
+  ``$cookbooksandbox/<name>`` fixture from the recipe's real
+  :file:`doc/example/<name>/` files via ``cookbook_read_example_file`` (only
+  substituting whatever real-system absolute path the recipe hardcodes,
+  e.g. ``/remote_apps``, for a sandbox path -- everything else is used byte
+  for byte), points the test environment at that sandbox, then loops over
+  ``cookbook_parse_transcript``'s steps in order, running each with
+  ``testouterr_cmd_re`` against ``cookbook_output_re`` of its illustrated
+  output (stdout, the env-var-assignment syntax a shell evals silently and
+  no recipe doc illustrates, is still checked against a hand-built answer
+  per step -- ``unresolved`` + ``return`` first if the transcript's step
+  count no longer matches what the test knows how to build one for, as a
+  signal it needs updating alongside the doc). Simulates each step's
+  effect on the environment for the next one exactly as a real shell would
+  (``setenv_loaded_module``/``setenv_path_var``), since every
+  ``modulecmd.tcl`` invocation here is an independent process.
+
+Adding a new recipe means adding its own ``0NN-<recipe-name>.exp`` file;
+nothing in ``005-init_ts.exp`` needs to change unless the new recipe needs a
+kind of substitution or transcript shape the existing helpers do not cover
+yet.
 
 Fixture and support directories
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -609,6 +681,7 @@ With ``make``
     make testinstall           # 'install' suite against a tree already processed by 'make install'
     make testlint              # 'lint' suite (Nagelfar + ShellCheck)
     make testcompletion        # 'completion' suite (interactive Tab-completion tests)
+    make testcookbook          # 'cookbook' suite (doc/source/cookbook recipes)
 
 Each target ends up calling ``runtest --tool <tool> $(RUNTESTFLAGS)
 $(RUNTESTFILES)``: ``RUNTESTFILES``, if set, restricts the run to specific
@@ -634,12 +707,14 @@ calling ``make test`` directly when iterating on a specific area.
     script/mt install             # same as: make testinstall
     script/mt lint                # same as: make testlint
     script/mt comp                # same as: make testcompletion
+    script/mt cook                # same as: make testcookbook
 
     script/mt 50/470              # only testsuite/modules.50-cmds/470-*.exp
     script/mt 50                  # every file in testsuite/modules.50-cmds
     script/mt 61                  # collection series (always run whole, see below)
     script/mt lint 00/030         # only testsuite/lint.00-init/030-*.exp
     script/mt comp 00/021         # only testsuite/completion.00-init/021-*.exp
+    script/mt cook 00/020         # only testsuite/cookbook.00-init/020-*.exp
     script/mt 50/{280,290} 61     # several selections at once
     script/mt --help              # full usage
 
@@ -648,7 +723,8 @@ mandatory setup files for that tool (for ``modules``:
 ``00/005 00/006 00/010 00/050 00/060 00/080 00/085``; for ``install``:
 ``00/005 00/006 00/010 00/011``; for ``lint``: ``00/005 00/006 00/011``; for
 ``completion``: ``00/005 00/006 00/007 00/008 00/010 00/011 00/020 00/030
-00/040 00/050``), plus the ``999-cleanup.exp`` of every selected series.
+00/040 00/050``; for ``cookbook``: ``00/005 00/006 00/010 00/011``), plus
+the ``999-cleanup.exp`` of every selected series.
 Passing a bare series number always expands to every file in that
 directory, because several of those series are order-sensitive or
 enumerate a whole modulepath (see
@@ -744,11 +820,12 @@ Debugging a broken test
    ``send_user`` progress messages emitted by ``config/base-config.exp``
    helpers like ``setenv_var``/``change_file_perms``), set
    ``RUNTESTFLAGS='-v -v'`` and call ``make test``/``testinstall``/
-   ``testlint``/``testcompletion`` directly, or invoke ``runtest`` yourself
-   with the environment variables :file:`script/mt`/the Makefile targets set
-   up (``TCLSH``, ``MODULECMD``, ``OBJDIR``, ``TESTSUITEDIR``) -- see the
-   ``test``/``testinstall``/``testlint``/``testcompletion`` targets in
-   :file:`Makefile` for the exact invocation.
+   ``testlint``/``testcompletion``/``testcookbook`` directly, or invoke
+   ``runtest`` yourself with the environment variables :file:`script/mt`/the
+   Makefile targets set up (``TCLSH``, ``MODULECMD``, ``OBJDIR``,
+   ``TESTSUITEDIR``) -- see the
+   ``test``/``testinstall``/``testlint``/``testcompletion``/``testcookbook``
+   targets in :file:`Makefile` for the exact invocation.
 4. **Check for order dependence.** If a test passes alone but fails in a
    full run (or vice-versa), suspect a missing/incomplete ``reset_test_env``
    footer in an earlier file, or a global-enumeration test (`Adding new test

@@ -1,0 +1,230 @@
+##############################################################################
+#   Modules Revision 3.0
+#   Providing a flexible user environment
+#
+#   File:		cookbook.00-init/%M%
+#   Revision:		%I%
+#   First Edition:	2026/08/13
+#   Last Mod.:		%U%, %G%
+#
+#   Authors:		Xavier Delaruelle, xavier.delaruelle@cea.fr
+#
+#   Description:	Testuite testsequence
+#   Command:
+#   Sub-Command:
+#
+#   Comment:	%C{
+#			Defines all patterns used further in the testsuite
+#		}C%
+#
+##############################################################################
+
+proc find_bin {name} {
+   set path {}
+
+   if {[info exists ::env(PATH)]} {
+      foreach dir [split $::env(PATH) ":"] {
+         if {[file executable "$dir/$name"]} {
+            set path "$dir/$name"
+            break
+         }
+      }
+   }
+
+   return $path
+}
+
+if {$verbose} {
+   send_user "\tInitializing the testsuite ...\n"
+}
+
+set TCLSH $env(TCLSH)
+set MODULECMD $env(MODULECMD)
+
+# every cookbook recipe is documented at doc/source/cookbook/<name>.rst and
+# ships its installable files under doc/example/<name>/
+set cookbookdocdir "$env(TESTSUITEDIR)/../doc/source/cookbook"
+set cookbookexampledir "$env(TESTSUITEDIR)/../doc/example"
+
+# sandbox holding every recipe's fixture tree, recreated fresh for each run;
+# each recipe test file builds its own "$cookbooksandbox/<name>" subtree and
+# is responsible for removing it once done (see 999-cleanup.exp for the
+# final sweep of the whole sandbox)
+set cookbooksandbox "$env(TESTSUITEDIR)/cookbook-sandbox"
+file delete -force $cookbooksandbox
+file mkdir $cookbooksandbox
+
+# escape a string so it is safe to embed in a Tcl regexp as a literal
+proc cookbook_re_escape {str} {
+   return [regsub -all {[][$.+?*\\()&|^{}]} $str {\\&}]
+}
+
+# read a file shipped with a recipe under doc/example/<name>/, applying a
+# 'string map' substitution list (e.g. to swap a hardcoded real-system path
+# the recipe documents for this test's own sandbox path); used to build a
+# recipe test's fixture from the exact files a user would install, instead
+# of a hand-copied duplicate that could silently drift from them
+proc cookbook_read_example_file {path submap} {
+   set fid [open $path r]
+   set content [read $fid]
+   close $fid
+   return [string map $submap $content]
+}
+
+# write 'content' to 'path', creating any missing parent directory
+proc cookbook_write_file {path content} {
+   file mkdir [file dirname $path]
+   set fid [open $path w]
+   puts -nonewline $fid $content
+   close $fid
+}
+
+# strip Sphinx inline role markup (':rolename:`text`', used throughout this
+# project's docs to color a parsed-literal transcript like a real terminal)
+# down to the plain text it wraps
+proc cookbook_strip_roles {text} {
+   return [regsub -all {:[A-Za-z0-9_]+:`([^`]*)`} $text {\1}]
+}
+
+# turn role-stripped illustrative output text into a regexp matching what a
+# sandboxed test run actually produces: escape it as a literal, then widen
+# the two kinds of detail a doc transcript shows for illustration but a
+# sandboxed, non-interactive run cannot reproduce as-is -- a run of '-'
+# padding whose exact width depends on terminal-width detection, and
+# whatever literal substrings 'subs' (a {pattern replacement ...} list, e.g.
+# a placeholder path mapped to this test's real sandbox path) says to widen
+proc cookbook_output_re {text {subs {}}} {
+   set re [cookbook_re_escape $text]
+   set re [regsub -all -- {-{2,}} $re {[-]+}]
+   foreach {pattern replacement} $subs {
+      set re [string map [list [cookbook_re_escape $pattern] $replacement] $re]
+   }
+   return $re
+}
+
+# build a {command output} transcript step: 'curoutput' is the list of
+# output lines collected so far for 'cmd', with any trailing blank lines
+# dropped (blank lines in the middle, e.g. separating an avail listing from
+# its trailing 'Key:' block, are kept) and role markup stripped
+proc cookbook_flush_step_ {cmd curoutput} {
+   while {[llength $curoutput] && [lindex $curoutput end] eq {}} {
+      set curoutput [lrange $curoutput 0 end-1]
+   }
+   return [list $cmd [cookbook_strip_roles [join $curoutput \n]]]
+}
+
+# parse the '.. parsed-literal::' blocks of a cookbook recipe's rst file
+# found under the section whose title is 'title' (matched as an exact line
+# immediately followed by a '-' underline at least as long as the title,
+# the section-heading convention used throughout this project's docs), and
+# return the ordered list of {command output} pairs typed at/shown after
+# the ':ps:`$`' prompt therein, with the output's role markup stripped
+# (see cookbook_strip_roles). This lets a recipe test drive the same
+# command sequence its documentation demonstrates, in the same order, and
+# check its own real output is similar to the one illustrated there
+# (see cookbook_output_re), instead of both being a hand-copied duplicate
+# that could silently drift from the documentation
+proc cookbook_parse_transcript {rstfile title} {
+   set fid [open $rstfile r]
+   set data [read $fid]
+   close $fid
+   set lines [split $data \n]
+   set n [llength $lines]
+
+   # locate '<title>\n<underline>'
+   set start {}
+   for {set i 0} {$i < $n - 1} {incr i} {
+      set nextline [lindex $lines [expr {$i + 1}]]
+      if {[lindex $lines $i] eq $title && [regexp {^-+$} $nextline]
+         && [string length $nextline] >= [string length $title]} {
+         set start [expr {$i + 2}]
+         break
+      }
+   }
+   if {$start eq {}} {
+      error "cookbook_parse_transcript: section '$title' not found in\
+         $rstfile"
+   }
+
+   # section ends at the next heading (a non-blank line immediately
+   # followed by an underline at least as long) or end of file
+   set end $n
+   for {set i $start} {$i < $n - 1} {incr i} {
+      set line [lindex $lines $i]
+      set nextline [lindex $lines [expr {$i + 1}]]
+      if {$line ne {} && [regexp {^[-=~]+$} $nextline]
+         && [string length $nextline] >= [string length $line]} {
+         set end $i
+         break
+      }
+   }
+
+   # walk the section line by line, only collecting content indented under
+   # a '.. parsed-literal::' directive (prose paragraphs in between are
+   # ignored); a ':ps:`$`' line starts a new command, every following
+   # indented line up to the next ':ps:`$`' line or the block's end (a
+   # dedented line) is that command's illustrated output. Only the block's
+   # own fixed indentation (its first content line's leading whitespace,
+   # normally 4 spaces) is stripped off each line, not all of it -- output
+   # can itself carry meaningful leading whitespace, e.g. a numbered
+   # 'module list' entry indented one space past its block indent
+   set steps {}
+   set inliteral 0
+   set blockindent {}
+   set havecmd 0
+   set cmd {}
+   set curoutput {}
+
+   foreach line [lrange $lines $start [expr {$end - 1}]] {
+      if {[regexp {^\s*\.\. parsed-literal::\s*$} $line]} {
+         if {$havecmd} {
+            lappend steps [cookbook_flush_step_ $cmd $curoutput]
+            set havecmd 0
+         }
+         set inliteral 1
+         set blockindent {}
+         set curoutput {}
+         continue
+      }
+      if {!$inliteral} {
+         continue
+      }
+      if {[string trim $line] eq {}} {
+         if {$havecmd} {
+            lappend curoutput {}
+         }
+         continue
+      }
+      if {$blockindent eq {}} {
+         regexp {^(\s*)} $line -> blockindent
+      }
+      set indentlen [string length $blockindent]
+      if {[string range $line 0 [expr {$indentlen - 1}]] ne $blockindent} {
+         # dedented below the block's own indentation: it has ended
+         if {$havecmd} {
+            lappend steps [cookbook_flush_step_ $cmd $curoutput]
+            set havecmd 0
+         }
+         set inliteral 0
+         continue
+      }
+      set content [string range $line $indentlen end]
+      if {[regexp {^:ps:`\$`\s?(.*)$} $content -> newcmd]} {
+         if {$havecmd} {
+            lappend steps [cookbook_flush_step_ $cmd $curoutput]
+         }
+         set cmd $newcmd
+         set curoutput {}
+         set havecmd 1
+      } elseif {$havecmd} {
+         lappend curoutput $content
+      }
+   }
+   if {$havecmd} {
+      lappend steps [cookbook_flush_step_ $cmd $curoutput]
+   }
+
+   return $steps
+}
+
+# vim:set tabstop=3 shiftwidth=3 expandtab autoindent:

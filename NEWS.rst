@@ -207,6 +207,13 @@ Modules 5.7.0 (not yet released)
   :subcmd:`initlist`, :subcmd:`initprepend` and :subcmd:`initrm`
   sub-commands as Tab completion candidates (bash, fish, tcsh, zsh), since
   ``module help`` does not document them.
+* Testsuite: add *cookbook* testsuite to validate the recipes documented
+  under :ref:`cookbook`. This testsuite can be invoked with ``make
+  testcookbook`` or ``script/mt cook``. It builds a sandboxed fixture
+  from the exact files a recipe ships under :file:`doc/example/`, then runs
+  the commands demonstrated in the recipe's ``Usage example`` documentation
+  in order and checks that similar output is obtained. Currently covers the
+  :ref:`sync-remote-appdir` recipe.
 
 
 .. _5.6 release notes:

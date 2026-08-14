@@ -4,7 +4,7 @@
 	install-testmodspath-empty install-testmodspath-wild \
 	install-testmoguicmd uninstall-testconfig uninstall dist dist-tar \
 	dist-gzip dist-bzip2 dist-win srpm rpm clean distclean test-deps test \
-	testinstall testlint testcompletion
+	testinstall testlint testcompletion testcookbook
 
 # commands to install files
 INSTALL = install
@@ -1079,6 +1079,13 @@ testcompletion: initdir $(MODULECMD)
 	OBJDIR=`pwd -P`; export OBJDIR; \
 	TESTSUITEDIR=`cd testsuite;pwd -P`; export TESTSUITEDIR; \
 	runtest --srcdir $$TESTSUITEDIR --objdir $$OBJDIR $(RUNTESTFLAGS) --tool completion $(RUNTESTFILES)
+
+testcookbook: $(MODULECMD)
+	TCLSH=$(TCLSH); export TCLSH; \
+	MODULECMD=$(MODULECMD); export MODULECMD; \
+	OBJDIR=`pwd -P`; export OBJDIR; \
+	TESTSUITEDIR=`cd testsuite;pwd -P`; export TESTSUITEDIR; \
+	runtest --srcdir $$TESTSUITEDIR --objdir $$OBJDIR $(RUNTESTFLAGS) --tool cookbook $(RUNTESTFILES)
 
 
 # install enhanced diff tool (to review test results)

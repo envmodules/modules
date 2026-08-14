@@ -1,0 +1,61 @@
+##############################################################################
+#   Modules Revision 3.0
+#   Providing a flexible user environment
+#
+#   File:		cookbook.00-init/%M%
+#   Revision:		%I%
+#   First Edition:	2026/08/13
+#   Last Mod.:		%U%, %G%
+#
+#   Authors:		Xavier Delaruelle, xavier.delaruelle@cea.fr
+#
+#   Description:	Test procedures
+#   Command:
+#   Sub-Command:
+#
+#   Comment:	%C{
+#			Defines the testprocedures for probing the outputs
+#			on stdout and stderr of the test target
+#		}C%
+#
+##############################################################################
+
+#
+# Test subprocedures
+#
+
+proc _test_sub {test_shell cmd {input noinput} {launcher {}}} {
+	global comp_output
+	global comp_error
+	global comp_exit
+	global shell
+	global verbose
+
+	if {$verbose} {
+        set cmdreport "modulecmd $test_shell $cmd"
+        if {$input ne {noinput}} {
+            append cmdreport " << $input"
+        }
+		send_user "   ...  Testing '$cmdreport'\n"
+	}
+	set comp_output ""
+	set comp_error ""
+	set comp_exit ""
+
+	if { ![info exists test_shell] || ![info exists cmd] } {
+		unresolved "$cmd ($test_shell) internal error"
+	}
+
+	set shell $test_shell
+	modulecmd_xxx_ "$cmd" $input $launcher
+
+	if { $verbose > 1 } {
+		set ol [string length $comp_output]
+		set oe [string length $comp_error]
+		send_user "OUT\[$ol\]: '$comp_output'#>\n"
+		send_user "ERR\[$oe\]: '$comp_error'#>\n"
+		send_user "EXIT: '$comp_exit'#>\n"
+	}
+}
+
+# vim:set tabstop=3 shiftwidth=3 expandtab autoindent:
