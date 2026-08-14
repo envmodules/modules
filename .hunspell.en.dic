@@ -615,6 +615,7 @@ modrc
 modscan
 modshare
 modspec
+moduleUnmetDep
 moduleVersSpec
 modulecache
 modulecmd
@@ -897,12 +898,14 @@ tweakable
 txt
 ubuntu
 umask
+ummod
 un
 unalias
 uname
 uncomplete
 undef
 unhide
+unmetDepHash
 unix
 unixtime
 unixtimestamp
@@ -912,6 +915,7 @@ unlink
 unloadable
 unprefixed
 unsetConf
+unsetModuleDependency
 unsetState
 unsetenv
 unsets

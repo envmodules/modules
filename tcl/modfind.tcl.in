@@ -2490,13 +2490,11 @@ proc unsetModuleDependency {mod} {
    # unset eventual registered unmet dependencies
    if {[info exists ::g_moduleUnmetDep($mod)]} {
       foreach ummod $::g_moduleUnmetDep($mod) {
-         if {[info exists ::g_unmetDepHash($ummod)]} {
-            set idx [lsearch -exact $::g_unmetDepHash($ummod) $mod]
-            set ::g_unmetDepHash($ummod) [lreplace $::g_unmetDepHash($ummod)\
-               $idx $idx+1]
-            if {![llength $::g_unmetDepHash($ummod)]} {
-               unset ::g_unmetDepHash($ummod)
-            }
+         set idx [lsearch -exact $::g_unmetDepHash($ummod) $mod]
+         set ::g_unmetDepHash($ummod) [lreplace $::g_unmetDepHash($ummod)\
+            $idx $idx+1]
+         if {![llength $::g_unmetDepHash($ummod)]} {
+            unset ::g_unmetDepHash($ummod)
          }
       }
       reportDebug "unset unmet requirements for '$mod'"
