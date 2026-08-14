@@ -371,6 +371,24 @@ if {[info exists env(TESTSUITE_ENABLE_SITECONFIG_BADVARIANTSHORTCUTDFLVALUE)]} {
     set g_config_defs(variant_shortcut) {MODULES_VARIANT_SHORTCUT {foo} 0 l {} {} initConfVariantShortcut}
 }
 
+# exercise the single-element validvallist "string is" class check path in
+# getConf, not used by any current config option, by superseding an existing
+# lockable option's definition with that shape
+if {[info exists env(TESTSUITE_ENABLE_SITECONFIG_VALIDVALLISTSTRINGIS)]} {
+    set ::g_config_defs(run_quarantine) {MODULES_RUN_QUARANTINE default 0 s\
+        integer}
+    set env(MODULES_RUN_QUARANTINE) 42
+    report [getConf run_quarantine]
+}
+
+# exercise the generic intvallist conversion path in getConf when no initproc
+# is set, not used by any current config option (the only option using
+# intvallist, color, has an initproc superseding this path)
+if {[info exists env(TESTSUITE_ENABLE_SITECONFIG_INTVALLISTCONV)]} {
+    set ::g_config_defs(csh_limit) {{} val2 0 s {val1 val2} {10 20}}
+    report [getConf csh_limit]
+}
+
 # specific tests to improve getModuleDesignation procs coverage
 if {[info exists env(TESTSUITE_ENABLE_SITECONFIG_GETMODULEDESIGNATION)]} {
     # test disabled sgr mode

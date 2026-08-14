@@ -599,6 +599,24 @@ lappend ans $vers_reportre
 testouterr_cmd_re sh -V OK [join $ans \n]
 unsetenv_var TESTSUITE_ENABLE_SITECONFIG_REDEFGETEQARRAYKEYPROC
 
+# test the single-element validvallist "string is" class check path in
+# getConf, not exercised by any current config option's own shape
+setenv_var TESTSUITE_ENABLE_SITECONFIG_VALIDVALLISTSTRINGIS 1
+set ans [list]
+lappend ans 42
+lappend ans $vers_reportre
+testouterr_cmd_re sh -V OK [join $ans \n]
+unsetenv_var TESTSUITE_ENABLE_SITECONFIG_VALIDVALLISTSTRINGIS
+
+# test the generic intvallist conversion path in getConf when no initproc is
+# set, not exercised by any current config option's own shape
+setenv_var TESTSUITE_ENABLE_SITECONFIG_INTVALLISTCONV 1
+set ans [list]
+lappend ans 20
+lappend ans $vers_reportre
+testouterr_cmd_re sh -V OK [join $ans \n]
+unsetenv_var TESTSUITE_ENABLE_SITECONFIG_INTVALLISTCONV
+
 # specific tests to improve formatErrStackTrace proc coverage
 setenv_var TESTSUITE_ENABLE_SITECONFIG_FORMATERRSTACKTRACE 1
 set ans [list]
