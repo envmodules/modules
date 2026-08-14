@@ -607,6 +607,7 @@ modEq
 modEqStatic
 modStartNb
 modVariantCmp
+modarg
 modetype
 modfile
 modquar
@@ -659,6 +660,7 @@ netcdf
 netlib
 newfstatat
 nglfar
+ni
 noLoadIntel
 nocaseatall
 noclobber

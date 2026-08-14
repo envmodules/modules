@@ -331,15 +331,42 @@ if {[info exists env(TESTSUITE_ENABLE_SITECONFIG_REDEFONTHEFLYPROCS)]} {
     report [modEq foo fOo equal]
 }
 
-# defineGetEqArrayKeyProc redefinition coverage test
+# defineGetEqArrayKeyProc redefinition coverage test: the first two calls
+# use the same implicit_default value in a row to exercise the no-op path
+# where the currently active variant already matches what is being asked
+# for; the following two calls switch value each time, to exercise the
+# rename-the-previous-variant-back path in both directions
 if {[info exists env(TESTSUITE_ENABLE_SITECONFIG_REDEFGETEQARRAYKEYPROC)]} {
     array set arr {foo/1.0 {version foo/1.0}}
+    defineGetEqArrayKeyProc 0
+    report [getEqArrayKey arr foo/1.0]
     defineGetEqArrayKeyProc 0
     report [getEqArrayKey arr foo/1.0]
     defineGetEqArrayKeyProc 1
     report [getEqArrayKey arr foo/1.0]
     defineGetEqArrayKeyProc 0
     report [getEqArrayKey arr foo/1.0]
+}
+
+# getMatchingTagList coverage test: force a duplicate tag entry directly in
+# the global tag structures (setModspecTag itself always dedupes by tag
+# name, so this shape cannot occur through module-tag/module-hide/
+# module-forbid) to exercise the "tag already seen earlier in this same
+# call" skip path, which normal usage never reaches
+if {[info exists env(TESTSUITE_ENABLE_SITECONFIG_DUPTAGROOT)]} {
+    defineModEqProc 0 0
+    set ::g_moduleTagRoot(duptagtest) [list sometag sometag]
+    set ::g_moduleTagRootSpec(duptagtest) [list [list duptagtest/1.0 {}]\
+        [list duptagtest/1.0 {}]]
+    report [getMatchingTagList duptagtest/1.0]
+}
+
+# getAvailListFromVersSpec coverage test: its only caller (the extra-match
+# search dispatch in modscan.tcl) always passes a modarg already registered
+# through parseModuleSpecification, so the unregistered-modarg path is
+# exercised directly here instead
+if {[info exists env(TESTSUITE_ENABLE_SITECONFIG_AVAILLISTUNREG)]} {
+    report [string length [getAvailListFromVersSpec neverregisteredmodarg]]
 }
 
 # specific tests to improve formatErrStackTrace proc coverage
