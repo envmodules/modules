@@ -1598,9 +1598,6 @@ proc reportModules {search_queries header hsgrkey hstyle show_mtime show_idx\
    if {$json} {
       ##nagelfar ignore Found constant
       upvar 0 clean_list display_list
-      if {![info exists display_list]} {
-         set display_list {}
-      }
    } else {
       set display_list {}
       foreach disp $clean_list {
