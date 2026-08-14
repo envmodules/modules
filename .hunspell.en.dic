@@ -256,6 +256,9 @@ autoload
 automake
 autopoint
 autoreconf
+autosym
+autosym10
+autosymbol
 autotools
 availabilities
 avx

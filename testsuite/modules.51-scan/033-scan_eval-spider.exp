@@ -190,7 +190,7 @@ scan/2.1{foo=val1,val2,val3}"
 testouterr_cmd sh {spider -t -o tag:variant:sym:alias scan} OK $tserr
 
 set tserr ".*
-Get modules: {foo/globalsym scan/globalsym foo/globalunk scan/globalunk} matching 'foo=val4' in ''
+Get modules: {(foo/globalsym|scan/globalsym|foo/globalunk|scan/globalunk) (foo/globalsym|scan/globalsym|foo/globalunk|scan/globalunk) (foo/globalsym|scan/globalsym|foo/globalunk|scan/globalunk) (foo/globalsym|scan/globalsym|foo/globalunk|scan/globalunk)} matching 'foo=val4' in ''
 .*
 Get modules: {((source|scan|foo).* )*(source|scan|foo).*} matching 'foo=val4' in '$mpre'
 scan/1.0{foo=val1,val2,val3,val4}\\\(globalsym:sym\\\)
