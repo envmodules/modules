@@ -1,0 +1,29 @@
+##############################################################################
+#   Modules Revision 3.0
+#   Providing a flexible user environment
+#
+#   File:		cookbook.00-init/%M%
+#   Revision:		%I%
+#   First Edition:	2026/08/13
+#   Last Mod.:		%U%, %G%
+#
+#   Authors:		Xavier Delaruelle, xavier.delaruelle@cea.fr
+#
+#   Description:	Testuite testsequence
+#   Command:
+#   Sub-Command:
+#
+#   Comment:	%C{
+#			Cleans out after end of all cookbook tests
+#		}C%
+#
+##############################################################################
+
+# remove the sandbox holding every recipe's fixture tree (see
+# 005-init_ts.exp), including the sandboxed $HOME set up in 010-environ.exp
+if {$verbose} {
+   send_user "\tDeleting $cookbooksandbox\n"
+}
+file delete -force $cookbooksandbox
+
+# vim:set tabstop=3 shiftwidth=3 expandtab autoindent:

@@ -348,6 +348,9 @@ config
 configs
 contrib
 conun
+cookbookdocdir
+cookbookexampledir
+cookbooksandbox
 cov
 cp
 cr
@@ -421,6 +424,7 @@ etcdic
 etcdir
 eu
 eval
+evals
 exe
 execLogger
 execcmdlist
@@ -488,6 +492,7 @@ grp
 gz
 gzip
 hardcode
+hardcodes
 hdf
 homebrewed
 hostname
@@ -829,6 +834,7 @@ submodule
 subprojects
 subshell
 substring
+substrings
 sudo
 svn
 sw
@@ -861,6 +867,7 @@ tcsh
 tcshrc
 ter
 testcompletion
+testcookbook
 testdir
 testfile
 testfiles
@@ -1427,9 +1434,11 @@ path3
 RUNTESTFILES
 RUNTESTFLAGS
 sandboxed
+sandbox's
 SC1090
 serienum
 setpath
+step's
 shorthands
 spider1
 spider2
@@ -1546,6 +1555,7 @@ API
 api
 modnamevr
 modulerc's
+transcript's
 logRequestedLoad
 auditRequestedLoad
 blockModule

@@ -1,0 +1,207 @@
+##############################################################################
+#   Modules Revision 3.0
+#   Providing a flexible user environment
+#
+#   File:		cookbook.00-init/%M%
+#   Revision:		%I%
+#   First Edition:	2026/08/13
+#   Last Mod.:		%U%, %G%
+#
+#   Authors:		Xavier Delaruelle, xavier.delaruelle@cea.fr
+#
+#   Description:	Testuite testsequence
+#   Command:		avail, load, list, unload
+#   Modulefiles:	sandboxed copy of doc/example/sync-remote-appdir
+#   Sub-Command:
+#
+#   Comment:	%C{
+#			Exercise the 'Sync remote application directories on
+#			first load' cookbook recipe
+#			(doc/source/cookbook/sync-remote-appdir.rst) against
+#			the exact files shipped in
+#			doc/example/sync-remote-appdir/: the remote-share
+#			application directory gets synced locally on first
+#			load only, the 'remote' tag shows up on avail until
+#			then and is dropped once loaded, and the commands
+#			driven here are the ones the recipe doc's 'Usage
+#			example' section demonstrates (see
+#			cookbook_parse_transcript, defined in 005-init_ts.exp)
+#		}C%
+#
+##############################################################################
+
+set recipe sync-remote-appdir
+set reciperst "$cookbookdocdir/$recipe.rst"
+set recipeexampledir "$cookbookexampledir/$recipe"
+
+if {![file readable $reciperst] || ![file isdirectory $recipeexampledir]} {
+   unsupported "cookbook recipe files not found for '$recipe' (this\
+      testsuite requires a full source checkout, not a release tarball)"
+   return
+}
+
+set rsyncbin [find_bin rsync]
+if {$rsyncbin eq {}} {
+   unsupported {no rsync binary found to drive the sync-remote-appdir cookbook recipe}
+   return
+}
+
+#
+# build the sandbox fixture from the exact files shipped with the recipe
+#
+
+set recipedir "$cookbooksandbox/$recipe"
+file delete -force $recipedir
+
+set remoteapps "$recipedir/remote_apps"
+set localapps "$recipedir/local_apps"
+set recipemodpath "$recipedir/modulefiles"
+set recipeetc "$recipedir/etc"
+file mkdir $remoteapps $localapps $recipemodpath $recipeetc
+
+# .module_appdir_map: copied verbatim, no hardcoded path to rewrite, at the
+# root of the sandboxed remote share
+set mapfile [file join $recipeexampledir .module_appdir_map]
+file copy $mapfile "$remoteapps/.module_appdir_map"
+
+# fake application directory payload on the sandboxed remote share, synced
+# locally on first load -- the recipe doc does not ship one since its
+# content is site-specific, only its mapped basename
+regexp {\S+\s+(\S+)} [cookbook_read_example_file $mapfile {}] -> appdir
+file mkdir "$remoteapps/$appdir/bin" "$remoteapps/$appdir/lib"
+cookbook_write_file "$remoteapps/$appdir/bin/foo" "#!/bin/sh\necho foo\n"
+cookbook_write_file "$remoteapps/$appdir/lib/libfoo.so" "fake shared object\n"
+
+# every other recipe file hardcodes '/remote_apps'/'/local_apps' as the
+# real-system absolute paths it gets installed under: rewrite just those to
+# this test's own sandbox paths, everything else is used byte for byte --
+# the same kind of surgical rewrite completion.00-init/005-init_ts.exp
+# applies to the tcsh completion script under test. This sandbox is also
+# not tied to any particular Modules release, so also drop the recipe's
+# '#%Module5.7' minimum-version requirement, which would otherwise reject
+# these files on a pre-5.7 development checkout of the very release that
+# ships the hook API they exercise
+set submap [list /remote_apps $remoteapps /local_apps $localapps\
+   #%Module5.7 #%Module]
+
+cookbook_write_file "$recipemodpath/.modulerc" [cookbook_read_example_file\
+   [file join $recipeexampledir modulefiles/.modulerc] $submap]
+cookbook_write_file "$recipemodpath/foo/2.1" [cookbook_read_example_file\
+   [file join $recipeexampledir modulefiles/foo/2.1] $submap]
+cookbook_write_file "$recipeetc/siteconfig.tcl" [cookbook_read_example_file\
+   [file join $recipeexampledir siteconfig.tcl] $submap]
+
+#
+# point the test environment at the sandbox
+#
+
+setenv_path_var MODULEPATH $recipemodpath
+setenv_var MODULES_SITECONFIG "$recipeetc/siteconfig.tcl"
+# give the 'remote' tag its abbreviation and drop it once a module is
+# loaded, exactly as documented for the initrc installed alongside
+# siteconfig.tcl -- 'module config' from an actual initrc file only runs
+# through shell autoinit (see doc/example/sync-remote-appdir/initrc),
+# which this testsuite does not drive; setting the equivalent
+# configuration through its environment variable override has the same
+# effect on modulecmd.tcl itself
+setenv_var MODULES_TAG_ABBREV remote=R
+setenv_var MODULES_NON_EXPORTABLE_TAGS remote
+
+#
+# drive the exact command sequence the recipe doc's 'Usage example' section
+# demonstrates, in the order it demonstrates it, checking the real stderr
+# each command produces is similar to the output illustrated there (with
+# its placeholder modulepath and unpredictable separator width widened
+# into a regexp, see cookbook_output_re)
+#
+
+set transcript [cookbook_parse_transcript $reciperst {Usage example}]
+
+set modpathre [cookbook_re_escape $recipemodpath]
+set appdirbin "$localapps/$appdir/bin"
+set appdirlib "$localapps/$appdir/lib"
+set altname {foo/2.1&as|foo/default&as|foo/latest}
+set origpath $env(PATH)
+set outputsubs [list /path/to/modulefiles $modpathre]
+
+set loadans [list]
+lappend loadans [list set LD_LIBRARY_PATH $appdirlib]
+lappend loadans [list set __MODULES_LMALTNAME $altname]
+lappend loadans [list set PATH "$appdirbin:$origpath"]
+lappend loadans [list set _LMFILES_ $recipemodpath/foo/2.1]
+lappend loadans [list set LOADEDMODULES foo/2.1]
+
+set unloadans [list]
+lappend unloadans [list unset LD_LIBRARY_PATH]
+lappend unloadans [list unset __MODULES_LMALTNAME]
+lappend unloadans [list set PATH $origpath]
+lappend unloadans [list unset _LMFILES_]
+lappend unloadans [list unset LOADEDMODULES]
+
+# expected stdout (the env-var-assignment syntax a real shell would eval
+# silently, so not part of what the doc transcript illustrates) for each
+# step, in the same order 'module avail foo'/'load foo/2.1'/'list'/
+# 'unload foo/2.1'/'avail foo'/'load foo/2.1' appears in the doc
+set stdoutexpected [list OK $loadans OK $unloadans OK $loadans]
+
+if {[llength $transcript] != [llength $stdoutexpected]} {
+   unresolved "sync-remote-appdir.rst 'Usage example' transcript now has\
+      [llength $transcript] steps ([llength $stdoutexpected] expected) --\
+      this test needs updating to match"
+   return
+}
+
+set idx 0
+foreach step $transcript {
+   lassign $step cmd docoutput
+   if {![regexp {^module\s+(.*)$} $cmd -> modargs]} {
+      unresolved "unexpected non-'module' command in sync-remote-appdir.rst\
+         'Usage example' transcript: '$cmd'"
+      return
+   }
+
+   testouterr_cmd_re sh $modargs [lindex $stdoutexpected $idx]\
+      [cookbook_output_re $docoutput $outputsubs]
+
+   # step 1 (0-indexed) is the first 'load foo/2.1': check the sync
+   # actually happened on disk, then simulate that it took hold in this
+   # shell, as steps 2 and 3 ('list'/'unload') need to see it
+   if {$idx == 1} {
+      if {[file exists "$localapps/.$appdir.synced"]} {
+         pass "sync-remote-appdir: local sync marker created"
+      } else {
+         fail "sync-remote-appdir: local sync marker created"
+      }
+      if {[file exists "$appdirbin/foo"]} {
+         pass "sync-remote-appdir: application directory synced locally"
+      } else {
+         fail "sync-remote-appdir: application directory synced locally"
+      }
+
+      setenv_loaded_module foo/2.1 $recipemodpath/foo/2.1
+      setenv_var __MODULES_LMALTNAME $altname
+      setenv_path_var PATH $appdirbin $origpath
+      setenv_var LD_LIBRARY_PATH $appdirlib
+   }
+
+   # step 3 is 'unload foo/2.1': drop the simulated loaded state so steps
+   # 4 and 5 ('avail'/'load' again) see a clean environment, exactly as a
+   # real shell would once the unload's env changes above got eval'd
+   if {$idx == 3} {
+      unsetenv_loaded_module
+      unsetenv_var __MODULES_LMALTNAME
+      unsetenv_var LD_LIBRARY_PATH
+      setenv_var PATH $origpath
+   }
+
+   incr idx
+}
+
+#
+#  Cleanup
+#
+
+file delete -force $recipedir
+reset_test_env
+
+# vim:set tabstop=3 shiftwidth=3 expandtab autoindent:

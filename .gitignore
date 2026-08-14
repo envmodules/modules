@@ -13,6 +13,8 @@
 /lint.sum
 /completion.log
 /completion.sum
+/cookbook.log
+/cookbook.sum
 /icdiff
 /.noicdiff
 /miniconda3
@@ -58,6 +60,7 @@
 /testsuite/.config
 /testsuite/completion-use-fixture
 /testsuite/completion-home
+/testsuite/cookbook-sandbox
 /doc/build
 /doc/source/version.py
 /doc/demo/*/*.svg

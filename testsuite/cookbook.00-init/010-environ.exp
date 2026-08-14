@@ -1,0 +1,81 @@
+##############################################################################
+#   Modules Revision 3.0
+#   Providing a flexible user environment
+#
+#   File:		cookbook.00-init/%M%
+#   Revision:		%I%
+#   First Edition:	2026/08/13
+#   Last Mod.:		%U%, %G%
+#
+#   Authors:		Xavier Delaruelle, xavier.delaruelle@cea.fr
+#
+#   Description:	initialization of the shell environment
+#   Command:
+#   Sub-Command:
+#
+#   Comment:	%C{
+#			First time initialization: setup a clean, reproducible
+#			environment for the cookbook recipe tests
+#		}C%
+#
+##############################################################################
+
+if {$verbose} {
+   send_user "\tInitializing a clean environment ...\n"
+}
+
+# clear testsuite-related variables
+foreach var [concat [array names env -glob TESTSUITE_*]\
+   [list TESTSUITE TS0 TS1 TS2 TS3 TS4 TS4 TS6 TS7 TS8 TS9]] {
+   # preserve variable externally set to configure testsuite run
+   if {$var ne {TESTSUITE_ENABLE_SITECONFIG}} {
+      unsetenv_var $var
+   }
+}
+
+# start every cookbook test from a clean module environment
+unsetenv_var MODULEPATH
+unsetenv_var LOADEDMODULES
+unsetenv_var _LMFILES_
+unsetenv_var __MODULES_LMALTNAME
+unsetenv_var MODULERCFILE
+unsetenv_var MODULESHOME
+unsetenv_var LD_LIBRARY_PATH
+foreach var [array names env] {
+   switch -glob $var {
+      __MODULES_SHARE_* - __MODULES_PUSHENV_* - __MODULES_QUAR_* - \
+      MODULES_FAMILY_* - MODULES_RUNENV_* - __MODULES_LM* {
+         unsetenv_var $var
+      }
+   }
+}
+
+# each recipe applies its own site configuration/tag setup: start unset so
+# every test file has to state what it actually relies on
+unsetenv_var MODULES_SITECONFIG
+unsetenv_var MODULES_TAG_ABBREV
+unsetenv_var MODULES_NON_EXPORTABLE_TAGS
+setenv_var MODULES_TAG_COLOR_NAME {}
+
+# sandbox $HOME so any file a recipe writes there never touches a
+# developer's actual home
+set cookbookhome "$cookbooksandbox/home"
+file mkdir $cookbookhome
+setenv_var HOME $cookbookhome
+
+# ensure colored output is disabled by default, so expected messages do not
+# need to account for SGR escape sequences
+setenv_var MODULES_COLOR never
+
+# ensure deterministic avail/list output regardless of the calling shell's
+# own configuration
+setenv_var MODULES_AVAIL_OUTPUT {modulepath:alias:dirwsym:sym:tag:variantifspec:key}
+setenv_var MODULES_LIST_OUTPUT {header:idx:variant:sym:tag:key}
+
+# ensure tests are run with a regular default verbosity level
+setenv_var MODULES_VERBOSITY normal
+
+# setup basic locale for tests
+setenv_var LANG C
+
+# vim:set tabstop=3 shiftwidth=3 expandtab autoindent:
