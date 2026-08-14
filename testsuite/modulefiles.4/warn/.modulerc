@@ -28,6 +28,9 @@ if {[info exists env(TESTSUITE_WARN)]} {
         rc_bad4 {
            module-warn --message text --unk warn/1
         }
+        rc_bad5 {
+           module-warn --message
+        }
         user1 {
            module-warn --message text --user [module-info username] warn/1
         }
