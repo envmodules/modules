@@ -131,6 +131,7 @@ set tserr "$modlin Aliases $modlin
 tag/1.1.al -> tag/1.0
 
 $modlin Versions $modlin
+loc_edm1/default -> loc_edm1/1.0.1
 loc_fdv2/default -> loc_fdv2/1.2
 tag/1.1.sym -> tag/1.0"
 
@@ -168,6 +169,7 @@ set tserr "$modlin Aliases $modlin
 tag/1.1.al -> tag/1.0
 
 $modlin Versions $modlin
+loc_edm1/default -> loc_edm1/1.0.1
 loc_fdv2/default -> loc_fdv2/1.2
 tag/1.1.sym -> tag/1.0"
 
