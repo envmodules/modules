@@ -589,15 +589,36 @@ lappend ans $vers_reportre
 testouterr_cmd_re sh -V OK [join $ans \n]
 unsetenv_var TESTSUITE_ENABLE_SITECONFIG_REDEFONTHEFLYPROCS
 
-# test redefinition of defineGetEqArrayKeyProc, called twice in a row with a
-# different implicit_default value each time, to demonstrate it renaming the
-# previously active variant back before renaming the new one in
+# test redefinition of defineGetEqArrayKeyProc: the same implicit_default
+# value called twice in a row is a no-op (the currently active variant
+# already matches), then a different value each time demonstrates renaming
+# the previously active variant back before renaming the new one in
 setenv_var TESTSUITE_ENABLE_SITECONFIG_REDEFGETEQARRAYKEYPROC 1
 set ans [list]
-lappend ans foo/1.0 foo/1.0 foo/1.0
+lappend ans foo/1.0 foo/1.0 foo/1.0 foo/1.0
 lappend ans $vers_reportre
 testouterr_cmd_re sh -V OK [join $ans \n]
 unsetenv_var TESTSUITE_ENABLE_SITECONFIG_REDEFGETEQARRAYKEYPROC
+
+# test getMatchingTagList's "tag already seen earlier in this same call"
+# skip path, forced through a duplicate tag entry directly in the global tag
+# structures since normal module-tag usage always dedupes by tag name
+setenv_var TESTSUITE_ENABLE_SITECONFIG_DUPTAGROOT 1
+set ans [list]
+lappend ans sometag
+lappend ans $vers_reportre
+testouterr_cmd_re sh -V OK [join $ans \n]
+unsetenv_var TESTSUITE_ENABLE_SITECONFIG_DUPTAGROOT
+
+# test getAvailListFromVersSpec's unregistered-modarg path, not reachable
+# through its only real caller since every modarg reaching it there is
+# already registered through parseModuleSpecification
+setenv_var TESTSUITE_ENABLE_SITECONFIG_AVAILLISTUNREG 1
+set ans [list]
+lappend ans 0
+lappend ans $vers_reportre
+testouterr_cmd_re sh -V OK [join $ans \n]
+unsetenv_var TESTSUITE_ENABLE_SITECONFIG_AVAILLISTUNREG
 
 # test the single-element validvallist "string is" class check path in
 # getConf, not exercised by any current config option's own shape
