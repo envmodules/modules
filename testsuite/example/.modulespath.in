@@ -16,5 +16,5 @@
 #				# location of version files
 @VERSIONING@@baseprefix@/$MODULE_VERSION/modulefiles	# Module pkg modulefiles (if versioning)
 @NOTVERSIONING@@modulefilesdir@	# Module pkg modulefiles (if no versioning)
-@prefix@/test/modulefiles:@prefix@/test/etc				# General module files
+@prefix@/test/modulefiles:@prefix@/test/etc:@prefix@/test/absent	# General module files, last one unresolved
 #@prefix@/your_contribs			# Edit for your requirements
