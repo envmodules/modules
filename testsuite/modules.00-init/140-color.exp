@@ -183,6 +183,14 @@ if {$install_color eq {y}} {
     color_test_case {} 0 $sgr
 }
 
+#
+# ensure Modules-specific color config env var override and its internal
+# representation conversion get exercised regardless of quick test mode
+#
+setenv_var MODULES_COLOR always
+color_test_case {} 2 $sgr
+unsetenv_var MODULES_COLOR
+
 skip_if_quick_mode
 
 # environment variable or/and command-line switch override

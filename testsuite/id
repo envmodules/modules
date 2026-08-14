@@ -1,5 +1,5 @@
 #!/bin/sh
 # fake id output
 
-echo "uid=1000(user) gid=1000(user) groups=1000(user),10(wheel),135(mock)"
+echo "uid=1000(user) gid=1000(user) groups=1000(user),10(wheel),135(mock) context=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023"
 exit 0
