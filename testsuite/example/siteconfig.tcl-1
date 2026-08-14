@@ -331,6 +331,17 @@ if {[info exists env(TESTSUITE_ENABLE_SITECONFIG_REDEFONTHEFLYPROCS)]} {
     report [modEq foo fOo equal]
 }
 
+# defineGetEqArrayKeyProc redefinition coverage test
+if {[info exists env(TESTSUITE_ENABLE_SITECONFIG_REDEFGETEQARRAYKEYPROC)]} {
+    array set arr {foo/1.0 {version foo/1.0}}
+    defineGetEqArrayKeyProc 0
+    report [getEqArrayKey arr foo/1.0]
+    defineGetEqArrayKeyProc 1
+    report [getEqArrayKey arr foo/1.0]
+    defineGetEqArrayKeyProc 0
+    report [getEqArrayKey arr foo/1.0]
+}
+
 # specific tests to improve formatErrStackTrace proc coverage
 if {[info exists env(TESTSUITE_ENABLE_SITECONFIG_FORMATERRSTACKTRACE)]} {
     set errmsg {error message
