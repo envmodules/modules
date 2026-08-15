@@ -381,6 +381,21 @@ foo
     report [formatErrStackTrace $errmsg foo]
 }
 
+# specific test to improve formatErrStackTrace proc coverage: the topmost
+# stack frame is itself an 'eval [...]' wrapper (as modulefile content is
+# evaluated via 'eval [getModuleContent $::ModulesCurrentModulefile]'), which
+# requires extracting the inner command from the second word of that frame
+if {[info exists env(TESTSUITE_ENABLE_SITECONFIG_FORMATERRSTACKTRACE_EVAL)]} {
+    set errmsg {error message
+    while executing
+"eval [getModuleContent $::ModulesCurrentModulefile]"
+    invoked from within
+"eval [getModuleContent $::ModulesCurrentModulefile]"
+    (file "foo")}
+
+    report [formatErrStackTrace $errmsg foo]
+}
+
 # produce an unknown error in a modulecmd.tcl procedure during a modulefile evaluation
 if {[info exists env(TESTSUITE_ENABLE_SITECONFIG_UNKINTERRDURINGMODEVAL)]} {
     proc getModshareVarName {var} {
