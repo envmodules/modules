@@ -651,6 +651,16 @@ lappend ans $vers_reportre
 testouterr_cmd_re sh -V OK [join $ans \n]
 unsetenv_var TESTSUITE_ENABLE_SITECONFIG_FORMATERRSTACKTRACE
 
+# specific test to improve formatErrStackTrace proc coverage: topmost stack
+# frame is itself an 'eval [...]' wrapper
+setenv_var TESTSUITE_ENABLE_SITECONFIG_FORMATERRSTACKTRACE_EVAL 1
+set ans [list]
+lappend ans {}
+lappend ans {    \(file "foo"\)}
+lappend ans $vers_reportre
+testouterr_cmd_re sh -V OK [join $ans \n]
+unsetenv_var TESTSUITE_ENABLE_SITECONFIG_FORMATERRSTACKTRACE_EVAL
+
 # produce an unknown error in a modulecmd.tcl procedure during a modulefile evaluation
 setenv_var TESTSUITE_ENABLE_SITECONFIG_UNKINTERRDURINGMODEVAL 1
 set ans [msg_moderr {invalid command name "foo"} {foo} $modpath/setenv/1.0 30 {} {} {} {    (procedure "getModshareVarName" line 2)
