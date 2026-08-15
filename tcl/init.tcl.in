@@ -730,9 +730,7 @@ proc initConfColor {envvar value validvallist intvallist} {
    }
 
    # convert value to its internal representation
-   if {[llength $intvallist]} {
-      set value [lindex $intvallist [lsearch -exact $validvallist $value]]
-   }
+   set value [lindex $intvallist [lsearch -exact $validvallist $value]]
 
    # disable color mode if no terminal attached except if 'always' asked
    if {$value != 0 && (![getState is_stderr_tty] || $value == 2)} {
