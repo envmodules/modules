@@ -13,6 +13,8 @@ permissions:
 jobs:
   macos:
     runs-on: macos-15
+    permissions:
+      id-token: write
     env:
       CONFIGURE_OPTS: |
         --prefix=/tmp/modules
@@ -62,10 +64,12 @@ jobs:
       - name: Uninstall Modules
         run: |
           make uninstall
-      # no token needed: public repo uses Codecov's tokenless upload via
-      # GitHub OIDC, which also works for pull requests coming from forks
-      # (base repo secrets are never exposed to fork-triggered PR runs)
+      # no token needed: id-token permission above lets Codecov verify
+      # this public repo via GitHub OIDC, which also works for pull
+      # requests from forks (base repo secrets are never exposed there)
       - uses: codecov/codecov-action@v7
+        with:
+          use_oidc: true
       - uses: actions/upload-artifact@v7
         if: failure()
         with:
