@@ -2197,6 +2197,61 @@ if {$insmodspath && $modspath_exinstalled && $modspath eq "$install_etcdir/modul
 }
 
 
+# test a modulespath file present but yielding no additional path entries
+# (only comments) correctly adds no extra 'module use --append' and behaves
+# just as if no modulespath file were installed at all
+if {$insmodspath && $modspath_exinstalled && $modspath eq "$install_etcdir/modulespath"\
+    && !$modrc_exinstalled && !$modrc1_exinstalled && !$initrc_exinstalled} {
+    # temporarily replace etc/modulespath with a comments-only variant
+    set fid [open $modspath r]
+    set origmodspathdata [read $fid]
+    close $fid
+    set fid [open $env(TESTSUITEDIR)/example/modulespath-empty r]
+    set emptymodspathdata [read $fid]
+    close $fid
+    set fid [open $modspath w]
+    puts -nonewline $fid $emptymodspathdata
+    close $fid
+
+    set ans [list]
+    lappend ans [list [set "func_sh"]]
+    if {$install_versioning eq "y"} {
+        lappend ans [list set MODULE_VERSION_STACK "(.*)"]
+    }
+    lappend ans [list set MODULES_CMD $modulecmd_path]
+    if {$change_manpath} {
+        if {$extra_sysmanpath} {
+            lappend ans [list set __MODULES_SHARE_MANPATH :1]
+        }
+        lappend ans [list set MANPATH $updatedmanpath]
+    }
+    if {$change_path} {
+        lappend ans [list set PATH $updatedpath]
+    }
+    if {$install_setshellstartup eq {y}} {
+        lappend ans [list set ENV $install_initdir/profile.sh]
+    }
+    lappend ans [list unset __MODULES_AUTOINIT_INPROGRESS]
+    if {$install_setshellstartup eq {y}} {
+        lappend ans [list set BASH_ENV $install_initdir/bash]
+    }
+    lappend ans [list set MODULESHOME $moduleshome]
+    lappend ans [list set LOADEDMODULES ""]
+    lappend ans [list set __MODULES_LMINIT ""]
+    lappend ans [list set MODULEPATH ""]
+    if {$install_versioning eq "y"} {
+        lappend ans [list set MODULE_VERSION "(.*)"]
+    }
+
+    testouterr_cmd_re sh autoinit $ans {}
+
+    # restore original etc/modulespath content
+    set fid [open $modspath w]
+    puts -nonewline $fid $origmodspathdata
+    close $fid
+}
+
+
 # ensure ml is set disabled as if modrc1 initrc were previously evaluated
 # since modulepath and modules are loaded, initrc will not be evaluated by autoinit
 if {$modrc1_exinstalled} {
