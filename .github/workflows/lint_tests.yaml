@@ -2,10 +2,13 @@ name: lint-tests
 
 on:
   push:
-    branches-ignore:
-      - c-main
-      - c-3.2
+    branches:
+      - main
+      - v*.*.x
   pull_request:
+    branches:
+      - main
+      - v*.*.x
 
 permissions:
   contents: read

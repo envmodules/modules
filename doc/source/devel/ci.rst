@@ -50,9 +50,8 @@ All of the above live under :file:`.github/workflows/`.
 .. _ClusterFuzzLite: https://google.github.io/clusterfuzzlite/
 
 Every build/test workflow (all except :file:`differential_shellcheck.yml`,
-:file:`scorecard.yml` and :file:`cflite.yml`) triggers on ``push`` to any
-branch except ``c-main`` and ``c-3.2`` (legacy imported-history branches
-that are not active development targets) and on every ``pull_request``.
+:file:`scorecard.yml` and :file:`cflite.yml`) triggers on ``push`` and
+``pull_request``, both restricted to ``main`` and ``v*.*.x`` branches.
 
 Build/test workflows
 ---------------------
