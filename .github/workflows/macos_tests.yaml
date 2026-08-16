@@ -10,9 +10,6 @@ on:
       - main
       - v*.*.x
 
-permissions:
-  contents: read
-
 jobs:
   macos:
     runs-on: macos-15

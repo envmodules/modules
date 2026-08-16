@@ -10,9 +10,6 @@ on:
       - main
       - v*.*.x
 
-permissions:
-  contents: read
-
 jobs:
   tcl86-nolibtclenvmodules:
     runs-on: ubuntu-22.04
