@@ -67,10 +67,9 @@ jobs:
       - name: Uninstall Modules
         run: |
           make uninstall
-      # no token needed: public repo uses Codecov's tokenless upload via
-      # GitHub OIDC, which also works for pull requests coming from forks
-      # (base repo secrets are never exposed to fork-triggered PR runs)
       - uses: codecov/codecov-action@v7
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
       - uses: actions/upload-artifact@v7
         if: failure()
         with:
@@ -155,10 +154,9 @@ jobs:
       - name: Uninstall Modules
         run: |
           make uninstall
-      # no token needed: public repo uses Codecov's tokenless upload via
-      # GitHub OIDC, which also works for pull requests coming from forks
-      # (base repo secrets are never exposed to fork-triggered PR runs)
       - uses: codecov/codecov-action@v7
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
       - uses: actions/upload-artifact@v7
         if: failure()
         with:
@@ -239,10 +237,9 @@ jobs:
       - name: Uninstall Modules
         run: |
           make uninstall
-      # no token needed: public repo uses Codecov's tokenless upload via
-      # GitHub OIDC, which also works for pull requests coming from forks
-      # (base repo secrets are never exposed to fork-triggered PR runs)
       - uses: codecov/codecov-action@v7
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
       - uses: actions/upload-artifact@v7
         if: failure()
         with:
@@ -308,10 +305,9 @@ jobs:
       - name: Uninstall Modules
         run: |
           make uninstall
-      # no token needed: public repo uses Codecov's tokenless upload via
-      # GitHub OIDC, which also works for pull requests coming from forks
-      # (base repo secrets are never exposed to fork-triggered PR runs)
       - uses: codecov/codecov-action@v7
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
       - uses: actions/upload-artifact@v7
         if: failure()
         with:
@@ -379,10 +375,9 @@ jobs:
       - name: Uninstall Modules
         run: |
           make uninstall
-      # no token needed: public repo uses Codecov's tokenless upload via
-      # GitHub OIDC, which also works for pull requests coming from forks
-      # (base repo secrets are never exposed to fork-triggered PR runs)
       - uses: codecov/codecov-action@v7
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
       - uses: actions/upload-artifact@v7
         if: failure()
         with:
@@ -525,10 +520,9 @@ jobs:
       - name: Uninstall Modules
         run: |
           make uninstall
-      # no token needed: public repo uses Codecov's tokenless upload via
-      # GitHub OIDC, which also works for pull requests coming from forks
-      # (base repo secrets are never exposed to fork-triggered PR runs)
       - uses: codecov/codecov-action@v7
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
       - uses: actions/upload-artifact@v7
         if: failure()
         with:
