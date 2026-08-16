@@ -69,6 +69,7 @@ jobs:
           make uninstall
       - uses: codecov/codecov-action@v7
         with:
+          verbose: true
           token: ${{ secrets.CODECOV_TOKEN }}
       - uses: actions/upload-artifact@v7
         if: failure()
@@ -156,6 +157,7 @@ jobs:
           make uninstall
       - uses: codecov/codecov-action@v7
         with:
+          verbose: true
           token: ${{ secrets.CODECOV_TOKEN }}
       - uses: actions/upload-artifact@v7
         if: failure()
@@ -239,6 +241,7 @@ jobs:
           make uninstall
       - uses: codecov/codecov-action@v7
         with:
+          verbose: true
           token: ${{ secrets.CODECOV_TOKEN }}
       - uses: actions/upload-artifact@v7
         if: failure()
@@ -307,6 +310,7 @@ jobs:
           make uninstall
       - uses: codecov/codecov-action@v7
         with:
+          verbose: true
           token: ${{ secrets.CODECOV_TOKEN }}
       - uses: actions/upload-artifact@v7
         if: failure()
@@ -377,6 +381,7 @@ jobs:
           make uninstall
       - uses: codecov/codecov-action@v7
         with:
+          verbose: true
           token: ${{ secrets.CODECOV_TOKEN }}
       - uses: actions/upload-artifact@v7
         if: failure()
@@ -522,6 +527,7 @@ jobs:
           make uninstall
       - uses: codecov/codecov-action@v7
         with:
+          verbose: true
           token: ${{ secrets.CODECOV_TOKEN }}
       - uses: actions/upload-artifact@v7
         if: failure()
