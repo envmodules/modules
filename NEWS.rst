@@ -214,6 +214,7 @@ Modules 5.7.0 (not yet released)
   the commands demonstrated in the recipe's ``Usage example`` documentation
   in order and checks that similar output is obtained. Currently covers the
   :ref:`sync-remote-appdir` recipe.
+* Doc: add :ref:`modulepath-ignore` design notes.
 
 
 .. _5.6 release notes:
