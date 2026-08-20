@@ -1,0 +1,253 @@
+##############################################################################
+#   Modules Revision 3.0
+#   Providing a flexible user environment
+#
+#   File:		modules.30-cache/%M%
+#   Revision:		%I%
+#   First Edition:	2026/08/19
+#   Last Mod.:		%U%, %G%
+#
+#   Authors:		Xavier Delaruelle, xavier.delaruelle@cea.fr
+#
+#   Description:	Testuite testsequence
+#   Command:		cachebuild, avail, load
+#   Modulefiles:
+#   Sub-Command:
+#
+#   Comment:	%C{
+#           Check modulepath elements matching modulepath-ignore patterns
+#           are excluded from built cache file
+#		}C%
+#
+##############################################################################
+
+# filesystem on Cygwin platform is responding in an unexpected way
+# skip these tests on this platform for now
+skip_if_os_in cygwin
+
+# ensure avail tests are made using in depth mode
+setenv_var MODULES_AVAIL_INDEPTH 1
+
+# ensure avail tests have implicit default enabled
+setenv_var MODULES_IMPLICIT_DEFAULT 1
+
+# ensure auto symbolic versions are set for these tests
+setenv_var MODULES_ADVANCED_VERSION_SPEC 1
+
+# create modulepath for tests
+set mp1 $env(HOME)/mpigncache1
+set mp1cache $mp1/.modulecache
+set mfcontent "#%Module\nmodule-whatis \[module-info name\]"
+
+file mkdir $mp1/foo $mp1/bar $mp1/helper
+set mp1rc_content "#%Module\nmodulepath-ignore *.tcl helper/"
+set fid [open $mp1/.modulerc w]
+puts -nonewline $fid $mp1rc_content
+close $fid
+set barrc_content "#%Module\nmodulepath-ignore 2*"
+set fid [open $mp1/bar/.modulerc w]
+puts -nonewline $fid $barrc_content
+close $fid
+foreach f [list foo/1.0 bar/1.0 bar/2.0] {
+    set fid [open $mp1/$f w]
+    puts -nonewline $fid $mfcontent
+    close $fid
+}
+set fid [open $mp1/foo/lib.tcl w]
+puts -nonewline $fid "proc helperproc {} {}"
+close $fid
+set fid [open $mp1/helper/util w]
+puts -nonewline $fid "not a modulefile"
+close $fid
+
+setenv_path_var MODULEPATH $mp1
+
+# ignored elements are excluded from built cache file
+set tserr [msg_create $mp1cache]
+set tscache "#%Module$cache_mcookie_version"
+append tscache \n[list modulerc-content .modulerc #%Module $mp1rc_content]
+append tscache \n[list modulerc-content bar/.modulerc #%Module\
+    $barrc_content]
+append tscache \n[list modulefile-content bar/1.0 [file mtime $mp1/bar/1.0]\
+    #%Module $mfcontent]
+append tscache \n[list modulefile-content foo/1.0 [file mtime $mp1/foo/1.0]\
+    #%Module $mfcontent]
+testouterrfile_cmd sh cachebuild OK $tserr $mp1cache $tscache
+
+# same search result whether cache file is used or not
+set tserr "bar/1.0
+foo/1.0"
+testouterr_cmd sh {avail -a -t -o } OK $tserr
+setenv_var MODULES_IGNORE_CACHE 1
+testouterr_cmd sh {avail -a -t -o } OK $tserr
+unsetenv_var MODULES_IGNORE_CACHE
+
+# same not found error whether cache file is used or not
+testouterr_cmd sh {load bar/2.0} ERR $err_path'bar/2.0'
+setenv_var MODULES_IGNORE_CACHE 1
+testouterr_cmd sh {load bar/2.0} ERR $err_path'bar/2.0'
+unsetenv_var MODULES_IGNORE_CACHE
+
+# ignored elements are excluded from cache file at build time: disabling
+# modulepath_ignore option does not get them back when cache file is used,
+# cache file also needs to be ignored to fetch them from disk
+set tserr "bar/1.0
+foo/1.0"
+testouterr_cmd sh {--no-modulepath-ignore avail -a -t -o } OK $tserr
+set tserr "bar/1.0
+bar/2.0
+foo/1.0"
+testouterr_cmd sh {--no-modulepath-ignore --ignore-cache avail -a -t -o }\
+    OK $tserr
+testouterr_cmd sh {--no-modulepath-ignore is-avail bar/2.0} ERR {}
+testouterr_cmd sh {--no-modulepath-ignore --ignore-cache is-avail bar/2.0}\
+    OK {}
+
+file delete $mp1cache
+
+skip_if_quick_mode
+
+# every element is recorded in cache when modulepath_ignore is disabled
+setenv_var MODULES_MODULEPATH_IGNORE 0
+set tserr [msg_create $mp1cache]
+set tscache "#%Module$cache_mcookie_version"
+append tscache \n[list modulerc-content .modulerc #%Module $mp1rc_content]
+append tscache \n[list modulerc-content bar/.modulerc #%Module\
+    $barrc_content]
+append tscache \n[list modulefile-content bar/1.0 [file mtime $mp1/bar/1.0]\
+    #%Module $mfcontent]
+append tscache \n[list modulefile-content bar/2.0 [file mtime $mp1/bar/2.0]\
+    #%Module $mfcontent]
+append tscache \n[list modulefile-content foo/1.0 [file mtime $mp1/foo/1.0]\
+    #%Module $mfcontent]
+append tscache \n[list modulefile-invalid foo/lib.tcl invalid {Magic cookie\
+    '#%Module' missing}]
+append tscache \n[list modulefile-invalid helper/util invalid {Magic cookie\
+    '#%Module' missing}]
+testouterrfile_cmd sh cachebuild OK $tserr $mp1cache $tscache
+unsetenv_var MODULES_MODULEPATH_IGNORE
+file delete $mp1cache
+
+
+#
+#  Limited access elements
+#
+
+# cannot test access if cannot change file permission
+if {!$is_file_perms_editable} {
+    send_user "\tskipping access tests as file permissions cannot be\
+        changed\n"
+# cannot test access if superuser privileges are in use
+} elseif {$tcl_platform(user) eq "root"} {
+    send_user "\tskipping access tests as tests are run by superuser\n"
+# cannot test access if restricted file permissions have no effect
+} elseif {$is_locked_dir_file_readable && $is_locked_file_readable} {
+    send_user "\tskipping access tests as locked files or directories are\
+        still readable\n"
+} else {
+
+file mkdir $mp1/bar/sub
+foreach f [list bar/sub/1.0 bar/sub/2.5 foo/norm] {
+    set fid [open $mp1/$f w]
+    puts -nonewline $fid $mfcontent
+    close $fid
+}
+set fid [open $mp1/foo/priv.tcl w]
+puts -nonewline $fid "proc anotherproc {} {}"
+close $fid
+
+change_file_perms $mp1/bar/sub o-rx
+change_file_perms $mp1/foo/priv.tcl o-r
+change_file_perms $mp1/foo/norm o-r
+change_file_perms $mp1/helper o-rx
+
+# ignored elements with limited access (foo/priv.tcl and helper) are not
+# recorded in cache file, limited access elements not ignored (bar/sub and
+# foo/norm) are recorded
+set tserr [msg_create $mp1cache]
+set tscache "#%Module$cache_mcookie_version"
+append tscache \n[list modulerc-content .modulerc #%Module $mp1rc_content]
+append tscache \n[list modulerc-content bar/.modulerc #%Module\
+    $barrc_content]
+append tscache \n[list modulefile-content bar/1.0 [file mtime $mp1/bar/1.0]\
+    #%Module $mfcontent]
+append tscache \n[list limited-access-directory bar/sub]
+append tscache \n[list modulefile-content foo/1.0 [file mtime $mp1/foo/1.0]\
+    #%Module $mfcontent]
+append tscache \n[list limited-access-file foo/norm]
+testouterrfile_cmd sh cachebuild OK $tserr $mp1cache $tscache
+
+# patterns from rc files recorded in cache apply when walking down limited
+# access directories on cache use: bar/sub/2.5 matches the pattern defined
+# in bar/.modulerc, which is not walked through as it is readable
+set tserr "bar/1.0
+bar/sub/1.0
+foo/1.0
+foo/norm"
+testouterr_cmd sh {avail -a -t -o } OK $tserr
+setenv_var MODULES_IGNORE_CACHE 1
+testouterr_cmd sh {avail -a -t -o } OK $tserr
+unsetenv_var MODULES_IGNORE_CACHE
+
+# same not found error whether cache file is used or not
+testouterr_cmd sh {load bar/sub/2.5} ERR $err_path'bar/sub/2.5'
+setenv_var MODULES_IGNORE_CACHE 1
+testouterr_cmd sh {load bar/sub/2.5} ERR $err_path'bar/sub/2.5'
+unsetenv_var MODULES_IGNORE_CACHE
+
+file delete $mp1cache
+restore_file_perms $mp1/bar/sub
+restore_file_perms $mp1/foo/priv.tcl
+restore_file_perms $mp1/foo/norm
+restore_file_perms $mp1/helper
+
+# rc files are exempt from ignore pattern check: a limited access rc file
+# matching a pattern (like '*' here) is still recorded as a limited access
+# entry, which keeps its content out of the cache file rather than having
+# it plainly recorded there despite its restricted access
+set mp2 $env(HOME)/mpigncache2
+set mp2cache $mp2/.modulecache
+file mkdir $mp2/app
+set mp2rc_content "#%Module\nmodulepath-ignore * !*/ !*.mod"
+set fid [open $mp2/.modulerc w]
+puts -nonewline $fid $mp2rc_content
+close $fid
+set fid [open $mp2/app/.modulerc w]
+puts -nonewline $fid "#%Module\nmodule-version app/1.0.mod stable"
+close $fid
+foreach f [list app/1.0.mod app/2.0] {
+    set fid [open $mp2/$f w]
+    puts -nonewline $fid $mfcontent
+    close $fid
+}
+change_file_perms $mp2/app/.modulerc o-r
+
+setenv_path_var MODULEPATH $mp2
+set tserr [msg_create $mp2cache]
+set tscache "#%Module$cache_mcookie_version"
+append tscache \n[list modulerc-content .modulerc #%Module $mp2rc_content]
+append tscache \n[list limited-access-file app/.modulerc]
+append tscache \n[list modulefile-content app/1.0.mod [file mtime\
+    $mp2/app/1.0.mod] #%Module $mfcontent]
+testouterrfile_cmd sh cachebuild OK $tserr $mp2cache $tscache
+
+# limited access rc file is tested then evaluated from disk on cache use
+set tserr app/1.0.mod
+testouterr_cmd sh {avail -a -t -o } OK $tserr
+setenv_var MODULES_IGNORE_CACHE 1
+testouterr_cmd sh {avail -a -t -o } OK $tserr
+unsetenv_var MODULES_IGNORE_CACHE
+
+restore_file_perms $mp2/app/.modulerc
+file delete -force $mp2
+setenv_path_var MODULEPATH $mp1
+
+}
+
+#
+#  Cleanup
+#
+
+file delete -force $mp1
+
+reset_test_env

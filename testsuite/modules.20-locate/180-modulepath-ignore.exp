@@ -1,0 +1,304 @@
+##############################################################################
+#   Modules Revision 3.0
+#   Providing a flexible user environment
+#
+#   File:		modules.20-locate/%M%
+#   Revision:		%I%
+#   First Edition:	2026/08/19
+#   Last Mod.:		%U%, %G%
+#
+#   Authors:		Xavier Delaruelle, xavier.delaruelle@cea.fr
+#
+#   Description:	Testuite testsequence
+#   Command:
+#   Modulefiles:
+#   Sub-Command:    avail, load, is-avail
+#
+#   Comment:	%C{
+#           Check modulepath content ignore patterns defined with the
+#           modulepath-ignore modulefile command
+#		}C%
+#
+##############################################################################
+
+# ensure avail tests are made using in depth mode
+setenv_var MODULES_AVAIL_INDEPTH 1
+
+# ensure avail tests have implicit default enabled
+setenv_var MODULES_IMPLICIT_DEFAULT 1
+
+# ensure auto symbolic versions are set for these tests
+setenv_var MODULES_ADVANCED_VERSION_SPEC 1
+
+# create modulepaths for tests
+set mp1 $env(HOME)/mpign1
+set mp2 $env(HOME)/mpign2
+set mp3 $env(HOME)/mpign3
+set mfcontent "#%Module\nmodule-whatis \[module-info name\]"
+
+file mkdir $mp1/foo $mp1/bar $mp1/baz $mp1/helper
+set fid [open $mp1/.modulerc w]
+puts $fid "#%Module\nmodulepath-ignore *.tcl helper/ *.log"
+close $fid
+set fid [open $mp1/foo/.modulerc w]
+puts $fid "#%Module\nmodulepath-ignore 2*"
+close $fid
+set fid [open $mp1/baz/.version w]
+puts $fid "#%Module\nmodulepath-ignore 3*\nset ModulesVersion 1.0"
+close $fid
+foreach f [list foo/1.0 foo/2.0 foo/run.log bar/1.0 bar/2.0 baz/1.0\
+    baz/3.0] {
+    set fid [open $mp1/$f w]
+    puts $fid $mfcontent
+    close $fid
+}
+set fid [open $mp1/foo/lib.tcl w]
+puts $fid "proc helperproc {} {}"
+close $fid
+set fid [open $mp1/helper/util w]
+puts $fid "not a modulefile"
+close $fid
+
+setenv_path_var MODULEPATH $mp1
+
+# ignored files and directories are excluded from module search
+set tserr "bar/1.0
+bar/2.0
+baz/1.0
+foo/1.0"
+testouterr_cmd sh {avail -a -t -o } OK $tserr
+
+# targeted search of an ignored element finds nothing
+testouterr_cmd sh {avail -t -o  foo/2.0} OK {}
+testouterr_cmd sh {avail -t -o  bar/2.0} OK bar/2.0
+
+# direct access to an ignored element leads to a not found error
+testouterr_cmd sh {load foo/2.0} ERR $err_path'foo/2.0'
+testouterr_cmd sh {is-avail foo/2.0} ERR {}
+testouterr_cmd sh {is-avail bar/2.0} OK {}
+
+# disabled modulepath_ignore configuration option skips all patterns
+setenv_var MODULES_MODULEPATH_IGNORE 0
+set tserr "bar/1.0
+bar/2.0
+baz/1.0
+baz/3.0
+foo/1.0
+foo/2.0
+foo/run.log"
+testouterr_cmd sh {avail -a -t -o } OK $tserr
+unsetenv_var MODULES_MODULEPATH_IGNORE
+
+# --no-modulepath-ignore command line switch skips patterns for one
+# execution
+testouterr_cmd sh {--no-modulepath-ignore avail -a -t -o } OK $tserr
+
+skip_if_quick_mode
+
+# ignore all accept some idiom with negated patterns
+file mkdir $mp2/app
+set fid [open $mp2/.modulerc w]
+puts $fid "#%Module\nmodulepath-ignore * !*/ !*.mod"
+close $fid
+foreach f [list app/1.0.mod app/2.0] {
+    set fid [open $mp2/$f w]
+    puts $fid $mfcontent
+    close $fid
+}
+setenv_path_var MODULEPATH $mp2
+testouterr_cmd sh {avail -a -t -o } OK app/1.0.mod
+
+# global rc file patterns apply to every modulepath
+if {[info exists env(MODULERCFILE)]} {
+    set save_modulercfile $env(MODULERCFILE)
+}
+set fid [open $env(HOME)/testglobalrc w]
+puts $fid "#%Module\nmodulepath-ignore bar/"
+close $fid
+setenv_var MODULERCFILE $env(HOME)/testglobalrc
+setenv_path_var MODULEPATH $mp1
+set tserr "baz/1.0
+foo/1.0"
+testouterr_cmd sh {avail -a -t -o } OK $tserr
+# patterns defined within modulepath take precedence over global patterns
+setenv_path_var MODULEPATH $mp2
+testouterr_cmd sh {avail -a -t -o } OK app/1.0.mod
+if {[info exists save_modulercfile]} {
+    setenv_var MODULERCFILE $save_modulercfile
+    unset save_modulercfile
+} else {
+    unsetenv_var MODULERCFILE
+}
+file delete $env(HOME)/testglobalrc
+
+# user rc file patterns also apply to every modulepath (even if user rc
+# file is named '.modulerc', it does not lie within a modulepath, so the
+# patterns it defines are global ones)
+set userhome $env(HOME)/ignhome
+file mkdir $userhome
+set fid [open $userhome/.modulerc w]
+puts $fid "#%Module\nmodulepath-ignore bar/"
+close $fid
+set save_home $env(HOME)
+setenv_var HOME $userhome
+setenv_path_var MODULEPATH $mp1
+set tserr "baz/1.0
+foo/1.0"
+testouterr_cmd sh {avail -a -t -o } OK $tserr
+# patterns from user rc file are dropped when this file is ignored
+set tserr "bar/1.0
+bar/2.0
+baz/1.0
+foo/1.0"
+testouterr_cmd sh {--ignore-user-rc avail -a -t -o } OK $tserr
+setenv_var HOME $save_home
+unset save_home
+file delete -force $userhome
+
+# double asterisk (leading, middle and mid-segment), character range
+# (regular and negated), single character, escaped characters, leading
+# slash anchor and unclosed character range patterns, defined over several
+# modulepath-ignore calls in same rc file
+set mp4 $env(HOME)/mpign4
+file mkdir $mp4/app $mp4/lib/x $mp4/sub/doc $mp4/qux $mp4/quax $mp4/a/x/y\
+    $mp4/mx
+set fid [open $mp4/.modulerc w]
+puts $fid "#%Module\nmodulepath-ignore **/doc lib/** {app/\[13\]*}\
+    {\\!bang} qu?x\nmodulepath-ignore /root1* a/**/b {e\[!0-9\]f} m**n\
+    {br\[ack} {sp\\*t}"
+close $fid
+foreach f [list app/1.0 app/2.0 app/3.0 lib/x/1.0 sub/doc/1.0 sub/1.0\
+    qux/1.0 quax/1.0 !bang root1.0 sub/root1.5 a/b a/x/b a/x/y/b a/c exf\
+    e5f mooon mx/n {br[ack} {sp*t} spot] {
+    set fid [open $mp4/$f w]
+    puts $fid $mfcontent
+    close $fid
+}
+setenv_path_var MODULEPATH $mp4
+set tserr "a/c
+app/2.0
+e5f
+mx/n
+qux/1.0
+spot
+sub/1.0
+sub/root1.5"
+testouterr_cmd sh {avail -a -t -o } OK $tserr
+
+# directories matching ignored_dirs configuration option and backup or
+# version control files cannot be re-included by a negated pattern and are
+# still ignored when modulepath_ignore option is disabled
+set mp5 $env(HOME)/mpign5
+file mkdir $mp5/.git $mp5/mod
+set fid [open $mp5/.modulerc w]
+puts $fid "#%Module\nmodulepath-ignore !.git/ !*~"
+close $fid
+foreach f [list .git/1.0 mod/1.0 mod/1.0~] {
+    set fid [open $mp5/$f w]
+    puts $fid $mfcontent
+    close $fid
+}
+setenv_path_var MODULEPATH $mp5
+testouterr_cmd sh {avail -a -t -o } OK mod/1.0
+testouterr_cmd sh {--no-modulepath-ignore avail -a -t -o } OK mod/1.0
+testouterr_cmd sh {--no-modulepath-ignore avail -a -t -o  .git} OK {}
+testouterr_cmd sh {--no-modulepath-ignore load .git/1.0} ERR\
+    $err_path'.git/1.0'
+
+# a '.version' rc file matching a '.version' pattern is exempt and still
+# evaluated; a directory bearing an rc file name is handled as an rc file
+# when fetched with its directory content, so it is not walked down
+# whether patterns apply or not
+set mp6 $env(HOME)/mpign6
+file mkdir $mp6/mod/.version $mp6/other
+set fid [open $mp6/.modulerc w]
+puts $fid "#%Module\nmodulepath-ignore .version"
+close $fid
+set fid [open $mp6/other/.version w]
+puts $fid "#%Module\nset ModulesVersion 1.0"
+close $fid
+foreach f [list mod/.version/1.0 mod/1.0 other/1.0 other/2.0] {
+    set fid [open $mp6/$f w]
+    puts $fid $mfcontent
+    close $fid
+}
+setenv_path_var MODULEPATH $mp6
+set tserr "mod/1.0
+other/1.0
+other/2.0"
+testouterr_cmd sh {avail -a -t -o } OK $tserr
+testouterr_cmd sh {avail -t -o  other/default} OK other/1.0
+testouterr_cmd sh {--no-modulepath-ignore avail -a -t -o } OK $tserr
+
+# ignore patterns are taken into account when determining the implicit
+# default version of a directory on the shortcut search made for an exact
+# 'name/version' specification: highest version is ignored so the next one
+# is the implicit default (patterns are obtained from the rc file evaluated
+# when directory content is fetched, prior the trimElemListForStopmod
+# optimization procedure narrows down the element list)
+set mp7 $env(HOME)/mpign7
+file mkdir $mp7/foo
+set fid [open $mp7/foo/.modulerc w]
+puts $fid "#%Module\nmodulepath-ignore 3*"
+close $fid
+foreach f [list foo/1.0 foo/2.0 foo/3.0] {
+    set fid [open $mp7/$f w]
+    puts $fid $mfcontent
+    close $fid
+}
+setenv_path_var MODULEPATH $mp7
+set ans [list]
+lappend ans [list set _LMFILES_ $mp7/foo/1.0]
+lappend ans [list set LOADEDMODULES foo/1.0]
+testouterr_cmd sh {load foo/1.0} $ans {}
+set ans [list]
+lappend ans [list set __MODULES_LMALTNAME foo/2.0&as|foo/default&as|foo/latest]
+lappend ans [list set _LMFILES_ $mp7/foo/2.0]
+lappend ans [list set LOADEDMODULES foo/2.0]
+testouterr_cmd sh {load foo/2.0} $ans {}
+
+# a default version explicitly set in a '.version' file targeting an
+# ignored version leads to a not found error, as ignored elements are
+# handled as if they do not exist
+set mp8 $env(HOME)/mpign8
+file mkdir $mp8/bar
+set fid [open $mp8/bar/.version w]
+puts $fid "#%Module\nset ModulesVersion 2.0"
+close $fid
+set fid [open $mp8/bar/.modulerc w]
+puts $fid "#%Module\nmodulepath-ignore 2*"
+close $fid
+foreach f [list bar/1.0 bar/2.0] {
+    set fid [open $mp8/$f w]
+    puts $fid $mfcontent
+    close $fid
+}
+setenv_path_var MODULEPATH $mp8
+testouterr_cmd sh {avail -t -o  bar} OK bar/1.0
+testouterr_cmd sh {load bar} ERR $err_path'bar/2.0'
+
+# modulepath-ignore is not allowed in modulefile
+file mkdir $mp3/err
+set fid [open $mp3/err/1.0 w]
+puts $fid "#%Module\nmodulepath-ignore *.x"
+close $fid
+set fid [open $mp3/err/2.0 w]
+puts $fid "#%Module\nmodulepath-ignore"
+close $fid
+setenv_path_var MODULEPATH $mp3
+set tserr [msg_load err/1.0 [msg_moderr {modulepath-ignore command not\
+    allowed in modulefile} {modulepath-ignore *.x} $mp3/err/1.0 2]]
+testouterr_cmd sh {load err/1.0} ERR $tserr
+
+# an argument is expected for modulepath-ignore command
+set tserr [msg_load err/2.0 [msg_moderr {No pattern specified in argument}\
+    modulepath-ignore $mp3/err/2.0 2]]
+testouterr_cmd sh {load err/2.0} ERR $tserr
+
+#
+#  Cleanup
+#
+
+file delete -force $mp1 $mp2 $mp3 $mp4 $mp5 $mp6 $mp7 $mp8
+
+reset_test_env
