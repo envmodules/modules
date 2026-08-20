@@ -2151,7 +2151,9 @@ Options:
                   Set output width to COLS columns.
   --ignore-cache  Ignore module cache
   --ignore-user-rc
-                  Skip evaluation of user-specific module rc file}
+                  Skip evaluation of user-specific module rc file
+  --no-modulepath-ignore
+                  Do not apply modulepath-ignore pattern definitions}
 }
 
 # create appropriate message and kind of report when a requirement is not

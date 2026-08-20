@@ -125,6 +125,7 @@ array set g_config_defs [list\
    mcookie_version_check {MODULES_MCOOKIE_VERSION_CHECK\
       @mcookieversioncheck@ 0 b {0 1}}\
    ml {MODULES_ML @ml@ 0 b {0 1}}\
+   modulepath_ignore {MODULES_MODULEPATH_IGNORE 1 0 b {0 1}}\
    nearly_forbidden_days {MODULES_NEARLY_FORBIDDEN_DAYS @nearlyforbiddendays@\
       0 i {0 365} {} {} intbe}\
    non_exportable_tags {MODULES_NON_EXPORTABLE_TAGS {} 0 l}\

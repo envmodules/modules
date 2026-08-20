@@ -2922,6 +2922,40 @@ proc doesModuleHaveSym {mod} {
       $::g_symbolHash($mod) $::g_hiddenSymHash($mod)] 0]])}]
 }
 
+# test given file path against every ignore pattern recorded: last matching
+# pattern decides whether element is ignored. patterns registered from
+# global or user rc files anchor at the root of the walked modulepath
+proc isPathIgnored {modpath fpelt {isdir 0}} {
+   # rc files are exempt from ignore patterns as they drive the walk itself
+   # (a directory bearing such a name is matched like any other directory)
+   if {!$isdir && [file tail $fpelt] in {.modulerc .version}} {
+      return 0
+   }
+   if {![info exists ::g_pathIgnorePatterns] || ![getConf\
+      modulepath_ignore]} {
+      return 0
+   }
+   set res 0
+   foreach entry $::g_pathIgnorePatterns {
+      lassign $entry anchor negated dironly re
+      if {$dironly && !$isdir} {
+         continue
+      }
+      if {$anchor eq {}} {
+         set anchor $modpath
+      }
+      # only apply pattern to elements lying below its anchor directory
+      set rel_start [expr {[string length $anchor] + 1}]
+      if {![string equal -length $rel_start $anchor/ $fpelt]} {
+         continue
+      }
+      if {[regexp -- $re [string range $fpelt $rel_start end]]} {
+         set res [expr {!$negated}]
+      }
+   }
+   return $res
+}
+
 # get list of elements located in a directory passed as argument. a flag is
 # set after each element to know if it is considered hidden or not. a
 # fetch_dotversion argument controls whether .version file should be looked at
@@ -2929,15 +2963,10 @@ proc doesModuleHaveSym {mod} {
 # extension library
 proc __getFilesInDirectory {dir fetch_dotversion} {
    set dir_list [list]
+   set hid_list [list]
 
-   set elt_list [glob -nocomplain -directory $dir *]
-
-   # Add each element in the current directory to the list
-   foreach elt $elt_list {
-      lappend dir_list $elt 0
-   }
-
-   # search for hidden files
+   # rc files are returned first as they must be treated prior any other
+   # element in directory (they may define patterns to ignore siblings)
    foreach elt [glob -nocomplain -types hidden -directory $dir -tails *] {
       switch -- $elt {
          . - .. { }
@@ -2948,9 +2977,17 @@ proc __getFilesInDirectory {dir fetch_dotversion} {
             }
          }
          default {
-            lappend dir_list $dir/$elt 1
+            lappend hid_list $dir/$elt 1
          }
       }
+   }
+
+   # then regular elements and other hidden files afterward
+   foreach elt [glob -nocomplain -directory $dir *] {
+      lappend dir_list $elt 0
+   }
+   if {[llength $hid_list]} {
+      lappend dir_list {*}$hid_list
    }
 
    return $dir_list
@@ -3023,19 +3060,13 @@ proc trimElemListForStopmod {dir mod_name stop_mod elt_list_name} {
       lappend tail_list [file tail $elt]
    }
 
-   # source the modulepath root '.modulerc' then this directory's own
-   # '.modulerc' and '.version' right away (in that order) if not already
-   # done, as any of them may set a hiding rule needed below, to correctly
-   # tell if a sibling actually is a qualifying higher element (guarded the
-   # same way the general consolidation phase guards its own later,
-   # deferred sourcing of them)
+   # source this directory's own '.modulerc' and '.version' right away (in
+   # that order) if not already done, as any of them may set a hiding or
+   # ignore rule needed below, to correctly tell if a sibling actually is a
+   # qualifying higher element (guarded the same way the walk loop guards
+   # its own later sourcing of them; the modulepath root '.modulerc' has
+   # already been sourced at walk start)
    global g_rcfilesSourced
-   set top_rc_file $dir/.modulerc
-   if {![info exists g_rcfilesSourced($top_rc_file)] && [file readable\
-      $top_rc_file]} {
-      execute-modulerc $top_rc_file .modulerc .modulerc
-      set g_rcfilesSourced($top_rc_file) 1
-   }
    foreach rc_tail {.modulerc .version} {
       set rc_elt $dir/$mod_name/$rc_tail
       if {[info exists up_elt_arr($rc_elt)] && ![info exists\
@@ -3068,8 +3099,9 @@ proc trimElemListForStopmod {dir mod_name stop_mod elt_list_name} {
          # everything untouched like usual
          return
       }
-      if {[lindex [checkValidModule $fp_elt] 0] eq {true} &&\
-         ![isModuleHidden $mod_name/$fp_tail $stop_mod 0 $fp_elt]} {
+      if {![isPathIgnored $dir $fp_elt] && [lindex [checkValidModule\
+         $fp_elt] 0] eq {true} && ![isModuleHidden $mod_name/$fp_tail\
+         $stop_mod 0 $fp_elt]} {
          set top_idx $ti
          break
       }
@@ -3106,7 +3138,31 @@ proc findModulesFromDirsAndFiles {dir full_list depthlvl fetch_mtime\
    foreach igndir [getConf ignored_dirs] {
       set ignored_dirs($igndir) 1
    }
+
+   # evaluate modulepath root rc file prior walking: it may define path
+   # ignore patterns and it is not part of the walked list when only the
+   # limited access elements from a cache file are walked down
+   global g_rcfilesSourced
+   set top_rc_file $dir/.modulerc
+   if {![info exists g_rcfilesSourced($top_rc_file)] && [file readable\
+      $top_rc_file]} {
+      execute-modulerc $top_rc_file .modulerc .modulerc
+      set g_rcfilesSourced($top_rc_file) 1
+   }
+
    array set mod_list {}
+
+   # also evaluate rc files already recorded in transmitted result list
+   # (entries coming from an evaluated cache file): these files are not
+   # walked through, as readable when cache was built, but the patterns
+   # they may define apply to the walk down of limited access elements
+   foreach elt [lsort [array names mod_list]] {
+      if {[lindex $mod_list($elt) 0] eq {modulerc} && ![info exists\
+         g_rcfilesSourced($dir/$elt)]} {
+         execute-modulerc $dir/$elt $elt $elt
+         set g_rcfilesSourced($dir/$elt) 1
+      }
+   }
    for {set i 0} {$i < [llength $full_list]} {incr i 1} {
       set element [lindex $full_list $i]
       set tail [file tail $element]
@@ -3115,8 +3171,14 @@ proc findModulesFromDirsAndFiles {dir full_list depthlvl fetch_mtime\
       set moddepthlvl [llength [file split $modulename]]
       # check if element is a directory if we do not already know if it is a
       # dir or a file from transmitted structures
-      if {[info exists dknown_arr($modulename)] || (![info exists\
-         fknown_arr($modulename)] && [file isdirectory $element])} {
+      set is_elt_dir [expr {[info exists dknown_arr($modulename)] ||\
+         (![info exists fknown_arr($modulename)] && [file isdirectory\
+         $element])}]
+      # skip element matching an ignore pattern as if it does not exist
+      if {[isPathIgnored $dir $element $is_elt_dir]} {
+         continue
+      }
+      if {$is_elt_dir} {
          if {![info exists ignored_dirs($tail)]} {
             if {[catch {
                set elt_list [getFilesInDirectory $element 1]
@@ -3130,25 +3192,51 @@ proc findModulesFromDirsAndFiles {dir full_list depthlvl fetch_mtime\
                # (left untouched in any other case)
                trimElemListForStopmod $dir $modulename $stop_mod elt_list
 
-               # Add each element in the current directory to the list
+               # Add each element in the current directory to the list:
+               # right after current position (depth-first) and in lexical
+               # order (rc files kept first) to evaluate rc files in the
+               # same deterministic order as when they were all evaluated
+               # after the walk, as module resolution and symbol definition
+               # results depend on rc file evaluation order
+               set chunk_list {}
+               set sortable_list {}
                foreach {fpelt hid} $elt_list {
-                  lappend full_list $fpelt
+                  if {[file tail $fpelt] in {.modulerc .version}} {
+                     lappend chunk_list $fpelt
+                  } else {
+                     lappend sortable_list [list $fpelt $hid]
+                  }
                   # Flag hidden files
                   if {$hid} {
                      set hidden_list($fpelt) 1
                   }
                }
+               foreach fpelt_hid [lsort -index 0 $sortable_list] {
+                  lappend chunk_list [lindex $fpelt_hid 0]
+               }
+               set full_list [linsert $full_list [expr {$i + 1}]\
+                  {*}$chunk_list]
             }
          }
       } else {
          switch -glob -- $tail {
             .modulerc {
+               # evaluate rc file as soon as it is reached during walk: it
+               # may define ignore patterns applying to elements walked next
+               if {![info exists g_rcfilesSourced($element)]} {
+                  execute-modulerc $element $modulename $modulename
+                  set g_rcfilesSourced($element) 1
+               }
                set mod_list($modulename) [list modulerc]
             }
             .version {
                # skip .version file from different depth level than search
                # targets if no in depth mode is enabled
                if {$depthlvl == 0 || $moddepthlvl == $depthlvl} {
+                  if {![info exists g_rcfilesSourced($element)]} {
+                     execute-modulerc $element $modulename $modulename
+                     set g_rcfilesSourced($element) 1
+                  }
                   set mod_list($modulename) [list modulerc]
                }
             }
@@ -3230,6 +3318,9 @@ proc findModules {dir mod depthlvl fetch_mtime {stop_mod {}}} {
             lappend full_list $fpelt
          }
       }
+      # walk root elements in lexical order to evaluate the rc files found
+      # down each of them in a deterministic order (see walk loop)
+      set full_list [lsort $full_list]
    }]} {
       return {}
    }
@@ -3250,8 +3341,7 @@ proc findModules {dir mod depthlvl fetch_mtime {stop_mod {}}} {
 
 proc getModules {dir {mod {}} {fetch_mtime 0} {search {}} {filter {}}} {
    global g_sourceAlias g_sourceVersion g_sourceVirtual g_rcAlias\
-      g_moduleAlias g_rcVersion g_moduleVersion g_rcVirtual g_moduleVirtual\
-      g_rcfilesSourced
+      g_moduleAlias g_rcVersion g_moduleVersion g_rcVirtual g_moduleVirtual
 
    reportDebug "get '$mod' in $dir (fetch_mtime=$fetch_mtime, search=$search,\
       filter=$filter)"
@@ -3364,15 +3454,14 @@ proc getModules {dir {mod {}} {fetch_mtime 0} {search {}} {filter {}}} {
    array set err_list {}
    array set versmod_list {}
 
-   foreach elt [lsort [array names found_list]] {
+   # no need to process entries in a sorted order here anymore, as rc files
+   # are not evaluated in this loop but during modulepath walk (they are
+   # still returned by findModules as cachebuild and lint sub-commands need
+   # them)
+   foreach elt [array names found_list] {
       switch -- [lindex $found_list($elt) 0] {
          modulerc {
-            # process rc files them remove them from found_list
-            if {![info exists g_rcfilesSourced($dir/$elt)]} {
-               execute-modulerc $dir/$elt $elt $elt
-               # Keep track of already sourced rc files not to run them again
-               set g_rcfilesSourced($dir/$elt) 1
-            }
+            # withdraw already evaluated rc files
             unset found_list($elt)
          }
          modulefile {
