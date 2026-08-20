@@ -483,6 +483,20 @@ switches are accepted:
     .. versionchanged:: 5.6
        Support for :subcmd:`spider` sub-command added
 
+.. option:: --no-modulepath-ignore
+
+ Do not apply :mfcmd:`modulepath-ignore` pattern definitions for current
+ command execution: every element of the modulepath directories is walked
+ through and checked as if no pattern were defined.
+
+ Note that a modulepath cache file built with patterns applied does not
+ contain the ignored elements: combine with :option:`--ignore-cache` option
+ to also search elements excluded from cache file.
+
+ .. only:: html or latex
+
+    .. versionadded:: 5.7
+
 .. option:: --no-pager, -P
 
  Do not pipe message output into a pager. See also :envvar:`MODULES_PAGINATE`
@@ -1426,6 +1440,20 @@ Module Sub-Commands
   .. only:: html or latex
 
      .. versionadded:: 4.5
+
+ .. mconfig:: modulepath_ignore
+
+  Apply :mfcmd:`modulepath-ignore` pattern definitions when searching for
+  modulefiles. When disabled, every element of the modulepath directories is
+  walked through and checked as if no pattern were defined.
+
+  Default value is ``1``. The :envvar:`MODULES_MODULEPATH_IGNORE` environment
+  variable or the :option:`--no-modulepath-ignore` command line switch
+  supersede this default value.
+
+  .. only:: html or latex
+
+     .. versionadded:: 5.7
 
  .. mconfig:: nearly_forbidden_days
 
@@ -5587,6 +5615,21 @@ ENVIRONMENT
  .. only:: html or latex
 
     .. versionadded:: 4.5
+
+.. envvar:: MODULES_MODULEPATH_IGNORE
+
+ If set to ``0``, do not apply :mfcmd:`modulepath-ignore` pattern
+ definitions: every element of the modulepath directories is walked through
+ and checked as if no pattern were defined.
+
+ This environment variable supersedes the default value of the
+ :mconfig:`modulepath_ignore` configuration option. Patterns can be skipped
+ for one command execution with the :option:`--no-modulepath-ignore` command
+ line switch.
+
+ .. only:: html or latex
+
+    .. versionadded:: 5.7
 
 .. envvar:: MODULES_NEARLY_FORBIDDEN_DAYS
 

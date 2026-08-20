@@ -246,6 +246,44 @@ additional hook events will be added in the future as real site needs for
 them come up. See :ref:`add-new-hook-event` for the guide contributors can
 follow to propose one.
 
+Ignore files in modulepath
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Modulepath directories sometimes hold files that are not modulefiles, like
+helper scripts sourced by modulefiles or software installation files when
+modulefiles are mixed with the software trees they describe. The new
+:mfcmd:`modulepath-ignore` modulefile command lets modulepath maintainers
+describe from rc files such content to ignore when searching for
+modulefiles. Ignored files and directories are handled as if they do not
+exist: they are not checked, not walked down, not reported and not recorded
+in modulepath cache file. Cache build time and size are thus kept
+proportional to the number of actual modulefiles, whatever the amount of
+other files stored in modulepath.
+
+Patterns follow the same syntax and behavior than git with
+:file:`.gitignore` files. For instance to ignore every file with the
+``.tcl`` extension and the whole content of the ``soft`` directory, add to
+the ``.modulerc`` file at the root of the modulepath::
+
+    modulepath-ignore *.tcl soft/
+
+Negated patterns switch to an *ignore all, accept some* logic. For instance
+to only take files with the ``.mod`` extension into account::
+
+    modulepath-ignore * !*/ !*.mod
+
+When defined in a ``.modulerc`` file located within a modulepath, patterns
+are relative to the directory of this rc file. When defined in a global or
+user rc file, patterns apply to every modulepath. As ignored elements are
+excluded from cache files when they are built, pattern definitions should
+not be conditional.
+
+The :mconfig:`modulepath_ignore` configuration option, enabled by default,
+controls whether pattern definitions are applied. Patterns can be skipped
+for one command execution with the :option:`--no-modulepath-ignore` command
+line switch, which helps finding out whether a module is missing because it
+is ignored.
+
 
 v5.6
 ----

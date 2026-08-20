@@ -866,7 +866,8 @@ The following command line switches appeared on Modules 5.
 +------------+-----------------------------------------------------------------+
 | 5.6        | :option:`--dumpname`                                            |
 +------------+-----------------------------------------------------------------+
-| 5.7        | :option:`-p`, :option:`-P`                                      |
+| 5.7        | :option:`-p`, :option:`-P`,                                     |
+|            | :option:`--no-modulepath-ignore`                                |
 +------------+-----------------------------------------------------------------+
 
 :option:`--output`
@@ -1104,7 +1105,8 @@ The following environment variables appeared on Modules 5.
 |            | :envvar:`MODULES_INFO_EXTENSION`,                               |
 |            | :envvar:`MODULES_LINKED_ENVVARS`,                               |
 |            | :envvar:`MODULES_INIT_ENVVARS`,                                 |
-|            | :envvar:`MODULES_DOMAINNAME`                                    |
+|            | :envvar:`MODULES_DOMAINNAME`,                                   |
+|            | :envvar:`MODULES_MODULEPATH_IGNORE`                             |
 +------------+-----------------------------------------------------------------+
 
 Modules Specific Tcl Commands
@@ -1131,6 +1133,8 @@ The following modulefile Tcl commands appeared on Modules 5.
 | 5.6        | :mfcmd:`depends-on-any`, :mfcmd:`module-help`,                  |
 |            | :mfcmd:`module-warn`, :mfcmd:`haveDynamicMPATH`,                |
 |            | :mfcmd:`provide`                                                |
++------------+-----------------------------------------------------------------+
+| 5.7        | :mfcmd:`modulepath-ignore`                                      |
 +------------+-----------------------------------------------------------------+
 
 :mfcmd:`system`, :mfcmd:`is-used`
@@ -1320,7 +1324,7 @@ The following Modules configuration option has been introduced on Modules 5.
 | 5.7        | :mconfig:`path_entry_reorder`, :mconfig:`paginate`,             |
 |            | :mconfig:`non_exportable_tags`, :mconfig:`info_extension`,      |
 |            | :mconfig:`linked_envvars`, :mconfig:`init_envvars`,             |
-|            | :mconfig:`domainname`                                           |
+|            | :mconfig:`domainname`, :mconfig:`modulepath_ignore`             |
 +------------+-----------------------------------------------------------------+
 
 :mconfig:`auto_handling`
