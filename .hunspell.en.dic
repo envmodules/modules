@@ -1579,3 +1579,13 @@ runHooks
 appdir
 build3
 rsync
+gitignore
+pattern1
+pattern2
+modrcAliases
+getLimitedAccessesInDirectory
+modulepathIgnorePatterns
+matcher
+isPathIgnored
+fpelt
+isdir
