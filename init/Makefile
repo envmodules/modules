@@ -119,7 +119,7 @@ endif
 
 # define variables for shell completion
 comp_cmds := add add-any apropos aliases avail append-path cachebuild cacheclear clear config delete describe disable display edit help is-loaded is-saved is-used is-avail info-loaded keyword lint list load load-any mod-to-sh path paths purge prepend-path refresh reload reset restore rm remove remove-path save savelist saveshow saverm search show sh-to-mod source spider stash stashclear stashlist stashpop stashrm stashshow state swap switch test try-add try-load unload unuse update use whatis
-comp_long_opts := --debug --dumpname --help --silent --trace --verbose --version --paginate --no-pager --color --color= --width --width= --ignore-cache --ignore-user-rc --timer --redirect --no-redirect
+comp_long_opts := --debug --dumpname --help --silent --trace --verbose --version --paginate --no-pager --color --color= --width --width= --ignore-cache --ignore-user-rc --no-modulepath-ignore --timer --redirect --no-redirect
 comp_opts := -D -h -s -T -v -V -p -P -w $(comp_long_opts)
 comp_load_opts := --auto --no-auto --force -f --icase -i --tag --tag=
 comp_unload_opts := --auto --no-auto --force -f --icase -i
@@ -145,7 +145,7 @@ comp_stashpop_opts := --force -f
 comp_source_opts := --auto --no-auto --force -f
 comp_path_opts := -d --delim --duplicates
 comp_rm_path_opts := -d --delim --index
-comp_config_opts := --dump-state --reset abort_on_error advanced_version_spec auto_handling avail_indepth avail_output avail_terse_output cache_buffer_bytes cache_expiry_secs collection_pin_version collection_pin_tag collection_target color colors conflict_unload contact csh_limit domainname editor extended_default extra_siteconfig hide_auto_loaded home icase ignore_cache ignore_user_rc ignored_dirs implicit_default implicit_requirement init_envvars info_extension linked_envvars list_output list_terse_output locked_configs logged_events logger mcookie_check mcookie_version_check ml nearly_forbidden_days non_exportable_tags pager paginate path_entry_reorder protected_envvars quarantine_support rcfile redirect_output require_via reset_target_state run_quarantine search_match set_shell_startup shells_with_ksh_fpath silent_shell_debug siteconfig source_cache spider_indepth spider_output spider_terse_output sticky_purge tag_abbrev tag_color_name tcl_ext_lib tcl_linter term_background term_width unique_name_loaded unload_match_order variant_shortcut verbosity wa_277
+comp_config_opts := --dump-state --reset abort_on_error advanced_version_spec auto_handling avail_indepth avail_output avail_terse_output cache_buffer_bytes cache_expiry_secs collection_pin_version collection_pin_tag collection_target color colors conflict_unload contact csh_limit domainname editor extended_default extra_siteconfig hide_auto_loaded home icase ignore_cache ignore_user_rc ignored_dirs implicit_default implicit_requirement init_envvars info_extension linked_envvars list_output list_terse_output locked_configs logged_events logger mcookie_check mcookie_version_check ml modulepath_ignore nearly_forbidden_days non_exportable_tags pager paginate path_entry_reorder protected_envvars quarantine_support rcfile redirect_output require_via reset_target_state run_quarantine search_match set_shell_startup shells_with_ksh_fpath silent_shell_debug siteconfig source_cache spider_indepth spider_output spider_terse_output sticky_purge tag_abbrev tag_color_name tcl_ext_lib tcl_linter term_background term_width unique_name_loaded unload_match_order variant_shortcut verbosity wa_277
 
 define translate-in-script
 $(ECHO_GEN)
