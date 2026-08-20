@@ -215,6 +215,14 @@ Modules 5.7.0 (not yet released)
   in order and checks that similar output is obtained. Currently covers the
   :ref:`sync-remote-appdir` recipe.
 * Doc: add :ref:`modulepath-ignore` design notes.
+* Add :mfcmd:`modulepath-ignore` modulefile command to define, from rc
+  files, gitignore-style patterns describing modulepath content to ignore
+  when searching for modulefiles. Ignored files and directories are handled
+  as if they do not exist: they are not checked, not walked down, not
+  reported and not recorded in modulepath cache file. Add
+  :mconfig:`modulepath_ignore` configuration option and
+  :option:`--no-modulepath-ignore` command line switch to control whether
+  pattern definitions are applied. (fix issue #562)
 
 
 .. _5.6 release notes:

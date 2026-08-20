@@ -1141,6 +1141,51 @@ the *modulefile* is being loaded.
  than one word specified. Words are defined to be separated by whitespace
  characters (space, tab, cr).
 
+.. mfcmd:: modulepath-ignore pattern...
+
+ Ignore files and directories matching *pattern* when walking down modulepath
+ content to search for modulefiles. Ignored elements are handled as if they
+ do not exist: they are not checked, not walked down, not reported and not
+ recorded in modulepath cache file.
+
+ *pattern* follows the same syntax and behavior than git with
+ :file:`.gitignore` files:
+
+ * A pattern without slash (except an optional trailing one) matches files or
+   directories at any depth below the directory of the rc file defining it.
+ * A pattern with a slash at its start or in its middle is relative to the
+   directory of the rc file defining it.
+ * A pattern ending with a slash only matches directories.
+ * ``*`` matches anything except a slash. ``?`` matches any single character
+   except a slash. ``[...]`` matches one character from a range or class.
+ * A leading ``**/`` means match in any directory. A trailing ``/**`` matches
+   everything inside the designated directory. ``a/**/b`` matches with zero
+   or more intermediate directories.
+ * A pattern starting with ``!`` negates a previous match: the element is
+   re-included. It is not possible to re-include an element if one of its
+   parent directories is ignored.
+ * When several patterns match an element, the last matching pattern decides.
+
+ When defined in a ``.modulerc`` file located within a modulepath directory,
+ patterns are relative to the directory of this rc file. When defined in a
+ global or user rc file, patterns apply to every modulepath, relatively to
+ their root directory.
+
+ The ``.modulerc`` and ``.version`` files of walked-through directories are
+ exempt from ignore matching.
+
+ ``modulepath-ignore`` definitions should not be conditional: ignored
+ elements are excluded from modulepath cache file when it is built, so
+ patterns have to be static to get consistent results whether cache is used
+ or not.
+
+ The :mconfig:`modulepath_ignore` configuration option, enabled by default,
+ controls whether ``modulepath-ignore`` definitions are applied.
+
+ .. only:: html or latex
+
+    .. versionadded:: 5.7
+
 .. mfcmd:: modulepath-label directory label
 
  Assigns *label* string to modulepath *directory*. This *label* is used on
@@ -1816,6 +1861,7 @@ for each interpretation context.
 |                           | :mfcmd:`module-hide`, :mfcmd:`module-info`,         |
 |                           | :mfcmd:`module-tag`, :mfcmd:`module-version`,       |
 |                           | :mfcmd:`module-virtual`, :mfcmd:`module-warn`,      |
+|                           | :mfcmd:`modulepath-ignore`,                         |
 |                           | :mfcmd:`modulepath-label`, :mfcmd:`system`,         |
 |                           | :mfcmd:`uname`, :mfcmd:`versioncmp` and standard    |
 |                           | Tcl commands                                        |
