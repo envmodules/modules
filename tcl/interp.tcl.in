@@ -72,7 +72,7 @@ proc initModfileModeAliases {mode auto aliasesVN aliasesPassArgVN\
       # the evaluation mode
       set ::g_modfileEvalModes {load unload display help test whatis refresh\
          scan}
-      ##nagelfar ignore #49 Too long line
+      ##nagelfar ignore #50 Too long line
       array set g_modfilePerModeAliases {
 add-property   {add-property   nop            reportCmd      nop            nop            nop            nop          nop}
 always-load    {always-load    nop            reportCmd      nop            nop            nop            nop          always-load-sc}
@@ -101,6 +101,7 @@ module-hide    {module-hide    module-hide    module-hide    module-hide    modu
 module-tag     {module-tag     module-tag     module-tag     module-tag     module-tag     module-tag     nop          nop         }
 module-warn    {module-warn    module-warn    module-warn    module-warn    module-warn    module-warn    nop          nop         }
 module-whatis  {nop            nop            reportCmd      nop            nop            module-whatis  nop          nop         }
+modulepath-ignore {modulepath-ignore modulepath-ignore modulepath-ignore modulepath-ignore modulepath-ignore modulepath-ignore nop nop}
 prepend-path   {prepend-path   prepend-path-un prepend-path  prepend-path   prepend-path   edit-path-wh   nop          edit-path-sc}
 prereq-all     {prereqAllModfileCmd  nop      reportCmd      nop            nop            nop            nop          prereq-all-sc}
 prereq-any     {prereqAnyModfileCmd  nop      reportCmd      nop            nop            nop            nop          prereq-sc   }
@@ -541,9 +542,10 @@ proc execute-modulerc {modfile modname modspec} {
          module-version module-version module-alias module-alias\
          module-virtual module-virtual module-forbid module-forbid\
          module-hide module-hide module-tag module-tag module-info\
-         module-info modulepath-label modulepath-label setModulesVersion\
-         setModulesVersion getModuleContent getModuleContent lsb-release\
-         lsb-release module-warn module-warn]
+         module-info modulepath-ignore modulepath-ignore modulepath-label\
+         modulepath-label setModulesVersion setModulesVersion\
+         getModuleContent getModuleContent lsb-release lsb-release\
+         module-warn module-warn]
 
       if {[getConf source_cache]} {
          set ::g_modrcAliases(source) sourceModfileCmd

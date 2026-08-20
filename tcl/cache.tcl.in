@@ -62,7 +62,8 @@ proc getLimitedAccessesInDirectory {modpath} {
       set eltname [getModuleNameFromModulepath $elt $modpath]
       if {[file isdirectory $elt]} {
          # skip ignored dirs
-         if {![info exists ignored_dirs($elttail)]} {
+         if {![info exists ignored_dirs($elttail)] && ![isPathIgnored\
+            $modpath $elt 1]} {
             if {[isFileAccessLimited $elt 1]} {
                set limited_arr($eltname) d
             # only walk through directory content if its access is not limited
@@ -81,11 +82,15 @@ proc getLimitedAccessesInDirectory {modpath} {
             }
          }
       } else {
-         # skip ignored files
+         # skip ignored files (rc files are exempt from ignore pattern
+         # check: without their limited access record, the content of a
+         # pattern-matching rc file with restricted access would get
+         # plainly recorded in cache file)
          switch -glob -- $elttail {
             *~ - *,v - \#*\# {}
             default {
-               if {[isFileAccessLimited $elt 0]} {
+               if {![isPathIgnored $modpath $elt 0] && [isFileAccessLimited\
+                  $elt 0]} {
                   set limited_arr($eltname) f
                }
             }
@@ -108,11 +113,23 @@ proc getLimitedAccessesInDirectory {modpath} {
 # Build cache file content for given modulepath
 proc formatModuleCacheContent {modpath} {
    set content {}
+   # rc files are evaluated during modulepath walk to apply the path ignore
+   # patterns they may define: silence their evaluation errors like during
+   # an avail-like walk (their bare content is recorded whether their code
+   # is correct or not)
+   set alreadyinhibit [getState inhibit_errreport]
+   inhibitErrorReport
+
    # collect files from modulepath directory
    array set found_list [findModules $modpath * 0 1]
 
    # collect files and dirs from modulepath directory with limited access
    array set limited_list [getLimitedAccessesInDirectory $modpath]
+
+   # re-enable error report if it was enabled prior collection
+   if {!$alreadyinhibit} {
+      setState inhibit_errreport 0
+   }
 
    # concatenate element found and those with limited access as the second
    # kind may not be part of found list
@@ -484,7 +501,8 @@ proc findModulesInCacheFile {modpath mod depthlvl fetch_mtime} {
 
    # walk through list of matching limited access dirs and files to find
    # modules available to current user (transmit list of known files and dirs
-   # to avoid file stat tests)
+   # to avoid file stat tests). rc files recorded in cache are evaluated
+   # first there, as their patterns may apply to this walk
    findModulesFromDirsAndFiles $modpath $limited_list $depthlvl $fetch_mtime\
       cache_arr modfile_indir hidden_list flimited_arr dlimited_arr
 

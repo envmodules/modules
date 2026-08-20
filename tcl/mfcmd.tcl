@@ -2316,6 +2316,133 @@ proc modulepath-label {modpath label} {
    reportDebug "modpath=$modpath, label='$label'"
 }
 
+# translate a gitignore-style pattern into its matching properties: negation
+# flag, directory-only flag and a regular expression to apply on file paths
+# relative to the pattern anchor directory. empty result if pattern is void
+proc compileIgnorePattern {pattern} {
+   set negated 0
+   if {[string index $pattern 0] eq {!}} {
+      set negated 1
+      set pattern [string range $pattern 1 end]
+   } elseif {[string equal -length 2 $pattern {\!}]} {
+      # backslash-escaped leading '!' is matched literally
+      set pattern [string range $pattern 1 end]
+   }
+   set dironly 0
+   if {[string index $pattern end] eq {/}} {
+      set dironly 1
+      set pattern [string range $pattern 0 end-1]
+   }
+   # a slash at pattern start or middle anchors it to the directory of the
+   # rc file defining it, otherwise it matches at any depth below
+   set anchored [expr {[string first / $pattern] != -1}]
+   set pattern [string trimleft $pattern /]
+   set plen [string length $pattern]
+   if {$plen == 0} {
+      return {}
+   }
+
+   set re {}
+   for {set i 0} {$i < $plen} {incr i} {
+      set c [string index $pattern $i]
+      switch -- $c {
+         * {
+            set seg_start [expr {$i == 0 || [string index $pattern [expr {$i\
+               - 1}]] eq {/}}]
+            if {[string index $pattern [expr {$i + 1}]] eq {*}} {
+               set next2 [string index $pattern [expr {$i + 2}]]
+               if {$seg_start && $next2 eq {/}} {
+                  # leading '**/' matches zero or more directories
+                  append re {(?:[^/]+/)*}
+                  incr i 2
+               } elseif {$seg_start && $next2 eq {}} {
+                  # trailing '**' matches everything inside
+                  append re .*
+                  incr i 1
+               } else {
+                  # consecutive asterisks elsewhere act as a regular one
+                  append re {[^/]*}
+                  incr i 1
+               }
+            } else {
+               append re {[^/]*}
+            }
+         }
+         ? {
+            append re {[^/]}
+         }
+         [ {
+            # copy character range, translating '!' negation prefix ('[' is
+            # matched literally if range is not closed, like git does)
+            set skip [expr {[string index $pattern [expr {$i + 1}]] eq {!} ?\
+               3 : 2}]
+            set j [string first {]} $pattern [expr {$i + $skip}]]
+            if {$j == -1} {
+               append re {\[}
+            } else {
+               set range [string range $pattern [expr {$i + 1}] [expr {$j -\
+                  1}]]
+               if {[string index $range 0] eq {!}} {
+                  set range ^[string range $range 1 end]
+               }
+               append re \[$range\]
+               set i $j
+            }
+         }
+         default {
+            if {$c eq "\\"} {
+               # backslash escapes next character which is matched literally
+               # (a trailing backslash is matched literally)
+               incr i
+               if {$i < $plen} {
+                  set c [string index $pattern $i]
+               }
+            }
+            if {[string first $c {\^$.|?*+()[]{}}] != -1} {
+               append re \\
+            }
+            append re $c
+         }
+      }
+   }
+
+   # pattern without slash matches element name at any depth
+   if {$anchored} {
+      set re ^$re\$
+   } else {
+      set re (?:^|/)$re\$
+   }
+   return [list $negated $dironly $re]
+}
+
+# register gitignore-style patterns describing modulepath content to ignore
+# when searching for modulefiles
+proc modulepath-ignore {args} {
+   if {![llength $args]} {
+      knerror {No pattern specified in argument}
+   }
+   # global and user rc files define global patterns applying to every
+   # modulepath, rc files within a modulepath anchor patterns to their
+   # directory
+   if {[isStateDefined rc_running]} {
+      set anchor {}
+   } else {
+      set rcfile [currentState modulefile]
+      if {[file tail $rcfile] ni {.modulerc .version}} {
+         knerror {modulepath-ignore command not allowed in modulefile}
+      }
+      set anchor [file dirname $rcfile]
+   }
+   foreach pattern $args {
+      set props [compileIgnorePattern $pattern]
+      # void pattern does not match anything
+      if {[llength $props]} {
+         lappend ::g_pathIgnorePatterns [list $anchor {*}$props]
+      }
+   }
+   reportDebug "anchor='$anchor', patterns='$args'"
+}
+
 proc unique-name-conflict {} {
    # skip if unique_name_loaded configuration is disabled
    if {![getConf unique_name_loaded]} {

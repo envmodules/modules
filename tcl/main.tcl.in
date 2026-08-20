@@ -801,6 +801,9 @@ if {[catch {
             --ignore-user-rc {
                set asked_ignore_user_rc 1
             }
+            --no-modulepath-ignore {
+               set asked_modulepath_ignore 0
+            }
             --timer {
                setState timer 1
                set timer_start [clock microseconds]
