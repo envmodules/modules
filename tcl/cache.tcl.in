@@ -50,9 +50,6 @@ proc getLimitedAccessesInDirectory {modpath} {
       return {}
    }
 
-   foreach igndir [getConf ignored_dirs] {
-      set ignored_dirs($igndir) 1
-   }
    # walk through directory to find elements with limited access
    array set limited_arr {}
    lappend full_list $modpath
@@ -62,8 +59,7 @@ proc getLimitedAccessesInDirectory {modpath} {
       set eltname [getModuleNameFromModulepath $elt $modpath]
       if {[file isdirectory $elt]} {
          # skip ignored dirs
-         if {![info exists ignored_dirs($elttail)] && ![isPathIgnored\
-            $modpath $elt 1]} {
+         if {![isPathIgnored $modpath $elt 1]} {
             if {[isFileAccessLimited $elt 1]} {
                set limited_arr($eltname) d
             # only walk through directory content if its access is not limited

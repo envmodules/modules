@@ -2931,6 +2931,20 @@ proc isPathIgnored {modpath fpelt {isdir 0}} {
    if {!$isdir && [file tail $fpelt] in {.modulerc .version}} {
       return 0
    }
+   # directories whose name matches ignored_dirs configuration option are
+   # always ignored: negated patterns cannot re-include them and disabling
+   # modulepath_ignore option does not withdraw them from this check
+   if {$isdir} {
+      if {![info exists ::g_ignoredDirsArr]} {
+         array set ::g_ignoredDirsArr {}
+         foreach igndir [getConf ignored_dirs] {
+            set ::g_ignoredDirsArr($igndir) 1
+         }
+      }
+      if {[info exists ::g_ignoredDirsArr([file tail $fpelt])]} {
+         return 1
+      }
+   }
    if {![info exists ::g_pathIgnorePatterns] || ![getConf\
       modulepath_ignore]} {
       return 0
@@ -3135,10 +3149,6 @@ proc findModulesFromDirsAndFiles {dir full_list depthlvl fetch_mtime\
       upvar $dknown_arrname dknown_arr
    }
 
-   foreach igndir [getConf ignored_dirs] {
-      set ignored_dirs($igndir) 1
-   }
-
    # evaluate modulepath root rc file prior walking: it may define path
    # ignore patterns and it is not part of the walked list when only the
    # limited access elements from a cache file are walked down
@@ -3179,44 +3189,42 @@ proc findModulesFromDirsAndFiles {dir full_list depthlvl fetch_mtime\
          continue
       }
       if {$is_elt_dir} {
-         if {![info exists ignored_dirs($tail)]} {
-            if {[catch {
-               set elt_list [getFilesInDirectory $element 1]
-            } errMsg]} {
-               set mod_list($modulename) [list accesserr [parseAccessIssue\
-                  $element] $element]
-            } else {
-               # narrow elt_list down to what is needed to correctly tell
-               # whether stop_mod is the implicit default/latest version of
-               # this directory, when this is stop_mod's own directory
-               # (left untouched in any other case)
-               trimElemListForStopmod $dir $modulename $stop_mod elt_list
+         if {[catch {
+            set elt_list [getFilesInDirectory $element 1]
+         } errMsg]} {
+            set mod_list($modulename) [list accesserr [parseAccessIssue\
+               $element] $element]
+         } else {
+            # narrow elt_list down to what is needed to correctly tell
+            # whether stop_mod is the implicit default/latest version of
+            # this directory, when this is stop_mod's own directory
+            # (left untouched in any other case)
+            trimElemListForStopmod $dir $modulename $stop_mod elt_list
 
-               # Add each element in the current directory to the list:
-               # right after current position (depth-first) and in lexical
-               # order (rc files kept first) to evaluate rc files in the
-               # same deterministic order as when they were all evaluated
-               # after the walk, as module resolution and symbol definition
-               # results depend on rc file evaluation order
-               set chunk_list {}
-               set sortable_list {}
-               foreach {fpelt hid} $elt_list {
-                  if {[file tail $fpelt] in {.modulerc .version}} {
-                     lappend chunk_list $fpelt
-                  } else {
-                     lappend sortable_list [list $fpelt $hid]
-                  }
-                  # Flag hidden files
-                  if {$hid} {
-                     set hidden_list($fpelt) 1
-                  }
+            # Add each element in the current directory to the list:
+            # right after current position (depth-first) and in lexical
+            # order (rc files kept first) to evaluate rc files in the
+            # same deterministic order as when they were all evaluated
+            # after the walk, as module resolution and symbol definition
+            # results depend on rc file evaluation order
+            set chunk_list {}
+            set sortable_list {}
+            foreach {fpelt hid} $elt_list {
+               if {[file tail $fpelt] in {.modulerc .version}} {
+                  lappend chunk_list $fpelt
+               } else {
+                  lappend sortable_list [list $fpelt $hid]
                }
-               foreach fpelt_hid [lsort -index 0 $sortable_list] {
-                  lappend chunk_list [lindex $fpelt_hid 0]
+               # Flag hidden files
+               if {$hid} {
+                  set hidden_list($fpelt) 1
                }
-               set full_list [linsert $full_list [expr {$i + 1}]\
-                  {*}$chunk_list]
             }
+            foreach fpelt_hid [lsort -index 0 $sortable_list] {
+               lappend chunk_list [lindex $fpelt_hid 0]
+            }
+            set full_list [linsert $full_list [expr {$i + 1}]\
+               {*}$chunk_list]
          }
       } else {
          switch -glob -- $tail {

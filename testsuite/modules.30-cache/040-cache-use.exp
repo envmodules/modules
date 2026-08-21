@@ -269,7 +269,6 @@ DEBUG findModulesInCacheFile: cache file '[escre $mp2cache]' exists and is reada
 DEBUG findModulesInCacheFile: 2 elements are cached for '[escre $mp2]'
 DEBUG findModulesInCacheFile: 0 limited access files for '[escre $mp2]'
 DEBUG findModulesInCacheFile: 0 limited access dirs for '[escre $mp2]'
-.*
 DEBUG findModulesInCacheFile: found foo \\(1\\)
 .*
 DEBUG \\\[#1:load:foo\\\] findModulesInCacheFile: cache file '[escre $mp2cache]' has already been evaluated
