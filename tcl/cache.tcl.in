@@ -55,7 +55,6 @@ proc getLimitedAccessesInDirectory {modpath} {
    lappend full_list $modpath
    for {set i 0} {$i < [llength $full_list]} {incr i 1} {
       set elt [lindex $full_list $i]
-      set elttail [file tail $elt]
       set eltname [getModuleNameFromModulepath $elt $modpath]
       if {[file isdirectory $elt]} {
          # skip ignored dirs
@@ -82,14 +81,9 @@ proc getLimitedAccessesInDirectory {modpath} {
          # check: without their limited access record, the content of a
          # pattern-matching rc file with restricted access would get
          # plainly recorded in cache file)
-         switch -glob -- $elttail {
-            *~ - *,v - \#*\# {}
-            default {
-               if {![isPathIgnored $modpath $elt 0] && [isFileAccessLimited\
-                  $elt 0]} {
-                  set limited_arr($eltname) f
-               }
-            }
+         if {![isPathIgnored $modpath $elt 0] && [isFileAccessLimited $elt\
+            0]} {
+            set limited_arr($eltname) f
          }
       }
    }

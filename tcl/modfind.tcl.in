@@ -2926,15 +2926,11 @@ proc doesModuleHaveSym {mod} {
 # pattern decides whether element is ignored. patterns registered from
 # global or user rc files anchor at the root of the walked modulepath
 proc isPathIgnored {modpath fpelt {isdir 0}} {
-   # rc files are exempt from ignore patterns as they drive the walk itself
-   # (a directory bearing such a name is matched like any other directory)
-   if {!$isdir && [file tail $fpelt] in {.modulerc .version}} {
-      return 0
-   }
-   # directories whose name matches ignored_dirs configuration option are
-   # always ignored: negated patterns cannot re-include them and disabling
-   # modulepath_ignore option does not withdraw them from this check
    if {$isdir} {
+      # directories whose name matches ignored_dirs configuration option
+      # are always ignored: negated patterns cannot re-include them and
+      # disabling modulepath_ignore option does not withdraw them from
+      # this check
       if {![info exists ::g_ignoredDirsArr]} {
          array set ::g_ignoredDirsArr {}
          foreach igndir [getConf ignored_dirs] {
@@ -2943,6 +2939,21 @@ proc isPathIgnored {modpath fpelt {isdir 0}} {
       }
       if {[info exists ::g_ignoredDirsArr([file tail $fpelt])]} {
          return 1
+      }
+   } else {
+      set tail [file tail $fpelt]
+      # rc files are exempt from ignore patterns as they drive the walk
+      # itself (a directory bearing such a name is matched like any other
+      # directory)
+      if {$tail in {.modulerc .version}} {
+         return 0
+      }
+      # backup or version control files are always ignored, like
+      # directories matching ignored_dirs configuration option
+      switch -glob -- $tail {
+         *~ - *,v - \#*\# {
+            return 1
+         }
       }
    }
    if {![info exists ::g_pathIgnorePatterns] || ![getConf\
@@ -3248,7 +3259,7 @@ proc findModulesFromDirsAndFiles {dir full_list depthlvl fetch_mtime\
                   set mod_list($modulename) [list modulerc]
                }
             }
-            .modulecache - *~ - *,v - \#*\# { }
+            .modulecache { }
             default {
                # skip modfile in no in depth mode search if it does not relate
                # to targeted depth level and one valid modfile has already be
