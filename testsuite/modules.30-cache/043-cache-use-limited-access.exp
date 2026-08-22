@@ -152,6 +152,17 @@ lappend ans_load1 [list set _LMFILES_ $mp1/bar/1.0]
 lappend ans_load1 [list set LOADEDMODULES bar/1.0]
 testouterr_cmd sh {load bar} $ans_load1 {}
 
+# load two module specifications of same root in a single command: module
+# search of second specification walks down again the limited access
+# elements from cache and finds the 'bar/.version' rc file already
+# evaluated during the module search of first specification
+set ans_load1b [list]
+lappend ans_load1b [list set __MODULES_LMALTNAME\
+    bar/1.0&bar/default&bar:bar/2.0&as|bar/latest]
+lappend ans_load1b [list set _LMFILES_ $mp1/bar/1.0:$mp1/bar/2.0]
+lappend ans_load1b [list set LOADEDMODULES bar/1.0:bar/2.0]
+testouterr_cmd sh {load bar bar/2.0} $ans_load1b {}
+
 set tserr_load2 "$err_magic'$mp1/foo/.modulerc'\n$err_contact
 $err_magic'$mp1/foo/1.0'\n$err_contact"
 testouterr_cmd sh {load foo/1.0} ERR $tserr_load2

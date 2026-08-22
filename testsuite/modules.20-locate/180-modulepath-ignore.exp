@@ -157,19 +157,21 @@ file delete -force $userhome
 
 # double asterisk (leading, middle and mid-segment), character range
 # (regular and negated), single character, escaped characters, leading
-# slash anchor and unclosed character range patterns, defined over several
-# modulepath-ignore calls in same rc file
+# slash anchor, unclosed character range, trailing backslash (matched
+# literally, so 'esc\' pattern does not match 'esc' file) and void (slash
+# or negation character only, matching nothing) patterns, defined over
+# several modulepath-ignore calls in same rc file
 set mp4 $env(HOME)/mpign4
 file mkdir $mp4/app $mp4/lib/x $mp4/sub/doc $mp4/qux $mp4/quax $mp4/a/x/y\
     $mp4/mx
 set fid [open $mp4/.modulerc w]
 puts $fid "#%Module\nmodulepath-ignore **/doc lib/** {app/\[13\]*}\
     {\\!bang} qu?x\nmodulepath-ignore /root1* a/**/b {e\[!0-9\]f} m**n\
-    {br\[ack} {sp\\*t}"
+    {br\[ack} {sp\\*t}\nmodulepath-ignore / ! esc\\\\"
 close $fid
 foreach f [list app/1.0 app/2.0 app/3.0 lib/x/1.0 sub/doc/1.0 sub/1.0\
     qux/1.0 quax/1.0 !bang root1.0 sub/root1.5 a/b a/x/b a/x/y/b a/c exf\
-    e5f mooon mx/n {br[ack} {sp*t} spot] {
+    e5f mooon mx/n {br[ack} {sp*t} spot esc] {
     set fid [open $mp4/$f w]
     puts $fid $mfcontent
     close $fid
@@ -178,6 +180,7 @@ setenv_path_var MODULEPATH $mp4
 set tserr "a/c
 app/2.0
 e5f
+esc
 mx/n
 qux/1.0
 spot
