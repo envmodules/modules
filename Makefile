@@ -535,6 +535,15 @@ DIST_WIN_PREFIX := $(DIST_PREFIX)-win
 # avoid shared definitions to be rebuilt by make
 Makefile.inc: ;
 
+# refresh files embedding shared definitions when ./configure updates them
+# (tcl scripts and their assemblies follow through their version.inc
+# prerequisite)
+version.inc share/rpm/environment-modules.spec script/add.modules \
+	script/gitlog2changelog.py script/modulecmd \
+	testsuite/example/.modulespath testsuite/example/modulespath-wild \
+	testsuite/example/modulerc testsuite/example/initrc-1 \
+	testsuite/example/initrc: Makefile.inc
+
 version.inc: version.inc.in $(GIT_REFRESH_PREREQ)
 	$(translate-in-script)
 
