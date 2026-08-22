@@ -413,7 +413,7 @@ proc cmdModuleSearch {args} {
    }
    lpopState mode
 
-   setState inhibit_errreport 0
+   uninhibitErrorReport
 
    # report errors if a modulefile was searched but not found
    if {{wild} ni $searchmod && !$foundmod} {
@@ -1853,7 +1853,7 @@ proc cmdModuleAliases {} {
       getModules $dir {} 0 {}
    }
 
-   setState inhibit_errreport 0
+   uninhibitErrorReport
 
    set display_list {}
    foreach name [lsort -dictionary [array names ::g_moduleAlias]] {
@@ -1945,7 +1945,7 @@ proc cmdModuleAvail {show_oneperline show_mtime show_filter search_filter\
       displayKey
    }
 
-   setState inhibit_errreport 0
+   uninhibitErrorReport
 }
 
 proc runModuleUse {cmd mode pos args} {
@@ -2875,7 +2875,7 @@ proc cmdModuleLint {args} {
             }
          }
       }
-      setState inhibit_errreport 0
+      uninhibitErrorReport
    } else {
       foreach mod $args {
          lassign [getPathToModule $mod] modfile modname modnamevr
@@ -3159,7 +3159,7 @@ proc cmdModuleSpider {show_oneperline show_mtime show_filter search_filter\
    }
    unsetConf advanced_version_spec
    defineParseModuleSpecificationProc [getConf advanced_version_spec]
-   setState inhibit_errreport 0
+   uninhibitErrorReport
    reportTrace $modpath_list {Collect modulepaths}
 
    # perform an avail on all collected modulepaths

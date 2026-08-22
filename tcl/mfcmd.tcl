@@ -1355,12 +1355,8 @@ proc is-avail {args} {
    set args [parseModuleSpecification 0 0 0 0 {*}$args]
    set ret 0
 
-   # disable error reporting to avoid modulefile errors
-   # to pollute result. Only if not already inhibited
-   set alreadyinhibit [getState inhibit_errreport]
-   if {!$alreadyinhibit} {
-      inhibitErrorReport
-   }
+   # disable error reporting to avoid modulefile errors to pollute result
+   inhibitErrorReport
 
    foreach mod $args {
       lassign [getPathToModule $mod] modfile modname modnamevr
@@ -1370,10 +1366,7 @@ proc is-avail {args} {
       }
    }
 
-   # re-enable only is it was disabled from this procedure
-   if {!$alreadyinhibit} {
-      setState inhibit_errreport 0
-   }
+   uninhibitErrorReport
    return $ret
 }
 

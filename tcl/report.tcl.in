@@ -672,10 +672,20 @@ proc reportName {} {
    report Modules
 }
 
-# disable error reporting (non-critical report only) unless debug enabled
+# disable error reporting (non-critical report only) unless debug enabled.
+# keep track of inhibition depth to cope with nested calls
 proc inhibitErrorReport {} {
    if {![isVerbosityLevel trace]} {
-      setState inhibit_errreport 1
+      setState inhibit_errreport [expr {[getState inhibit_errreport] + 1}]
+   }
+}
+
+# withdraw an error report inhibition demand (depth stays null if demand
+# was made under trace verbosity where inhibition is disabled)
+proc uninhibitErrorReport {} {
+   set inhibit_depth [getState inhibit_errreport]
+   if {$inhibit_depth > 0} {
+      setState inhibit_errreport [expr {$inhibit_depth - 1}]
    }
 }
 

@@ -418,10 +418,7 @@ proc scanExtraMatchSearch {modpath mod res_arrname} {
 
    # disable error reporting to avoid modulefile errors (not coping with
    # scan evaluation for instance) to pollute result
-   set alreadyinhibit [getState inhibit_errreport]
-   if {!$alreadyinhibit} {
-      inhibitErrorReport
-   }
+   inhibitErrorReport
    # evaluate all modules found in scan mode to gather content information
    lappendState mode scan
 
@@ -440,10 +437,7 @@ proc scanExtraMatchSearch {modpath mod res_arrname} {
    }
 
    lpopState mode
-   # re-enable error report only is it was disabled from this procedure
-   if {!$alreadyinhibit} {
-      setState inhibit_errreport 0
-   }
+   uninhibitErrorReport
 }
 
 # perform extra match search on currently being built module search result
