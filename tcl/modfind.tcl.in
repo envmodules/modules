@@ -2988,10 +2988,15 @@ proc isPathIgnored {modpath fpelt {isdir 0}} {
 # extension library
 proc __getFilesInDirectory {dir fetch_dotversion} {
    set dir_list [list]
-   set hid_list [list]
 
-   # rc files are returned first as they must be treated prior any other
-   # element in directory (they may define patterns to ignore siblings)
+   set elt_list [glob -nocomplain -directory $dir *]
+
+   # Add each element in the current directory to the list
+   foreach elt $elt_list {
+      lappend dir_list $elt 0
+   }
+
+   # search for hidden files
    foreach elt [glob -nocomplain -types hidden -directory $dir -tails *] {
       switch -- $elt {
          . - .. { }
@@ -3002,17 +3007,9 @@ proc __getFilesInDirectory {dir fetch_dotversion} {
             }
          }
          default {
-            lappend hid_list $dir/$elt 1
+            lappend dir_list $dir/$elt 1
          }
       }
-   }
-
-   # then regular elements and other hidden files afterward
-   foreach elt [glob -nocomplain -directory $dir *] {
-      lappend dir_list $elt 0
-   }
-   if {[llength $hid_list]} {
-      lappend dir_list {*}$hid_list
    }
 
    return $dir_list
@@ -3044,62 +3041,31 @@ proc findModulesInMemCache {searchid} {
    return [list $match_searchid $mod_list]
 }
 
-# when 'mod_name' is 'stop_mod''s own parent directory, narrow
-# 'elt_list_name' (in the {path hid} pairs shape returned by
-# getFilesInDirectory) down to only what is needed to tell whether stop_mod
-# is the implicit 'default'/'latest' version of that directory: its
-# dotfiles (always kept, the general consolidation phase in getModules
-# deals with them normally) plus, among its plain elements, only the
-# dictionary range from stop_mod up to either the first higher element that
-# is itself valid and not hidden (stop_mod is then known not to be
-# default/latest) or the highest element if none qualifies. Left untouched
-# in any other case: this is not stop_mod's own directory, stop_mod does not
-# exist in it, or it is not itself a valid modulefile, in which case there
-# is nothing to optimize
-proc trimElemListForStopmod {dir mod_name stop_mod elt_list_name} {
-   if {![string length $stop_mod] || $mod_name ne [file dirname $stop_mod]} {
-      return
+# when 'mod_name' is 'stop_mod''s own parent directory, narrow the received
+# list of this directory's element paths (rc files, already evaluated and
+# withdrawn by the caller, are not part of it) down to only what is needed
+# to tell whether stop_mod is the implicit 'default'/'latest' version of
+# that directory: only the dictionary range from stop_mod up to either the
+# first higher element that is itself valid and not hidden (stop_mod is
+# then known not to be default/latest) or the highest element if none
+# qualifies. List is returned untouched in any other case: this is not
+# stop_mod's own directory, stop_mod does not exist in it, or it is not
+# itself a valid modulefile, in which case there is nothing to optimize
+proc trimElemListForStopmod {dir mod_name stop_mod elt_list} {
+   if {![string length $stop_mod] || $mod_name ne [file dirname\
+      $stop_mod]} {
+      return $elt_list
    }
 
-   upvar $elt_list_name elt_list
-   array set elt_arr $elt_list
-
-   if {![info exists elt_arr($dir/$stop_mod)] || [lindex [checkValidModule\
-      $dir/$stop_mod] 0] ne {true}} {
-      return
-   }
-
-   # first fill updated element list with rc files if any and remove them from
-   # reference array to work only on other items
-   array set up_elt_arr {}
-   foreach rc_tail {.modulerc .version} {
-      set elt $dir/$mod_name/$rc_tail
-      if {[info exists elt_arr($elt)]} {
-         set up_elt_arr($elt) $elt_arr($elt)
-         unset elt_arr($elt)
-      }
+   set stop_elt $dir/$stop_mod
+   if {$stop_elt ni $elt_list || [lindex [checkValidModule $stop_elt] 0]\
+      ne {true}} {
+      return $elt_list
    }
 
    set tail_list {}
-   foreach elt [array names elt_arr] {
+   foreach elt $elt_list {
       lappend tail_list [file tail $elt]
-   }
-
-   # source this directory's own '.modulerc' and '.version' right away (in
-   # that order) if not already done, as any of them may set a hiding or
-   # ignore rule needed below, to correctly tell if a sibling actually is a
-   # qualifying higher element (guarded the same way the walk loop guards
-   # its own later sourcing of them; the modulepath root '.modulerc' has
-   # already been sourced at walk start)
-   global g_rcfilesSourced
-   foreach rc_tail {.modulerc .version} {
-      set rc_elt $dir/$mod_name/$rc_tail
-      if {[info exists up_elt_arr($rc_elt)] && ![info exists\
-         g_rcfilesSourced($rc_elt)]} {
-         set rc_mod $mod_name/$rc_tail
-         execute-modulerc $rc_elt $rc_mod $rc_mod
-         set g_rcfilesSourced($rc_elt) 1
-      }
    }
 
    # sort this directory's plain elements and look, starting from the
@@ -3122,7 +3088,7 @@ proc trimElemListForStopmod {dir mod_name stop_mod elt_list_name} {
          # a nested version directory: its own validity cannot be settled
          # without recursing into it, give up trying to stop early, keep
          # everything untouched like usual
-         return
+         return $elt_list
       }
       if {![isPathIgnored $dir $fp_elt] && [lindex [checkValidModule\
          $fp_elt] 0] eq {true} && ![isModuleHidden $mod_name/$fp_tail\
@@ -3132,13 +3098,12 @@ proc trimElemListForStopmod {dir mod_name stop_mod elt_list_name} {
       }
    }
 
-   # only keep rc files, stop_mod and highest element the updated structure
-   set up_elt_arr($dir/$stop_mod) $elt_arr($dir/$stop_mod)
+   # only keep stop_mod and highest element in returned list
+   set trimmed_list [list $stop_elt]
    if {$top_idx > $stop_idx} {
-      set elt $dir/$mod_name/[lindex $sorted_tails $top_idx]
-      set up_elt_arr($elt) $elt_arr($elt)
+      lappend trimmed_list $dir/$mod_name/[lindex $sorted_tails $top_idx]
    }
-   set elt_list [array get up_elt_arr]
+   return $trimmed_list
 }
 
 # Walk through provided list of directories and files to find modules
@@ -3206,42 +3171,68 @@ proc findModulesFromDirsAndFiles {dir full_list depthlvl fetch_mtime\
             set mod_list($modulename) [list accesserr [parseAccessIssue\
                $element] $element]
          } else {
-            # narrow elt_list down to what is needed to correctly tell
-            # whether stop_mod is the implicit default/latest version of
-            # this directory, when this is stop_mod's own directory
-            # (left untouched in any other case)
-            trimElemListForStopmod $dir $modulename $stop_mod elt_list
+            array unset elt_arr
+            array set elt_arr $elt_list
 
-            # Add each element in the current directory to the list:
-            # right after current position (depth-first) and in lexical
-            # order (rc files kept first) to evaluate rc files in the
-            # same deterministic order as when they were all evaluated
-            # after the walk, as module resolution and symbol definition
-            # results depend on rc file evaluation order
-            set chunk_list {}
-            set sortable_list {}
-            foreach {fpelt hid} $elt_list {
-               if {[file tail $fpelt] in {.modulerc .version}} {
-                  lappend chunk_list $fpelt
-               } else {
-                  lappend sortable_list [list $fpelt $hid]
+            # evaluate and record this directory's rc files right away
+            # then withdraw them from element array: the hiding or ignore
+            # rules they may define are needed to trim element list for
+            # stop_mod and to filter the elements walked next
+            foreach fptail {.modulerc .version} {
+               set fpelt $element/$fptail
+               if {![info exists elt_arr($fpelt)]} {
+                  continue
                }
-               # Flag hidden files
-               if {$hid} {
+               unset elt_arr($fpelt)
+               # apply same depth restriction on .version files than walk
+               # loop recording below
+               if {$fptail eq {.version} && $depthlvl != 0 &&\
+                  ($moddepthlvl + 1) != $depthlvl} {
+                  continue
+               }
+               set fpmod $modulename/$fptail
+               if {![info exists g_rcfilesSourced($fpelt)]} {
+                  execute-modulerc $fpelt $fpmod $fpmod
+                  set g_rcfilesSourced($fpelt) 1
+               }
+               set mod_list($fpmod) [list modulerc]
+            }
+
+            # narrow element list down to what is needed to correctly tell
+            # whether stop_mod is the implicit default/latest version of
+            # this directory, when this is stop_mod's own directory (left
+            # untouched in any other case). Remaining element paths are
+            # lexically sorted, as sub-directories are fetched in the
+            # order they are walked in, which rc file evaluation order
+            # depends on
+            set trimmed_list [trimElemListForStopmod $dir $modulename\
+               $stop_mod [lsort [array names elt_arr]]]
+
+            # Flag hidden files among elements kept for the walk
+            foreach fpelt $trimmed_list {
+               if {$elt_arr($fpelt)} {
                   set hidden_list($fpelt) 1
                }
             }
-            foreach fpelt_hid [lsort -index 0 $sortable_list] {
-               lappend chunk_list [lindex $fpelt_hid 0]
+
+            # Add each element in the current directory to the list right
+            # after current position to walk depth-first: rc files of any
+            # sub-directory are this way evaluated prior those of the
+            # directories lying next to or deeper than this sub-directory
+            # (an append would lead to a breadth-first walk, evaluating
+            # the rc files of all first-level directories prior any
+            # deeper one). Tcl 8.5 requires at least one element on linsert
+            if {[llength $trimmed_list]} {
+               set full_list [linsert $full_list [expr {$i + 1}]\
+                  {*}$trimmed_list]
             }
-            set full_list [linsert $full_list [expr {$i + 1}]\
-               {*}$chunk_list]
          }
       } else {
          switch -glob -- $tail {
             .modulerc {
-               # evaluate rc file as soon as it is reached during walk: it
-               # may define ignore patterns applying to elements walked next
+               # rc file has normally been evaluated when its directory
+               # content was fetched: evaluate it here otherwise, when it
+               # is walked directly (limited access rc file from cache)
                if {![info exists g_rcfilesSourced($element)]} {
                   execute-modulerc $element $modulename $modulename
                   set g_rcfilesSourced($element) 1
