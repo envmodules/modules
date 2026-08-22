@@ -92,6 +92,11 @@ script/mb profile
 cd doc && make html   # requires Sphinx >= 1.0; output in doc/_build/html
 ```
 
+In `.rst` files, make a section title's underline exactly as long as the
+title text — no more, no less. Sphinx silently accepts a longer underline,
+so a length mismatch has to be checked deliberately whenever a title is
+added or its text edited.
+
 ## Repository layout
 
 - `tcl/` — Tcl source, split by concern; concatenated into `modulecmd.tcl`
@@ -177,11 +182,30 @@ cd doc && make html   # requires Sphinx >= 1.0; output in doc/_build/html
   git `user.name`/`user.email` — use `git commit -s`.
 - Patches (bug fix or feature) should include tests, and the test should be
   shown to fail without the patch.
+- A commit body describes the change and why it is needed — never the
+  investigation or verification steps taken to produce it ("Verified
+  with `<command>`", "Confirmed via git archaeology"). If a verification
+  detail is essential to justify the change, state it as a plain
+  declarative fact about the change itself.
+- Squash small follow-up commits that merely refine a change introduced
+  earlier on the same branch (typo fix, forgotten hunk, reworded sentence)
+  into the commit introducing that change, so each commit in the series
+  stands as a coherent change. Only rewrite commits not pushed yet.
 - The project follows the Linux kernel's policy on AI coding assistants (see
   "AI coding assistants" in `CONTRIBUTING.rst`): never add a
   `Signed-off-by:` trailer on behalf of the AI — only the human committer
   signs off — and disclose AI involvement with an `Assisted-by:` trailer,
   e.g. `Assisted-by: Claude:claude-sonnet-5`.
+
+## Pull request descriptions
+
+- Start the body directly with the prose or bullet list describing the
+  change — no "Summary" or any other heading, no test-plan section, no
+  "Generated with ..." tool attribution line.
+- Do not hard-wrap the body to a column width — GitHub renders it as
+  Markdown and wraps paragraphs itself, so manual line breaks only produce
+  ragged text. The 72-column wrapping convention applies to commit
+  messages only.
 
 ## Updating NEWS.rst
 
