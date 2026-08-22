@@ -423,6 +423,7 @@ envvar
 envvars
 eol
 eq
+errreport
 etcdic
 etcdir
 eu
@@ -509,6 +510,7 @@ icdiff
 idx
 incompat
 indepth
+inhibitErrorReport
 init
 initStateClockSeconds
 initStateUsergroups
@@ -908,6 +910,7 @@ uname
 uncomplete
 undef
 unhide
+uninhibitErrorReport
 unmetDepHash
 unix
 unixtime
