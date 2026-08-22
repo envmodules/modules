@@ -203,7 +203,11 @@ endef
 # avoid shared definitions to be rebuilt by make
 ../Makefile.inc: ;
 
-%: %.in
+# refresh files embedding shared definitions when ../configure updates them
+initrc tcsh profile.sh $(EXAMPLE_MODFILES_SRCDIR)/modules \
+	$(EXAMPLE_MODFILES_SRCDIR)/version: ../Makefile.inc
+
+%: %.in ../Makefile.inc
 	$(translate-in-script)
 
 # workaround '\\\n' issue on Linux with Make 3.81
