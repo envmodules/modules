@@ -92,6 +92,14 @@ else
   setzshfpathre := /@setzshfpath@/d
 endif
 
+# define python module location
+ifeq ($(pythondir),)
+  pythondir := $(initdir)
+  makepythondir := n
+else
+  makepythondir := y
+endif
+
 # comment entries if feature not enabled
 ifeq ($(versioning),y)
   versdir := $(baseprefix)/versions
@@ -266,10 +274,18 @@ endif
 ifeq ($(makefishcompdir),y)
 	$(INSTALL_DIR) '$(DESTDIR)$(fishcompletiondir)'
 endif
+ifeq ($(makepythondir),y)
+	$(INSTALL_DIR) '$(DESTDIR)$(pythondir)'
+endif
 	$(INSTALL_DIR) '$(DESTDIR)$(zshcompletiondir)'
 	$(INSTALL_DIR) '$(DESTDIR)$(modulefilesdir)'
-	$(INSTALL_DATA) $(ALL_SHELLS) '$(DESTDIR)$(initdir)/'
+	$(INSTALL_DATA) $(filter-out env_modules.py,$(ALL_SHELLS)) '$(DESTDIR)$(initdir)/'
+	$(INSTALL_DATA) env_modules.py '$(DESTDIR)$(pythondir)/'
+ifeq ($(makepythondir),y)
+	ln -f -s '$(pythondir)/env_modules.py' '$(DESTDIR)$(initdir)/python.py'
+else
 	ln -f -s env_modules.py '$(DESTDIR)$(initdir)/python.py'
+endif
 ifeq ($(windowssupport),y)
 	$(INSTALL_DATA) cmd.cmd '$(DESTDIR)$(initdir)/'
 endif
@@ -300,7 +316,8 @@ ifeq ($(versioning),y)
 endif
 
 uninstall:
-	rm -f $(foreach initscript,$(ALL_SHELLS) python.py,'$(DESTDIR)$(initdir)/$(initscript)')
+	rm -f $(foreach initscript,$(filter-out env_modules.py,$(ALL_SHELLS)) python.py,'$(DESTDIR)$(initdir)/$(initscript)')
+	rm -f '$(DESTDIR)$(pythondir)/env_modules.py'
 ifeq ($(windowssupport),y)
 	rm -f '$(DESTDIR)$(initdir)/cmd.cmd'
 endif
@@ -327,6 +344,9 @@ ifeq ($(makebashcompdir),y)
 endif
 ifeq ($(makefishcompdir),y)
 	$(RMDIR_IGN_NON_EMPTY) '$(DESTDIR)$(fishcompletiondir)' || true
+endif
+ifeq ($(makepythondir),y)
+	$(RMDIR_IGN_NON_EMPTY) '$(DESTDIR)$(pythondir)' || true
 endif
 	$(RMDIR_IGN_NON_EMPTY) '$(DESTDIR)$(zshcompletiondir)' || true
 	$(RMDIR_IGN_NON_EMPTY) '$(DESTDIR)$(initdir)' || true

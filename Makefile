@@ -247,6 +247,10 @@ ifeq ($(appendpythonpath),y)
 else
   setappendpythonpath := prepend
 endif
+# env_modules python module is installed in initdir if no specific location
+ifeq ($(pythondir),)
+  pythondir := $(initdir)
+endif
 ifeq ($(setmanpath),y)
   setsetmanpath :=
 else
@@ -519,6 +523,7 @@ sed -e 's|@prefix@|$(prefix)|g' \
 	-e 's|@usemanpath@|$(setusemanpath)|g' \
 	-e 's|@setpythonpath@|$(setsetpythonpath)|g' \
 	-e 's|@appendpythonpath@|$(setappendpythonpath)|g' \
+	-e 's|@pythondir@|$(pythondir)|g' \
 	-e 's|@notusemanpath@|$(setnotusemanpath)|g' \
 	-e 's|@shellcompsource@|$(shellcompsource)|g' \
 	-e 's|@tcllintercmd@|$(tcllintercmd)|g' \

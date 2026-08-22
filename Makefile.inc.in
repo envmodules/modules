@@ -178,6 +178,9 @@ bashcompletiondir := @bashcompletiondir@
 fishcompletiondir := @fishcompletiondir@
 zshcompletiondir := @zshcompletiondir@
 
+# python module location
+pythondir := @pythondir@
+
 # linter setup
 nagelfaraddons  := @nagelfaraddons@
 tcllinter := @tcllinter@
