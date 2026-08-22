@@ -130,6 +130,11 @@ if {$install_setzshfpath eq {y}} {
     set install_zshcompletiondir $install_initdir/zsh-functions
 }
 
+# env_modules python module is installed in initdir if no specific location
+if {$install_pythondir eq {}} {
+    set install_pythondir $install_initdir
+}
+
 # locate siteconfig file
 set siteconfig_file "$install_etcdir/siteconfig.tcl"
 set siteconfig_filere [regsub -all "\(\[.+?\]\)" $siteconfig_file {\\\1}]

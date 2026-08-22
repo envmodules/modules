@@ -905,9 +905,9 @@ setenv_loaded_module [list foo/1.0] [list $modpath.3/foo/1.0]
 if {[is_conf_enabled setpythonpath]} {
     setenv_var PYTHONPATH /tmp
     if {[is_conf_enabled appendpythonpath]} {
-        set updatedpythonpath /tmp:$install_initdir
+        set updatedpythonpath /tmp:$install_pythondir
     } else {
-        set updatedpythonpath $install_initdir:/tmp
+        set updatedpythonpath $install_pythondir:/tmp
     }
 }
 
@@ -1013,7 +1013,7 @@ testouterr_cmd_re bash autoinit ERR $tserr
 
 # ensure PYTHONPATH is already initialized for Modules
 if {[is_conf_enabled setpythonpath]} {
-    setenv_var PYTHONPATH $install_initdir
+    setenv_var PYTHONPATH $install_pythondir
 }
 
 # coherent environment state with loaded module that defines volatile components

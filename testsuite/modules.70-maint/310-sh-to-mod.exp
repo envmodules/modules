@@ -73,10 +73,10 @@ foreach var [array names -glob FOO*] {
 # prepare things if PYTHONPATH is configured by autoinit
 if {[is_conf_enabled setpythonpath]} {
     unsetenv_var PYTHONPATH
-    if {[string first { } $install_initdir] != -1} {
-        set initdirenc "{$install_initdir}"
+    if {[string first { } $install_pythondir] != -1} {
+        set pythondirenc "{$install_pythondir}"
     } else {
-        set initdirenc $install_initdir
+        set pythondirenc $install_pythondir
     }
 }
 
@@ -862,7 +862,7 @@ setenv\t\tMODULE_VERSION_STACK $install_version\n"
 append tserr $tsvarsetwpath
 append tserr "setenv\t\tMODULES_COLLECTION_TARGET bar"
 if {[is_conf_enabled setpythonpath]} {
-    append tserr "\nsetenv\t\tPYTHONPATH $initdirenc"
+    append tserr "\nsetenv\t\tPYTHONPATH $pythondirenc"
 }
 append tserr "\nsetenv\t\ttestsuite yes"
 set tserrbash "$tserr$extratserr"
@@ -890,7 +890,7 @@ setenv\t\tMODULE_VERSION_STACK $install_version\n"
 append tserr $tsvarsetwpath
 append tserr "setenv\t\tMODULES_COLLECTION_TARGET bar"
 if {[is_conf_enabled setpythonpath]} {
-    append tserr "\nsetenv\t\tPYTHONPATH $initdirenc"
+    append tserr "\nsetenv\t\tPYTHONPATH $pythondirenc"
 }
 append tserr $extratserr
 testouterr_shtomod bash {} OK $tserr
@@ -906,7 +906,7 @@ setenv\t\tMODULE_VERSION_STACK $install_version\n"
 append tserr $tsvarsetwpath
 append tserr "setenv\t\tMODULES_COLLECTION_TARGET bar"
 if {[is_conf_enabled setpythonpath]} {
-    append tserr "\nsetenv\t\tPYTHONPATH $initdirenc"
+    append tserr "\nsetenv\t\tPYTHONPATH $pythondirenc"
 }
 append tserr $extratserr
 testouterr_shtomod bash {} OK $tserr
