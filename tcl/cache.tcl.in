@@ -107,7 +107,6 @@ proc formatModuleCacheContent {modpath} {
    # patterns they may define: silence their evaluation errors like during
    # an avail-like walk (their bare content is recorded whether their code
    # is correct or not)
-   set alreadyinhibit [getState inhibit_errreport]
    inhibitErrorReport
 
    # collect files from modulepath directory
@@ -116,10 +115,7 @@ proc formatModuleCacheContent {modpath} {
    # collect files and dirs from modulepath directory with limited access
    array set limited_list [getLimitedAccessesInDirectory $modpath]
 
-   # re-enable error report if it was enabled prior collection
-   if {!$alreadyinhibit} {
-      setState inhibit_errreport 0
-   }
+   uninhibitErrorReport
 
    # concatenate element found and those with limited access as the second
    # kind may not be part of found list
