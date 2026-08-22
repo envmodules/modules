@@ -223,6 +223,13 @@ Modules 5.7.0 (not yet released)
   :mconfig:`modulepath_ignore` configuration option and
   :option:`--no-modulepath-ignore` command line switch to control whether
   pattern definitions are applied. (fix issue #562)
+* Install: add the :instopt:`--with-pythondir` installation option to
+  define the directory where to install the ``env_modules`` Python module.
+  It enables for instance to install :file:`env_modules.py` with the other
+  Python modules available on the system. When this option is set,
+  :instopt:`--enable-set-pythonpath` adds this directory to
+  :envvar:`PYTHONPATH` instead of the Modules ``init`` directory. (fix issue
+  #643)
 
 
 .. _5.6 release notes:
