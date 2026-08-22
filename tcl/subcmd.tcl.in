@@ -2171,9 +2171,9 @@ proc cmdModuleAutoinit {} {
       @setmanpath@}
    }
 
-   # add Modules init directory to PYTHONPATH if enabled
-   @setpythonpath@if {{@initdir@} ni [split [get-env PYTHONPATH] :]} {
-   @setpythonpath@   @appendpythonpath@-path PYTHONPATH {@initdir@}
+   # add env_modules python module directory to PYTHONPATH if enabled
+   @setpythonpath@if {{@pythondir@} ni [split [get-env PYTHONPATH] :]} {
+   @setpythonpath@   @appendpythonpath@-path PYTHONPATH {@pythondir@}
    @setpythonpath@}
 
    # source shell completion script if available, not installed in default

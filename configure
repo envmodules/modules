@@ -42,7 +42,7 @@ zshcompletiondir tcllinter tcllinteropts nagelfardatadir nagelfaraddons \
 stickypurge uniquenameloaded abortonerror sourcecache logger loggeropts \
 loggedevents conflictunload spideroutput spiderterseoutput spiderindepth \
 emacsdatadir emacsaddons requirevia compressedchangelog paginate initenvvars \
-setpythonpath appendpythonpath domainname domainnameopts"
+setpythonpath appendpythonpath pythondir domainname domainnameopts"
 libarglist=()
 
 # flags to know if argument has been specified on command-line
@@ -156,6 +156,7 @@ variantshortcut=
 bashcompletiondir=
 fishcompletiondir=
 zshcompletiondir=
+pythondir=
 tcllinter='nagelfar.tcl'
 tcllinteropts=
 nagelfaraddons=y
@@ -474,6 +475,9 @@ Optional Packages:
                           a quarantine variable instead of emptying it. []
   --with-python=BIN       name or full path of Python interpreter command to
                           use as shebang for helper scripts [$PYTHON]
+  --with-pythondir=DIR    installation directory of \`env_modules' Python
+                          module. \`env_modules.py' is installed in the
+                          initialization script directory if not set []
   --with-pager=BIN        name or full path of default pager program to use to
                           paginate informational message output (can be super-
                           seeded at run-time by environment variable) [$pager]
@@ -986,6 +990,9 @@ for arg in "$@"; do
       libarglist+=("$arg") ;;
    --with-python=*|--without-python)
       pythonbin=$(get_package_value "$arg") ;;
+   --with-pythondir=*|--without-pythondir)
+      # shellcheck disable=SC2034
+      pythondir=$(get_package_value "$arg" "") ;;
    --with-module-path=*)
       echo_warning "Option \`--with-module-path' ignored, use \`--modulepath' instead" ;;
    -h|--help)

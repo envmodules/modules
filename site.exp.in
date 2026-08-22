@@ -135,6 +135,8 @@ set install_bashcompletiondir "@bashcompletiondir@"
 set install_fishcompletiondir "@fishcompletiondir@"
 set install_zshcompletiondir "@zshcompletiondir@"
 
+set install_pythondir "@pythondir@"
+
 set install_tcllinter "@tcllinter@"
 set install_tcllinteropts "@tcllinteropts@"
 set install_tcllintercmd $install_tcllinter
