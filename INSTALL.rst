@@ -506,8 +506,9 @@ instance :instopt:`--disable-set-manpath<--enable-set-manpath>`):
 
 .. instopt:: --enable-append-pythonpath
 
- Append rather prepend init directory to the PYTHONPATH environment variable
- when the :instopt:`--enable-set-pythonpath` option is enabled. (default=no)
+ Append rather prepend the ``env_modules`` Python module directory to the
+ PYTHONPATH environment variable when the :instopt:`--enable-set-pythonpath`
+ option is enabled. (default=no)
 
  .. only:: html or latex
 
@@ -841,9 +842,9 @@ instance :instopt:`--disable-set-manpath<--enable-set-manpath>`):
 
 .. instopt:: --enable-set-pythonpath
 
- Prepend init directory defined by the :instopt:`--initdir` option to the
- PYTHONPATH environment variable in the shell initialization scripts.
- (default=yes)
+ Prepend directory where the ``env_modules`` Python module is installed (see
+ :instopt:`--with-pythondir` option) to the PYTHONPATH environment
+ variable in the shell initialization scripts. (default=yes)
 
  .. only:: html or latex
 
@@ -1453,6 +1454,24 @@ instance :instopt:`--without-modulepath<--with-modulepath>`):
  .. only:: html or latex
 
     .. versionadded:: 4.5
+
+.. instopt:: --with-pythondir=DIR
+
+ Installation directory of the ``env_modules`` Python module. When this
+ option is not set, :file:`env_modules.py` is installed in the initialization
+ script directory. Whatever the installation directory of this Python module,
+ the :file:`python.py` symbolic link created in the initialization script
+ directory points to its location. (default=)
+
+ If this option is set to the ``site-packages`` directory of the Python
+ installation available on the system, the ``env_modules`` module can be
+ imported without requiring the PYTHONPATH environment variable to be set.
+ In this case the :instopt:`--disable-set-pythonpath<--enable-set-pythonpath>`
+ option may be used.
+
+ .. only:: html or latex
+
+    .. versionadded:: 5.7
 
 .. instopt:: --with-quarantine-vars=<VARNAME[=VALUE] ...>
 

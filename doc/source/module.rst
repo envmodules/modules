@@ -89,10 +89,11 @@ time if :command:`mogui-cmd` command is found in :envvar:`PATH`.
 changes performed in the GUI is applied onto the shell session that executed
 :command:`mogui`.
 
-The installation location of the ``env_modules`` Python module may also be
-added to the :envvar:`PYTHONPATH` environment variable during initialization,
-unless the :instopt:`--enable-append-pythonpath` installation option has been
-disabled.
+The installation location of the ``env_modules`` Python module (which is
+defined with the :instopt:`--with-pythondir` installation option) may also
+be added to the :envvar:`PYTHONPATH` environment variable during
+initialization, unless the :instopt:`--enable-set-pythonpath` installation
+option has been disabled.
 
 .. only:: html or latex
 
