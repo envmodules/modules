@@ -45,7 +45,6 @@ table highlights features that are unique to each implementation.
        * `Path entry priorities`_
        * ``--regexp`` search option
        * `settarg`_
-       * |LMOD_FILE_IGNORE_PATTERNS|_ environment variable
        * `MarkDown support in module help and whatis`_
        * `Load dot hidden modules without leading dot`_
      - * Integration with *cmd* and *pwsh* shells and *Tcl* language
@@ -80,8 +79,6 @@ table highlights features that are unique to each implementation.
 .. _Update path entry order: https://lmod.readthedocs.io/en/latest/077_ref_counting.html
 .. _settarg: https://lmod.readthedocs.io/en/latest/310_settarg.html
 .. _Hook functions: https://lmod.readthedocs.io/en/latest/170_hooks.html#hook-functions
-.. |LMOD_FILE_IGNORE_PATTERNS| replace:: ``LMOD_FILE_IGNORE_PATTERNS``
-.. _LMOD_FILE_IGNORE_PATTERNS: https://lmod.readthedocs.io/en/latest/090_configuring_lmod.html#setting-environment-variables-or-cosmic-assign-at-startup
 .. _MarkDown support in module help and whatis: https://lmod.readthedocs.io/en/latest/106_markdown_help.html
 .. _Load dot hidden modules without leading dot: https://lmod.readthedocs.io/en/latest/079_hidden_modules.html#dot-leading-version-directories-and-lmod-dot-hidden-load-alias
 
@@ -122,8 +119,9 @@ the end of this section to map these equivalents.
    * - ``module-forbid-regex``, ``module-hide-regex``, ``remove-property``
      - :mfcmd:`getvariant`, :mfcmd:`is-saved`, :mfcmd:`is-used`,
        :mfcmd:`lsb-release`, :mfcmd:`module-tag`, :mfcmd:`module-warn`,
-       :mfcmd:`modulepath-label`, :mfcmd:`provide`, :mfcmd:`reportWarning`,
-       :mfcmd:`uncomplete`, :mfcmd:`variant`, :mfcmd:`x-resource`
+       :mfcmd:`modulepath-ignore`, :mfcmd:`modulepath-label`,
+       :mfcmd:`provide`, :mfcmd:`reportWarning`, :mfcmd:`uncomplete`,
+       :mfcmd:`variant`, :mfcmd:`x-resource`
 
 See the :ref:`Compatibility with Lmod Tcl modulefile` section for details on
 how the implementation of the Tcl modulefile commands differ between Lmod and
@@ -160,6 +158,8 @@ implementation.
      - :ref:`Conflict unload MIGRATING`
    * - `Update path entry order`_
      - :mconfig:`path_entry_reorder` configuration option
+   * - |LMOD_FILE_IGNORE_PATTERNS|_ environment variable
+     - :mfcmd:`modulepath-ignore` environment variable
    * - |LMOD_DOWNSTREAM_CONFLICTS|_ environment variable
      - :ref:`Dependencies between modulefiles`
    * - |LMOD_QUARANTINE_VARS|_ environment variable
@@ -227,6 +227,8 @@ implementation.
 .. _XALT: https://github.com/xalt/xalt
 .. _Module hierarchy: https://lmod.readthedocs.io/en/latest/080_hierarchy.html
 .. _Autoswap: https://lmod.readthedocs.io/en/latest/060_locating.html#autoswapping-rules
+.. |LMOD_FILE_IGNORE_PATTERNS| replace:: ``LMOD_FILE_IGNORE_PATTERNS``
+.. _LMOD_FILE_IGNORE_PATTERNS: https://lmod.readthedocs.io/en/latest/090_configuring_lmod.html#setting-environment-variables-or-cosmic-assign-at-startup
 .. |LMOD_DOWNSTREAM_CONFLICTS| replace:: ``LMOD_DOWNSTREAM_CONFLICTS``
 .. _LMOD_DOWNSTREAM_CONFLICTS: https://lmod.readthedocs.io/en/latest/090_configuring_lmod.html#configuration-or-cosmic-assign-at-startup
 .. |LMOD_QUARANTINE_VARS| replace:: ``LMOD_QUARANTINE_VARS``
@@ -292,4 +294,4 @@ If you're aware of a ``module``-related project missing from this list, feel
 free to :ref:`contact us<Community>` so we can add it.
 
 .. |modules_version| replace:: Modules 5.7.0 (not yet released)
-.. |lmod_version| replace:: Lmod 9.3.0
+.. |lmod_version| replace:: Lmod 9.3.1
