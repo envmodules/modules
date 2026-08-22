@@ -29,6 +29,24 @@ setenv_path_var MODULEPATH $mp
 
 
 # check expected siteconfig file is installed
+#
+# This testfile silently self-skips in a plain development checkout: it
+# requires testsuite/example/siteconfig.tcl-1 installed as
+# <etcdir>/siteconfig.tcl plus TESTSUITE_ENABLE_SITECONFIG=1 exported. The
+# primary siteconfig location has no environment override: it is the etcdir
+# baked into modulecmd-test.tcl at ./configure time (/usr/local/Modules/etc
+# by default, not writable without root). CI sets this up with a real 'make
+# install-testsiteconfig-1' (see .github/workflows/linux_tests.yaml).
+#
+# To exercise these tests locally without touching the system:
+#   1. ./configure --etcdir=<scratch>/etc
+#   2. force a full rebuild, as make does not regenerate the built files
+#      after a configure change: rm -f modulecmd.tcl modulecmd-test.tcl
+#      tcl/{init,cache,coll,envmngt,interp,main,modfind,report,subcmd}.tcl
+#      then make modulecmd.tcl modulecmd-test.tcl
+#   3. cp testsuite/example/siteconfig.tcl-1 <scratch>/etc/siteconfig.tcl
+#   4. TESTSUITE_ENABLE_SITECONFIG=1 script/mt 50/560
+#   5. restore with a plain ./configure and the same forced rebuild
 set is_stderr_tty [siteconfig_isStderrTty]
 if {$is_stderr_tty} {
 
