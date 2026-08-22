@@ -16,6 +16,7 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
+import importlib.util
 import os
 import sys
 # sys.path.insert(0, os.path.abspath('.'))
@@ -117,7 +118,9 @@ todo_include_todos = False
 # a list of builtin themes.
 #
 os_rtd = os.environ.get('READTHEDOCS', None) == 'True'
-if os_rtd:
+# use the same theme as on Read The Docs when it is installed locally
+use_furo = os_rtd or importlib.util.find_spec('furo') is not None
+if use_furo:
     html_theme = 'furo'
 else:
     html_theme = 'bizstyle'
@@ -134,7 +137,7 @@ html_css_files = [
 # documentation.
 #
 # html_theme_options = {}
-if os_rtd:
+if use_furo:
     html_theme_options = {
         'sidebar_hide_name': True,
         'light_logo': 'modules_red.svg',
@@ -143,7 +146,7 @@ if os_rtd:
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
-if not os_rtd:
+if not use_furo:
     html_logo = '_static/modules_red.svg'
 
 # The name of an image file (within the static path) to use as favicon of the
