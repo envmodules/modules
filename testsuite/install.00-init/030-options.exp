@@ -268,6 +268,18 @@ if {[string length $nafelgar_script]} {
 }
 
 
+# test env_modules Python module installation location
+if {$verbose} {
+   send_user "\tChecking env_modules Python module installation\n"
+}
+if {$install_pythondir ne {}} {
+   set pythondir $install_pythondir
+} else {
+   set pythondir $install_initdir
+}
+testall_cmd_re "sh" "test -f '$pythondir/env_modules.py'" "" "" 0
+testall_cmd_re "sh" "test -f '$install_initdir/python.py'" "" "" 0
+
 # test Python module is found if PYTHONPATH is defined
 if {$install_setpythonpath eq {y} && [info exists shell_path(python)]} {
    # create a temporary script that checks import of module command
