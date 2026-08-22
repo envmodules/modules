@@ -553,6 +553,7 @@ jobs:
         --with-bashcompletiondir=/usr/share/bash-completion/completions
         --with-fishcompletiondir=/usr/share/fish/vendor_completions.d
         --with-zshcompletiondir=/usr/share/zsh/site-functions
+        --with-pythondir=/usr/lib/python3.6/site-packages
     steps:
       - name: Install system packages
         run: |
@@ -565,7 +566,7 @@ jobs:
           # need git in PATH for actions/checkout to get git repo instead of github export
           dnf install -y git
           yum install -y epel-release
-          yum install -y tcsh zsh ksh tcl perl python36 gzip ruby cmake R-core make curl perl python3-sphinx git dejagnu man-db rpm-build bzip2 autoconf gcc tcl-devel emacs
+          yum install -y tcsh zsh ksh tcl perl python36 python36-devel gzip ruby cmake R-core make curl perl python3-sphinx git dejagnu man-db rpm-build bzip2 autoconf gcc tcl-devel emacs
           yum install -y which xorg-x11-server-utils xorg-x11-server-Xvfb
           yum install -y fish
       - name: Fix git safe directory
@@ -615,6 +616,7 @@ jobs:
         --with-bashcompletiondir=/usr/share/bash-completion/completions
         --with-fishcompletiondir=/usr/share/fish/vendor_completions.d
         --with-zshcompletiondir=/usr/share/zsh/site-functions
+        --with-pythondir=/usr/lib/python3.9/site-packages
     steps:
       - name: Install system packages
         run: |
@@ -622,7 +624,7 @@ jobs:
           dnf install -y git
           dnf install -y dnf-plugins-core epel-release
           dnf config-manager --set-enabled crb
-          dnf install -y tcsh zsh ksh fish tcl perl python3 gzip ruby cmake R-core make perl python3-sphinx git dejagnu man-db rpm-build bzip2 autoconf gcc tcl-devel procps-ng emacs
+          dnf install -y tcsh zsh ksh fish tcl perl python3 python3-devel gzip ruby cmake R-core make perl python3-sphinx git dejagnu man-db rpm-build bzip2 autoconf gcc tcl-devel procps-ng emacs
       - name: Fix git safe directory
         run: |
           # avoid "detected dubious ownership in repository" error
