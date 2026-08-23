@@ -82,6 +82,7 @@ array set configdfl [list\
     home                      [regsub -all "\(\[.+?\]\)" $install_moduleshome {\\\1}]\
     icase                     $install_icase\
     ignore_cache              0\
+    ignore_cache_subcmds      {}\
     ignore_user_rc            0\
     ignored_dirs              {CVS RCS SCCS .svn .git .SYNC .sos}\
     implicit_default          [expr {$install_implicitdefault eq {y}}]\
@@ -157,6 +158,7 @@ array set configvar [list\
     home                      MODULESHOME\
     icase                     MODULES_ICASE\
     ignore_cache              MODULES_IGNORE_CACHE\
+    ignore_cache_subcmds      MODULES_IGNORE_CACHE_SUBCMDS\
     ignore_user_rc            MODULES_IGNORE_USER_RC\
     implicit_default          MODULES_IMPLICIT_DEFAULT\
     implicit_requirement      MODULES_IMPLICIT_REQUIREMENT\

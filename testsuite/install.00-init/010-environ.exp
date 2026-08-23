@@ -168,6 +168,7 @@ unsetenv_var MODULES_RESET_TARGET_STATE
 
 # clean any cache configuration
 unsetenv_var MODULES_IGNORE_CACHE
+unsetenv_var MODULES_IGNORE_CACHE_SUBCMDS
 unsetenv_var MODULES_CACHE_BUFFER_BYTES
 unsetenv_var MODULES_CACHE_EXPIRY_SECS
 
