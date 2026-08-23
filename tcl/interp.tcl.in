@@ -29,8 +29,41 @@ proc nimp {cmd args} {
 }
 
 proc createInterp {itrp} {
+   # set quarantine variables to their runtime value or unset them during
+   # interp creation to protect this initialization step from their current
+   # definition (e.g., a TCL_LIBRARY variable pointing at a broken Tcl
+   # installation)
+   set quar_var_list [getQuarantineVarList]
+   foreach var $quar_var_list {
+      if {[info exists ::env($var)]} {
+         set quar_orig_val($var) $::env($var)
+      }
+      if {[info exists ::env(MODULES_RUNENV_$var)]} {
+         reportDebug "Set '$var' environment variable in quarantine\
+            ($::env(MODULES_RUNENV_$var))"
+         set ::env($var) $::env(MODULES_RUNENV_$var)
+      } else {
+         reportDebug "Unset '$var' environment variable in quarantine"
+         unset -nocomplain ::env($var)
+      }
+   }
+
    reportDebug "creating interp $itrp"
    interp create $itrp
+
+   # restore environment variables put in quarantine once interp is created
+   foreach var $quar_var_list {
+      if {[info exists quar_orig_val($var)]} {
+         set ::env($var) $quar_orig_val($var)
+      } else {
+         unset -nocomplain ::env($var)
+         # also unset variable in created interp if it was set during
+         # creation: this env entry is not removed by the unset above and a
+         # read attempt on it would raise a "no such variable" error
+         ##nagelfar ignore Found constant
+         interp eval $itrp [list unset -nocomplain ::env($var)]
+      }
+   }
 }
 
 # Get identifier name of current Tcl modulefile interpreter. An interp is

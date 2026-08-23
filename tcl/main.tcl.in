@@ -904,25 +904,19 @@ if {[catch {
    # put back quarantine variables in env, if quarantine mechanism supported
    if {[info exists env(__MODULES_QUARANTINE_SET)] &&\
       $env(__MODULES_QUARANTINE_SET) eq {1}} {
-      foreach var [split [getConf run_quarantine]] {
-         # check variable name is valid
-         if {[regexp {^[A-Za-z_][A-Za-z0-9_]*$} $var]} {
-            set quarvar __MODULES_QUAR_${var}
-            # put back value
-            if {[info exists env($quarvar)]} {
-               reportDebug "Release '$var' environment variable from\
-                  quarantine ($env($quarvar))"
-               set env($var) $env($quarvar)
-               unset env($quarvar)
-            # or unset env var if no value found in quarantine
-            } elseif {[info exists env($var)]} {
-               reportDebug "Unset '$var' environment variable after\
-                  quarantine"
-               unset env($var)
-            }
-         } elseif {[string length $var]} {
-            reportWarning "Bad variable name set in MODULES_RUN_QUARANTINE\
-               ($var)"
+      foreach var [getQuarantineVarList 1] {
+         set quarvar __MODULES_QUAR_${var}
+         # put back value
+         if {[info exists env($quarvar)]} {
+            reportDebug "Release '$var' environment variable from\
+               quarantine ($env($quarvar))"
+            set env($var) $env($quarvar)
+            unset env($quarvar)
+         # or unset env var if no value found in quarantine
+         } elseif {[info exists env($var)]} {
+            reportDebug "Unset '$var' environment variable after\
+               quarantine"
+            unset env($var)
          }
       }
    }

@@ -5880,6 +5880,15 @@ ENVIRONMENT
  Original values of these environment variables set in quarantine are passed
  to :file:`modulecmd.tcl` via :envvar:`__MODULES_QUAR_\<VAR\>` variables.
 
+ Each variable found in :envvar:`MODULES_RUN_QUARANTINE` is also set in
+ quarantine by :file:`modulecmd.tcl` during the creation of the Tcl
+ sub-interpreters used to evaluate modulercs and modulefiles. Variables are
+ unset or set to the value of their corresponding
+ :envvar:`MODULES_RUNENV_\<VAR\>` variable during this creation step, then
+ their original value is restored. It protects sub-interpreter initialization
+ from side-effect coming from current definition of these variables (e.g., a
+ ``TCL_LIBRARY`` variable pointing at a broken Tcl installation).
+
  This environment variable value supersedes the default value set in the
  :mconfig:`run_quarantine` configuration option. It can be defined with the
  :subcmd:`config` sub-command.
@@ -5887,6 +5896,9 @@ ENVIRONMENT
  .. only:: html or latex
 
     .. versionadded:: 4.1
+
+    .. versionchanged:: 5.7
+       Quarantine also applied during Tcl sub-interpreter creation
 
 .. envvar:: MODULES_RUNENV_<VAR>
 
