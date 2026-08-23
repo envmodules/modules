@@ -54,6 +54,16 @@ proc aboveCommandName {} {
    return [lindex [getState commandname] end-1]
 }
 
+# get top-level command name, with ml frontend translated onto the
+# underlying load or unload sub-command it currently processes
+proc topCommandName {} {
+   set subcmd [topState commandname]
+   if {$subcmd eq {ml}} {
+      set subcmd [topState eval_context]
+   }
+   return $subcmd
+}
+
 proc ongoingCommandName {commandName} {
    return [expr {[lsearch -exact [getState commandname] $commandName] != -1}]
 }
