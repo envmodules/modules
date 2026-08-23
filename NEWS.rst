@@ -238,6 +238,12 @@ Modules 5.7.0 (not yet released)
   :mconfig:`ignore_cache_subcmds` is changed with :subcmd:`config`
   sub-command, it sets the :envvar:`MODULES_IGNORE_CACHE_SUBCMDS`
   environment variable. (fix issue #563)
+* Protect the creation of the Tcl sub-interpreters used to evaluate modulercs
+  and modulefiles with the quarantine mechanism. Environment variables listed
+  in the :mconfig:`run_quarantine` configuration option are unset or set to
+  the value of their corresponding :envvar:`MODULES_RUNENV_\<VAR\>` variable
+  during this creation step, then restored to their original value. (fix
+  issue #623)
 
 
 .. _5.6 release notes:

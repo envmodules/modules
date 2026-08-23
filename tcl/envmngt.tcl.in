@@ -1438,6 +1438,21 @@ proc isEnvVarDefined {var_name} {
    return [info exists ::env($var_name)]
 }
 
+# Get list of valid variable names found in run_quarantine configuration
+# option, cleared from duplicate entries. Warn about invalid names if asked
+proc getQuarantineVarList {{report_bad 0}} {
+   set var_list {}
+   foreach var [split [getConf run_quarantine]] {
+      if {[regexp {^[A-Za-z_][A-Za-z0-9_]*$} $var]} {
+         lappendNoDup var_list $var
+      } elseif {$report_bad && [string length $var]} {
+         reportWarning "Bad variable name set in MODULES_RUN_QUARANTINE\
+            ($var)"
+      }
+   }
+   return $var_list
+}
+
 proc setEnvVarIfUndefined {var_name value} {
    if {![isEnvVarDefined $var_name]} {
       set ::env($var_name) $value

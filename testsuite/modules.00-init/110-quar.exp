@@ -188,3 +188,80 @@ reset_test_env
 } elseif {$verbose} {
    send_user "\tSkipping quarantine mechanism checks\n"
 }
+
+
+#
+# Quarantine protection of Tcl sub-interpreter creation (issue #623)
+#
+
+# fake Tcl library directories whose init.tcl script leaves a mark in
+# environment when sourced by a sub-interpreter then applies the genuine
+# init.tcl content of the Tcl interpreter running modulecmd. This content
+# is embedded in the fake script, as raising an error instead would engage
+# the init.tcl fallback search of tclInit, which panics on Tcl 9.1a1, like
+# sourcing the genuine init.tcl file when it lies in a zipfs archive.
+# ::argv only exists in the master interpreter, which also sources this
+# script when TCL_LIBRARY designates one of these directories
+set real_tcl_lib [exec $TCLSH << {puts -nonewline [info library]}]
+set real_init_content [exec $TCLSH << {set fid [open [file join\
+    [info library] init.tcl] r]; puts -nonewline [read $fid]; close $fid}]
+set fakelib1 [file join [pwd] faketcllib1]
+set fakelib2 [file join [pwd] faketcllib2]
+foreach {fakelib mark} [list $fakelib1 lib1 $fakelib2 lib2] {
+    file mkdir $fakelib
+    set fid [open $fakelib/init.tcl w]
+    puts $fid "if {!\[info exists ::argv\]} {"
+    puts $fid "    set ::env(TESTSUITE_FAKE_TCL_INIT) $mark"
+    puts $fid "}"
+    puts $fid "set ::tcl_library {$real_tcl_lib}"
+    puts $fid $real_init_content
+    close $fid
+}
+
+# modulefile reporting mark left by fake Tcl library and TCL_LIBRARY value
+set modfile [file join [pwd] faketcllib.mod]
+set fid [open $modfile w]
+puts $fid {#%Module
+if {[info exists env(TESTSUITE_FAKE_TCL_INIT)]} {
+    puts stderr "TESTSUITE_FAKE_TCL_INIT=$env(TESTSUITE_FAKE_TCL_INIT)"
+}
+if {[info exists env(TCL_LIBRARY)]} {
+    puts stderr "TCL_LIBRARY=$env(TCL_LIBRARY)"
+}}
+close $fid
+
+setenv_var TCL_LIBRARY $fakelib1
+
+# no quarantine: sub-interpreter initialization is affected by the broken
+# Tcl library installation found in environment
+set ans [list]
+lappend ans "TESTSUITE_FAKE_TCL_INIT=lib1"
+lappend ans "TCL_LIBRARY=$fakelib1"
+testouterr_cmd sh "source $modfile" OK [join $ans \n]
+
+# variable in quarantine: sub-interpreter creation is protected but variable
+# is restored afterward for modulefile evaluation
+setenv_var MODULES_RUN_QUARANTINE TCL_LIBRARY
+testouterr_cmd sh "source $modfile" OK "TCL_LIBRARY=$fakelib1"
+
+# defined runtime value is applied during sub-interpreter creation
+setenv_var MODULES_RUNENV_TCL_LIBRARY $fakelib2
+set ans [list]
+lappend ans "TESTSUITE_FAKE_TCL_INIT=lib2"
+lappend ans "TCL_LIBRARY=$fakelib1"
+testouterr_cmd sh "source $modfile" OK [join $ans \n]
+
+# variable initially unset with a defined runtime value: sub-interpreter
+# should not keep trace of the variable set during its creation once this
+# variable is unset after this step
+unsetenv_var TCL_LIBRARY
+testouterr_cmd sh "source $modfile" OK "TESTSUITE_FAKE_TCL_INIT=lib2"
+
+
+#
+#  Clean up variables used in this test case
+#
+
+file delete -force $fakelib1 $fakelib2 $modfile
+
+reset_test_env
