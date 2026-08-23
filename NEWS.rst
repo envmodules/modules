@@ -230,6 +230,14 @@ Modules 5.7.0 (not yet released)
   :instopt:`--enable-set-pythonpath` adds this directory to
   :envvar:`PYTHONPATH` instead of the Modules ``init`` directory. (fix issue
   #643)
+* Introduce :mconfig:`ignore_cache_subcmds` configuration option that
+  defines a list of module sub-commands on which module cache files are
+  ignored. It is useful when cache files are large: a sub-command targeting
+  specific modules (like :subcmd:`load`) may find them faster by walking
+  through modulepath directories than by evaluating whole cache files. When
+  :mconfig:`ignore_cache_subcmds` is changed with :subcmd:`config`
+  sub-command, it sets the :envvar:`MODULES_IGNORE_CACHE_SUBCMDS`
+  environment variable. (fix issue #563)
 
 
 .. _5.6 release notes:

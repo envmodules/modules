@@ -1233,6 +1233,19 @@ Module Sub-Commands
 
      .. versionadded:: 5.3
 
+ .. mconfig:: ignore_cache_subcmds
+
+  List of module sub-commands that ignore module cache.
+
+  Default is an empty list. The :envvar:`MODULES_IGNORE_CACHE_SUBCMDS`
+  environment variable is defined by :subcmd:`config` sub-command when
+  changing this configuration option from its default value. See
+  :envvar:`MODULES_IGNORE_CACHE_SUBCMDS` description for details.
+
+  .. only:: html or latex
+
+     .. versionadded:: 5.7
+
  .. mconfig:: ignore_user_rc
 
   Skip evaluation of user-specific module rc file (:file:`$HOME/.modulerc`).
@@ -5317,6 +5330,30 @@ ENVIRONMENT
  .. only:: html or latex
 
     .. versionadded:: 5.3
+
+.. envvar:: MODULES_IGNORE_CACHE_SUBCMDS
+
+ A colon separated list of the module sub-commands that ignore module cache.
+ When one of these sub-commands is run, modulepath directories are walked
+ through to search modules instead of relying on their cache file.
+
+ Sub-command name aliases (like ``add`` for :subcmd:`load`) resolve to their
+ target sub-command, which is the name to set in value list. The
+ :command:`ml` command used without a sub-command name translates to the
+ underlying :subcmd:`load` or :subcmd:`unload` sub-commands.
+
+ Ignoring cache may be useful for sub-commands targeting specific modules
+ (like :subcmd:`load`) when cache files are large: walking through modulepath
+ content to find the requested modules may be faster than evaluating the
+ whole cache file.
+
+ This environment variable value supersedes the default value set in the
+ :mconfig:`ignore_cache_subcmds` configuration option. It can be defined
+ with the :subcmd:`config` sub-command.
+
+ .. only:: html or latex
+
+    .. versionadded:: 5.7
 
 .. envvar:: MODULES_IGNORE_USER_RC
 
