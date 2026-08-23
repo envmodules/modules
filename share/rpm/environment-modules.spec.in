@@ -19,6 +19,11 @@ BuildRequires:  dejagnu
 BuildRequires:  make
 BuildRequires:  sed
 BuildRequires:  less
+# python3_sitelib macro and byte-compilation of env_modules.py installed
+# in this directory
+%if 0%{?fedora} >= 22 || 0%{?rhel} >= 8
+BuildRequires:  python3-devel
+%endif
 %if 0%{?rhel} && 0%{?rhel} <= 8
 BuildRequires:  util-linux
 %else
@@ -120,6 +125,10 @@ have access to the module alias.
            --disable-doc-install \
            --enable-modulespath \
            --with-python=%{pythonbin} \
+%if 0%{?fedora} >= 22 || 0%{?rhel} >= 8
+           --with-pythondir=%{python3_sitelib} \
+           --disable-set-pythonpath \
+%endif
            --with-modulepath=%{_datadir}/Modules/modulefiles:%{_sysconfdir}/modulefiles:%{_datadir}/modulefiles \
            --with-quarantine-vars='LD_LIBRARY_PATH LD_PRELOAD' \
            --with-init-envvars='MANPATH='
@@ -237,6 +246,10 @@ fi
 %{_datadir}/Modules/libexec/modulecmd.tcl
 %dir %{_datadir}/Modules/init
 %{_datadir}/Modules/init/*
+%if 0%{?fedora} >= 22 || 0%{?rhel} >= 8
+%{python3_sitelib}/env_modules.py
+%{python3_sitelib}/__pycache__/env_modules.cpython-*.pyc
+%endif
 # do not need to require shell package as we "own" completion dir
 %dir %{bash_completions_dir}
 %{bash_completions_dir}/module
