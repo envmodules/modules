@@ -80,6 +80,26 @@ These measurements were obtained on a system where all modulefiles are stored
 on local flash storage. If your modulefiles reside on a shared network
 filesystem, using a `Module cache`_ is strongly recommended.
 
+A module cache file aggregates the content of all the modulercs and
+modulefiles found in a modulepath and this whole file is evaluated when a
+module search occurs, even if the search targets specific modules. On setups
+with a very large number of modulefiles, resulting in cache files of several
+megabytes, evaluating the whole cache file may take longer than walking
+through the modulepath directory to find the few requested modules. The new
+:mconfig:`ignore_cache_subcmds` configuration option defines a list of
+module sub-commands on which module cache files are ignored. For instance to
+keep cache benefit on listing sub-commands but avoid its penalty on targeted
+ones:
+
+.. parsed-literal::
+
+    :ps:`$` module config ignore_cache_subcmds load:try-load:load-any
+
+When the configuration option is changed from its default value using the
+:subcmd:`config` sub-command, the :envvar:`MODULES_IGNORE_CACHE_SUBCMDS`
+environment variable is defined accordingly. See
+:envvar:`MODULES_IGNORE_CACHE_SUBCMDS` for details.
+
 Reorder existing entries in path-like variables
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

@@ -265,6 +265,21 @@ Cache files are ignored if :mconfig:`ignore_cache` configuration option is
 enabled. This option can also be enabled just for one execution with the
 :option:`--ignore-cache` command line option.
 
+Cache files are also ignored if the currently running top-level sub-command
+is part of the :mconfig:`ignore_cache_subcmds` configuration option. On
+setup with a very large number of modulefiles, resulting in cache files of
+several megabytes, evaluating the whole cache file may take longer for a
+sub-command targeting specific modules (like :subcmd:`load`) than walking
+through the modulepath directory to find these modules. This option helps
+to skip cache use for such sub-commands while preserving cache benefit on
+the others (like :subcmd:`avail`).
+
+Sub-command name aliases resolve to their target sub-command prior the
+comparison against the option value. The :command:`ml` command used without
+a sub-command name translates to the :subcmd:`load` or :subcmd:`unload`
+sub-command it is currently processing, so ``ml`` is not a value to set in
+this option.
+
 Cache files are ignored if cache expiry mechanism is enabled through the
 :mconfig:`cache_expiry_secs` configuration option. When this option is set to
 0, it means a cache file never expires. This is the default behavior. If set

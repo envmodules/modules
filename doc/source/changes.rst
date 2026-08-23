@@ -1108,7 +1108,8 @@ The following environment variables appeared on Modules 5.
 |            | :envvar:`MODULES_LINKED_ENVVARS`,                               |
 |            | :envvar:`MODULES_INIT_ENVVARS`,                                 |
 |            | :envvar:`MODULES_DOMAINNAME`,                                   |
-|            | :envvar:`MODULES_MODULEPATH_IGNORE`                             |
+|            | :envvar:`MODULES_MODULEPATH_IGNORE`,                            |
+|            | :envvar:`MODULES_IGNORE_CACHE_SUBCMDS`                          |
 +------------+-----------------------------------------------------------------+
 
 Modules Specific Tcl Commands
@@ -1326,7 +1327,8 @@ The following Modules configuration option has been introduced on Modules 5.
 | 5.7        | :mconfig:`path_entry_reorder`, :mconfig:`paginate`,             |
 |            | :mconfig:`non_exportable_tags`, :mconfig:`info_extension`,      |
 |            | :mconfig:`linked_envvars`, :mconfig:`init_envvars`,             |
-|            | :mconfig:`domainname`, :mconfig:`modulepath_ignore`             |
+|            | :mconfig:`domainname`, :mconfig:`modulepath_ignore`,            |
+|            | :mconfig:`ignore_cache_subcmds`                                 |
 +------------+-----------------------------------------------------------------+
 
 :mconfig:`auto_handling`
