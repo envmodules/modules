@@ -1,0 +1,106 @@
+##############################################################################
+#   Modules Revision 3.0
+#   Providing a flexible user environment
+#
+#   File:		modules.30-cache/%M%
+#   Revision:		%I%
+#   First Edition:	2026/08/23
+#   Last Mod.:		%U%, %G%
+#
+#   Authors:		Xavier Delaruelle, xavier.delaruelle@cea.fr
+#
+#   Description:	Testuite testsequence
+#   Command:		avail, whatis, load, add, ml
+#   Modulefiles:
+#   Sub-Command:
+#
+#   Comment:	%C{
+#           Test ignore_cache_subcmds configuration option
+#		}C%
+#
+##############################################################################
+
+skip_if_quick_mode
+
+# ensure avail tests are made using in depth mode
+setenv_var MODULES_AVAIL_INDEPTH 1
+
+# generate content in modulepaths
+lassign [create_simple_module_setup $mp1] dir_list file_list
+array set file_arr $file_list
+
+setenv_var MODULEPATH $mp1
+
+# tests with empty cache file
+create_dummy_cachefile $mp1
+
+set tserr_avail "bar/1.0
+bar/2.0
+foo/1.0"
+set tserr_whatis "$modlin [escre $mp1] $modlin
+\\s+foo/1.0: foo/1.0"
+set ans_load [list]
+lappend ans_load [list set _LMFILES_ $mp1/bar/1.0]
+lappend ans_load [list set LOADEDMODULES bar/1.0]
+
+# option unset: cache used whatever the sub-command
+testouterr_cmd sh {avail -t -o } OK {}
+testouterr_cmd sh {whatis} OK {}
+testouterr_cmd sh {load bar/1.0} ERR $err_path'bar/1.0'
+
+# cache only ignored on listed sub-commands
+setenv_var MODULES_IGNORE_CACHE_SUBCMDS load
+testouterr_cmd sh {avail -t -o } OK {}
+testouterr_cmd sh {whatis} OK {}
+testouterr_cmd sh {load bar/1.0} $ans_load {}
+# sub-command name alias resolves to the sub-command set in option value
+testouterr_cmd sh {add bar/1.0} $ans_load {}
+# ml frontend translates to the underlying load sub-command
+testouterr_cmd sh {ml bar/1.0} $ans_load {}
+# ml frontend with explicit sub-command or alias resolves to it
+testouterr_cmd sh {ml load bar/1.0} $ans_load {}
+testouterr_cmd sh {ml add bar/1.0} $ans_load {}
+
+# ml is not a value to match: it translates to underlying load or unload
+setenv_var MODULES_IGNORE_CACHE_SUBCMDS ml
+testouterr_cmd sh {ml bar/1.0} ERR $err_path'bar/1.0'
+testouterr_cmd sh {load bar/1.0} ERR $err_path'bar/1.0'
+
+setenv_var MODULES_IGNORE_CACHE_SUBCMDS avail:whatis
+testouterr_cmd sh {avail -t -o } OK $tserr_avail
+testouterr_cmd_re sh {whatis} OK $tserr_whatis
+testouterr_cmd sh {load bar/1.0} ERR $err_path'bar/1.0'
+
+# value that does not match a sub-command name has no effect
+setenv_var MODULES_IGNORE_CACHE_SUBCMDS foo:load
+testouterr_cmd sh {avail -t -o } OK {}
+testouterr_cmd sh {load bar/1.0} $ans_load {}
+
+# ignore_cache option applies whatever the sub-command
+setenv_var MODULES_IGNORE_CACHE_SUBCMDS load
+setenv_var MODULES_IGNORE_CACHE 1
+testouterr_cmd sh {avail -t -o } OK $tserr_avail
+testouterr_cmd sh {load bar/1.0} $ans_load {}
+unsetenv_var MODULES_IGNORE_CACHE
+setenv_var MODULES_IGNORE_CACHE 0
+testouterr_cmd sh {avail -t -o } OK {}
+testouterr_cmd sh {load bar/1.0} $ans_load {}
+unsetenv_var MODULES_IGNORE_CACHE
+
+# --ignore-cache command line switch applies whatever the sub-command
+testouterr_cmd sh {avail --ignore-cache -t -o } OK $tserr_avail
+testouterr_cmd sh {load bar/1.0 --ignore-cache} $ans_load {}
+
+unsetenv_var MODULES_IGNORE_CACHE_SUBCMDS
+
+
+#
+#  Cleanup
+#
+
+file delete $mp1cache
+
+# delete created files and dirs
+delete_module_setup $mp1 [array names file_arr] $dir_list
+
+reset_test_env
