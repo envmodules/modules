@@ -1595,3 +1595,5 @@ isdir
 bizstyle
 importlib
 pythondir
+subcmds
+topCommandName

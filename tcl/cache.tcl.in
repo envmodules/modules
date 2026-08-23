@@ -380,8 +380,10 @@ proc limited-access-directory {dir} {
 proc findModulesInCacheFile {modpath mod depthlvl fetch_mtime} {
    set cachefile [getModuleCacheFilename $modpath]
 
-   # check if cache should be ignored
-   if {[getConf ignore_cache]} {
+   # check if cache should be ignored, either globally or for currently
+   # running top-level sub-command
+   if {[getConf ignore_cache] || [topCommandName] in [getConfList\
+      ignore_cache_subcmds]} {
       return [list 0 {}]
    }
 

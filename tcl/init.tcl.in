@@ -104,6 +104,7 @@ array set g_config_defs [list\
    home {MODULESHOME {@moduleshome@} 0 s}\
    icase {MODULES_ICASE @icase@ 0 s {never search always}}\
    ignore_cache {MODULES_IGNORE_CACHE 0 0 b {0 1}}\
+   ignore_cache_subcmds {MODULES_IGNORE_CACHE_SUBCMDS {} 0 l}\
    ignore_user_rc {MODULES_IGNORE_USER_RC 0 0 b {0 1}}\
    ignored_dirs {{} {CVS RCS SCCS .svn .git .SYNC .sos} 0 o}\
    implicit_requirement {MODULES_IMPLICIT_REQUIREMENT @implicitrequirement@ 0\
