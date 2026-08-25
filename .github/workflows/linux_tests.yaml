@@ -436,9 +436,9 @@ jobs:
           # libtclenvmodules build requirements
           sudo apt-get install -y gcc autoconf
           # manually install tcl9.1
-          curl -L --output tcl9.1a1-src.tar.gz http://downloads.sourceforge.net/tcl/tcl9.1a1-src.tar.gz
-          tar xfz tcl9.1a1-src.tar.gz
-          cd tcl9.1a1/unix
+          curl -L --output tcl9.1b0-src.tar.gz http://downloads.sourceforge.net/tcl/tcl9.1b0-src.tar.gz
+          tar xfz tcl9.1b0-src.tar.gz
+          cd tcl9.1b0/unix
           ./configure
           make -j
           sudo make install
