@@ -29,6 +29,16 @@
 # Tcl>=8.6): use channel pipe instead of saving these outputs in file
 if {[lindex [lsort -dictionary [list 8.6 [info tclversion]]] 1] eq [info tclversion]} {
 
+# catch background errors, like a modulecmd process killed by a signal that
+# makes readpipe raise an uncaught CHILDKILLED error from its event handler.
+# without this catching procedure defined, such an error leaves the endpipe
+# variable unset and the vwait call in modulecmd_xxx_ hangs forever
+proc bgerror {msg} {
+    send_user "ERROR: background error caught: $msg\n"
+    # release ongoing command wait to make related test fail right away
+    set ::endpipe error
+}
+
 proc readpipe {p1 p2 varname {exit_varname {}}} {
     append ::$varname [read $p1]
     if {[eof $p1]} {
