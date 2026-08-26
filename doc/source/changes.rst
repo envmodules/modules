@@ -648,6 +648,15 @@ Module Sub-Commands
  these variables. Exception is made for :envvar:`MODULEPATH` environment
  variable where the mechanism still applies.
 
+:subcmd:`purge`
+
+ Starting with version 5.7, direct and indirect requirements of retained
+ sticky and super-sticky modules are kept loaded, even if those requirements
+ are not sticky themselves. The :mconfig:`sticky_purge` configuration
+ controls reporting for their skipped unload as well as for sticky modules.
+ With :option:`--force`, sticky modules and their requirements can be
+ unloaded, but super-sticky modules and their requirements remain loaded.
+
 :subcmd:`refresh`
 
  Sub-command evaluates all loaded modulefiles and re-apply the non-persistent

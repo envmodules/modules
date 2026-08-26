@@ -336,6 +336,13 @@ In case of error, *continue on error* behavior is applied. If purge is added
 in the value list of :mconfig:`abort_on_error` configuration option and if
 force mode is not set, *abort on error* behavior applies.
 
+Starting Modules 5.7, unload of a requirement needed by a retained sticky or
+super-sticky module is skipped according to :mconfig:`sticky_purge`.
+``error`` raises an error and follows the above abort or continue behavior.
+``warning`` and ``silent`` skip unload without an error exit code. This also
+applies to indirect requirements and, even in force mode, to requirements of
+super-sticky modules.
+
 Unload sub-command
 ------------------
 

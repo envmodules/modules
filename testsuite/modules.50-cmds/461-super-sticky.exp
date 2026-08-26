@@ -352,14 +352,8 @@ lappend ans [list set __MODULES_LMPREREQ sticky/1.0&foo|baz]
 lappend ans [list set _LMFILES_ $mp/foo/2.0:$mp/sticky/1.0]
 lappend ans [list set LOADEDMODULES foo/2.0:sticky/1.0]
 lappend ans [list ERR]
-set tserr [msg_unload {sticky/1.0 <sS>} $err_superstickyunload]\n\n[msg_unload foo/2.0 [err_deplo sticky/1.0]]
+set tserr [msg_unload {sticky/1.0 <sS>} $err_superstickyunload]\n\n[msg_unload foo/2.0 $err_superstickyrequnload]
 testouterr_cmd_re sh {purge} $ans $tserr
-set ans [list]
-lappend ans [list set LOADEDMODULES sticky/1.0]
-lappend ans [list set _LMFILES_ $mp/sticky/1.0]
-lappend ans [list set __MODULES_LMPREREQ sticky/1.0&foo|baz]
-lappend ans [list ERR]
-set tserr [msg_unload {sticky/1.0 <sS>} $err_superstickyunload]\n\n[msg_unload foo/2.0 [err_deplof sticky/1.0]]
 testouterr_cmd_re sh {purge -f} $ans $tserr
 
 

@@ -56,6 +56,13 @@ Specification
   - ``super-sticky``: loaded module cannot be unloaded even if forced, it stills can be unloaded if reloaded afterward (see :ref:`sticky-modules`)
   - ``keep-loaded``: auto_handling mechanism does not unload auto-loaded module
 
+- Starting Modules 5.7, :subcmd:`purge` also preserves the direct and
+  indirect requirements of retained ``sticky`` or ``super-sticky`` modules.
+  Requirements do not inherit these tags. Their unload is skipped according
+  to :mconfig:`sticky_purge`, including when a requirement has no sticky tag.
+  With :option:`--force`, only requirements needed by retained super-sticky
+  modules are protected by this mechanism.
+
 - Tags inherited from module state cannot be set with ``module-tag`` command
 
   - An error is otherwise thrown

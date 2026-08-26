@@ -959,6 +959,19 @@ proc isModuleSticky {mod} {
       $mod sticky 1] && ![getState force])}]
 }
 
+proc getModuleStickyDependentTag {mod} {
+   set sticky_tag {}
+   foreach dep_mod [getDependentLoadedModuleList [list $mod] 1 0 0 0] {
+      if {[isModuleTagged $dep_mod super-sticky 1]} {
+         set sticky_tag super-sticky
+         break
+      } elseif {![getState force] && [isModuleTagged $dep_mod sticky 1]} {
+         set sticky_tag sticky
+      }
+   }
+   return $sticky_tag
+}
+
 proc saveLoadedReqOfUnloadingModule {unload_mod} {
    # fetch requirements of unloading module
    set ::g_savedLoReqOfUnloadMod($unload_mod)\
@@ -1170,6 +1183,21 @@ proc failOrSkipUnloadIfSticky {modname modfile} {
    }
 
    return 0
+}
+
+proc failOrSkipUnloadIfRequiredBySticky {mod} {
+   set sticky_tag [getModuleStickyDependentTag $mod]
+   if {$sticky_tag eq {}} {
+      return 0
+   }
+
+   set msg [getStickyReqUnloadMsg $sticky_tag]
+   switch -- [getConf sticky_purge] {
+      error {knerror $msg}
+      warning {reportWarning $msg}
+   }
+
+   return 1
 }
 
 # ;;; Local Variables:

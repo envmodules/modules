@@ -1577,6 +1577,11 @@ proc cmdModuleUnload {context match auto force onlyureq args} {
          set prereq_list [getDependentLoadedModuleList [list $modname]]
          set prereq_loaded_list [getDependentLoadedModuleList [list $modname]\
             1 1 0 0]
+         if {[llength $prereq_loaded_list] &&\
+            [getState commandname] eq {purge} &&\
+            [failOrSkipUnloadIfRequiredBySticky $modname]} {
+            continue
+         }
          if {[llength $prereq_loaded_list] && (![getConf auto_handling] ||\
             !$auto)} {
             # force mode should not affect if we only look for mods w/o dep

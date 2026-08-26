@@ -97,6 +97,127 @@ testouterr_cmd sh {purge} $ans {}
 testouterr_cmd sh {purge -f} $ans {}
 
 
+# super-sticky module with non-sticky requirement
+setenv_var TESTSUITE_STICKY purge_req
+setenv_loaded_module [list sticky1/1.0 sticky2/1.0] [list\
+    $mp/sticky1/1.0 $mp/sticky2/1.0]
+setenv_var __MODULES_LMTAG sticky2/1.0&super-sticky
+setenv_var __MODULES_LMPREREQ sticky2/1.0&sticky1/1.0|sticky1/2.0
+
+set ans [list]
+
+setenv_var MODULES_STICKY_PURGE error
+set anserr $ans
+lappend anserr [list ERR]
+set tserr [msg_unload {sticky2/1.0 <sS>}\
+    $err_superstickyunload]\n\n[msg_unload sticky1/1.0\
+    $err_superstickyrequnload]
+testouterr_cmd sh {purge} $anserr $tserr
+testouterr_cmd sh {purge -f} $anserr $tserr
+
+setenv_var MODULES_STICKY_PURGE warning
+set tserr [msg_unload {sticky2/1.0 <sS>}\
+    $warn_superstickyunload]\n\n[msg_unload sticky1/1.0\
+    $warn_superstickyrequnload]
+testouterr_cmd sh {purge} $ans $tserr
+testouterr_cmd sh {purge -f} $ans $tserr
+
+setenv_var MODULES_STICKY_PURGE silent
+testouterr_cmd sh {purge} $ans {}
+testouterr_cmd sh {purge -f} $ans {}
+
+unsetenv_var TESTSUITE_STICKY
+
+
+# sticky module with non-sticky requirement, including forced unload
+setenv_var __MODULES_LMTAG sticky2/1.0&sticky
+foreach {report_mode msg reqmsg} [list error $err_stickyunload\
+    $err_stickyrequnload warning $warn_stickyunload\
+    $warn_stickyrequnload silent {} {}] {
+    setenv_var MODULES_STICKY_PURGE $report_mode
+    set ans [list]
+    if {$report_mode eq {error}} {
+        lappend ans [list ERR]
+    }
+    set tserr {}
+    if {$report_mode ne {silent}} {
+        set tserr [msg_unload {sticky2/1.0 <S>} $msg]\n\n[msg_unload\
+            sticky1/1.0 $reqmsg]
+    }
+    testouterr_cmd sh {purge} $ans $tserr
+
+    set ans [list]
+    foreach var {__MODULES_LMPREREQ _LMFILES_ LOADEDMODULES __MODULES_LMTAG} {
+        lappend ans [list unset $var]
+    }
+    set tserr [msg_unload {sticky2/1.0 <S>} $err_stickyunloadf]
+    testouterr_cmd sh {purge -f} $ans $tserr
+}
+
+
+# registered dependency chain: sticky3 -> sticky2 -> sticky1
+setenv_loaded_module [list sticky1/1.0 sticky2/1.0 sticky3/1.0] [list\
+    $mp/sticky1/1.0 $mp/sticky2/1.0 $mp/sticky3/1.0]
+setenv_var __MODULES_LMTAG sticky3/1.0&super-sticky
+setenv_var __MODULES_LMPREREQ\
+    sticky2/1.0&sticky1/1.0|sticky1/2.0:sticky3/1.0&sticky2/1.0
+foreach auto_handling {0 1} {
+    setenv_var MODULES_AUTO_HANDLING $auto_handling
+    foreach {report_mode msg reqmsg} [list error $err_superstickyunload\
+        $err_superstickyrequnload warning $warn_superstickyunload\
+        $warn_superstickyrequnload silent {} {}] {
+        setenv_var MODULES_STICKY_PURGE $report_mode
+        set ans [list]
+        if {$report_mode eq {error}} {
+            lappend ans [list ERR]
+        }
+        set tserr {}
+        if {$report_mode ne {silent}} {
+            set tserr [msg_unload {sticky3/1.0 <sS>} $msg]\n\n[msg_unload\
+                sticky2/1.0 $reqmsg]\n\n[msg_unload sticky1/1.0 $reqmsg]
+        }
+        testouterr_cmd sh {purge} $ans $tserr
+        testouterr_cmd sh {purge -f} $ans $tserr
+    }
+}
+unsetenv_var MODULES_AUTO_HANDLING
+
+
+# unload an alternative requirement while retaining the last necessary one
+setenv_var TESTSUITE_STICKY purge_req
+setenv_loaded_module [list sticky1/1.0 sticky1/2.0 sticky2/1.0] [list\
+    $mp/sticky1/1.0 $mp/sticky1/2.0 $mp/sticky2/1.0]
+setenv_var __MODULES_LMTAG sticky2/1.0&super-sticky
+setenv_var __MODULES_LMPREREQ sticky2/1.0&sticky1/1.0|sticky1/2.0
+setenv_var MODULES_STICKY_PURGE silent
+set ans [list]
+lappend ans [list set _LMFILES_ $mp/sticky1/1.0:$mp/sticky2/1.0]
+lappend ans [list set LOADEDMODULES sticky1/1.0:sticky2/1.0]
+testouterr_cmd sh {purge} $ans {}
+testouterr_cmd sh {purge -f} $ans {}
+unsetenv_var TESTSUITE_STICKY
+
+
+# super-sticky takes precedence regardless of dependent load order
+setenv_loaded_module [list sticky1/1.0 sticky2/1.0 sticky3/1.0] [list\
+    $mp/sticky1/1.0 $mp/sticky2/1.0 $mp/sticky3/1.0]
+setenv_var __MODULES_LMPREREQ\
+    sticky2/1.0&sticky1/1.0:sticky3/1.0&sticky1/1.0
+setenv_var MODULES_STICKY_PURGE warning
+foreach {tag2 tag3 msg2 msg3} [list sticky super-sticky\
+    $warn_stickyunload $warn_superstickyunload super-sticky sticky\
+    $warn_superstickyunload $warn_stickyunload] {
+    setenv_var __MODULES_LMTAG sticky2/1.0&$tag2:sticky3/1.0&$tag3
+    set abbrev2 [expr {$tag2 eq {sticky} ? {S} : {sS}}]
+    set abbrev3 [expr {$tag3 eq {sticky} ? {S} : {sS}}]
+    set tserr [msg_unload "sticky3/1.0 <$abbrev3>" $msg3]\n\n[msg_unload\
+        "sticky2/1.0 <$abbrev2>" $msg2]\n\n[msg_unload sticky1/1.0\
+        $warn_superstickyrequnload]
+    testouterr_cmd sh {purge} {} $tserr
+}
+unsetenv_var __MODULES_LMPREREQ
+
+
 # module both sticky and super-sticky
 setenv_var TESTSUITE_FPMOD_TAG sticky2
 setenv_loaded_module [list foo/1.0 tag/1.0] [list $mp/foo/1.0 $mp/tag/1.0]

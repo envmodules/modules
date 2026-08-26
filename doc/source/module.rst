@@ -341,7 +341,8 @@ switches are accepted:
  On :subcmd:`clear` sub-command, skip the confirmation dialog and proceed.
 
  On :subcmd:`purge` sub-command also unload `sticky modules`_ and modulefiles
- that are depended by non-unloadable modules.
+ that are depended by non-unloadable modules, except requirements of retained
+ super-sticky modules.
 
  .. only:: html or latex
 
@@ -1772,6 +1773,9 @@ Module Sub-Commands
   Error behavior when unloading sticky or super-sticky module during a module
   :subcmd:`purge`.
 
+  Also applies to modules whose unload is skipped because they are required,
+  directly or indirectly, by a retained sticky or super-sticky module.
+
   Raise an ``error`` (default) or emit a ``warning`` or be ``silent``. It can
   be changed at installation time with :instopt:`--with-sticky-purge` option.
   The :envvar:`MODULES_STICKY_PURGE` environment variable is defined by
@@ -2379,9 +2383,15 @@ Module Sub-Commands
 
  Unload all loaded *modulefiles*.
 
+ Sticky and super-sticky modules are kept loaded, along with their required
+ modules, including indirect requirements. Unload attempts for these modules
+ are skipped according to the :mconfig:`sticky_purge` configuration: raise an
+ ``error`` (default), emit a ``warning`` or remain ``silent``.
+
  When the :option:`--force` option is set, also unload `sticky modules`_,
  modulefiles that are depended by non-unloadable modules and modulefiles
- raising an evaluation error.
+ raising an evaluation error. Super-sticky modules and their requirements
+ remain loaded even with :option:`--force`.
 
  If one modulefile unload evaluation raises an error, purge sequence
  continues: unloaded modules prior the evaluation error are kept unloaded and
@@ -2397,6 +2407,9 @@ Module Sub-Commands
 
     .. versionchanged:: 5.4
        Support for :mconfig:`abort_on_error` configuration option added
+
+    .. versionchanged:: 5.7
+       Preserve requirements of retained sticky and super-sticky modules
 
 .. subcmd:: refresh
 
@@ -3544,6 +3557,14 @@ loaded environment). Two kind of stickiness can be distinguished:
 Modules are designated sticky by associating them the ``sticky`` or the
 ``super-sticky`` :ref:`module tag<Module tags>` with the :mfcmd:`module-tag`
 modulefile command.
+
+Starting with version 5.7, :subcmd:`purge` also preserves the direct and
+indirect requirements of retained sticky or super-sticky modules, even if
+these requirements have no sticky tag. The :mconfig:`sticky_purge`
+configuration applies to their skipped unload. With :option:`--force`,
+sticky modules can be unloaded, but super-sticky modules and their
+requirements remain loaded. If several loaded modules satisfy an alternative
+requirement, only the last necessary one is preserved.
 
 When stickiness is defined over the generic module name (and not over a
 specific module version, a version list or a version range), sticky or
@@ -6131,6 +6152,9 @@ ENVIRONMENT
  :subcmd:`purge`, raise an ``error`` or emit a ``warning`` message or be
  ``silent``.
 
+ Also applies to the skipped unload of modules required, directly or
+ indirectly, by a retained sticky or super-sticky module.
+
  This environment variable value supersedes the default value set in the
  :mconfig:`sticky_purge` configuration option. It can be defined with the
  :subcmd:`config` sub-command.
@@ -6436,4 +6460,3 @@ SEE ALSO
 --------
 
 :ref:`envml(1)`, :ref:`ml(1)`, :ref:`modulecmd(1)`, :ref:`modulefile(5)`
-

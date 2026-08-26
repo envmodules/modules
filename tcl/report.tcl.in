@@ -1115,6 +1115,10 @@ proc getStickyUnloadMsg {{tag sticky}} {
    return "Unload of $tag module skipped"
 }
 
+proc getStickyReqUnloadMsg {{tag sticky}} {
+   return "Unload of $tag module requirement skipped"
+}
+
 proc getStickyForcedUnloadMsg {} {
    return {Unload of sticky module forced}
 }

@@ -170,4 +170,56 @@ for load in the initialization RC file |file etcdir_initrc|:
     module load core
     module load compiler/compB
 
+Preserving requirements during purge
+------------------------------------
+
+Starting with Modules v5.7, :subcmd:`purge` also preserves the requirements
+of retained sticky or super-sticky modules.
+
+A base environment can group *core* and *compiler* under a single *env/base*
+module. In this example, *core* and *compiler* have no sticky tag. The
+:file:`env/base` modulefile declares both as requirements:
+
+.. code-block:: tcl
+
+    #%Module
+    prereq core
+    prereq compiler
+
+Only *env/base* is tagged *super-sticky*, in :file:`env/.modulerc`:
+
+.. code-block:: tcl
+
+    #%Module
+    module-tag super-sticky env/base
+
+With :mconfig:`sticky_purge` set to ``warning``, a purge explains why each
+module remains loaded:
+
+.. parsed-literal::
+
+    :ps:`$` module config sticky_purge warning
+    :ps:`$` module load env/base
+    :ps:`$` module purge
+    Unloading :sgrhi:`env/base`
+      :sgrwa:`WARNING`: Unload of super-sticky module skipped
+
+    Unloading :sgrhi:`compiler`
+      :sgrwa:`WARNING`: Unload of super-sticky module requirement skipped
+
+    Unloading :sgrhi:`core`
+      :sgrwa:`WARNING`: Unload of super-sticky module requirement skipped
+    :ps:`$` module list
+    Currently Loaded Modulefiles:
+     1) core   2) compiler   3) :sgrss:`env/base`
+
+    Key:
+    :sgrss:`super-sticky`
+
+Both requirements remain loaded even though they are not sticky themselves.
+The same protection applies to indirect requirements and to a forced purge
+because *env/base* is super-sticky. Setting ``sticky_purge`` to ``silent``
+suppresses these warnings; its default value, ``error``, reports errors for
+the skipped unloads.
+
 .. vim:set tabstop=2 shiftwidth=2 expandtab autoindent:

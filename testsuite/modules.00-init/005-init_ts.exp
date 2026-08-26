@@ -455,6 +455,14 @@ set warn_stickyunload "$::warn_msgs: Unload of sticky module skipped"
 set err_stickyunloadf "$::warn_msgs: Unload of sticky module forced"
 set err_superstickyunload "$::error_msgs: Unload of super-sticky module skipped"
 set warn_superstickyunload "$::warn_msgs: Unload of super-sticky module skipped"
+set err_stickyrequnload "$::error_msgs: Unload of sticky module requirement\
+    skipped"
+set warn_stickyrequnload "$::warn_msgs: Unload of sticky module requirement\
+    skipped"
+set err_superstickyrequnload "$::error_msgs: Unload of super-sticky module\
+    requirement skipped"
+set warn_superstickyrequnload "$::warn_msgs: Unload of super-sticky module\
+    requirement skipped"
 set err_reqfull "$::error_msgs: Module version must be specified to load module"
 set err_nomodloaded "$error_msgs: $msg_nomodloaded"
 set err_modfromdiffpathloaded "$error_msgs: Module already loaded from a different modulepath"
