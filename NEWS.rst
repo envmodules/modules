@@ -251,6 +251,9 @@ Modules 5.7.0 (not yet released)
 * Doc: add the :ref:`user-guide` document that explains a selection of
   useful but lesser known features through practical examples and common
   use cases.
+* Keep non-sticky requirements of sticky modules loaded during a
+  :subcmd:`purge` and explicitly report why their unload is skipped according
+  to the :mconfig:`sticky_purge` configuration. (fix issue #582)
 
 
 .. _5.6 release notes:
