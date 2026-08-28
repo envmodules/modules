@@ -33,6 +33,29 @@ needs_sphinx = '1.0'
 # ones.
 extensions = []
 
+# generate Open Graph meta tags so links shared on social media get a
+# preview card; extension is an optional dependency, installed on Read The
+# Docs through requirements.txt, so skip it when unavailable locally
+# find_spec raises an error rather returning None if parent 'sphinxext'
+# package is not found
+try:
+    use_ogp = importlib.util.find_spec('sphinxext.opengraph') is not None
+except ModuleNotFoundError:
+    use_ogp = False
+if use_ogp:
+    extensions.append('sphinxext.opengraph')
+    # on Read The Docs, extension gets site URL of the exact doc version
+    # built from READTHEDOCS_CANONICAL_URL environment variable; only set a
+    # fallback URL for builds outside of Read The Docs
+    if os.environ.get('READTHEDOCS', None) != 'True':
+        ogp_site_url = 'https://modules.readthedocs.io/en/latest/'
+    # point to PNG rendering of project logo (relative to site URL) as SVG
+    # is not supported by social media platforms
+    ogp_image = '_static/social_preview.png'
+    ogp_custom_meta_tags = [
+        '<meta name="twitter:card" content="summary_large_image" />',
+    ]
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
