@@ -244,6 +244,10 @@ Modules 5.7.0 (not yet released)
   the value of their corresponding :envvar:`MODULES_RUNENV_\<VAR\>` variable
   during this creation step, then restored to their original value. (fix
   issue #623)
+* Doc: adopt the Linux kernel policy on :ref:`ai-coding-assistants` in
+  :ref:`CONTRIBUTING`: AI agents must never add their own ``Signed-off-by:``
+  trailer and their involvement must be disclosed with an ``Assisted-by:``
+  trailer.
 
 
 .. _5.6 release notes:

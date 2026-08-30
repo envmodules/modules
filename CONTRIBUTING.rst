@@ -365,7 +365,7 @@ will fail. You will need to amend your commit::
 .. _ai-coding-assistants:
 
 AI coding assistants
-~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
 
 Modules follows the Linux kernel's approach to AI-assisted contributions. AI
 tools may help write a patch, but the human submitter remains fully
