@@ -1,7 +1,7 @@
-.. _user_guide:
+.. _user-guide:
 
-Lesser know features
-====================
+Lesser known features
+=====================
 
 Environment Modules provides many capabilities beyond the commonly used
 :command:`module` :subcmd:`load` command. Some features are lesser known, despite being very
@@ -10,8 +10,8 @@ useful for users, modulefile developers, and site administrators.
 This document gathers and explains a selection of these features through
 practical examples and common use cases.
 
-It originates from the presentation *Beyond `module load`: Exploring the
-Capabilities of Environment Modules* presented at `HPSFCon 2026
+It originates from the presentation *Beyond "module load": Exploring the
+Capabilities of Environment Modules* given at `HPSFCon 2026
 <https://hpsf.io/event/hpsf-conference-2026/>`_. Original slides and video
 demonstrations can be found on the `event session page
 <https://hpsf2026.sched.com/event/2ESia/beyond-module-load-exploring-the-capabilities-of-environment-modules-part-1-adrien-cotte-as+>`_.
@@ -50,8 +50,8 @@ provides a shorter alternative interface for common operations.
 Display/Parsing
 ---------------
 
---output=LIST
-^^^^^^^^^^^^^
+``--output=LIST``
+^^^^^^^^^^^^^^^^^
 
 The :option:`--output`, or :option:`-o`, option customizes the information
 displayed by Modules commands.
@@ -91,15 +91,15 @@ A simpler and more robust approach is:
 
    modules_list=$(module avail -o '')
 
-spider
-^^^^^^
+``spider``
+^^^^^^^^^^
 
 The :command:`module` :subcmd:`spider` sub-command lists all available
 modulefiles found in enabled modulepaths, including modulepaths recursively
 added by modulefiles.
 
 Unlike :subcmd:`avail`, :subcmd:`spider` explores the full dependency tree
-created by :mfcmd:`module use`, :mfcmd:`append-path`, or
+created by :mfcmd:`module use<module>`, :mfcmd:`append-path`, or
 :mfcmd:`prepend-path` instructions.
 
 This command is especially useful with hierarchical module layouts, where some
@@ -130,10 +130,10 @@ their dependency path:
    gcc/14.0  intel/25.0
 
 
-   ---------- /usr/share//modulefiles/intel (via intel/25.0) ----------
+   ---------- /usr/share/modulefiles/intel (via intel/25.0) -----------
    intelmpi/25.0
 
-   ------------ /usr/share//modulefiles/gcc (via gcc/14.0) ------------
+   ------------ /usr/share/modulefiles/gcc (via gcc/14.0) -------------
    openmpi/5.0.8
 
 
@@ -143,8 +143,8 @@ become available.
 Modules caches are automatically used by :subcmd:`spider` when configured,
 which significantly improves search performance on large installations.
 
---latest and --default
-^^^^^^^^^^^^^^^^^^^^^^
+``--latest`` and ``--default``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The :option:`--latest`, or :option:`-L`, and :option:`--default`, or
 :option:`-d`, options restrict the output of the :command:`module`
@@ -167,8 +167,8 @@ module name.
 These options may also be combined with other display options such as
 :option:`--output` or :option:`--json`.
 
---indepth and --no-indepth
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+``--indepth`` and ``--no-indepth``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The :option:`--indepth` and :option:`--no-indepth` options control how the
 :command:`module` :subcmd:`avail` and :subcmd:`spider` sub-commands search
@@ -176,15 +176,14 @@ for matching modulefiles.
 
 By default, Modules searches recursively and returns all matching
 modulefiles. This behavior is equivalent to :option:`--indepth` and
-could be configured with :command:`module` :subcmd:`config` :mconfig:`avail_indepth`
+can be configured with :command:`module` :subcmd:`config` :mconfig:`avail_indepth`
 and :mconfig:`spider_indepth`.
 
 .. code-block:: console
 
    $ module avail
    ------------------- /usr/share/modulefiles ------------------
-
-   intel/24.0 intel/25.0 gcc/8.3 gcc/11.1 gcc/14.0
+   intel/24.0  intel/25.0  gcc/8.3  gcc/11.1  gcc/14.0
 
 The :option:`--no-indepth` option limits results to the depth level
 expressed by the search query. Modulefiles contained in matching directories
@@ -194,11 +193,10 @@ are not displayed.
 
    $ module avail --no-indepth
    ------------------- /usr/share/modulefiles ------------------
+   intel/  gcc/
 
-   intel/ gcc/
-
---json
-^^^^^^
+``--json``
+^^^^^^^^^^
 
 The :option:`--json`, or :option:`-j`, option displays command results in
 JSON format.
@@ -208,7 +206,7 @@ It is supported by the :command:`module` :subcmd:`avail`, :subcmd:`list`,
 :subcmd:`stashlist`, and :subcmd:`whatis` sub-commands.
 
 JSON output is intended for machine consumption and can be processed directly
-by tools such as Python or `jq`.
+by tools such as ``jq`` or Python scripts.
 
 .. code-block:: console
 
@@ -229,8 +227,8 @@ by tools such as Python or `jq`.
 The JSON format is also useful for monitoring, reporting, and integration
 with external tools.
 
-Manipulating environment for users
-----------------------------------
+Manipulating the environment for users
+--------------------------------------
 
 Collections
 ^^^^^^^^^^^
@@ -280,46 +278,8 @@ on systems sharing a common home directory across multiple clusters.
    $ module purge
    $ module restore
 
-mogui
-^^^^^
-
-``mogui`` provides a graphical interface to browse available modules and
-manage collections.
-
-It offers an alternative to the command line and can be useful for new users
-discovering a software stack or for users who prefer an interactive
-interface.
-
-Any environment change made from the GUI, such as loading modules or
-restoring collections, is applied back to the shell session that launched
-the application.
-
-The project is available on GitHub:
-`cea-hpc/mogui <https://github.com/cea-hpc/mogui>`_. It can be installed
-from PyPI with :command:`pip` or from Spack.
-
-.. code-block:: console
-
-   $ pip install modules-gui
-
-or:
-
-.. code-block:: console
-
-   $ spack install py_modules_gui
-
-Then start the graphical interface:
-
-.. code-block:: console
-
-   $ mogui
-
-.. image:: https://raw.githubusercontent.com/cea-hpc/mogui/main/doc/sneak_peek.gif
-   :alt: mogui graphical interface
-   :align: center
-
-stash commands
-^^^^^^^^^^^^^^
+``stash`` commands
+^^^^^^^^^^^^^^^^^^
 
 Stash collections temporarily save the current module environment and make it
 easy to switch to another environment.
@@ -378,8 +338,46 @@ Unlike regular collections, stash collections are intended to be short-lived
 and are automatically removed when restored with
 :subcmd:`stashpop`.
 
-Envml
-^^^^^
+``mogui``
+^^^^^^^^^
+
+``mogui`` provides a graphical interface to browse available modules and
+manage collections.
+
+It offers an alternative to the command line and can be useful for new users
+discovering a software stack or for users who prefer an interactive
+interface.
+
+Any environment change made from the GUI, such as loading modules or
+restoring collections, is applied back to the shell session that launched
+the application.
+
+The project is available on GitHub:
+`cea-hpc/mogui <https://github.com/cea-hpc/mogui>`_. It can be installed
+from PyPI with :command:`pip` or from Spack.
+
+.. code-block:: console
+
+   $ pip install modules-gui
+
+or:
+
+.. code-block:: console
+
+   $ spack install py-modules-gui
+
+Then start the graphical interface:
+
+.. code-block:: console
+
+   $ mogui
+
+.. image:: https://raw.githubusercontent.com/cea-hpc/mogui/main/doc/sneak_peek.gif
+   :alt: mogui graphical interface
+   :align: center
+
+``envml``
+^^^^^^^^^
 
 The :ref:`envml(1)` command executes a command in a specific module
 environment.
@@ -452,7 +450,8 @@ Protected environment variables
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The :mconfig:`protected_envvars` configuration option prevents Modules from
-modifying selected environment variables. Multiple variables may be specified using the ``:`` separator.
+modifying selected environment variables. Multiple variables may be specified
+using the ``:`` separator.
 
 This feature is useful to protect critical environment settings from
 unintended changes.
@@ -467,11 +466,11 @@ the modification and emits a warning.
    Loading intel/25.0
      WARNING: Modification of protected environment variable LD_PRELOAD ignored
 
-Developing and configuring module files
----------------------------------------
+Developing and configuring modulefiles
+--------------------------------------
 
-module edit
-^^^^^^^^^^^
+``module edit``
+^^^^^^^^^^^^^^^
 
 The :command:`module` :subcmd:`edit` sub-command opens a modulefile in the
 configured text editor (cf. :subcmd:`config` :mconfig:`editor`).
@@ -488,8 +487,8 @@ One can directly edit it with:
 
    $ module edit appA
 
-module lint
-^^^^^^^^^^^
+``module lint``
+^^^^^^^^^^^^^^^
 
 The :command:`module` :subcmd:`lint` sub-command analyzes modulefiles and
 reports potential issues.
@@ -510,8 +509,8 @@ Reported issues may include:
 * Invalid command arguments
 * Tcl syntax errors
 
-source-sh
-^^^^^^^^^
+``source-sh``
+^^^^^^^^^^^^^
 
 The :mfcmd:`source-sh` modulefile command evaluates a shell script and tracks
 the environment changes it performs.
@@ -531,8 +530,8 @@ For example:
 
    source-sh bash /opt/spack/share/spack/setup-env.sh
 
-sh-to-mod
-^^^^^^^^^
+``sh-to-mod``
+^^^^^^^^^^^^^
 
 The :command:`module` :subcmd:`sh-to-mod` sub-command evaluates a shell script
 and reports the resulting environment changes as modulefile commands.
@@ -551,8 +550,8 @@ For example:
    Use :subcmd:`sh-to-mod` when you want to generate and maintain a regular
    modulefile from an existing shell script.
 
-mod-to-sh
-^^^^^^^^^
+``mod-to-sh``
+^^^^^^^^^^^^^
 
 The :command:`module` :subcmd:`mod-to-sh` sub-command evaluates one or more
 modulefiles and reports the resulting environment changes as shell code.
@@ -568,8 +567,8 @@ For example:
    The :subcmd:`mod-to-sh` sub-command can be seen as the reverse operation of
    :subcmd:`sh-to-mod`.
 
-prereq
-^^^^^^
+``prereq``
+^^^^^^^^^^
 
 The :mfcmd:`prereq` modulefile command declares one or more modules that must
 already be loaded before the current modulefile can be loaded.
@@ -594,8 +593,8 @@ to load the modulefile.
 Multiple module names passed to a single :mfcmd:`prereq` command act as a
 logical OR. Multiple :mfcmd:`prereq` commands act as a logical AND.
 
-conflict
-^^^^^^^^
+``conflict``
+^^^^^^^^^^^^
 
 The :mfcmd:`conflict` modulefile command declares one or more modules that
 cannot be loaded together with the current modulefile.
@@ -630,8 +629,8 @@ The conflict check may be bypassed with the :option:`--force` option:
    consider enabling the :mconfig:`unique_name_loaded` configuration option
    instead of declaring self-conflicts in every modulefile.
 
-variant
-^^^^^^^
+``variant``
+^^^^^^^^^^^
 
 The :mfcmd:`variant` modulefile command declares variants and their accepted
 values.
@@ -690,7 +689,7 @@ For example:
 
    $ module config variant_shortcut compiler=%
 
-Allows users to write:
+This allows users to write:
 
 .. code-block:: console
 
@@ -699,7 +698,7 @@ Allows users to write:
 Advanced manipulations
 ----------------------
 
-Advanced specifications specifiers
+Advanced module version specifiers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 :ref:`advanced_module_version_specifiers` provide a concise way to select modulefiles based on
@@ -749,8 +748,8 @@ Variant specifications may also be used:
    * - ``module avail +mpi +cuda``
      - Select modules matching both variant requirements.
 
---timer and --debug
-^^^^^^^^^^^^^^^^^^^
+``--timer`` and ``--debug``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The :option:`--timer` and :option:`--debug`, or :option:`-D`, options help
 analyze and troubleshoot Modules commands.
@@ -784,8 +783,8 @@ internal procedure call.
 
 For even more detailed debugging information, use :option:`-DD`.
 
-.modulerc files
-^^^^^^^^^^^^^^^
+``.modulerc`` files
+^^^^^^^^^^^^^^^^^^^
 
 A :file:`.modulerc` file contains Tcl code automatically evaluated by
 Modules when encountered during a command execution.
@@ -826,8 +825,8 @@ See :ref:`Modulecmd startup` for details on the startup sequence,
 of user rc files, and :sitevar:`modulerc_extra_vars` and
 :sitevar:`modulerc_extra_cmds` to extend :file:`.modulerc` files.
 
-module-tag
-^^^^^^^^^^
+``module-tag``
+^^^^^^^^^^^^^^
 
 The :mfcmd:`module-tag` modulerc command associates one or more tags with
 modulefiles.
@@ -871,8 +870,8 @@ Sticky modules can help ensure that essential software stacks remain loaded.
 The behavior of :subcmd:`purge` with sticky modules can be configured through
 :mconfig:`sticky_purge`.
 
-module-hide
-^^^^^^^^^^^
+``module-hide``
+^^^^^^^^^^^^^^^
 
 The :mfcmd:`module-hide` modulerc command hides modulefiles from module
 searches and selection.
@@ -888,7 +887,7 @@ For example:
 
    module-hide app/1.0
 
-Visibility may also be restricted to specific users or groups with options.
+Visibility may also be restricted to specific users or groups.
 
 Time-based restrictions can be defined with ``--after`` and ``--before``.
 
@@ -901,8 +900,8 @@ For example:
 See :mfcmd:`module-hide` for additional visibility options, including **soft**
 and **hard** hiding, as well as **users** and **groups** restrictions.
 
-module-forbid
-^^^^^^^^^^^^^
+``module-forbid``
+^^^^^^^^^^^^^^^^^
 
 The :mfcmd:`module-forbid` modulerc command prevents designated modulefiles
 from being loaded.
@@ -919,7 +918,7 @@ For example:
    module-forbid app/1.0
 
 A custom message may be displayed when a user attempts to load a forbidden
-module with ``--message`` option.
+module with the ``--message`` option.
 
 For example:
 
@@ -930,8 +929,8 @@ For example:
 See :mfcmd:`module-forbid` for additional restriction options, including
 custom messages, as well as **after**/**before**, **users** and **groups** restrictions.
 
-module-virtual
-^^^^^^^^^^^^^^
+``module-virtual``
+^^^^^^^^^^^^^^^^^^
 
 The :mfcmd:`module-virtual` modulerc command associates a virtual module name
 with an existing modulefile.
@@ -963,7 +962,7 @@ The :file:`.modulerc` file may define several virtual versions:
 
    $ module avail
    ------------------- /usr/share/modulefiles ------------------
-   app/1.0  app/1.2 app/1.5 app/2.0
+   app/1.0  app/1.2  app/1.5  app/2.0
 
 All these virtual modules are evaluated using the same :file:`.common`
 modulefile.
