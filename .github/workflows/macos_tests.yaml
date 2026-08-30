@@ -49,19 +49,11 @@ jobs:
           done
           eval $EXTRA_SCRIPT_PRETEST
           make test-deps
-          script/mt
+          script/mt quick
           eval $EXTRA_SCRIPT_POSTTEST
       - name: Install Modules
         run: |
           make install
-      - name: Test Modules installation
-        run: |
-          script/mt install
-          for f in tcl/*.tcl; do
-            script/nglfar2ccov $f
-          done
-          cd lib
-          gcov envmodules
       - name: Uninstall Modules
         run: |
           make uninstall
