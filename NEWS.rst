@@ -248,6 +248,9 @@ Modules 5.7.0 (not yet released)
   :ref:`CONTRIBUTING`: AI agents must never add their own ``Signed-off-by:``
   trailer and their involvement must be disclosed with an ``Assisted-by:``
   trailer.
+* Doc: add the :ref:`user-guide` document that explains a selection of
+  useful but lesser known features through practical examples and common
+  use cases.
 
 
 .. _5.6 release notes:
