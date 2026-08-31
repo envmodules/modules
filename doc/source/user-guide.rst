@@ -69,17 +69,17 @@ Python programs, or monitoring tools.
 
 For example, with the following available modulefiles:
 
-.. code-block:: console
+.. parsed-literal::
 
-   $ module avail
-   ------------------- /usr/share/modulefiles ------------------
-   gcc/8.3  gcc/11.1(default)  gcc/14.0  openmpi/5.0.8
+   :ps:`$` module avail
+   ------------------- :sgrmp:`/usr/share/modulefiles` ------------------
+   gcc/8.3  :sgrde:`gcc/11.1`  gcc/14.0  openmpi/5.0.8
 
 When *LIST* is set to an empty value, only module names are displayed:
 
-.. code-block:: console
+.. parsed-literal::
 
-   $ module avail -o ''
+   :ps:`$` module avail -o ''
    gcc/8.3  gcc/11.1  gcc/14.0  openmpi/5.0.8
 
 The output format is defined as a colon-separated list of elements. Supported
@@ -89,11 +89,11 @@ elements are documented in the corresponding sub-command manual pages.
 to or subtract them from the currently configured value. For example, report
 the variants declared by each modulefile in addition to the default output:
 
-.. code-block:: console
+.. parsed-literal::
 
-   $ module avail -o +variant
-   ------------------- /usr/share/modulefiles ------------------
-   gcc/8.3  gcc/11.1(default)  gcc/14.0  openmpi/5.0.8{cuda=on,off}
+   :ps:`$` module avail -o +variant
+   ------------------- :sgrmp:`/usr/share/modulefiles` ------------------
+   gcc/8.3  :sgrde:`gcc/11.1`  gcc/14.0  openmpi/5.0.8\ :sgrse:`{`:sgrva:`cuda=on`:sgrse:`,`\ :sgrva:`off`:sgrse:`}`
 
 This feature helps avoid fragile text parsing pipelines.
 
@@ -131,10 +131,10 @@ options as :subcmd:`avail`, including :option:`--output`,
 
 For example, in a hierarchical environment:
 
-.. code-block:: console
+.. parsed-literal::
 
-   $ module avail
-   ------------------- /usr/share/modulefiles/common ------------------
+   :ps:`$` module avail
+   ------------------- :sgrmp:`/usr/share/modulefiles/common` ------------------
    gcc/14.0  intel/25.0
 
 Only compiler modules are initially visible.
@@ -142,17 +142,17 @@ Only compiler modules are initially visible.
 The :subcmd:`spider` sub-command reveals additional modules together with
 their dependency path:
 
-.. code-block:: console
+.. parsed-literal::
 
-   $ module spider
-   ------------------- /usr/share/modulefiles/common ------------------
+   :ps:`$` module spider
+   ------------------- :sgrmp:`/usr/share/modulefiles/common` ------------------
    gcc/14.0  intel/25.0
 
 
-   ---------- /usr/share/modulefiles/intel (via intel/25.0) -----------
+   ---------- :sgrmp:`/usr/share/modulefiles/intel` (via intel/25.0) -----------
    intelmpi/25.0
 
-   ------------ /usr/share/modulefiles/gcc (via gcc/14.0) -------------
+   ------------ :sgrmp:`/usr/share/modulefiles/gcc` (via gcc/14.0) -------------
    openmpi/5.0.8
 
 
@@ -171,30 +171,30 @@ The :option:`--latest`, or :option:`-L`, and :option:`--default`, or
 
 For example, with the following available modulefiles:
 
-.. code-block:: console
+.. parsed-literal::
 
-   $ module avail
-   ------------------- /usr/share/modulefiles ------------------
-   gcc/8.3  gcc/11.1(default)  gcc/14.0  intel/24.0  intel/25.0
+   :ps:`$` module avail
+   ------------------- :sgrmp:`/usr/share/modulefiles` ------------------
+   gcc/8.3  :sgrde:`gcc/11.1`  gcc/14.0  intel/24.0  intel/25.0
 
 The :option:`--latest` option displays only the highest numerically sorted
 version of each module name.
 
-.. code-block:: console
+.. parsed-literal::
 
-   $ module avail --latest
-   ------------------- /usr/share/modulefiles ------------------
+   :ps:`$` module avail --latest
+   ------------------- :sgrmp:`/usr/share/modulefiles` ------------------
    gcc/14.0  intel/25.0
 
 The :option:`--default` option displays only the default version of each
 module name. This version is either explicitly defined (as here for ``gcc``)
 or implicitly the highest one (as for ``intel``).
 
-.. code-block:: console
+.. parsed-literal::
 
-   $ module avail --default
-   ------------------- /usr/share/modulefiles ------------------
-   gcc/11.1(default)  intel/25.0
+   :ps:`$` module avail --default
+   ------------------- :sgrmp:`/usr/share/modulefiles` ------------------
+   :sgrde:`gcc/11.1`  intel/25.0
 
 These options may also be combined with other display options such as
 :option:`--output` or :option:`--json`.
@@ -211,21 +211,21 @@ modulefiles. This behavior is equivalent to :option:`--indepth` and
 can be configured with :command:`module` :subcmd:`config` :mconfig:`avail_indepth`
 and :mconfig:`spider_indepth`.
 
-.. code-block:: console
+.. parsed-literal::
 
-   $ module avail
-   ------------------- /usr/share/modulefiles ------------------
+   :ps:`$` module avail
+   ------------------- :sgrmp:`/usr/share/modulefiles` ------------------
    intel/24.0  intel/25.0  gcc/8.3  gcc/11.1  gcc/14.0
 
 The :option:`--no-indepth` option limits results to the depth level
 expressed by the search query. Modulefiles contained in matching directories
 are not displayed.
 
-.. code-block:: console
+.. parsed-literal::
 
-   $ module avail --no-indepth
-   ------------------- /usr/share/modulefiles ------------------
-   intel/  gcc/
+   :ps:`$` module avail --no-indepth
+   ------------------- :sgrmp:`/usr/share/modulefiles` ------------------
+   :sgrdi:`intel`/  :sgrdi:`gcc`/
 
 ``--json``
 ^^^^^^^^^^
@@ -240,9 +240,9 @@ It is supported by the :command:`module` :subcmd:`avail`, :subcmd:`list`,
 JSON output is intended for machine consumption and can be processed directly
 by tools such as ``jq`` or Python scripts.
 
-.. code-block:: console
+.. parsed-literal::
 
-    $ module avail -j | jq .
+    :ps:`$` module avail -j | jq .
     {
       "/usr/share/modulefiles": {
         "gcc/14.0": {
@@ -304,11 +304,11 @@ The :envvar:`MODULES_COLLECTION_TARGET` environment variable may be defined
 to append a suffix to collection names. This feature is particularly useful
 on systems sharing a common home directory across multiple clusters.
 
-.. code-block:: console
+.. parsed-literal::
 
-   $ module save
-   $ module purge
-   $ module restore
+   :ps:`$` module save
+   :ps:`$` module purge
+   :ps:`$` module restore
 
 ``stash`` commands
 ^^^^^^^^^^^^^^^^^^
@@ -349,22 +349,22 @@ sub-commands:
 
 Save the current environment:
 
-.. code-block:: console
+.. parsed-literal::
 
-   $ module stash
+   :ps:`$` module stash
 
 Load a different software stack:
 
-.. code-block:: console
+.. parsed-literal::
 
-   $ module purge
-   $ module load ...
+   :ps:`$` module purge
+   :ps:`$` module load ...
 
 Restore the original environment:
 
-.. code-block:: console
+.. parsed-literal::
 
-   $ module stashpop
+   :ps:`$` module stashpop
 
 Unlike regular collections, stash collections are intended to be short-lived
 and are automatically removed when restored with
@@ -388,21 +388,21 @@ The project is available on GitHub:
 `cea-hpc/mogui <https://github.com/cea-hpc/mogui>`_. It can be installed
 from PyPI with :command:`pip` or from Spack.
 
-.. code-block:: console
+.. parsed-literal::
 
-   $ pip install modules-gui
+   :ps:`$` pip install modules-gui
 
 or:
 
-.. code-block:: console
+.. parsed-literal::
 
-   $ spack install py-modules-gui
+   :ps:`$` spack install py-modules-gui
 
 Then start the graphical interface:
 
-.. code-block:: console
+.. parsed-literal::
 
-   $ mogui
+   :ps:`$` mogui
 
 .. image:: https://raw.githubusercontent.com/cea-hpc/mogui/main/doc/sneak_peek.gif
    :alt: mogui graphical interface
@@ -455,9 +455,9 @@ shells, such as Bash, the ``&`` character must be escaped or quoted.
 
 For example, execute a command in a clean environment:
 
-.. code-block:: console
+.. parsed-literal::
 
-   $ envml purge -- gcc hello.c
+   :ps:`$` envml purge -- gcc hello.c
 
 The :ref:`envml(1)` command can simplify scripts by replacing sequences of
 module operations with a single command.
@@ -491,12 +491,12 @@ unintended changes.
 When a modulefile attempts to modify a protected variable, Modules ignores
 the modification and emits a warning.
 
-.. code-block:: console
+.. parsed-literal::
 
-   $ module config protected_envvars LD_PRELOAD
-   $ module load intel
-   Loading intel/25.0
-     WARNING: Modification of protected environment variable LD_PRELOAD ignored
+   :ps:`$` module config protected_envvars LD_PRELOAD
+   :ps:`$` module load intel
+   Loading :sgrhi:`intel/25.0`
+     :sgrwa:`WARNING`: Modification of protected environment variable LD_PRELOAD ignored
 
 Developing and configuring modulefiles
 --------------------------------------
@@ -509,15 +509,15 @@ configured text editor (cf. :subcmd:`config` :mconfig:`editor`).
 
 Instead of manually locating a modulefile:
 
-.. code-block:: console
+.. parsed-literal::
 
-   $ vi $(module path appA)
+   :ps:`$` vi $(module path appA)
 
 One can directly edit it with:
 
-.. code-block:: console
+.. parsed-literal::
 
-   $ module edit appA
+   :ps:`$` module edit appA
 
 ``module lint``
 ^^^^^^^^^^^^^^^
@@ -530,9 +530,9 @@ common mistakes.
 
 Analyze a specific modulefile:
 
-.. code-block:: console
+.. parsed-literal::
 
-   $ module lint appA
+   :ps:`$` module lint appA
 
 Reported issues may include:
 
@@ -573,9 +573,9 @@ modulefiles.
 
 For example:
 
-.. code-block:: console
+.. parsed-literal::
 
-   $ module sh-to-mod bash setup-env.sh > setup-env.mod
+   :ps:`$` module sh-to-mod bash setup-env.sh > setup-env.mod
 
 .. tip::
 
@@ -590,9 +590,9 @@ modulefiles and reports the resulting environment changes as shell code.
 
 For example:
 
-.. code-block:: console
+.. parsed-literal::
 
-   $ module mod-to-sh bash appA > setup-env.sh
+   :ps:`$` module mod-to-sh bash appA > setup-env.sh
 
 .. tip::
 
@@ -629,11 +629,11 @@ Declare the requirement unconditionally instead:
 Loading a module declaring this requirement (here ``appB``) automatically
 loads the required module when missing:
 
-.. code-block:: console
+.. parsed-literal::
 
-   $ module load appB
-   Loading appB
-     Loading requirement: appA
+   :ps:`$` module load appB
+   Loading :sgrhi:`appB`
+     :sgrin:`Loading requirement`: appA
 
 When automated module handling is disabled, a missing requirement is not
 automatically loaded: an error is reported and the modulefile load fails.
@@ -671,11 +671,11 @@ addition to the automated module handling mode (see :mconfig:`auto_handling`),
 loading a module automatically unloads the conflicting modules found in the
 user environment:
 
-.. code-block:: console
+.. parsed-literal::
 
-   $ module load appA
-   Loading appA
-     Unloading conflict: appB
+   :ps:`$` module load appA
+   Loading :sgrhi:`appA`
+     :sgrin:`Unloading conflict`: appB
 
 When these options are disabled, an error is reported instead and the
 modulefile load fails.
@@ -688,11 +688,11 @@ a time.
 
    conflict appA
 
-.. code-block:: console
+.. parsed-literal::
 
-   $ module load appA/2.0
-   Loading appA/2.0
-     Unloading conflict: appA/1.0
+   :ps:`$` module load appA/2.0
+   Loading :sgrhi:`appA/2.0`
+     :sgrin:`Unloading conflict`: appA/1.0
 
 .. tip::
 
@@ -722,9 +722,9 @@ Boolean variants are enabled with ``+`` and disabled with ``~``:
    #%Module
    variant --boolean cuda
 
-.. code-block:: console
+.. parsed-literal::
 
-   $ module load openmpi +cuda
+   :ps:`$` module load openmpi +cuda
 
 Variants with multiple values are declared by listing the accepted values:
 
@@ -735,9 +735,9 @@ Variants with multiple values are declared by listing the accepted values:
 
 And selected with the ``=`` syntax:
 
-.. code-block:: console
+.. parsed-literal::
 
-   $ module load openmpi compiler=intel
+   :ps:`$` module load openmpi compiler=intel
 
 The :mfcmd:`getvariant` modulefile command retrieves the value of a declared
 variant, allowing the modulefile to adapt its behavior.
@@ -760,15 +760,15 @@ for variants.
 
 For example:
 
-.. code-block:: console
+.. parsed-literal::
 
-   $ module config variant_shortcut compiler=%
+   :ps:`$` module config variant_shortcut compiler=%
 
 This allows users to write:
 
-.. code-block:: console
+.. parsed-literal::
 
-   $ module load openmpi %gcc
+   :ps:`$` module load openmpi %gcc
 
 Advanced manipulations
 ----------------------
@@ -835,42 +835,42 @@ The :option:`--timer` option reports the total execution time of a command.
 
 For example:
 
-.. code-block:: console
+.. parsed-literal::
 
-   $ module avail --timer
-   ------------------- /usr/share/modulefiles ------------------
-   gcc/8.3  gcc/11.1(default)  gcc/14.0  openmpi/5.0.8
+   :ps:`$` module avail --timer
+   ------------------- :sgrmp:`/usr/share/modulefiles` ------------------
+   gcc/8.3  :sgrde:`gcc/11.1`  gcc/14.0  openmpi/5.0.8
 
-   TIMER Total execution took 20.045 ms
+   :sgrtr:`TIMER Total execution took 20.045 ms`
 
 The :option:`--debug`, or :option:`-D`, option displays debugging messages
 describing the internal execution of the command.
 
 For example:
 
-.. code-block:: console
+.. parsed-literal::
 
-   $ module avail -D
-   DEBUG setState: cmdline set to 'modulecmd.tcl bash avail -D'
-   DEBUG setState: shell set to 'bash'
-   DEBUG setState: subcmd set to 'avail'
-   DEBUG setConf: verbosity set to 'debug'
+   :ps:`$` module avail -D
+   :sgrtr:`DEBUG setState: cmdline set to 'modulecmd.tcl bash avail -D'`
+   :sgrtr:`DEBUG setState: shell set to 'bash'`
+   :sgrtr:`DEBUG setState: subcmd set to 'avail'`
+   :sgrtr:`DEBUG setConf: verbosity set to 'debug'`
    ...
-   ------------------- /usr/share/modulefiles ------------------
-   gcc/8.3  gcc/11.1(default)  gcc/14.0  openmpi/5.0.8
+   ------------------- :sgrmp:`/usr/share/modulefiles` ------------------
+   gcc/8.3  :sgrde:`gcc/11.1`  gcc/14.0  openmpi/5.0.8
 
 The :option:`--timer` and :option:`--debug` options may be combined. In this
 case, regular debug messages are replaced by execution time reports for each
 internal procedure call.
 
-.. code-block:: console
+.. parsed-literal::
 
-   $ module avail --timer -D
-   TIMER parseModuleCommandName avail help (0.151 ms)
-   TIMER isIcase (0.088 ms)
-   TIMER defineModStartNbProc 1 (0.060 ms)
+   :ps:`$` module avail --timer -D
+   :sgrtr:`TIMER parseModuleCommandName avail help (0.151 ms)`
+   :sgrtr:`TIMER isIcase (0.088 ms)`
+   :sgrtr:`TIMER defineModStartNbProc 1 (0.060 ms)`
    ...
-   TIMER Total execution took 31.722 ms
+   :sgrtr:`TIMER Total execution took 31.722 ms`
 
 For even more detailed debugging information, use :option:`-DD`.
 
@@ -935,11 +935,11 @@ For example:
 
 The tag is then reported along the module name in search results:
 
-.. code-block:: console
+.. parsed-literal::
 
-   $ module avail
-   ------------------- /usr/share/modulefiles ------------------
-   app/1.0  app/2.0 <experimental>
+   :ps:`$` module avail
+   ------------------- :sgrmp:`/usr/share/modulefiles` ------------------
+   app/1.0  app/2.0 :sgrse:`<`\ experimental\ :sgrse:`>`
 
 Several predefined tags affect the behavior of Modules:
 
@@ -966,17 +966,17 @@ For example:
    module-tag sticky core
 
 Once loaded, the ``core`` module cannot be unloaded, even with the
-:subcmd:`purge` sub-command. The ``sticky`` tag is abbreviated ``<S>`` in
-the output.
+:subcmd:`purge` sub-command. The ``sticky`` tag is rendered with a specific
+background color in the output.
 
-.. code-block:: console
+.. parsed-literal::
 
-   $ module purge
-   Unloading core/1.0 <S>
-     ERROR: Unload of sticky module skipped
-   $ module list
+   :ps:`$` module purge
+   Unloading :sgrshi:`core/1.0`
+     :sgrer:`ERROR`: Unload of sticky module skipped
+   :ps:`$` module list
    Currently Loaded Modulefiles:
-    1) core/1.0 <S>
+    1) :sgrs:`core/1.0`
 
 Sticky modules can help ensure that essential software stacks remain loaded.
 The behavior of :subcmd:`purge` with sticky modules can be configured through
@@ -1070,10 +1070,10 @@ The :file:`.modulerc` file may define several virtual versions:
    module-virtual 1.5 .common
    module-virtual 2.0 .common
 
-.. code-block:: console
+.. parsed-literal::
 
-   $ module avail
-   ------------------- /usr/share/modulefiles ------------------
+   :ps:`$` module avail
+   ------------------- :sgrmp:`/usr/share/modulefiles` ------------------
    app/1.0  app/1.2  app/1.5  app/2.0
 
 All these virtual modules are evaluated using the same :file:`.common`
@@ -1099,9 +1099,9 @@ The :mconfig:`logger` option defines the command used to record log messages.
 
 For example:
 
-.. code-block:: console
+.. parsed-literal::
 
-   $ module config logger "/usr/bin/logger -t modules"
+   :ps:`$` module config logger "/usr/bin/logger -t modules"
 
 The :mconfig:`logged_events` option defines which module events are recorded.
 
@@ -1125,9 +1125,9 @@ Multiple events may be specified using the ``:`` separator.
 
 For example:
 
-.. code-block:: console
+.. parsed-literal::
 
-   $ module config logged_events requested_cmd:requested_eval
+   :ps:`$` module config logged_events requested_cmd:requested_eval
 
 By default, no events are logged.
 
