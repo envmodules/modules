@@ -1615,3 +1615,5 @@ spack
 mpivars
 cuda
 lindex
+defineModStartNbProc
+isIcase

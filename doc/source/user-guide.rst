@@ -67,14 +67,33 @@ only the needed fields.
 This option is especially useful when parsing command output in shell scripts,
 Python programs, or monitoring tools.
 
+For example, with the following available modulefiles:
+
+.. code-block:: console
+
+   $ module avail
+   ------------------- /usr/share/modulefiles ------------------
+   gcc/8.3  gcc/11.1(default)  gcc/14.0  openmpi/5.0.8
+
+When *LIST* is set to an empty value, only module names are displayed:
+
 .. code-block:: console
 
    $ module avail -o ''
-
-Only module names are displayed.
+   gcc/8.3  gcc/11.1  gcc/14.0  openmpi/5.0.8
 
 The output format is defined as a colon-separated list of elements. Supported
 elements are documented in the corresponding sub-command manual pages.
+
+*LIST* may also be prefixed by ``+`` or ``-`` to respectively append elements
+to or subtract them from the currently configured value. For example, report
+the variants declared by each modulefile in addition to the default output:
+
+.. code-block:: console
+
+   $ module avail -o +variant
+   ------------------- /usr/share/modulefiles ------------------
+   gcc/8.3  gcc/11.1(default)  gcc/14.0  openmpi/5.0.8{cuda=on,off}
 
 This feature helps avoid fragile text parsing pipelines.
 
@@ -150,19 +169,32 @@ The :option:`--latest`, or :option:`-L`, and :option:`--default`, or
 :option:`-d`, options restrict the output of the :command:`module`
 :subcmd:`avail` and :subcmd:`spider` sub-commands.
 
+For example, with the following available modulefiles:
+
+.. code-block:: console
+
+   $ module avail
+   ------------------- /usr/share/modulefiles ------------------
+   gcc/8.3  gcc/11.1(default)  gcc/14.0  intel/24.0  intel/25.0
+
 The :option:`--latest` option displays only the highest numerically sorted
 version of each module name.
 
 .. code-block:: console
 
    $ module avail --latest
+   ------------------- /usr/share/modulefiles ------------------
+   gcc/14.0  intel/25.0
 
 The :option:`--default` option displays only the default version of each
-module name.
+module name. This version is either explicitly defined (as here for ``gcc``)
+or implicitly the highest one (as for ``intel``).
 
 .. code-block:: console
 
    $ module avail --default
+   ------------------- /usr/share/modulefiles ------------------
+   gcc/11.1(default)  intel/25.0
 
 These options may also be combined with other display options such as
 :option:`--output` or :option:`--json`.
@@ -570,10 +602,13 @@ For example:
 ``prereq``
 ^^^^^^^^^^
 
-The :mfcmd:`prereq` modulefile command declares one or more modules that must
-already be loaded before the current modulefile can be loaded.
+The :mfcmd:`prereq` modulefile command declares one or more modules as a
+requirement of the current modulefile. When the automated module handling
+mode is enabled (see :mconfig:`auto_handling`), which is the default, a
+requirement is automatically loaded if not yet present in the user
+environment.
 
-Instead of explicitly loading dependencies:
+Requirements are sometimes expressed with a condition block:
 
 .. code-block:: tcl
 
@@ -581,17 +616,34 @@ Instead of explicitly loading dependencies:
       module load appA
    }
 
-Declare them with:
+This must be avoided: when ``appA`` is already loaded, the condition is
+false and no requirement rule is defined, so Modules is not aware that the
+current module depends on ``appA``.
+
+Declare the requirement unconditionally instead:
 
 .. code-block:: tcl
 
    prereq appA
 
-When the prerequisite is not satisfied, Modules reports an error and refuses
-to load the modulefile.
+Loading a module declaring this requirement (here ``appB``) automatically
+loads the required module when missing:
 
-Multiple module names passed to a single :mfcmd:`prereq` command act as a
-logical OR. Multiple :mfcmd:`prereq` commands act as a logical AND.
+.. code-block:: console
+
+   $ module load appB
+   Loading appB
+     Loading requirement: appA
+
+When automated module handling is disabled, a missing requirement is not
+automatically loaded: an error is reported and the modulefile load fails.
+
+The :mfcmd:`module load<module>` modulefile command equally declares a
+requirement rule, and it loads the missing required module even when
+automated module handling is disabled. The two commands also differ when
+several modules are specified: :mfcmd:`module load<module>` loads them all
+(logical AND) whereas :mfcmd:`prereq` requires only one of them (logical
+OR). Multiple :mfcmd:`prereq` commands act as a logical AND.
 
 ``conflict``
 ^^^^^^^^^^^^
@@ -614,20 +666,43 @@ Declare the conflict with:
 
    conflict appB
 
-When a conflicting module is loaded, Modules reports an error and refuses to
-load the modulefile.
-
-The conflict check may be bypassed with the :option:`--force` option:
+When the :mconfig:`conflict_unload` configuration option is enabled in
+addition to the automated module handling mode (see :mconfig:`auto_handling`),
+loading a module automatically unloads the conflicting modules found in the
+user environment:
 
 .. code-block:: console
 
-   $ module load --force appA
+   $ module load appA
+   Loading appA
+     Unloading conflict: appB
+
+When these options are disabled, an error is reported instead and the
+modulefile load fails.
+
+A modulefile declaring a conflict on its own module name defines a
+*reflexive conflict*: only one version of this module can then be loaded at
+a time.
+
+.. code-block:: tcl
+
+   conflict appA
+
+.. code-block:: console
+
+   $ module load appA/2.0
+   Loading appA/2.0
+     Unloading conflict: appA/1.0
 
 .. tip::
 
-   To ensure that only one version of a module can be loaded at a time,
-   consider enabling the :mconfig:`unique_name_loaded` configuration option
-   instead of declaring self-conflicts in every modulefile.
+   When only one module should be loaded at a time for any given module
+   name, enable the :mconfig:`unique_name_loaded` configuration option
+   instead of declaring a reflexive conflict in every modulefile. As this
+   option applies to all existing modules, every module name must follow
+   this rule. It is generally the case when only *application* modules are
+   provided, but may not be if application configurations are also handled
+   through modulefiles.
 
 ``variant``
 ^^^^^^^^^^^
@@ -763,6 +838,10 @@ For example:
 .. code-block:: console
 
    $ module avail --timer
+   ------------------- /usr/share/modulefiles ------------------
+   gcc/8.3  gcc/11.1(default)  gcc/14.0  openmpi/5.0.8
+
+   TIMER Total execution took 20.045 ms
 
 The :option:`--debug`, or :option:`-D`, option displays debugging messages
 describing the internal execution of the command.
@@ -772,6 +851,13 @@ For example:
 .. code-block:: console
 
    $ module avail -D
+   DEBUG setState: cmdline set to 'modulecmd.tcl bash avail -D'
+   DEBUG setState: shell set to 'bash'
+   DEBUG setState: subcmd set to 'avail'
+   DEBUG setConf: verbosity set to 'debug'
+   ...
+   ------------------- /usr/share/modulefiles ------------------
+   gcc/8.3  gcc/11.1(default)  gcc/14.0  openmpi/5.0.8
 
 The :option:`--timer` and :option:`--debug` options may be combined. In this
 case, regular debug messages are replaced by execution time reports for each
@@ -780,6 +866,11 @@ internal procedure call.
 .. code-block:: console
 
    $ module avail --timer -D
+   TIMER parseModuleCommandName avail help (0.151 ms)
+   TIMER isIcase (0.088 ms)
+   TIMER defineModStartNbProc 1 (0.060 ms)
+   ...
+   TIMER Total execution took 31.722 ms
 
 For even more detailed debugging information, use :option:`-DD`.
 
@@ -842,6 +933,14 @@ For example:
 
    module-tag experimental app/2.0
 
+The tag is then reported along the module name in search results:
+
+.. code-block:: console
+
+   $ module avail
+   ------------------- /usr/share/modulefiles ------------------
+   app/1.0  app/2.0 <experimental>
+
 Several predefined tags affect the behavior of Modules:
 
 .. list-table::
@@ -865,6 +964,19 @@ For example:
 .. code-block:: tcl
 
    module-tag sticky core
+
+Once loaded, the ``core`` module cannot be unloaded, even with the
+:subcmd:`purge` sub-command. The ``sticky`` tag is abbreviated ``<S>`` in
+the output.
+
+.. code-block:: console
+
+   $ module purge
+   Unloading core/1.0 <S>
+     ERROR: Unload of sticky module skipped
+   $ module list
+   Currently Loaded Modulefiles:
+    1) core/1.0 <S>
 
 Sticky modules can help ensure that essential software stacks remain loaded.
 The behavior of :subcmd:`purge` with sticky modules can be configured through
