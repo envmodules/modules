@@ -97,6 +97,40 @@ testouterr_cmd sh {purge} $ans {}
 testouterr_cmd sh {purge -f} $ans {}
 
 
+# super-sticky module with non-sticky requirement
+setenv_var TESTSUITE_STICKY purge_req
+setenv_loaded_module [list sticky1/1.0 sticky2/1.0] [list\
+    $mp/sticky1/1.0 $mp/sticky2/1.0]
+setenv_var __MODULES_LMTAG sticky2/1.0&super-sticky
+setenv_var __MODULES_LMPREREQ sticky2/1.0&sticky1/1.0|sticky1/2.0
+
+set ans [list]
+lappend ans [list set _LMFILES_ $mp/sticky1/1.0:$mp/sticky2/1.0]
+lappend ans [list set LOADEDMODULES sticky1/1.0:sticky2/1.0]
+
+setenv_var MODULES_STICKY_PURGE error
+set anserr $ans
+lappend anserr [list ERR]
+set tserr [msg_unload {sticky2/1.0 <sS>}\
+    $err_superstickyunload]\n\n[msg_unload sticky1/1.0\
+    $err_superstickyrequnload]
+testouterr_cmd sh {purge} $anserr $tserr
+testouterr_cmd sh {purge -f} $anserr $tserr
+
+setenv_var MODULES_STICKY_PURGE warning
+set tserr [msg_unload {sticky2/1.0 <sS>}\
+    $warn_superstickyunload]\n\n[msg_unload sticky1/1.0\
+    $warn_superstickyrequnload]
+testouterr_cmd sh {purge} $ans $tserr
+testouterr_cmd sh {purge -f} $ans $tserr
+
+setenv_var MODULES_STICKY_PURGE silent
+testouterr_cmd sh {purge} $ans {}
+testouterr_cmd sh {purge -f} $ans {}
+
+unsetenv_var TESTSUITE_STICKY
+
+
 # module both sticky and super-sticky
 setenv_var TESTSUITE_FPMOD_TAG sticky2
 setenv_loaded_module [list foo/1.0 tag/1.0] [list $mp/foo/1.0 $mp/tag/1.0]
