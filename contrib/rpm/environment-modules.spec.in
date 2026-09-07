@@ -2,7 +2,7 @@
 %global vimdatadir %{_datadir}/vim/vimfiles
 
 Name:           environment-modules
-Version:        4.5.3
+Version:        4.5.4
 Release:        @MODULES_RPM_RELEASE@%{?dist}
 Summary:        Provides dynamic modification of a user's environment
 
@@ -252,6 +252,9 @@ fi
 
 
 %changelog
+* Mon Sep 07 2026 Xavier Delaruelle <xavier.delaruelle@cea.fr> - 4.5.4-1
+- Update to 4.5.4 (fix CVE-2026-85013)
+
 * Mon Aug 31 2020 Xavier Delaruelle <xavier.delaruelle@cea.fr> - 4.5.3-1
 - Update to 4.5.3
 - Use 'configure' macro

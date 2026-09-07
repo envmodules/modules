@@ -6,6 +6,17 @@ Release notes
 This file describes changes in recent versions of Modules. It primarily
 documents those changes that are of interest to users and admins.
 
+Modules 4.5.4 (2026-09-07)
+--------------------------
+
+* Init: fix command injection in Bash completion when module names contain
+  shell meta-characters. Completion candidates were passed to ``compgen -W``
+  which evaluates command substitution syntax. (fix `CVE-2026-85013`_ found
+  by AISLE in partnership with Red Hat)
+
+.. _CVE-2026-85013: https://github.com/envmodules/modules/security/advisories/GHSA-8hrw-p88g-qhmg
+
+
 Modules 4.5.3 (2020-08-31)
 --------------------------
 
