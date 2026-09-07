@@ -1,7 +1,7 @@
 # Release definitions shared across the Makefiles of this project
 # run make to generate version.inc
 
-MODULES_RELEASE := 5.3.1
+MODULES_RELEASE := 5.3.2
 MODULES_BUILD_HASH := $Format:%h$
 MODULES_BUILD_REFS := $Format:%D$
 MODULES_BUILD_FDATE := $Format:%ci$
