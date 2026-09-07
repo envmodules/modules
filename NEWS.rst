@@ -8,6 +8,17 @@ documents those changes that are of interest to users and admins.
 
 .. _5.6 release notes:
 
+Modules 5.6.2 (2026-09-07)
+--------------------------
+
+* Init: fix command injection in Bash completion when module names contain
+  shell meta-characters. Completion candidates were passed to ``compgen -W``
+  which evaluates command substitution syntax. (fix `CVE-2026-85013`_ found
+  by AISLE in partnership with Red Hat)
+
+.. _CVE-2026-85013: https://github.com/envmodules/modules/security/advisories/GHSA-8hrw-p88g-qhmg
+
+
 Modules 5.6.1 (2025-11-25)
 --------------------------
 
