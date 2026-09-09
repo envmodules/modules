@@ -33,8 +33,9 @@ jobs:
       - uses: cygwin/cygwin-install-action@3f0a3f9f988f7e96b8c18098ae05eaec175f5b52 # v6.1
         with:
           # precise all sphinxcontrib packages required as dependency spec
-          # of python39-sphinx package is regularly broken
-          packages: make sed git autoconf automake libtool tcl python39 python39-docutils=0.18.1-1 python39-sphinx gzip zip python39-sphinxcontrib-applehelp python39-sphinxcontrib-devhelp python39-sphinxcontrib-htmlhelp python39-sphinxco  ntrib-jsmath python39-sphinxcontrib-qthelp python39-sphinxcontrib-serializinghtml python39-sphinxcontrib-websupport python39-alabaster python39-sqlalchemy
+          # of python39-sphinx package is regularly broken (tomli module is
+          # required by Sphinx 7.4 on Python < 3.11)
+          packages: make sed git autoconf automake libtool tcl python39 python39-docutils=0.18.1-1 python39-sphinx python39-tomli gzip zip python39-sphinxcontrib-applehelp python39-sphinxcontrib-devhelp python39-sphinxcontrib-htmlhelp python39-sphinxcontrib-jsmath python39-sphinxcontrib-qthelp python39-sphinxcontrib-serializinghtml python39-sphinxcontrib-websupport python39-alabaster python39-sqlalchemy
       - name: Install Tcl under Windows
         shell: cmd
         run: |
@@ -108,8 +109,9 @@ jobs:
       - uses: cygwin/cygwin-install-action@3f0a3f9f988f7e96b8c18098ae05eaec175f5b52 # v6.1
         with:
           # precise all sphinxcontrib packages required as dependency spec
-          # of python39-sphinx package is regularly broken
-          packages: make sed git autoconf automake libtool tcl python39 python39-docutils=0.18.1-1 python39-sphinx gzip zip python39-sphinxcontrib-applehelp python39-sphinxcontrib-devhelp python39-sphinxcontrib-htmlhelp python39-sphinxco  ntrib-jsmath python39-sphinxcontrib-qthelp python39-sphinxcontrib-serializinghtml python39-sphinxcontrib-websupport python39-alabaster python39-sqlalchemy
+          # of python39-sphinx package is regularly broken (tomli module is
+          # required by Sphinx 7.4 on Python < 3.11)
+          packages: make sed git autoconf automake libtool tcl python39 python39-docutils=0.18.1-1 python39-sphinx python39-tomli gzip zip python39-sphinxcontrib-applehelp python39-sphinxcontrib-devhelp python39-sphinxcontrib-htmlhelp python39-sphinxcontrib-jsmath python39-sphinxcontrib-qthelp python39-sphinxcontrib-serializinghtml python39-sphinxcontrib-websupport python39-alabaster python39-sqlalchemy
       - name: Install Tcl under Windows
         shell: cmd
         run: |
@@ -154,10 +156,11 @@ jobs:
       - uses: cygwin/cygwin-install-action@3f0a3f9f988f7e96b8c18098ae05eaec175f5b52 # v6.1
         with:
           # precise all sphinxcontrib packages required as dependency spec
-          # of python39-sphinx package is regularly broken
+          # of python39-sphinx package is regularly broken (tomli module is
+          # required by Sphinx 7.4 on Python < 3.11)
           # precise liblapack0 package needed by R package (missing dependency
           # since R-4.2.1-1)
-          packages: make sed git autoconf automake libtool tcl dejagnu python39 python39-docutils=0.18.1-1 python39-sphinx gzip ruby zsh tcsh mksh fish cmake R liblapack0 tcl-devel gcc-core curl python39-sphinxcontrib-applehelp python39-sphinxcontrib-devhelp python39-sphinxcontrib-htmlhelp python39-sphinxcontrib-jsmath python39-sphinxcontrib-qthelp python39-sphinxcontrib-serializinghtml python39-sphinxcontrib-websupport python39-alabaster python39-sqlalchemy
+          packages: make sed git autoconf automake libtool tcl dejagnu python39 python39-docutils=0.18.1-1 python39-sphinx python39-tomli gzip ruby zsh tcsh mksh fish cmake R liblapack0 tcl-devel gcc-core curl python39-sphinxcontrib-applehelp python39-sphinxcontrib-devhelp python39-sphinxcontrib-htmlhelp python39-sphinxcontrib-jsmath python39-sphinxcontrib-qthelp python39-sphinxcontrib-serializinghtml python39-sphinxcontrib-websupport python39-alabaster python39-sqlalchemy
       - name: Configure Git safe.directory
         run: |
           bash -lc 'git config --global --add safe.directory $(cygpath -u "$GITHUB_WORKSPACE")'

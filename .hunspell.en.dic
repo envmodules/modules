@@ -402,6 +402,7 @@ dl
 dll
 dnsdomainname
 docdir
+docutils
 doesLoadingModuleMatchesName
 doesModuleConflict
 domainname
@@ -545,6 +546,7 @@ isbooleanvariant
 isdefaultvalue
 ismodlo
 journalctl
+jsmath
 json
 keypress
 kL
@@ -733,6 +735,7 @@ pty
 pushenv
 py
 pwsh
+python39
 quuz
 qux
 rc
@@ -826,6 +829,7 @@ softb
 somescript
 sos
 specfile
+sphinxcontrib
 spoolfile
 sse
 stashclear
@@ -897,6 +901,7 @@ threadingmodel
 tmp
 tmux
 toctree
+tomli
 toolchain
 topState
 toppostvalue
