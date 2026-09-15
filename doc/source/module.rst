@@ -3235,6 +3235,9 @@ the activation of the extended default mechanism (see
 to refer to more precise version numbers like ``1.2.3``. Characters ``.`` and
 ``-`` are considered version number separator to determine abbreviated
 versions. Range of versions on its side natively handles abbreviated versions.
+The upper bound may be less precise than the lower bound. An abbreviated
+upper bound includes all versions that extend it, provided they also satisfy
+the lower bound.
 
 In order to be specified in a range of versions or compared to a range of
 versions, the version major element should corresponds to a number. For

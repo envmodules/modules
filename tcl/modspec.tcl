@@ -1246,7 +1246,9 @@ proc parseModuleVersionSpecifier {modspec} {
          set cmpspec le
          set versspec $hivers
       # between or equal
-      } elseif {[versioncmp $lovers $hivers] == 1} {
+      # An abbreviated upper bound includes its more precise versions.
+      } elseif {[versioncmp $lovers $hivers] == 1 && ![string match\
+         $hivers[extendedDefaultCharGlobMatch] $lovers]} {
          set invalidversrange 1
       } else {
          set cmpspec be

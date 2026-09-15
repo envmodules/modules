@@ -91,6 +91,14 @@ Specification
 
     - for instance *@1:1.10* will matches *1.0* and *1.8* but not *1.12*
 
+  - the upper bound may be less precise than the lower bound
+
+    - an abbreviated upper bound includes all versions that extend it,
+      provided they also satisfy the lower bound
+    - for instance *@1.2:1* matches *1.2* and *1.10* but not *1.1* or *2.0*
+    - a reversed range remains invalid unless the lower bound extends the
+      abbreviated upper bound, so *@2.0:1* is still rejected
+
 - version could be specified as list
 
   - soft@vers,vers,vers

@@ -84,6 +84,8 @@ testouterr_cmd sh {load mod@1::} ERR "$err_specvers'1::'"
 testouterr_cmd sh {load mod@1,:,} ERR "$err_specvers'1,:,'"
 testouterr_cmd sh {load mod@,:} ERR "$err_specvers',:'"
 testouterr_cmd sh {load mod@1.3:1.2} ERR "$err_rangevers'1.3:1.2'"
+testouterr_cmd sh {load mod@4.1:3} ERR "$err_rangevers'4.1:3'"
+testouterr_cmd sh {load mod@1.30:1.3} ERR "$err_rangevers'1.30:1.3'"
 testouterr_cmd sh {load mod@,<} ERR "$err_specvers',<'"
 testouterr_cmd sh {load mod@:<} ERR "$err_rangevers':<'"
 testouterr_cmd sh {load mod@1/1:2} ERR "$err_specvers'1/1:2'"
@@ -113,6 +115,7 @@ testouterr_cmd sh {load extdfl @1.2:} $ans {}
 testouterr_cmd sh {load extdfl @:1.3.1} $ans {}
 testouterr_cmd sh {load extdfl @:1.3.7} $ans {}
 testouterr_cmd sh {load extdfl @1.2:1.3} $ans {}
+testouterr_cmd sh {load extdfl @1.2:1} $ans {}
 testouterr_cmd sh {load extdfl @1.2.3:1.3.7} $ans {}
 testouterr_cmd sh {load extdfl @:2.0.1} $ans {}
 testouterr_cmd sh {load extdfl @:2.0} $ans {}
@@ -162,6 +165,7 @@ testouterr_cmd sh {path extdfl/ @1.2:1.3} [list [list text $mp/extdfl/1.3.1]] {}
 
 # test all sub-cmd concerned by context
 testouterr_cmd sh {avail -t extdfl @1.3:1.4} OK "$mp:\nextdfl/1.3.1(default)\nextdfl/1.3.7\nextdfl/1.4.5"
+testouterr_cmd sh {avail -t extdfl @1.3.7:1} OK "$mp:\nextdfl/1.3.7\nextdfl/1.4.5"
 testouterr_cmd_re sh {whatis extdfl@1.3.7:1.4.5} OK "$modlin $mpre $modlin
 \\s+extdfl/1.3.7: extdfl/1.3.7
 \\s+extdfl/1.4.5: extdfl/1.4.5"
@@ -187,6 +191,18 @@ testouterr_cmd sh {spider -t ext?fl @1.3:} OK "$mp:\nextdfl/1.3.1(default)\nextd
 testouterr_cmd sh {avail -t e??.* @:1.4} OK "$mp:\ne.t.fl/1.3.1\ne.t.fl/1.3.7\ne.t.fl/1.4.5"
 
 # additional version tests
+# Abbreviated upper bounds apply independently of extended defaults.
+foreach extdfl {0 1} {
+    setenv_var MODULES_EXTENDED_DEFAULT $extdfl
+    set ans [list [list text $mp/extdfl/1.3.7] [list text $mp/extdfl/1.4.5]]
+    testouterr_cmd sh {paths extdfl@1.3.7:1} $ans {}
+    testouterr_cmd sh {paths -i EXTDFL@1.3.7:1} $ans {}
+    set ans [list [list text $mp/extdfl/1.3.7]]
+    testouterr_cmd sh {paths extdfl@1.3.7:1.3} $ans {}
+    testouterr_cmd sh {paths extdfl@1.3.7:1.3,9:10} $ans {}
+}
+unsetenv_var MODULES_EXTENDED_DEFAULT
+
 testouterr_cmd sh {avail -t extdfl8 @1.33:} OK "$mp:\nextdfl8/1.33"
 testouterr_cmd sh {avail -t extdfl8 @:1.3} OK "$mp:\nextdfl8/1.3.1\nextdfl8/1.3.7"
 testouterr_cmd sh {spider -t extdfl8 @:1.3} OK "$mp:\nextdfl8/1.3.1\nextdfl8/1.3.7"
@@ -297,6 +313,7 @@ set ans [list]
 lappend ans [list set _LMFILES_ $mp/extdfl2/3.1.7]
 lappend ans [list set LOADEDMODULES extdfl2/3.1.7]
 testouterr_cmd sh {load extdfl2@3.0.2:3.1.7} $ans {}
+testouterr_cmd sh {load extdfl2@3.1.7:3.1} $ans {}
 testouterr_cmd sh {load extdfl2@:3.1.7} $ans {}
 testouterr_cmd sh {load extdfl2@:3.1.7} $ans {}
 testouterr_cmd sh "load $mp/extdfl2 @:3.1.7" ERR "$err_file'$mp/extdfl2 @:3.1.7'"

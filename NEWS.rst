@@ -255,6 +255,8 @@ Modules 5.7.0 (not yet released)
   shell meta-characters. Completion candidates were passed to ``compgen -W``
   which evaluates command substitution syntax. (fix `CVE-2026-85013`_ found
   by AISLE in partnership with Red Hat)
+* Accept abbreviated upper bounds in version ranges such as ``@3.20:3`` to
+  select versions starting at ``3.20`` within major version ``3``.
 
 .. _CVE-2026-85013: https://github.com/envmodules/modules/security/advisories/GHSA-8hrw-p88g-qhmg
 
