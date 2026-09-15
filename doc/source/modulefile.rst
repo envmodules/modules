@@ -2279,7 +2279,13 @@ reloaded or refreshed. This is especially important when the modulefile
 updates an environment variable also altered by other modulefiles like
 :envvar:`PATH`. As the order of the path elements in such variable defines
 priority, it is important that this order does not change depending on the way
-the modulefiles are loaded.
+the modulefiles are loaded. Moreover when :mconfig:`conflict_unload` is
+enabled, a conflicting loaded modulefile is unloaded at the time the
+:mfcmd:`conflict`, :mfcmd:`family` or :mfcmd:`module unload<module>` command
+is evaluated. Environment changes made prior to this command by the loading
+modulefile are overridden by this unload when they affect variables also
+altered by the unloaded modulefile. For instance a variable set by the loading
+modulefile ends up unset if it is also set by the unloaded modulefile.
 
 :command:`module` keeps environment consistent which means a modulefile cannot
 be loaded if its requirements are not loaded or if a conflicting module is

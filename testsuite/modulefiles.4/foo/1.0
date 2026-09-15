@@ -61,6 +61,13 @@ if {[info exists env(TESTSUITE_CONFLICT_UNLOAD)]} {
         depre_of_conun_is_conflict_of_reqlo1 {
             conflict bar/1
         }
+        setenv_before_conflict1 - setenv_after_conflict1 - setenv_before_unload1 {
+            setenv TSCONUN foo
+        }
+        setenv_before_family1 {
+            setenv TSCONUN foo
+            family conun
+        }
     }
 }
 if {[info exists env(TESTSUITE_MODULEPATH_OPT)]} {

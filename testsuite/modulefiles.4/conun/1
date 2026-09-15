@@ -67,6 +67,22 @@ if {[info exists env(TESTSUITE_CONFLICT_UNLOAD)]} {
         depun_of_conun_is_sticky1 - depun_of_conun_is_super_sticky1 {
             conflict conun
         }
+        setenv_before_conflict1 {
+            setenv TSCONUN conun
+            conflict foo
+        }
+        setenv_after_conflict1 {
+            conflict foo
+            setenv TSCONUN conun
+        }
+        setenv_before_unload1 {
+            setenv TSCONUN conun
+            module unload foo
+        }
+        setenv_before_family1 {
+            setenv TSCONUN conun
+            family conun
+        }
         implicit_default_off1 {
             conflict conun
         }
