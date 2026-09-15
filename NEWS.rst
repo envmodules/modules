@@ -257,6 +257,13 @@ Modules 5.7.0 (not yet released)
   by AISLE in partnership with Red Hat)
 * Accept abbreviated upper bounds in version ranges such as ``@3.20:3`` to
   select versions starting at ``3.20`` within major version ``3``.
+* Fix resolution of relative path entries in :envvar:`MODULEPATH` when a
+  module is loaded during a modulefile evaluation. Such entry was resolved
+  against the directory of the evaluating modulefile rather than against the
+  current working directory. A relative *directory* argument of the
+  :mfcmd:`is-used` modulefile command or of the :subcmd:`unuse` sub-command
+  is also resolved against the current working directory to recognize such
+  entry whatever its form.
 
 .. _CVE-2026-85013: https://github.com/envmodules/modules/security/advisories/GHSA-8hrw-p88g-qhmg
 

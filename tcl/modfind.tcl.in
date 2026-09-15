@@ -495,9 +495,7 @@ proc getLoadedModulePropertyEnvVarName {prop} {
 # is set. by default an empty list is returned if no MODULEPATH set
 # resolv_var param tells if environment variable references in path elements
 # should be resolved or passed as-is in result list
-# set_abs param applies an absolute path name conversion to path elements
-# if enabled
-proc getModulePathList {{behavior returnempty} {resolv_var 1} {set_abs 1}} {
+proc getModulePathList {{behavior returnempty} {resolv_var 1}} {
    if {![isEnvVarDefined MODULEPATH] && $behavior eq {exiterronundef}} {
       reportErrorAndExit {No module path defined}
    }
@@ -507,12 +505,32 @@ proc getModulePathList {{behavior returnempty} {resolv_var 1} {set_abs 1}} {
       if {$resolv_var} {
          set modpath [resolvStringWithEnv $modpath]
       }
-      if {$set_abs} {
-         set modpath [getAbsolutePath $modpath]
-      }
-      lappendNoDup modpath_list $modpath
+      # relative modulepath refers to current working directory of module
+      # command, not to the directory of the modulefile being evaluated
+      lappendNoDup modpath_list [getAbsolutePath $modpath 1]
    }
    return $modpath_list
+}
+
+# return the MODULEPATH entry, as registered in environment variable, that
+# corresponds to given path. path is resolved as an absolute path from the
+# directory of the modulefile being evaluated and from the current working
+# directory, as a relative MODULEPATH entry refers to the latter. an empty
+# string is returned if path is not found in MODULEPATH
+# resolv_var param tells if environment variable references in MODULEPATH
+# entries should be resolved or compared as-is
+proc getUsedModulePathEntry {path {resolv_var 1}} {
+   set abspath [getAbsolutePath $path]
+   set abspath_from_cwd [getAbsolutePath $path 1]
+   foreach modpath [getEnvLoadedModulePropertyParsedList modulepath] {
+      set absmodpath [expr {$resolv_var ? [resolvStringWithEnv $modpath] :\
+         $modpath}]
+      set absmodpath [getAbsolutePath $absmodpath 1]
+      if {$absmodpath eq $abspath || $absmodpath eq $abspath_from_cwd} {
+         return $modpath
+      }
+   }
+   return {}
 }
 
 proc getModulepathLabel {modpath} {

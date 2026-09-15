@@ -1,0 +1,74 @@
+##############################################################################
+#   Modules Revision 3.0
+#   Providing a flexible user environment
+#
+#   File:		modules.50-cmds/%M%
+#   Revision:		%I%
+#   First Edition:	2026/09/15
+#   Last Mod.:		%U%, %G%
+#
+#   Authors:		Xavier Delaruelle, xavier.delaruelle@cea.fr
+#
+#   Description:	Testuite testsequence
+#   Command:		load
+#   Modulefiles:    bar, foo
+#   Sub-Command:    is-used
+#
+#   Comment:	%C{
+#           Test module load made during a modulefile evaluation when
+#           modulepath is set as a relative path
+#		}C%
+#
+##############################################################################
+
+skip_if_quick_mode
+
+set mp $modpath.4
+
+# modulepath relative to current working directory of module command
+set relmp [file tail $env(TESTSUITEDIR)]/[file tail $mp]
+
+setenv_var MODULES_AUTO_HANDLING 1
+
+set ans [list]
+lappend ans [list set __MODULES_LMPREREQ bar/1&foo/1.0]
+lappend ans [list set _LMFILES_ $mp/foo/1.0:$mp/bar/1]
+lappend ans [list set LOADEDMODULES foo/1.0:bar/1]
+lappend ans [list set __MODULES_LMTAG foo/1.0&auto-loaded]
+set tserr [msg_top_load bar/1 {} foo/1.0 {}]
+
+# is-used given the relative entry (raw or in a non-normalized form) or a path
+# relative to the modulefile directory, which is not the current working
+# directory
+set ans2 [list]
+lappend ans2 [list set TS_ISUSED_UNK 0]
+lappend ans2 [list set TS_ISUSED_RAW 1]
+lappend ans2 [list set TS_ISUSED_REL 1]
+lappend ans2 [list set TS_ISUSED_SLASH 1]
+lappend ans2 [list set TS_ISUSED_DOT 1]
+lappend ans2 [list set _LMFILES_ $mp/bar/1]
+lappend ans2 [list set LOADEDMODULES bar/1]
+
+foreach modulepath [list $relmp ./$relmp] {
+    setenv_path_var MODULEPATH $modulepath
+    foreach tscase {load1 prereq1 depon1} {
+        setenv_var TESTSUITE_RELATIVE_MODULEPATH $tscase
+        testouterr_cmd bash {load bar/1} $ans $tserr
+    }
+
+    setenv_var TESTSUITE_RELATIVE_MODULEPATH isused1
+    testouterr_cmd bash {load bar/1} $ans2 {}
+
+    # unuse given the relative entry raw or in a non-normalized form
+    foreach unusepath [list $relmp ./$relmp $relmp/ $mp] {
+        testouterr_cmd bash "unuse $unusepath" [list [list unset MODULEPATH]]\
+            {}
+    }
+}
+
+
+#
+#  Cleanup
+#
+
+reset_test_env

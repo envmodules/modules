@@ -449,9 +449,17 @@ the *modulefile* is being loaded.
  is enabled in case no argument is provided. If a list contains more than one
  *directory*, then each member acts as a boolean OR operation.
 
+ A relative *directory* is resolved against the directory of the modulefile
+ being evaluated and also against the current working directory, as a
+ relative path entry in :envvar:`MODULEPATH` refers to the latter.
+
  .. only:: html or latex
 
     .. versionadded:: 4.1
+
+    .. versionchanged:: 5.7
+       A relative *directory* is also resolved against the current working
+       directory
 
 .. mfcmd:: lsb-release field
 

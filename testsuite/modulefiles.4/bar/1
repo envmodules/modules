@@ -78,3 +78,23 @@ if {[info exists env(TESTSUITE_LCOMPAT)]} {
         }
     }
 }
+if {[info exists env(TESTSUITE_RELATIVE_MODULEPATH)]} {
+    switch -- $env(TESTSUITE_RELATIVE_MODULEPATH) {
+        load1 {
+            module load foo/1.0
+        }
+        prereq1 {
+            prereq foo/1.0
+        }
+        depon1 {
+            depends-on foo/1.0
+        }
+        isused1 {
+            setenv TS_ISUSED_RAW [is-used $env(MODULEPATH)]
+            setenv TS_ISUSED_DOT [is-used ./$env(MODULEPATH)]
+            setenv TS_ISUSED_SLASH [is-used $env(MODULEPATH)/]
+            setenv TS_ISUSED_REL [is-used ..]
+            setenv TS_ISUSED_UNK [is-used [file tail $env(MODULEPATH)]]
+        }
+    }
+}

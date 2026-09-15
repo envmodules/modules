@@ -1952,11 +1952,6 @@ proc runModuleUse {cmd mode pos args} {
    if {$args eq {}} {
       showModulePath
    } else {
-      if {$pos eq {remove}} {
-         # get current module path list
-         set modpathlist [getModulePathList returnempty 0 0]
-      }
-
       foreach path $args {
          switch -glob -- $path {
             --remove-on-unload - --append-on-unload - --prepend-on-unload -\
@@ -1978,18 +1973,13 @@ proc runModuleUse {cmd mode pos args} {
             }
             default {
                if {$pos eq {remove}} {
-                  if {$path in $modpathlist} {
-                     lappend pathlist $path
-                  # transform given path in an absolute path which should have
-                  # been registered in the MODULEPATH env var. however for
-                  # compatibility with previous behavior where relative paths
-                  # were registered in MODULEPATH given path is first checked
-                  # against current path list
-                  } elseif {[set abspath [getAbsolutePath $path]] in\
-                     $modpathlist} {
-                     lappend pathlist $abspath
-                  # even if not found, transmit this path to remove-path in
-                  # case several path elements have been joined as one string
+                  # transmit path as registered in MODULEPATH env var, where
+                  # variable references are kept as-is. even if not found,
+                  # transmit given path to remove-path in case several path
+                  # elements have been joined as one string
+                  if {[set usedpath [getUsedModulePathEntry $path 0]] ne\
+                     {}} {
+                     lappend pathlist $usedpath
                   } else {
                      lappend pathlist $path
                   }

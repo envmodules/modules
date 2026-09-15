@@ -1335,17 +1335,13 @@ proc is-saved {args} {
 
 # test at least one of the directories passed as argument is set in MODULEPATH
 proc is-used {args} {
-   set modpathlist [getModulePathList]
    foreach path $args {
-      # transform given path in an absolute path to compare with dirs
-      # registered in the MODULEPATH env var which are returned absolute.
-      set abspath [getAbsolutePath $path]
-      if {$abspath in $modpathlist} {
+      if {[getUsedModulePathEntry $path] ne {}} {
          return 1
       }
    }
    # is something used whatever it is?
-   return [expr {![llength $args] && [llength $modpathlist]}]
+   return [expr {![llength $args] && [llength [getModulePathList]]}]
 }
 
 # test at least one of the modulefiles passed as argument exists

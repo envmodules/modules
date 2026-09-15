@@ -94,9 +94,10 @@ proc runCommand {cmd args} {
    }
 }
 
-proc getAbsolutePath {path} {
+proc getAbsolutePath {path {from_cwd 0}} {
    # currently executing a modulefile or rc, so get the directory of this file
-   if {[currentState modulefile] ne {}} {
+   # unless resolution from current working directory is requested
+   if {!$from_cwd && [currentState modulefile] ne {}} {
       set curdir [file dirname [currentState modulefile]]
    # elsewhere get module command current working directory
    } else {
