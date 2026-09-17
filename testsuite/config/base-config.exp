@@ -1390,10 +1390,12 @@ proc is_quick_mode {} {
         $::env(QUICKTEST)]}]
 }
 
-# if quick test mode is running stop processing of current test file
-proc skip_if_quick_mode {} {
+# if quick test mode is running stop processing of current test file after
+# removing given fixture paths
+proc skip_if_quick_mode {args} {
     if {[is_quick_mode]} {
         send_user "\tSkipping tests as quick test mode is enabled\n"
+        file delete -force {*}$args
         reset_test_env
         return -code 0 -level 2 0
     }

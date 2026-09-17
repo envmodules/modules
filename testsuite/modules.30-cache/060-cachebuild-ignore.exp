@@ -105,7 +105,7 @@ testouterr_cmd sh {--no-modulepath-ignore --ignore-cache is-avail bar/2.0}\
 
 file delete $mp1cache
 
-skip_if_quick_mode
+skip_if_quick_mode $mp1
 
 # every element is recorded in cache when modulepath_ignore is disabled
 setenv_var MODULES_MODULEPATH_IGNORE 0

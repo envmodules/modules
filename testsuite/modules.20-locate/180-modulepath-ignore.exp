@@ -93,7 +93,7 @@ unsetenv_var MODULES_MODULEPATH_IGNORE
 # execution
 testouterr_cmd sh {--no-modulepath-ignore avail -a -t -o } OK $tserr
 
-skip_if_quick_mode
+skip_if_quick_mode $mp1
 
 # ignore all accept some idiom with negated patterns
 file mkdir $mp2/app
