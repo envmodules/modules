@@ -22,33 +22,49 @@
 # test source-sh against Spack setup-env scripts if found installed for test
 if {[file exists spack/share/spack/setup-env.sh]} {
 
+# Spack reports on stderr the warnings raised when loading its package
+# repository (like a SyntaxWarning from a package file on recent Python
+# versions), which is not what is tested here: drop these lines
+proc testall_cmd_spack {test_shell cmd answer anserr exitval} {
+   _test_sub $test_shell $cmd
+   set ::comp_error [regsub -all -line {^==> Warning: .*(\n|$)}\
+      $::comp_error {}]
+   if {[_test_out $test_shell $cmd $answer fail]\
+      && [_test_err $test_shell $cmd $anserr fail]\
+      && [_test_exit $test_shell $cmd $exitval fail]} {
+      _test_ok $test_shell $cmd
+   }
+}
+
 if {{bash} in $shell_list} {
    set tsout "function\nenvironment-modules"
-   testall_cmd bash "module use \"$testsuite_modpath.3\"\; module load source-sh/spack\; type -t _spack_pathadd && spack list environment-modules\; module unload source-sh\; test -n \"\$PATH\"" $tsout {} 0
+   testall_cmd_spack bash "module use \"$testsuite_modpath.3\"\; module load source-sh/spack\; type -t _spack_pathadd && spack list environment-modules\; module unload source-sh\; test -n \"\$PATH\"" $tsout {} 0
 }
 
 if {{ksh} in $shell_list} {
    set tserr "_spack_pathadd()\nenvironment-modules"
    # need to manually specify SPACK_ROOT prior script evaluation for ksh
-   testall_cmd ksh "module use \"$testsuite_modpath.3\"\; export SPACK_ROOT=spack\; module load source-sh/spack\; typeset +f _spack_pathadd && spack list environment-modules\; module unload source-sh\; test -n \"\$PATH\"" $tserr {} 0
+   testall_cmd_spack ksh "module use \"$testsuite_modpath.3\"\; export SPACK_ROOT=spack\; module load source-sh/spack\; typeset +f _spack_pathadd && spack list environment-modules\; module unload source-sh\; test -n \"\$PATH\"" $tserr {} 0
 }
 
 if {{zsh} in $shell_list} {
    set tsout "_spack_pathadd\nenvironment-modules"
-   testall_cmd zsh "module use \"$testsuite_modpath.3\"\; module load source-sh/spack\; typeset +f _spack_pathadd && spack list environment-modules\; module unload source-sh\; test -n \"\$PATH\"" $tsout {} 0
+   testall_cmd_spack zsh "module use \"$testsuite_modpath.3\"\; module load source-sh/spack\; typeset +f _spack_pathadd && spack list environment-modules\; module unload source-sh\; test -n \"\$PATH\"" $tsout {} 0
 }
 
 if {{tcsh} in $shell_list} {
    # not working on tcsh as variables used in spack alias are local variable, not environment variable
    set tserr "_spack_share_dir: Undefined variable."
-   testall_cmd tcsh "module use \"$testsuite_modpath.3\"\; module load source-sh/spack\; spack list environment-modules\; module unload source-sh\; test -n \"\$PATH\"" {} $tserr 1
+   testall_cmd_spack tcsh "module use \"$testsuite_modpath.3\"\; module load source-sh/spack\; spack list environment-modules\; module unload source-sh\; test -n \"\$PATH\"" {} $tserr 1
 }
 
 if {{fish} in $shell_list} {
    set tsout "environment-modules"
    # module command seems superseded by spack definition on fish: cannot test unload
-   testall_cmd fish "module use \"$testsuite_modpath.3\"\; module load source-sh/spack\; functions -q spack_pathadd\; and spack list environment-modules" $tsout {} 0
+   testall_cmd_spack fish "module use \"$testsuite_modpath.3\"\; module load source-sh/spack\; functions -q spack_pathadd\; and spack list environment-modules" $tsout {} 0
 }
+
+rename testall_cmd_spack {}
 
 } else {
    send_user "\tSkipping source-sh tests over Spack scripts\n"
