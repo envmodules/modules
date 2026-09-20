@@ -250,6 +250,82 @@ foreach {report_mode msg reqmsg stickymsg} [list error\
 }
 
 
+# requirement loaded after its super-sticky dependent
+setenv_loaded_module [list sticky2/1.0 sticky1/1.0] [list\
+    $mp/sticky2/1.0 $mp/sticky1/1.0]
+setenv_var __MODULES_LMTAG sticky2/1.0&super-sticky
+foreach {report_mode msg reqmsg} [list error $err_superstickyunload\
+    $err_superstickyrequnload warning $warn_superstickyunload\
+    $warn_superstickyrequnload silent {} {}] {
+    setenv_var MODULES_STICKY_PURGE $report_mode
+    set ans [list]
+    if {$report_mode eq {error}} {
+        lappend ans [list ERR]
+    }
+    set tserr {}
+    if {$report_mode ne {silent}} {
+        set tserr [msg_unload sticky1/1.0 $reqmsg]\n\n[msg_unload\
+            {sticky2/1.0 <sS>} $msg]
+    }
+    testouterr_cmd sh {purge} $ans $tserr
+    testouterr_cmd sh {purge -f} $ans $tserr
+}
+
+
+# requirement loaded after its sticky dependent
+setenv_var __MODULES_LMTAG sticky2/1.0&sticky
+foreach {report_mode msg reqmsg} [list error $err_stickyunload\
+    $err_stickyrequnload warning $warn_stickyunload $warn_stickyrequnload\
+    silent {} {}] {
+    setenv_var MODULES_STICKY_PURGE $report_mode
+    set ans [list]
+    if {$report_mode eq {error}} {
+        lappend ans [list ERR]
+    }
+    set tserr {}
+    if {$report_mode ne {silent}} {
+        set tserr [msg_unload sticky1/1.0 $reqmsg]\n\n[msg_unload\
+            {sticky2/1.0 <S>} $msg]
+    }
+    testouterr_cmd sh {purge} $ans $tserr
+
+    set ans [list]
+    foreach var {__MODULES_LMPREREQ _LMFILES_ LOADEDMODULES __MODULES_LMTAG} {
+        lappend ans [list unset $var]
+    }
+    set tserr [msg_unload {sticky2/1.0 <S>} $err_stickyunloadf]
+    testouterr_cmd sh {purge -f} $ans $tserr
+}
+
+
+# skipped requirement unload aborts purge if abort_on_error is configured
+setenv_var MODULES_ABORT_ON_ERROR purge
+setenv_loaded_module [list foo/1.0 sticky2/1.0 sticky1/1.0] [list\
+    $mp/foo/1.0 $mp/sticky2/1.0 $mp/sticky1/1.0]
+setenv_var __MODULES_LMTAG sticky2/1.0&super-sticky
+
+setenv_var MODULES_STICKY_PURGE error
+set tserr [msg_unload sticky1/1.0 $err_superstickyrequnload]
+testouterr_cmd sh {purge} ERR $tserr
+# force mode disables abort behavior
+set ans [list]
+lappend ans [list set _LMFILES_ $mp/sticky2/1.0:$mp/sticky1/1.0]
+lappend ans [list set LOADEDMODULES sticky2/1.0:sticky1/1.0]
+lappend ans [list ERR]
+set tserr [msg_unload sticky1/1.0 $err_superstickyrequnload]\n\n[msg_unload\
+    {sticky2/1.0 <sS>} $err_superstickyunload]
+testouterr_cmd sh {purge -f} $ans $tserr
+
+setenv_var MODULES_STICKY_PURGE warning
+set ans [list]
+lappend ans [list set _LMFILES_ $mp/sticky2/1.0:$mp/sticky1/1.0]
+lappend ans [list set LOADEDMODULES sticky2/1.0:sticky1/1.0]
+set tserr [msg_unload sticky1/1.0 $warn_superstickyrequnload]\n\n[msg_unload\
+    {sticky2/1.0 <sS>} $warn_superstickyunload]
+testouterr_cmd sh {purge} $ans $tserr
+testouterr_cmd sh {purge -f} $ans $tserr
+
+unsetenv_var MODULES_ABORT_ON_ERROR
 unsetenv_var __MODULES_LMPREREQ
 unsetenv_var TESTSUITE_STICKY
 

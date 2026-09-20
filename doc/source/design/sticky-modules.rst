@@ -52,6 +52,8 @@ Specification
   and super-sticky modules
 
   - Direct and indirect requirements are preserved, even without a sticky tag
+  - Requirements are preserved whatever their load order relative to their
+    dependent, as a requirement may be loaded after its dependent
   - Only strong requirements are preserved: an alternative requirement may
     be unloaded while another loaded module still satisfies it
   - A forced ``purge`` unloads sticky modules and can unload their

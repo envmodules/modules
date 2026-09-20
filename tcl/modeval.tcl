@@ -961,7 +961,9 @@ proc isModuleSticky {mod} {
 
 proc getModuleStickyDependentTag {mod} {
    set sticky_tag {}
-   foreach dep_mod [getDependentLoadedModuleList [list $mod] 1 0 0 0] {
+   # look at dependents whatever their load order to also protect a
+   # requirement loaded after its sticky dependent
+   foreach dep_mod [getDependentLoadedModuleList [list $mod] 1 0 1 0] {
       if {[isModuleTagged $dep_mod super-sticky 1]} {
          set sticky_tag super-sticky
          break
