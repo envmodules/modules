@@ -1,10 +1,10 @@
 # AGENTS.md
 
 This file provides guidance to AI coding assistants when working with code
-in this repository. Codex and Mistral Vibe read it directly. Claude Code and
-Gemini CLI only look for their own `CLAUDE.md`/`GEMINI.md` filename, so both
-are generated as stubs that just import this file (see the `CLAUDE.md:` and
-`GEMINI.md:` rules in `Makefile`).
+in this repository. Codex, Claude Code and Mistral Vibe read it directly.
+Gemini CLI only looks for its own `GEMINI.md` filename, so it is generated
+as a stub that just imports this file (see the `GEMINI.md:` rule in
+`Makefile`).
 
 ## What this is
 
