@@ -200,6 +200,8 @@ module remains loaded:
 
     :ps:`$` module config sticky_purge warning
     :ps:`$` module load env/base
+    Loading :sgrhi:`env/base`
+      :sgrin:`Loading requirement`: core compiler
     :ps:`$` module purge
     Unloading :sgrhi:`env/base`
       :sgrwa:`WARNING`: Unload of super-sticky module skipped
@@ -211,10 +213,10 @@ module remains loaded:
       :sgrwa:`WARNING`: Unload of super-sticky module requirement skipped
     :ps:`$` module list
     Currently Loaded Modulefiles:
-     1) core   2) compiler   3) :sgrss:`env/base`
+     1) :sgral:`core`   2) :sgral:`compiler`   3) :sgrss:`env/base`
 
     Key:
-    :sgrss:`super-sticky`
+    :sgral:`auto-loaded`  :sgrss:`super-sticky`
 
 Both requirements remain loaded even though they are not sticky themselves.
 The same protection applies to indirect requirements and to a forced purge

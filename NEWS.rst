@@ -251,9 +251,6 @@ Modules 5.7.0 (not yet released)
 * Doc: add the :ref:`user-guide` document that explains a selection of
   useful but lesser known features through practical examples and common
   use cases.
-* Keep non-sticky requirements of sticky modules loaded during a
-  :subcmd:`purge` and explicitly report why their unload is skipped according
-  to the :mconfig:`sticky_purge` configuration. (fix issue #582)
 * Init: fix command injection in Bash completion when module names contain
   shell meta-characters. Completion candidates were passed to ``compgen -W``
   which evaluates command substitution syntax. (fix `CVE-2026-85013`_ found
@@ -267,8 +264,12 @@ Modules 5.7.0 (not yet released)
   :mfcmd:`is-used` modulefile command or of the :subcmd:`unuse` sub-command
   is also resolved against the current working directory to recognize such
   entry whatever its form.
+* Keep non-sticky requirements of sticky modules loaded during a
+  :subcmd:`purge` and explicitly report why their unload is skipped according
+  to the :mconfig:`sticky_purge` configuration. (fix issue #582)
 
 .. _CVE-2026-85013: https://github.com/envmodules/modules/security/advisories/GHSA-8hrw-p88g-qhmg
+
 
 .. _5.6 release notes:
 
