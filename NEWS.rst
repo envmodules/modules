@@ -267,6 +267,11 @@ Modules 5.7.0 (not yet released)
 * Keep non-sticky requirements of sticky modules loaded during a
   :subcmd:`purge` and explicitly report why their unload is skipped according
   to the :mconfig:`sticky_purge` configuration. (fix issue #582)
+* Fix internal error raised by :subcmd:`switch` sub-command when the unload
+  of the switched-off module fails after some of its dependent modules were
+  unloaded for reload, and switch sequence continues as ``switch_unload`` is
+  not set in :mconfig:`abort_on_error`. Dependent modules restored by the
+  failed unload are not reloaded anymore.
 
 .. _CVE-2026-85013: https://github.com/envmodules/modules/security/advisories/GHSA-8hrw-p88g-qhmg
 

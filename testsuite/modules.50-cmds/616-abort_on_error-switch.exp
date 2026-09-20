@@ -878,6 +878,34 @@ append ts_depre_unload_error_force [msg_top_switch foo/1.0 setenv/1.0 {} {} {} {
 testouterr_cmd bash {switch --force foo/1.0 setenv/1.0} $ans_unload_fail_depre_force $ts_depre_unload_error_force
 
 
+# another dependent module was unloaded prior failing dependent unload
+setenv_loaded_module [list foo/1.0 lerr/1.0 err/1.0] [list $mp/foo/1.0 $mp/lerr/1.0 $mp/err/1.0]
+setenv_var __MODULES_LMPREREQ lerr/1.0&foo:err/1.0&err/1.0|foo
+
+set ans_unload_fail_depre_other_continue [list]
+lappend ans_unload_fail_depre_other_continue [list set TS1 {}]
+lappend ans_unload_fail_depre_other_continue [list set TS2 {}]
+lappend ans_unload_fail_depre_other_continue [list set _LMFILES_ $mp/foo/1.0:$mp/lerr/1.0:$mp/err/1.0:$mp/setenv/1.0]
+lappend ans_unload_fail_depre_other_continue [list set LOADEDMODULES foo/1.0:lerr/1.0:err/1.0:setenv/1.0]
+lappend ans_unload_fail_depre_other_continue [list ERR]
+
+testouterr_cmd bash {switch foo/1.0 setenv/1.0} $ans_unload_fail_depre_other_continue $ts_depre_unload_error
+
+set ans_unload_fail_depre_other_force [list]
+lappend ans_unload_fail_depre_other_force [list set TS1 {}]
+lappend ans_unload_fail_depre_other_force [list set TS2 {}]
+lappend ans_unload_fail_depre_other_force [list set __MODULES_LMPREREQ err/1.0&err/1.0|foo]
+lappend ans_unload_fail_depre_other_force [list set _LMFILES_ $mp/setenv/1.0:$mp/err/1.0]
+lappend ans_unload_fail_depre_other_force [list set LOADEDMODULES setenv/1.0:err/1.0]
+
+set ts_depre_unload_error_other_force [msg_unload err/1.0 [msg_modwarn msg {error msg} $mp/err/1.0 2 {} {} {} $custom_error_trace]]\n\n
+append ts_depre_unload_error_other_force [msg_top_switch foo/1.0 setenv/1.0 {} {} {} {} [list {err/1.0 lerr/1.0} err/1.0]]
+testouterr_cmd bash {switch --force foo/1.0 setenv/1.0} $ans_unload_fail_depre_other_force $ts_depre_unload_error_other_force
+
+setenv_loaded_module [list foo/1.0 err/1.0] [list $mp/foo/1.0 $mp/err/1.0]
+setenv_var __MODULES_LMPREREQ err/1.0&err/1.0|foo
+
+
 setenv_var TESTSUITE_ABORT_ON_ERROR depre_unload_bad
 
 set ts_depre_unload_bad [msg_unload err/1.0 [msg_moderr {invalid command name "bad"} bad $mp/err/1.0 2 {} {} {} $custom_error_trace]]\n\n

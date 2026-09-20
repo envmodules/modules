@@ -593,7 +593,7 @@ proc pushSettings {} {
       g_moduleNPODepend g_dependNPOHash g_prereqViolation\
       g_prereqNPOViolation g_conflictViolation g_moduleUnmetDep\
       g_unmetDepHash g_moduleEval g_moduleHiddenEval g_scanModuleVariant\
-      g_savedLoReqOfReloadMod g_savedLoReqOfUnloadMod\
+      g_savedLoReqOfReloadMod g_savedLoReqOfUnloadMod g_savedPropsOfReloadMod\
       g_loadedModulePrereqPath g_tagHash g_loadedByModroot g_modrootByLoaded\
       g_loadedModulePosition g_modrootByLoadedConflict\
       g_loadedConflictByModroot} {
@@ -605,7 +605,7 @@ proc pushSettings {} {
 
    # save non-array variable and indication if it was set
    foreach var {g_changeDir g_stdoutPuts g_prestdoutPuts g_return_text\
-      g_uReqUnFromDepReList} {
+      g_uReqUnFromDepReList g_depReList} {
       ##nagelfar ignore #2 Badly formed if statement
       lappend save_var $var {*}[if {[info exists ::$var]} {list 1 [set\
          ::$var]} {list 0 {}}]
