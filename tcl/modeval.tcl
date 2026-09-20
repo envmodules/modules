@@ -965,7 +965,7 @@ proc getModuleStickyDependentTag {mod} {
       if {[isModuleTagged $dep_mod super-sticky 1]} {
          set sticky_tag super-sticky
          break
-      } elseif {![getState force] && [isModuleTagged $dep_mod sticky 1]} {
+      } elseif {[isModuleSticky $dep_mod]} {
          set sticky_tag sticky
       }
    }
@@ -1166,10 +1166,8 @@ proc failOrSkipUnloadIfSticky {modname modfile} {
    set sticky_purge [expr {[getState commandname] eq {purge} ? [getConf\
       sticky_purge] : {}}]
 
-   if {!$is_supersticky_not_reloading && $is_sticky_not_reloading &&\
-      [getState force]} {
-      reportWarning [getStickyForcedUnloadMsg]
-   } elseif {$is_supersticky_not_reloading || $is_sticky_not_reloading} {
+   if {$is_supersticky_not_reloading || ($is_sticky_not_reloading &&\
+      ![getState force])} {
       set msg [getStickyUnloadMsg [expr {$is_supersticky_not_reloading ?\
          {super-sticky} : {sticky}}]]
       # no message if sticky_purge is set to silent
@@ -1180,6 +1178,17 @@ proc failOrSkipUnloadIfSticky {modname modfile} {
 
       # skip unload without raising error
       return 1
+   }
+
+   # on purge, module required by a retained sticky module is kept loaded,
+   # which prevails over the forced unload of a sticky module
+   if {$sticky_purge ne {} && [failOrSkipUnloadIfRequiredBySticky\
+      $modname]} {
+      return 1
+   }
+
+   if {$is_sticky_not_reloading && [getState force]} {
+      reportWarning [getStickyForcedUnloadMsg]
    }
 
    return 0

@@ -218,6 +218,42 @@ foreach {tag2 tag3 msg2 msg3} [list sticky super-sticky\
 unsetenv_var __MODULES_LMPREREQ
 
 
+# sticky requirement of super-sticky module is kept on forced purge
+setenv_var TESTSUITE_STICKY purge_req
+setenv_loaded_module [list sticky1/1.0 sticky2/1.0] [list\
+    $mp/sticky1/1.0 $mp/sticky2/1.0]
+setenv_var __MODULES_LMTAG sticky1/1.0&sticky:sticky2/1.0&super-sticky
+setenv_var __MODULES_LMPREREQ sticky2/1.0&sticky1/1.0|sticky1/2.0
+foreach {report_mode msg reqmsg stickymsg} [list error\
+    $err_superstickyunload $err_superstickyrequnload $err_stickyunload\
+    warning $warn_superstickyunload $warn_superstickyrequnload\
+    $warn_stickyunload silent {} {} {}] {
+    setenv_var MODULES_STICKY_PURGE $report_mode
+    set ans [list]
+    if {$report_mode eq {error}} {
+        lappend ans [list ERR]
+    }
+    set tserr {}
+    if {$report_mode ne {silent}} {
+        set tserr [msg_unload {sticky2/1.0 <sS>} $msg]\n\n[msg_unload\
+            {sticky1/1.0 <S>} $stickymsg]
+    }
+    testouterr_cmd sh {purge} $ans $tserr
+
+    # requirement is retained, so no forced unload warning
+    set tserr {}
+    if {$report_mode ne {silent}} {
+        set tserr [msg_unload {sticky2/1.0 <sS>} $msg]\n\n[msg_unload\
+            {sticky1/1.0 <S>} $reqmsg]
+    }
+    testouterr_cmd sh {purge -f} $ans $tserr
+}
+
+
+unsetenv_var __MODULES_LMPREREQ
+unsetenv_var TESTSUITE_STICKY
+
+
 # module both sticky and super-sticky
 setenv_var TESTSUITE_FPMOD_TAG sticky2
 setenv_loaded_module [list foo/1.0 tag/1.0] [list $mp/foo/1.0 $mp/tag/1.0]
