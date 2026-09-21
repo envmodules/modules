@@ -1074,8 +1074,11 @@ fi
 export GIT_DIR="${progdir}/.git"
 export GIT_WORK_TREE="${progdir}"
 
-test -e "${GIT_DIR}"
-work_from_git_repo=$?
+if test -e "${GIT_DIR}"; then
+   work_from_git_repo=0
+else
+   work_from_git_repo=1
+fi
 
 # if we install from git repository, must have git to fetch current release number
 if [ $work_from_git_repo -eq 0 ]; then

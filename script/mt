@@ -246,9 +246,8 @@ if [ -t 1 ]; then
 fi
 
 # highlight failed tests
-retreview=0
 review_log
-retreview+=$?
+retreview=$?
 
 # testsuite ok but mtreview failed to run
 if [ $ret -eq 0 ] && [ $retreview -ne 0 ]; then
