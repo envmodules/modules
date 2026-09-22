@@ -57,7 +57,7 @@ Perform commit:
 .. code-block:: console
 
   version=$(grep ^MODULES_RELEASE version.inc.in | cut -d ' ' -f 3)
-  git commit -a -m "Release of version $version"
+  git commit -s -a -m "Release of version $version"
 
 Tag version:
 
