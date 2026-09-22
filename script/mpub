@@ -207,7 +207,7 @@ set fid [open index.html w]
 puts -nonewline $fid [string map [list modules-$prevver modules-$relver\
    "Download ($prevtag)" "Download ($reltag)"] $index]
 close $fid
-runcmd 2>@$logfid git commit -m "release of version $relver" index.html
+runcmd 2>@$logfid git commit -s -m "release of version $relver" index.html
 
 # upload new page
 runcmd 2>@$logfid git push $ghremote gh-pages
