@@ -30,7 +30,8 @@ Finalize release content:
 
 * Update version number in :file:`version.inc.in` and
   :file:`doc/source/conf.py`
-* Set release date in :file:`NEWS.rst` and :file:`MIGRATING.rst`
+* Set release date in :file:`NEWS.rst` and remove the *not yet released*
+  mention in :file:`MIGRATING.rst`
 * Update version number and draft changelog message in
   :file:`share/rpm/environment-modules.spec.in`
 
@@ -43,8 +44,12 @@ Finalize release content:
 * If Modules Tcl extension library has been changed since last release, update
   the version number of this library in :file:`lib/configure.ac`.
 * Update table of supported versions in :file:`SECURITY.md`.
+* Update the ``|modules_version|`` substitution in
+  :file:`doc/source/other-implementations.rst` to remove the *not yet
+  released* mention, and refresh ``|lmod_version|`` to the latest Lmod
+  release the comparison was checked against.
 
-Look at previous release commit, like :ghcommit:`3b68dee7`, to view the lines
+Look at previous release commit, like :ghcommit:`9b1d0134`, to view the lines
 that should be modified and what content to write.
 
 Perform commit:
@@ -148,7 +153,7 @@ Create release on GitHub at https://github.com/envmodules/modules/releases/new:
    grep -B1000 ".. _$previous_version release notes:" NEWS.rst | grep -A1000 -- "--------------------------" >NEWS.new
    nb_lines=$(wc -l NEWS.new| cut -d ' ' -f 1)
    sed -i -e "1,2d;$((nb_lines-3)),\$d" NEWS.new
-   sed -i -z -e "s/\n   / /g" -e "s/\n  / /g" -e 's/:option://g' -e 's/:mfcmd://g' -e 's/:subcmd://g' -e 's/:file://g' -e 's/:ref://g' -e 's/:mfcmd://g' -e 's/:mconfig://g' -e 's/:instopt://g' -e 's/:mfvar://g' -e 's/:envvar://g' -e 's/:command://g' -e 's/:sitevar://g' -e 's/``/`/g' NEWS.new
+   sed -i -z -e "s/\n   / /g" -e "s/\n  / /g" -e 's/:option://g' -e 's/:mfcmd://g' -e 's/:subcmd://g' -e 's/:file://g' -e 's/:ref://g' -e 's/:mfcmd://g' -e 's/:mconfig://g' -e 's/:instopt://g' -e 's/:mfvar://g' -e 's/:envvar://g' -e 's/:command://g' -e 's/:sitevar://g' -e 's/:mhook://g' -e 's/``/`/g' NEWS.new
 
 Check resulting :file:`NEWS.new` to adapt RST code for boxes, links, codes
 (especially cleaning those containing ``\<`` or ``\>``) and make them valid
