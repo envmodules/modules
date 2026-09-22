@@ -502,7 +502,7 @@ option.
 Issue warning upon module evaluation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The mfcmd:`module-warn` modulefile Tcl command is introduced to define warning
+The :mfcmd:`module-warn` modulefile Tcl command is introduced to define warning
 message to print when loading specified modulefiles.
 
 .. parsed-literal::
@@ -522,7 +522,7 @@ The warning message is printed when targeted modulefile is evaluated in
 of affected or unaffected users or groups. Warning may also be only effective
 before or after a particular date.
 
-The ``warning`` tag is set on modules targeted by a mfcmd:`module-warn`
+The ``warning`` tag is set on modules targeted by a :mfcmd:`module-warn`
 command.
 
 Simplified way to define module help message

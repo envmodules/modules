@@ -51,7 +51,7 @@ Lmod Tcl modulefile compatibility
   context (not within modulerc)
 
 - An update is made on Modules version 5.6: argument *value* of
-  mfcmd:`add-property` is converted to :mfcmd:`module-tag` onto loading
+  :mfcmd:`add-property` is converted to :mfcmd:`module-tag` onto loading
   modulefile
 
   - Argument *name* is ignored as it seems *value* is the deterministic

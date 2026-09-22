@@ -81,7 +81,7 @@ configuration option is not set to ``always`` as this procedure is called by
 all module search contexts. It is called by:
 
 * ``findModules`` to check files in directories within modulepaths
-* ``getModules`` to check files pointed by mfcmd:`module-virtual`
+* ``getModules`` to check files pointed by :mfcmd:`module-virtual`
 * ``getPathToModule`` to check files transmitted as full path file
 
 .. note:: File readability (permission check) is not verified when
