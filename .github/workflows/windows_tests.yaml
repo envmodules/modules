@@ -204,7 +204,7 @@ jobs:
       - name: Install system packages
         shell: msys2 {0}
         run: |
-          pacman --noconfirm --noprogressbar -S tcl tcl-devel dejagnu python ruby cmake zsh tcsh mksh fish gcc autoconf make git curl gzip
+          pacman --noconfirm --noprogressbar -S tcl tcl-devel dejagnu python ruby cmake zsh tcsh fish gcc autoconf make git curl gzip
       - name: Build Modules
         shell: msys2 {0}
         run: |
