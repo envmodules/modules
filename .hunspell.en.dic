@@ -565,6 +565,8 @@ libg
 libl
 libtclenvmodules
 libtclxX
+libuv
+libuv1
 licensefile
 linalg
 lineno

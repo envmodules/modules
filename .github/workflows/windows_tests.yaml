@@ -160,7 +160,8 @@ jobs:
           # required by Sphinx 7.4 on Python < 3.11)
           # precise liblapack0 package needed by R package (missing dependency
           # since R-4.2.1-1)
-          packages: make sed git autoconf automake libtool tcl dejagnu python39 python39-docutils=0.18.1-1 python39-sphinx python39-tomli gzip ruby zsh tcsh mksh fish cmake R liblapack0 tcl-devel gcc-core curl python39-sphinxcontrib-applehelp python39-sphinxcontrib-devhelp python39-sphinxcontrib-htmlhelp python39-sphinxcontrib-jsmath python39-sphinxcontrib-qthelp python39-sphinxcontrib-serializinghtml python39-sphinxcontrib-websupport python39-alabaster python39-sqlalchemy
+          # pin libuv1 as cmake execute_process hangs with libuv 1.53.0
+          packages: make sed git autoconf automake libtool tcl dejagnu python39 python39-docutils=0.18.1-1 python39-sphinx python39-tomli gzip ruby zsh tcsh mksh fish cmake libuv1=1.52.1-1 R liblapack0 tcl-devel gcc-core curl python39-sphinxcontrib-applehelp python39-sphinxcontrib-devhelp python39-sphinxcontrib-htmlhelp python39-sphinxcontrib-jsmath python39-sphinxcontrib-qthelp python39-sphinxcontrib-serializinghtml python39-sphinxcontrib-websupport python39-alabaster python39-sqlalchemy
       - name: Configure Git safe.directory
         run: |
           bash -lc 'git config --global --add safe.directory $(cygpath -u "$GITHUB_WORKSPACE")'
@@ -205,6 +206,8 @@ jobs:
         shell: msys2 {0}
         run: |
           pacman --noconfirm --noprogressbar -S tcl tcl-devel dejagnu python ruby cmake zsh tcsh fish gcc autoconf make git curl gzip
+          # downgrade libuv as cmake execute_process hangs with libuv 1.53.0
+          pacman --noconfirm --noprogressbar -U https://repo.msys2.org/msys/x86_64/libuv-1.52.1-1-x86_64.pkg.tar.zst
       - name: Build Modules
         shell: msys2 {0}
         run: |
