@@ -92,8 +92,8 @@ Start coding
 
 * Create a branch to identify the issue or feature you would like to work on
 * Using your favorite editor, make your changes, `committing as you go`_
-  and following the `commit message conventions
-  <commit-message-conventions_>`_ of this project.
+  and following the `commit message conventions of this project
+  <commit-message-conventions_>`_.
 * Comply to the `coding conventions of this project <coding-conventions_>`_
   and its `code comments guidelines <code-comments_>`_.
 * Your Tcl code has to be compatible with Tcl version 8.5 and above (see
@@ -102,8 +102,8 @@ Start coding
   without your patch.
 * `Run the tests <running-the-tests_>`_ and `verify coverage <running-test-coverage_>`_.
 * `Sign-off your commits <developer-certificate-of-origin_>`_.
-* If you used `AI coding assistants <ai-coding-assistants_>`_, disclose it in
-  your commit message.
+* If you used `an AI coding assistant <ai-coding-assistants_>`_, disclose it
+  in your commit message.
 * Push your commits to GitHub and `create a pull request`_.
 
 .. _committing as you go: https://afraid-to-commit.readthedocs.io/en/latest/git/commandlinegit.html#commit-your-changes
@@ -317,7 +317,7 @@ Commit message conventions
   subject line alone says everything there is to say.
 * Reference an issue this commit resolves on its own line in the body,
   e.g. ``Fixes #645`` or ``Closes #572``.
-* Disclose `AI coding assistants <ai-coding-assistants_>`_ involvement, if
+* Disclose `AI coding assistant <ai-coding-assistants_>`_ involvement, if
   any, with an ``Assisted-by:`` trailer.
 * `Sign-off your commits <developer-certificate-of-origin_>`_ with a
   ``Signed-off-by:`` trailer, always as the last line of the commit
