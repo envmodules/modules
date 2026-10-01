@@ -1,4 +1,4 @@
-FROM gcr.io/oss-fuzz-base/base-builder:v1@sha256:8b4a73d83374b298a0a771eeec9a1d44ceff3416a678b7d7946303389d022aca
+FROM gcr.io/oss-fuzz-base/base-builder:v1@sha256:e67da2b0f6156b29b62734305a8c74db61aaf3158c7ab96386a07974fb33cdc8
 RUN apt-get update && apt-get install -y autoconf tcl8.6-dev
 COPY . $SRC/modules
 WORKDIR $SRC/modules
