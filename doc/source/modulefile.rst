@@ -875,6 +875,45 @@ the *modulefile* is being loaded.
   ``refresh``, ``nonpersist`` (alias of ``refresh``), ``display``, ``help``,
   ``test``, ``whatis`` or ``scan``.
 
+ **module-info modulename**
+
+  Return the name of currently evaluating *modulefile* without its version
+  part, which is the string returned by :mfcmd:`module-info
+  name<module-info>` without the last ``/`` character and what follows it.
+  Returns ``app`` for a *modulefile* named ``app/1.2.3`` and ``compiler/gcc``
+  for ``compiler/gcc/12.1``. Returns the full name if it contains no ``/``
+  character.
+
+  If currently evaluating *modulefile* has been specified as a full path,
+  :mfcmd:`module-info name<module-info>` returns this full path, so
+  :mfcmd:`module-info modulename<module-info>` returns the directory part of
+  this path.
+
+  .. only:: html or latex
+
+     .. versionadded:: 5.8
+
+ **module-info moduleversion**
+
+  Return the version of currently evaluating *modulefile*, which is the part
+  after the last ``/`` character of the string returned by
+  :mfcmd:`module-info name<module-info>`. Returns ``1.2.3`` for a
+  *modulefile* named ``app/1.2.3`` and ``12.1`` for ``compiler/gcc/12.1``.
+  Returns an empty string if the name contains no ``/`` character.
+
+  Symbolic versions and aliases are resolved as for :mfcmd:`module-info
+  name<module-info>`, so the version of the resolved *modulefile* is
+  returned. Variants are not included in the returned string.
+
+  If currently evaluating *modulefile* has been specified as a full path,
+  :mfcmd:`module-info name<module-info>` returns this full path, so
+  :mfcmd:`module-info moduleversion<module-info>` returns the file basename of
+  this path.
+
+  .. only:: html or latex
+
+     .. versionadded:: 5.8
+
  **module-info name**
 
   Return the name of the *modulefile*. This is not the full pathname for
@@ -885,6 +924,10 @@ the *modulefile* is being loaded.
   *modulefile*. The defined variants are not included in the returned string.
   See :mfcmd:`getvariant` command or :mfvar:`ModuleVariant` array variable to
   get defined variant values for currently evaluating *modulefile*.
+
+  See :mfcmd:`module-info modulename<module-info>` and :mfcmd:`module-info
+  moduleversion<module-info>` to get separately the name and version parts of
+  the returned string.
 
  **module-info shell** [shellname]
 

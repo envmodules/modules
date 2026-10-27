@@ -1634,3 +1634,7 @@ defineModStartNbProc
 isIcase
 CVE
 backport
+moduleversion
+myModuleFullName
+myModuleName
+myModuleVersion

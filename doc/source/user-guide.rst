@@ -770,6 +770,42 @@ This allows users to write:
 
    :ps:`$` module load openmpi %gcc
 
+``module-info``
+^^^^^^^^^^^^^^^
+
+The :mfcmd:`module-info` modulefile command provides information about the
+current evaluation context, like the name of the module being evaluated or
+the evaluation mode.
+
+The :mfcmd:`module-info name<module-info>` sub-command returns the full name
+of the evaluating module, like ``app/1.2.3``. Modulefiles often need only
+the version part of this name, to build an installation path for instance.
+The :mfcmd:`module-info moduleversion<module-info>` sub-command returns this
+part, what follows the last ``/`` character of the module name, and the
+:mfcmd:`module-info modulename<module-info>` sub-command returns what comes
+before this character.
+
+For example:
+
+.. code-block:: tcl
+
+   #%Module
+
+   set prefix /opt/[module-info modulename]/[module-info moduleversion]
+   prepend-path PATH $prefix/bin
+
+For a module named ``compiler/gcc/12.1``, :mfcmd:`module-info
+modulename<module-info>` returns ``compiler/gcc`` and :mfcmd:`module-info
+moduleversion<module-info>` returns ``12.1``. If the module name contains no
+``/`` character, the full name is returned as name part and the version part
+is an empty string.
+
+.. tip::
+
+   Symbolic versions and aliases are resolved before the modulefile is
+   evaluated, so these sub-commands always report the name of the resolved
+   modulefile.
+
 Advanced manipulations
 ----------------------
 
@@ -1085,9 +1121,7 @@ name being evaluated.
 
    #%Module
 
-   set version [lindex [split [module-info name] /] end]
-
-   setenv APP_VERSION $version
+   setenv APP_VERSION [module-info moduleversion]
 
 Module logger
 ^^^^^^^^^^^^^

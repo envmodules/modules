@@ -164,6 +164,8 @@ set {::syntax(module-info alias)} 1
 set {::syntax(module-info command)} x?
 set {::syntax(module-info loaded)} 1
 set {::syntax(module-info mode)} x?
+set {::syntax(module-info modulename)} 0
+set {::syntax(module-info moduleversion)} 0
 set {::syntax(module-info name)} 0
 set {::syntax(module-info shell)} x?
 set {::syntax(module-info shelltype)} x?
@@ -240,9 +242,9 @@ set ::subCmd(module) {add load add-any load-any swap switch try-add try-load\
    initadd initload initclear initlist initprepend initunload initrm\
    initswap initswitch list purge reload restore save savelist saverm disable\
    saveshow describe apropos keyword search test update whatis}
-set ::subCmd(module-info) {alias command loaded mode name shell shelltype\
-   specified symbols tags type usergroups username version user trace\
-   tracepat flags}
+set ::subCmd(module-info) {alias command loaded mode modulename moduleversion\
+   name shell shelltype specified symbols tags type usergroups username\
+   version user trace tracepat flags}
 set ::subCmd(uname) {sysname nodename domain release version machine}
 
 # option

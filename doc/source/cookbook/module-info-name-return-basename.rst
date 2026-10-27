@@ -11,6 +11,15 @@ as once loaded this module is identified by its full pathname. This recipe
 describes a way to get back the behavior of Modules compatibility version for
 the ``module-info name`` modulefile command.
 
+.. note::
+
+   Starting Modules 5.8, the :mfcmd:`module-info moduleversion<module-info>`
+   modulefile command returns the part of the module name after its last
+   ``/`` character, which is the file basename when module is specified as a
+   full path. It can be used instead of this recipe when the goal is to get
+   this basename rather than to change the result of :mfcmd:`module-info
+   name<module-info>`.
+
 Implementation
 --------------
 

@@ -15,6 +15,9 @@ Modules 5.8.0 (not yet released)
   designated by :instopt:`--with-tcl` when :instopt:`--with-tclsh` is not set,
   so that installed scripts run with the same Tcl the extension library is
   built against. (fix issue #717)
+* Add :mfcmd:`module-info modulename<module-info>` and :mfcmd:`module-info
+  moduleversion<module-info>` modulefile commands to get the name part and
+  the version part of currently evaluating modulefile. (fix issue #713)
 
 
 .. _5.7 release notes:

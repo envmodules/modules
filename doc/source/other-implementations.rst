@@ -56,8 +56,9 @@ table highlights features that are unique to each implementation.
        * Handle modulefile outside modulepath
        * :ref:`Case insensitive module load<Insensitive case>`
        * Automatic ``latest`` and ``loaded`` symbols
-       * ``alias``, ``command``, ``loaded``, ``tags``, ``usergroups`` and
-         ``username`` sub-commands of :mfcmd:`module-info`
+       * ``alias``, ``command``, ``loaded``, ``modulename``,
+         ``moduleversion``, ``tags``, ``usergroups`` and ``username``
+         sub-commands of :mfcmd:`module-info`
        * :ref:`Super-sticky modules<Sticky modules>`
        * :ref:`Fine-tuned output configuration<--output>`
        * :ref:`Editing modulefiles`
@@ -217,6 +218,12 @@ implementation.
      - |foo@5.0:7.0|_
    * - ``latest("foo")``
      - |foo@latest|_
+   * - ``myModuleFullName()``
+     - :mfcmd:`module-info name<module-info>`
+   * - ``myModuleName()``
+     - :mfcmd:`module-info modulename<module-info>`
+   * - ``myModuleVersion()``
+     - :mfcmd:`module-info moduleversion<module-info>`
 
 .. _Irreversible module actions: https://lmod.readthedocs.io/en/latest/370_irreversible.html
 .. _NAG file: https://lmod.readthedocs.io/en/latest/140_deprecating_modules.html

@@ -1,0 +1,4 @@
+#%Module
+setenv TS_NAME [module-info name]
+setenv TS_MODULENAME [module-info modulename]
+setenv TS_MODULEVERSION [module-info moduleversion]

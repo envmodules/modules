@@ -1,0 +1,9 @@
+#%Module
+if {[info exists env(TESTSUITE_INFO_MODULENAME)]} {
+    switch -- $env(TESTSUITE_INFO_MODULENAME) {
+        sym {
+            module-version info-name/1.2.3 sym
+            module-alias info-name-alias info-name/sub/2.0
+        }
+    }
+}

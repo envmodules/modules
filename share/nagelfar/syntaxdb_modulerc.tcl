@@ -60,6 +60,8 @@ set {::syntax(module-info alias)} 1
 set {::syntax(module-info command)} x?
 set {::syntax(module-info loaded)} 1
 set {::syntax(module-info mode)} x?
+set {::syntax(module-info modulename)} 0
+set {::syntax(module-info moduleversion)} 0
 set {::syntax(module-info name)} 0
 set {::syntax(module-info shell)} x?
 set {::syntax(module-info shelltype)} x?
@@ -96,9 +98,9 @@ set {::return(module-info flags)} int
 
 # subCmd
 set ::subCmd(lsb-release) {id release codename}
-set ::subCmd(module-info) {alias command loaded mode name shell shelltype\
-   specified symbols tags type usergroups username version user trace\
-   tracepat flags}
+set ::subCmd(module-info) {alias command loaded mode modulename moduleversion\
+   name shell shelltype specified symbols tags type usergroups username\
+   version user trace tracepat flags}
 set ::subCmd(uname) {sysname nodename domain release version machine}
 
 # option

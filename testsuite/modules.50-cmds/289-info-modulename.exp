@@ -1,0 +1,137 @@
+##############################################################################
+#   Modules Revision 3.0
+#   Providing a flexible user environment
+#
+#   File:		modules.50-cmds/%M%
+#   Revision:		%I%
+#   First Edition:	2026/10/27
+#   Last Mod.:		%U%, %G%
+#
+#   Authors:		Xavier Delaruelle, xavier.delaruelle@cea.fr
+#
+#   Description:	Testuite testsequence
+#   Command:		load, display, unload
+#   Modulefiles:	info-name, info-noversion
+#   Sub-Command:
+#
+#   Comment:	%C{
+#			Check 'module-info modulename' and 'module-info moduleversion'
+#			modulefile commands
+#		}C%
+#
+##############################################################################
+
+set mp $modpath.5
+set mpre [regsub -all "\(\[.+?\]\)" $mp {\\\1}]
+
+# setup specific environment
+setenv_path_var MODULEPATH $mp
+
+
+# regular module name made of name and version
+set ans [list]
+lappend ans [list set TS_MODULENAME info-name]
+lappend ans [list set _LMFILES_ $mp/info-name/1.2.3]
+lappend ans [list set LOADEDMODULES info-name/1.2.3]
+lappend ans [list set TS_MODULEVERSION 1.2.3]
+lappend ans [list set TS_NAME info-name/1.2.3]
+testouterr_cmd sh {load info-name/1.2.3} $ans {}
+
+skip_if_quick_mode
+
+# deep module name, version is the last element only
+set ans [list]
+if {[is_conf_enabled advversspec implicitdefault]} {
+    lappend ans [list set __MODULES_LMALTNAME info-name/sub/2.0&as|info-name/default&as|info-name/latest&as|info-name/sub/default&as|info-name/sub/latest]
+}
+lappend ans [list set TS_MODULENAME info-name/sub]
+lappend ans [list set _LMFILES_ $mp/info-name/sub/2.0]
+lappend ans [list set LOADEDMODULES info-name/sub/2.0]
+lappend ans [list set TS_MODULEVERSION 2.0]
+lappend ans [list set TS_NAME info-name/sub/2.0]
+testouterr_cmd sh {load info-name/sub/2.0} $ans {}
+
+# version string that looks like a number is returned untouched
+set ans [list]
+lappend ans [list set TS_MODULENAME info-name]
+lappend ans [list set _LMFILES_ $mp/info-name/1.10]
+lappend ans [list set LOADEDMODULES info-name/1.10]
+lappend ans [list set TS_MODULEVERSION 1.10]
+lappend ans [list set TS_NAME info-name/1.10]
+testouterr_cmd sh {load info-name/1.10} $ans {}
+
+# module name without version
+set ans [list]
+lappend ans [list set TS_MODULENAME info-noversion]
+lappend ans [list set _LMFILES_ $mp/info-noversion]
+lappend ans [list set LOADEDMODULES info-noversion]
+lappend ans [list set TS_MODULEVERSION {}]
+lappend ans [list set TS_NAME info-noversion]
+testouterr_cmd sh {load info-noversion} $ans {}
+
+# symbolic version and alias are resolved like module-info name does
+setenv_var TESTSUITE_INFO_MODULENAME sym
+
+set ans [list]
+lappend ans [list set __MODULES_LMALTNAME info-name/1.2.3&info-name/sym]
+lappend ans [list set TS_MODULENAME info-name]
+lappend ans [list set _LMFILES_ $mp/info-name/1.2.3]
+lappend ans [list set LOADEDMODULES info-name/1.2.3]
+lappend ans [list set TS_MODULEVERSION 1.2.3]
+lappend ans [list set TS_NAME info-name/1.2.3]
+testouterr_cmd sh {load info-name/sym} $ans {}
+
+set altname info-name/sub/2.0&al|info-name-alias
+if {[is_conf_enabled advversspec implicitdefault]} {
+    append altname &as|info-name/default&as|info-name/latest&as|info-name/sub/default&as|info-name/sub/latest
+}
+set ans [list]
+lappend ans [list set __MODULES_LMALTNAME $altname]
+lappend ans [list set TS_MODULENAME info-name/sub]
+lappend ans [list set _LMFILES_ $mp/info-name/sub/2.0]
+lappend ans [list set LOADEDMODULES info-name/sub/2.0]
+lappend ans [list set TS_MODULEVERSION 2.0]
+lappend ans [list set TS_NAME info-name/sub/2.0]
+testouterr_cmd sh {load info-name-alias} $ans {}
+
+unsetenv_var TESTSUITE_INFO_MODULENAME
+
+# module specified as a full path: name is the full path to modulefile
+set ans [list]
+lappend ans [list set TS_MODULENAME $mp/info-name]
+lappend ans [list set _LMFILES_ $mp/info-name/1.2.3]
+lappend ans [list set LOADEDMODULES $mp/info-name/1.2.3]
+lappend ans [list set TS_MODULEVERSION 1.2.3]
+lappend ans [list set TS_NAME $mp/info-name/1.2.3]
+testouterr_cmd sh "load $mp/info-name/1.2.3" $ans {}
+
+# display evaluation
+set tserr "$modlin
+$mpre/info-name/1.2.3:
+
+setenv\t\tTS_NAME info-name/1.2.3
+setenv\t\tTS_MODULENAME info-name
+setenv\t\tTS_MODULEVERSION 1.2.3
+$modlin"
+testouterr_cmd_re sh {display info-name/1.2.3} OK $tserr
+
+# unload evaluation
+setenv_loaded_module [list info-name/sub/2.0] [list $mp/info-name/sub/2.0]
+setenv_var TS_NAME info-name/sub/2.0
+setenv_var TS_MODULENAME info-name/sub
+setenv_var TS_MODULEVERSION 2.0
+
+set ans [list]
+lappend ans [list unset TS_MODULENAME]
+lappend ans [list unset _LMFILES_]
+lappend ans [list unset LOADEDMODULES]
+lappend ans [list unset TS_MODULEVERSION]
+lappend ans [list unset TS_NAME]
+testouterr_cmd sh {unload info-name/sub/2.0} $ans {}
+
+
+#
+#  Cleanup
+#
+
+reset_test_env

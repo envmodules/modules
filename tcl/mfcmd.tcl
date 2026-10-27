@@ -60,6 +60,25 @@ proc module-info {what {more {}}} {
       name {
          return [currentState modulename]
       }
+      modulename {
+         set modname [currentState modulename]
+         set idx [string last / $modname]
+         # whole name is the name part if it has no version separator
+         if {$idx == -1} {
+            return $modname
+         } else {
+            return [string range $modname 0 $idx-1]
+         }
+      }
+      moduleversion {
+         set modname [currentState modulename]
+         set idx [string last / $modname]
+         if {$idx == -1} {
+            return {}
+         } else {
+            return [string range $modname $idx+1 end]
+         }
+      }
       specified {
          return [currentState specifiedname]
       }
