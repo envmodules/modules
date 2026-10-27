@@ -6,6 +6,17 @@ Release notes
 This file describes changes in recent versions of Modules. It primarily
 documents those changes that are of interest to users and admins.
 
+.. _5.8 release notes:
+
+Modules 5.8.0 (not yet released)
+--------------------------------
+
+* Install: look for the Tcl interpreter shell in the Tcl installation
+  designated by :instopt:`--with-tcl` when :instopt:`--with-tclsh` is not set,
+  so that installed scripts run with the same Tcl the extension library is
+  built against. (fix issue #717)
+
+
 .. _5.7 release notes:
 
 Modules 5.7.0 (2026-09-21)

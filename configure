@@ -88,6 +88,7 @@ pathentryreorder=n
 loadedmodules=
 quarantinevars=
 binsearchpath=/usr/bin:/bin:/usr/local/bin
+tcldir=
 TCLSH=tclsh
 PYTHON=python
 SPHINXBUILD=sphinx-build
@@ -522,13 +523,16 @@ Optional Packages:
                           TAGLIST is a tag name or abbreviation (elements in
                           TAGLIST are separated by \`:') [$tagcolorname]
   --with-tcl              directory containing the Tcl configuration script
-                          tclConfig.sh.
+                          tclConfig.sh. Tcl interpreter shell is also looked
+                          for in this Tcl installation (see --with-tclsh).
   --with-tcl-linter=BIN   name of full path of program to use to lint Tcl
                           modulefiles [$tcllinter]
   --with-tcl-linter-opts=OPTLIST
                           settings to apply to tcl linter program [$tcllinteropts]
   --with-tclinclude       directory containing the Tcl header files.
-  --with-tclsh=BIN        name or full path of Tcl interpreter shell [tclsh]
+  --with-tclsh=BIN        name or full path of Tcl interpreter shell. Unless
+                          set, tclsh is looked for in the Tcl installation
+                          designated by --with-tcl then in PATH [tclsh]
   --with-terminal-background=VALUE
                           terminal background color which determines the color
                           set to apply by default between the \`dark' background
@@ -609,6 +613,13 @@ check_requirement() {
          echo_warning "$optmesg"
       fi
    fi
+}
+
+# get value of a variable defined in Tcl configuration script
+get_tclconfig_value() {
+   # source script in a subshell to keep its variables out of our environment
+   # shellcheck disable=SC1090
+   (. "$1" >/dev/null 2>&1; echo "${!2}")
 }
 
 # parse optional argument to find if feature is enabled or disabled
@@ -986,7 +997,10 @@ for arg in "$@"; do
    --with-tcl-linter-opts=*|--without-tcl-linter-opts)
       # shellcheck disable=SC2034
       tcllinteropts=$(get_package_value "$arg" "") ;;
-   --with-tcl=*|--without-tcl|--with-tclinclude=*|--without-tclinclude)
+   --with-tcl=*|--without-tcl)
+      tcldir=$(get_package_value "$arg")
+      libarglist+=("$arg") ;;
+   --with-tclinclude=*|--without-tclinclude)
       libarglist+=("$arg") ;;
    --with-python=*|--without-python)
       pythonbin=$(get_package_value "$arg") ;;
@@ -1112,8 +1126,46 @@ fi
 if [ -n "$tclshbin" ]; then
    check_requirement "$tclshbin" '' "PATH=$binsearchpath"
 else
-   # also check version-specific names in case no generic tclsh binary exists
-   check_requirement $TCLSH '' "PATH=$binsearchpath" 'tclsh8.6' 'tclsh8.5' 'tclsh8.4'
+   reqpath=''
+   # look first in the Tcl installation designated by --with-tcl, so that
+   # installed scripts run with the Tcl the extension library is built
+   # against rather than with whatever tclsh comes first in PATH
+   if [ -n "$tcldir" ]; then
+      # accept tclConfig.sh file path like extension library configure does
+      tcldir=${tcldir%/tclConfig.sh}
+      # the configuration script records where Tcl binaries are installed and
+      # the version suffix of the interpreter shell
+      if [ -f "$tcldir/tclConfig.sh" ]; then
+         tclexecprefix=$(get_tclconfig_value "$tcldir/tclConfig.sh" \
+            TCL_EXEC_PREFIX)
+         tclversion=$(get_tclconfig_value "$tcldir/tclConfig.sh" TCL_VERSION)
+      else
+         tclexecprefix=''
+         tclversion=''
+      fi
+      if [ -n "$tclexecprefix" ]; then
+         tclbinsearchpath="$tclexecprefix/bin"
+      else
+         # assume tclConfig.sh lies in a lib directory sibling to bin
+         tclbinsearchpath=$(cd "$tcldir/../bin" 2>/dev/null && pwd \
+            || echo "$tcldir/../bin")
+      fi
+      if [ -n "$tclversion" ]; then
+         check_requirement "tclsh$tclversion" '-' "PATH=$tclbinsearchpath" \
+            'tclsh'
+      else
+         check_requirement 'tclsh' '-' "PATH=$tclbinsearchpath" 'tclsh9.0' \
+            'tclsh8.6' 'tclsh8.5'
+      fi
+      if [ -z "$reqpath" ]; then
+         echo_warning "No Tcl interpreter shell found in \`$tclbinsearchpath' \
+from Tcl installation designated by \`--with-tcl', looking in standard PATHs"
+      fi
+   fi
+   if [ -z "$reqpath" ]; then
+      # also check version-specific names in case no generic tclsh binary exists
+      check_requirement $TCLSH '' "PATH=$binsearchpath" 'tclsh9.0' 'tclsh8.6' 'tclsh8.5'
+   fi
 fi
 TCLSH=$reqpath
 

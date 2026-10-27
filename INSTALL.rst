@@ -1596,6 +1596,21 @@ instance :instopt:`--without-modulepath<--with-modulepath>`):
  compile Modules Tcl extension library if this file cannot be automatically
  found in default locations.
 
+ Unless :instopt:`--with-tclsh` is set, the Tcl interpreter shell is also
+ looked for in the Tcl installation designated by this option: ``tclsh`` is
+ searched in the ``bin`` directory of the installation prefix recorded in
+ ``tclConfig.sh`` (or in the ``bin`` directory sibling of the directory
+ holding this script when it cannot be read). This way :file:`modulecmd.tcl`
+ and other installed scripts run with the same Tcl the extension library is
+ built against. If no interpreter shell is found there, a warning is reported
+ and ``tclsh`` is looked for in standard binary paths.
+
+ .. only:: html or latex
+
+    .. versionchanged:: 5.8
+       Tcl interpreter shell is looked for in designated Tcl installation
+       unless :instopt:`--with-tclsh` is set
+
 .. instopt:: --with-tclinclude
 
  Directory containing the Tcl header files. Useful to compile Modules Tcl
@@ -1606,9 +1621,19 @@ instance :instopt:`--without-modulepath<--with-modulepath>`):
 
  Name or full path of Tcl interpreter shell (default=\ ``tclsh``)
 
+ When this option is not set, ``tclsh`` is looked for in the Tcl installation
+ designated by :instopt:`--with-tcl` if this option is set, then in standard
+ binary paths. Set this option to decouple the interpreter shell running the
+ installed scripts from the Tcl installation the extension library is built
+ against.
+
  .. only:: html or latex
 
     .. versionadded:: 4.0
+
+    .. versionchanged:: 5.8
+       Default interpreter shell is looked for in the Tcl installation
+       designated by :instopt:`--with-tcl`
 
 .. instopt:: --with-tcl-linter=BIN
 
