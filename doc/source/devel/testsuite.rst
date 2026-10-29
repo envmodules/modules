@@ -708,6 +708,7 @@ calling ``make test`` directly when iterating on a specific area.
 .. code-block:: sh
 
     script/mt                     # same as: make test
+    script/mt -j 8                # same as: make test JOBS=8 (see below)
     script/mt quick               # same as: make test QUICKTEST=y
     script/mt cov                 # same as: make test COVERAGE=y
     script/mt install             # same as: make testinstall
@@ -749,6 +750,51 @@ whenever a case other than all-pass completes. When done, it invokes
 test procedures and renders them as a diff (using ``icdiff`` if available --
 :file:`script/mt` auto-downloads it once and caches it as ``./icdiff`` --
 falling back to ``diff -u``).
+
+Running test files in parallel
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A full run spawns one ``modulecmd.tcl`` process per test case, so its
+duration is bound by the single CPU DejaGnu uses. The ``modules`` testsuite
+can instead be run by several concurrent ``runtest`` processes:
+
+.. code-block:: sh
+
+    make test JOBS=8                 # whole suite, 8 concurrent runtest
+    script/mt -j 8                   # same, with mt's review of failures
+    script/mt -j 4 50 70/420         # parallel run of a selection
+
+Both forms hand over to :file:`script/mpt`, which splits the selected
+test files into *shards* of at most 8 files from the same series (``-s``
+option of the script changes this size), each shard being run by its own
+``runtest`` process. Like :file:`script/mt` does, every shard also runs the
+bootstrap files of ``00-init`` first, plus the ``010-init_ts.exp`` and
+``999-cleanup.exp`` files of every series (DejaGnu matches bare file names
+in every series directory). Series whose files depend on each other
+(``60-initx`` and ``61-coll``) are always run as a single shard. Shards are
+started biggest first, each in its own directory under :file:`.testshards/`
+in the object directory, holding a private copy of :file:`testsuite/`
+(which is also the ``$HOME`` of tests) and of :file:`lib/` (some tests
+replace the Tcl extension library file) so that the files tests write never
+clash, plus a symbolic link to every other entry of the object directory.
+Each shard runs under a pseudo-terminal of its own, as some tests change
+the column number of the terminal attached to the test harness, and leaves
+its own ``modules.log`` and ``modules.sum`` files in its directory. Once
+all shards are done, their results are merged into the usual
+:file:`modules.log` and :file:`modules.sum` files, with a summary section
+reflecting the whole run, so :file:`script/mtreview` works unchanged on
+it. Interrupting a run (``Ctrl-C``) stops the running shards,
+merges the results obtained so far and cleans the shard directories like a
+complete run does. A shard whose log file stops growing for 10 minutes
+(``-t`` option of the script changes this delay) is considered stalled, for
+instance on a test waiting for an input: it is stopped and reported as
+such, so a hanging test does not block the run until its own timeout.
+
+A parallel run requires symbolic link support and the ``expect`` command.
+It cannot be combined with ``COVERAGE=y``, as concurrent instrumented runs
+would corrupt the coverage logs, and is only available for the ``modules``
+testsuite. On MSYS2, where symbolic links are created as copies by default,
+set the ``MSYS`` environment variable to ``winsymlinks:native`` beforehand.
 
 Coverage
 ~~~~~~~~

@@ -52,6 +52,7 @@ a failing one.
 ```sh
 make test                  # full suite via DejaGnu (~25,000 cases, ~12 min)
 make test QUICKTEST=y      # quick mode, most essential tests (~1,900 cases, ~1 min)
+make test JOBS=8           # full suite, test files run concurrently by 8 jobs
 make testinstall           # test an already-`make install`ed tree
 ```
 

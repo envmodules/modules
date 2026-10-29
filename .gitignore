@@ -6,6 +6,7 @@
 /version.inc
 /modules.log
 /modules.sum
+/.testshards
 /install.log
 /install.sum
 /lint.log

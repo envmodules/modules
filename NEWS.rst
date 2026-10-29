@@ -33,6 +33,10 @@ Modules 5.8.0 (not yet released)
   :subcmd:`sh-to-mod` sub-command with an empty standard input, as script is
   run to collect its environment changes and some shells start an interactive
   session when a terminal is found on their standard input.
+* Testsuite: add ``JOBS`` option to ``make test`` and ``-j`` option to
+  :file:`script/mt` to run the test files of the ``modules`` testsuite
+  concurrently, each group of files being run in a private copy of the
+  testsuite directory.
 
 
 .. _5.7 release notes:
