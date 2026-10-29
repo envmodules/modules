@@ -790,11 +790,18 @@ complete run does. A shard whose log file stops growing for 10 minutes
 instance on a test waiting for an input: it is stopped and reported as
 such, so a hanging test does not block the run until its own timeout.
 
-A parallel run requires symbolic link support and the ``expect`` command.
-It cannot be combined with ``COVERAGE=y``, as concurrent instrumented runs
-would corrupt the coverage logs, and is only available for the ``modules``
-testsuite. On MSYS2, where symbolic links are created as copies by default,
-set the ``MSYS`` environment variable to ``winsymlinks:native`` beforehand.
+Coverage mode combines with a parallel run (``make test COVERAGE=y JOBS=8``
+or ``script/mt -j 8 cov``). The instrumented scripts write their coverage
+logs in :file:`tcl/` relatively to their current directory, so each shard
+gets a :file:`tcl/` directory of its own, made of links to the files of the
+object directory one, and the logs each shard produces there are merged by
+:file:`script/mpt` into the :file:`tcl/*.tcl_log` files of the object
+directory, which are then marked up as usual.
+
+A parallel run requires symbolic link support and the ``expect`` command,
+and is only available for the ``modules`` testsuite. On MSYS2, where
+symbolic links are created as copies by default, set the ``MSYS``
+environment variable to ``winsymlinks:native`` beforehand.
 
 Coverage
 ~~~~~~~~

@@ -68,6 +68,7 @@ Coverage (uses Nagelfar):
 
 ```sh
 make test COVERAGE=y       # then inspect tcl/*.tcl_m for ';# Not covered' lines
+make test COVERAGE=y JOBS=8  # same, test files run concurrently by 8 jobs
 script/mt cov 70/{280,290} # coverage run on selected testfiles
 ```
 

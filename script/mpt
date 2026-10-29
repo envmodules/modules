@@ -87,6 +87,12 @@ set stop_period 30000
 # in shard directory rather than linked
 set copied_entries [list lib]
 
+# entries of object directory whose content is linked file by file rather
+# than the entry itself, so that files written there land in shard
+# directory: the instrumented scripts of coverage mode write their log in
+# tcl/ relative to current directory
+set linked_content_entries [list tcl]
+
 ##########################################################################
 # parse arguments and environment
 
@@ -276,7 +282,8 @@ file mkdir $sharddir
 
 # make sure a link is created rather than a copy of target, like MSYS2 does
 # by default: copying large object directory entries like .git for each
-# shard would be too slow
+# shard would be too slow and coverage logs written in shard directory would
+# not be seen
 proc linkEntry {link target} {
    file link -symbolic $link $target
    if {[file type $link] ne {link}} {
@@ -300,6 +307,18 @@ proc setupShardDir {id} {
       }
       if {$entry in $::copied_entries} {
          exec cp -R [file join $::objdir $entry] [file join $dir $entry]
+      } elseif {$entry in $::linked_content_entries} {
+         file mkdir [file join $dir $entry]
+         foreach subentry [glob -nocomplain -directory [file join $::objdir\
+            $entry] -tails *] {
+            # leave out coverage logs and their lock file
+            if {[string match *_log $subentry] || [string match *.lck\
+               $subentry]} {
+               continue
+            }
+            linkEntry [file join $dir $entry $subentry] [file join $::objdir\
+               $entry $subentry]
+         }
       } else {
          linkEntry [file join $dir $entry] [file join $::objdir $entry]
       }
@@ -523,6 +542,59 @@ proc countResults {sumfile} {
    return $counts
 }
 
+# merge a coverage log file, made of incr and lappend commands over the
+# counters of instrumented lines, into a dictionary keyed by counter name
+proc readCovLog {file dictvar} {
+   upvar 1 $dictvar covlog
+   set fid [open $file r]
+   set content [read $fid]
+   close $fid
+   foreach line [split $content \n] {
+      switch -- [lindex $line 0] {
+         incr {
+            dict incr covlog [lindex $line 1] [lindex $line 2]
+         }
+         lappend {
+            dict lappend covlog [lindex $line 1] {*}[lrange $line 2 end]
+         }
+      }
+   }
+}
+
+# write coverage log file in the same format Nagelfar produces
+proc writeCovLog {file covlog} {
+   set fid [open $file w]
+   foreach var [lsort -dictionary [dict keys $covlog]] {
+      set val [dict get $covlog $var]
+      if {[string match {*,var)} $var]} {
+         puts $fid [linsert $val 0 lappend $var]
+      } else {
+         puts $fid [list incr $var $val]
+      }
+   }
+   close $fid
+}
+
+# collect coverage logs written by shard, which are merged with those
+# already in object directory, like instrumented scripts do when they exit
+proc mergeShardCovLogs {dir} {
+   foreach entry $::linked_content_entries {
+      foreach file [glob -nocomplain -directory [file join $dir $entry]\
+         -types f *_log] {
+         set relfile [file join $entry [file tail $file]]
+         if {![info exists ::covlog($relfile)]} {
+            set ::covlog($relfile) [dict create]
+            set objfile [file join $::objdir $relfile]
+            if {[file exists $objfile]} {
+               readCovLog $objfile ::covlog($relfile)
+            }
+         }
+         readCovLog $file ::covlog($relfile)
+      }
+      file delete -force [file join $dir $entry]
+   }
+}
+
 proc reportShardResult {id} {
    set dir [file join $::sharddir $id]
    set counts [countResults [file join $dir $::tool.sum]]
@@ -552,6 +624,7 @@ proc reportShardResult {id} {
    } else {
       puts "$label: $res"
    }
+   mergeShardCovLogs $dir
    # drop testsuite copy once run, shard logs are kept
    file delete -force [file join $dir testsuite]
 }
@@ -591,6 +664,7 @@ set aborted 0
 array set running {}
 array set shard_status {}
 array set shard_counts {}
+array set covlog {}
 for {set i 0} {$i < $jobs && [llength $shard_order]} {incr i} {
    startNextShard
 }
@@ -638,6 +712,11 @@ foreach ext {log sum} {
       puts $outfid "runtest completed at [clock format [clock seconds]]"
    }
    close $outfid
+}
+
+# write merged coverage logs in object directory, for Nagelfar markup
+foreach relfile [array names covlog] {
+   writeCovLog [file join $objdir $relfile] $covlog($relfile)
 }
 
 # report summary like runtest does
