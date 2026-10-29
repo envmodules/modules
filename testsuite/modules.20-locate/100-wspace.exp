@@ -667,6 +667,8 @@ testouterr_cmd sh "unuse $modpath\\ wspac\\ " $ans {}
 # module whose name and target finish with space character
 testouterr_cmd sh {avail -t space\ y\ /1\ } OK "$mp:\n'space y /1 '(n )"
 testouterr_cmd_re sh {whatis space\ y\ /1\ } OK "$modlin $mpre $modlin\n\\s+space y /1 : space y /1 "
+# whatis text cut at terminal width right before its trailing space
+testouterr_cmd_re sh {-w 32 whatis space\ y\ /1\ } OK "$modlin $mpre $modlin\n\\s+space y /1 : space y /1"
 set ans [list]
 lappend ans [list set __MODULES_LMALTNAME "space y /1 &space y /n &al|space y /a "]
 lappend ans [list set _LMFILES_ "$mp/space y /1 "]

@@ -18,6 +18,10 @@ Modules 5.8.0 (not yet released)
 * Add :mfcmd:`module-info modulename<module-info>` and :mfcmd:`module-info
   moduleversion<module-info>` modulefile commands to get the name part and
   the version part of currently evaluating modulefile. (fix issue #713)
+* Improve readability of :subcmd:`whatis` and :subcmd:`search` output: name of
+  each matching modulefile is reported once, followed by its
+  :mfcmd:`module-whatis` lines wrapped to the terminal width. (fix issue
+  #720)
 
 
 .. _5.7 release notes:

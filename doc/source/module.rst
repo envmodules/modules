@@ -2677,6 +2677,10 @@ Module Sub-Commands
  *string* in a case insensitive manner will be displayed. *string* may contain
  wildcard characters.
 
+ Name of each matching *modulefile* is reported once, followed by its
+ *module-whatis* lines. This text is wrapped to the terminal width and its
+ continuation lines are aligned under the start of the first line text.
+
  .. only:: html or latex
 
     .. versionadded:: 4.0
@@ -2688,6 +2692,10 @@ Module Sub-Commands
 
     .. versionchanged:: 4.6
        Option :option:`--all`/:option:`-a` added
+
+    .. versionchanged:: 5.8
+       Module name is reported once with its *module-whatis* lines grouped
+       below and wrapped to terminal width
 
 .. subcmd:: sh-to-mod shell script [arg...]
 
@@ -3172,6 +3180,10 @@ Module Sub-Commands
  *modulefiles* matching *pattern*. *pattern* may contain wildcard characters.
  If no *pattern* is specified, all :mfcmd:`module-whatis` lines will be shown.
 
+ Name of each matching *modulefile* is reported once, followed by its
+ *module-whatis* lines. This text is wrapped to the terminal width and its
+ continuation lines are aligned under the start of the first line text.
+
  The parameter *pattern* may also be a symbolic modulefile name or a
  modulefile alias. It may also leverage a specific syntax to finely select
  module version (see `Advanced module version specifiers`_ section below).
@@ -3197,6 +3209,10 @@ Module Sub-Commands
     .. versionchanged:: 5.6
        Results from a multi *pattern* search are consolidated under a single
        output
+
+    .. versionchanged:: 5.8
+       Module name is reported once with its *module-whatis* lines grouped
+       below and wrapped to terminal width
 
 
 Modulefiles

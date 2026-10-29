@@ -35,7 +35,10 @@ set header "$modlin $modpathre $modlin"
 set warn_opt "$warn_msgs: Unsupported option "
 
 set ts_1  "        whatis/lines: Testsuite Whatis Modulefile"
-set ts_1a "        whatis/lines: Second line of whatis tokens"
+# module name is reported once, next whatis lines are aligned under text of
+# first line
+set text_pad [string repeat { } 22]
+set ts_1a "${text_pad}Second line of whatis tokens"
 # different behavior than C-version: on Tcl-version multiple arguments provided on a single
 # module-whatis call produce a single module-whatis line, not one line per passed argument
 set ts_2  "     whatis/multiple: Testsuite Whatis Modulefile"
@@ -68,6 +71,20 @@ testouterr_cmd_re "csh" "apropos token" "ERR" "$header\n$ts_1\n$ts_1a"
 # command nickname tests
 testouterr_cmd_re "csh" "keyword token" "ERR" "$header\n$ts_1\n$ts_1a"
 testouterr_cmd_re "csh" "search token" "ERR" "$header\n$ts_1\n$ts_1a"
+
+# text is wrapped to terminal width
+testouterr_cmd_re "csh" "-w 45 search Whatis" "ERR" "$header\n        whatis/lines: Testsuite Whatis\n${text_pad}Modulefile\n${text_pad}Second line of whatis\n${text_pad}tokens\n     whatis/multiple: Testsuite Whatis\n${text_pad}Modulefile\n       whatis/string: Testsuite Whatis\n${text_pad}Modulefile"
+
+# highlighted search string does not count in wrapped line length
+setenv_var MODULES_COLOR always
+setenv_var MODULES_COLORS {hi=1:mp=1;94}
+set hi [sgr 1]
+set nohi [sgr 22]
+set header_sgr "$modlin [sgr {1;94}]$modpathre[sgr 0] $modlin"
+testouterr_cmd_re "csh" "-w 49 search token" "ERR" "$header_sgr\n        whatis/lines: Testsuite Whatis Modulefile\n${text_pad}Second line of whatis\n${text_pad}${hi}token${nohi}s"
+testouterr_cmd_re "csh" "-w 50 search token" "ERR" "$header_sgr\n        whatis/lines: Testsuite Whatis Modulefile\n${text_pad}Second line of whatis ${hi}token${nohi}s"
+setenv_var MODULES_COLOR never
+unsetenv_var MODULES_COLORS
 
 #
 # test with erroneous modulefile

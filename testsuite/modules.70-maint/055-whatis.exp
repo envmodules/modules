@@ -54,7 +54,10 @@ set ts_csh_2 "$header\n$whatis_2: Testsuite-Modulefile"
 # module-whatis call produce a single module-whatis line, not one line per passed argument
 set ts_csh_3 "$header\n$whatis_3: Testsuite Whatis Modulefile"
 set ts_csh_4 "$header\n$whatis_4: Testsuite Whatis Modulefile"
-set ts_csh_5 "$header\n$whatis_5: Testsuite Whatis Modulefile\n$whatis_5: Second line of whatis tokens"
+# module name is reported once, next whatis lines are aligned under text of
+# first line
+set text_pad [string repeat { } 22]
+set ts_csh_5 "$header\n$whatis_5: Testsuite Whatis Modulefile\n${text_pad}Second line of whatis tokens"
 set ts_csh_6 "$err_path'$module_6'"
 set ts_csh_7 "$header\n$whatis_7: erroneous module test"
 
@@ -62,21 +65,39 @@ set ts_csh_7 "$header\n$whatis_7: erroneous module test"
 #  The tests
 #
 
-testouterr_cmd_re "csh" "--terse whatis $module_1" "OK" "$ts_csh_1"
-testouterr_cmd_re "csh" "--terse whatis $module_2" "OK" "$ts_csh_2"
-testouterr_cmd_re "csh" "--terse whatis $module_3" "OK" "$ts_csh_3"
+testouterr_cmd_re "csh" "whatis $module_1" "OK" "$ts_csh_1"
+testouterr_cmd_re "csh" "whatis $module_2" "OK" "$ts_csh_2"
+testouterr_cmd_re "csh" "whatis $module_3" "OK" "$ts_csh_3"
 
 skip_if_quick_mode
 
-testouterr_cmd_re "csh" "--terse whatis $module_4" "OK" "$ts_csh_4"
-testouterr_cmd_re "csh" "--terse whatis $module_5" "OK" "$ts_csh_5"
+testouterr_cmd_re "csh" "whatis $module_4" "OK" "$ts_csh_4"
+testouterr_cmd_re "csh" "whatis $module_5" "OK" "$ts_csh_5"
+testouterr_cmd_re "csh" "whatis $module_5 $module_2" "OK" "$ts_csh_5\n$whatis_2: Testsuite-Modulefile"
 
 # command nickname tests
-testouterr_cmd_re "csh" "--terse wh $module_5" "OK" "$ts_csh_5"
+testouterr_cmd_re "csh" "wh $module_5" "OK" "$ts_csh_5"
+
+set module_8 "verssort/1.8-2015-12-01"
+set text_pad_8 [string repeat { } 25]
+
+# whatis text is wrapped to terminal width, module name longer than its column
+# shifts text start column
+testouterr_cmd_re "csh" "-w 40 whatis $module_5" "OK" "$header\n$whatis_5: Testsuite Whatis\n${text_pad}Modulefile\n${text_pad}Second line of\n${text_pad}whatis tokens"
+testouterr_cmd_re "csh" "whatis $module_8" "OK" "$header\n$module_8: module version sort test"
+testouterr_cmd_re "csh" "-w 40 whatis $module_8" "OK" "$header\n$module_8: module version\n${text_pad_8}sort test"
+# word longer than remaining width is kept whole on its own line
+testouterr_cmd_re "csh" "-w 30 whatis $module_8" "OK" "$header\n$module_8: module\n${text_pad_8}version\n${text_pad_8}sort\n${text_pad_8}test"
+testouterr_cmd_re "csh" "-w 10 whatis $module_8" "OK" "$header\n$module_8: module\n${text_pad_8}version\n${text_pad_8}sort\n${text_pad_8}test"
+testouterr_cmd_re "csh" "-w 1 whatis $module_8" "OK" "$header\n$module_8: module\n${text_pad_8}version\n${text_pad_8}sort\n${text_pad_8}test"
+
+# json output
+set ts_json_5 "{\"$modpathre\": {\n\"$module_5\": { \"name\": \"$module_5\", \"whatis\": \\\[ \"Testsuite Whatis Modulefile\", \"Second line of whatis tokens\" \\\]}\n}}"
+testouterr_cmd_re "csh" "-j whatis $module_5" "OK" "$ts_json_5"
 
 # setup MODULEPATH with a trailing slash and an empty dir element
 setenv_path_var MODULEPATH {} "$modpath/"
-testouterr_cmd_re "csh" "--terse whatis $module_1" "OK" "$ts_csh_1"
+testouterr_cmd_re "csh" "whatis $module_1" "OK" "$ts_csh_1"
 
 # restore MODULEPATH
 setenv_path_var MODULEPATH $modpath
@@ -115,7 +136,7 @@ setenv_loaded_module [list foo bar] "/path/to/foo"
 set ts_csh_8 "$err_loinconsist
   LOADEDMODULES=foo bar
   _LMFILES_=/path/to/foo"
-testouterr_cmd_re "csh" "--terse whatis $module_5" ERR $ts_csh_8
+testouterr_cmd_re "csh" "whatis $module_5" ERR $ts_csh_8
 
 #
 #  Cleanup

@@ -1062,6 +1062,11 @@ The following module sub-commands appeared on Modules 5.
  of :subcmd:`reload` sub-command. No more support from ``MODULESBEGINENV``,
  initial environment handling now covers this use case.
 
+:subcmd:`search`, :subcmd:`whatis`
+
+ Starting Modules 5.8, name of each matching modulefile is reported once,
+ followed by its :mfcmd:`module-whatis` lines wrapped to the terminal width.
+
 Environment
 """""""""""
 

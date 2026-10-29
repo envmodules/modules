@@ -573,8 +573,8 @@ testouterr_cmd_re bash {display link/1} OK $tserr
 setenv_var TESTSUITE_LINKED_ENVVARS append1
 set tserr "$modlin $mpre $modlin
 \\s*link/1: link/1
-\\s*link/1: BAR: val2
-\\s*link/1: QUX: value"
+\\s*BAR: val2
+\\s*QUX: value"
 testouterr_cmd_re bash {whatis link/1} OK $tserr
 
 setenv_var TESTSUITE_LINKED_ENVVARS prepend1

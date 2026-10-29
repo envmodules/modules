@@ -1645,6 +1645,56 @@ proc showModulePath {} {
    }
 }
 
+# split text into lines whose visible length does not exceed max_len, cutting
+# at whitespace position (SGR codes consume no length). A word longer than
+# max_len is kept whole on its own line
+proc wrapTextToWidth {text max_len} {
+   # empty text produces one empty line
+   if {$text eq {}} {
+      return [list {}]
+   }
+   set wrapped_list {}
+   foreach line [split $text \n] {
+      while {1} {
+         # walk through line until max_len visible characters are passed
+         set idx 0
+         set vis_len 0
+         set line_len [string length $line]
+         while {$idx < $line_len} {
+            if {[string range $line $idx $idx+1] eq "\033\[" && [set midx\
+               [string first m $line $idx]] != -1} {
+               set idx [expr {$midx + 1}]
+            } elseif {$vis_len == $max_len} {
+               break
+            } else {
+               incr idx
+               incr vis_len
+            }
+         }
+         # whole remaining line fits
+         if {$idx >= $line_len} {
+            lappend wrapped_list $line
+            break
+         }
+         # cut after word if no whitespace found before it
+         if {[set cut_idx [string last { } $line $idx]] < 1} {
+            set cut_idx [string first { } $line $idx]
+         }
+         if {$cut_idx == -1} {
+            lappend wrapped_list $line
+            break
+         }
+         lappend wrapped_list [string range $line 0 $cut_idx-1]
+         set line [string trimleft [string range $line $cut_idx+1 end]]
+         # nothing left to report if only whitespace remains after cut
+         if {$line eq {}} {
+            break
+         }
+      }
+   }
+   return $wrapped_list
+}
+
 proc displayTableHeader {sgrkey args} {
    foreach {title col_len} $args {
       set col "- [sgr $sgrkey $title] "
