@@ -26,6 +26,10 @@ Modules 5.8.0 (not yet released)
   :subcmd:`search` sub-commands to get one output line per
   :mfcmd:`module-whatis` entry prefixed by module name, without wrapping or
   padding, and modulepath reported as a header line. (fix issue #720)
+* Testsuite: add ``JOBS`` option to ``make test`` and ``-j`` option to
+  :file:`script/mt` to run the test files of the ``modules`` testsuite
+  concurrently, each group of files being run in a private copy of the
+  testsuite directory.
 
 
 .. _5.7 release notes:

@@ -42,10 +42,13 @@ Select parts of testsuite:
                   '370' for 370-variant.exp testfile in modules.70-maint dir.)
 
 Options:
+  -j, --jobs N    Run modulecmd.tcl testsuite files concurrently with N
+                  jobs (see script/mpt)
   -h, --help      Show this help message and exit
 
 Examples:
   $0
+  $0 -j 8
   $0 quick
   $0 lint
   $0 comp
@@ -82,6 +85,25 @@ fi
 target='test'
 testserie='modules'
 setuptestfiles=(00/005 00/006 00/010 00/050 00/060 00/085)
+jobs=''
+while [ $# -gt 0 ]; do
+   case "$1" in
+      -j|--jobs)
+         if [ $# -lt 2 ]; then
+            echo_error "Missing argument for option '$1'"
+         fi
+         jobs=$2
+         shift 2 ;;
+      -j*)
+         jobs=${1#-j}
+         shift ;;
+      *)
+         break ;;
+   esac
+done
+if [ -n "$jobs" ] && ! [[ $jobs =~ ^[1-9][0-9]*$ ]]; then
+   echo_error "Invalid number of jobs '$jobs'"
+fi
 if [ $# -gt 0 ]; then
    if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
       echo_usage
@@ -154,13 +176,19 @@ fi
 
 # attempt to get enhanced diff tool but disable this retrieval if download
 # tentative fails
+if [ -n "$jobs" ] && [ "$target" != 'test' ]; then
+   echo_error "Parallel run is only supported for the modules testsuite"
+fi
+
 if [ ! -e .noicdiff ]; then
    $make icdiff || touch .noicdiff
 fi
 
 rm -f $testserie.log
 
-if [ -t 1 ]; then
+# live progress from log file is not available on parallel run, as each job
+# writes its own log file, mpt reports progress itself
+if [ -t 1 ] && [ -z "$jobs" ]; then
    fail_count=0
    xfail_count=0
    pass_count=0
@@ -238,10 +266,14 @@ fi
 trap 'review_log && exit 1' SIGINT
 
 export RUNTESTFLAGS='-v -v >/dev/null 2>&1'
-$make $target
+if [ -n "$jobs" ]; then
+   $make $target JOBS="$jobs"
+else
+   $make $target
+fi
 ret=$?
 
-if [ -t 1 ]; then
+if [ -t 1 ] && [ -z "$jobs" ]; then
    kill $!
 fi
 

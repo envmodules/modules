@@ -90,7 +90,7 @@ foreach fpath $scan_files {
          {Bourne-Again shell script*} {
             lappend lint_files(bash) $fpath
          }
-         {*tclsh script*} - {Tcl/Tk script*} {
+         {*tclsh script*} - {Tcl/Tk script*} - {*expect script*} {
             lappend lint_files(tcl) $fpath
          }
       }

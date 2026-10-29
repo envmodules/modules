@@ -949,6 +949,7 @@ rpm: dist-bzip2
 
 clean:
 	rm -f *.log *.sum
+	rm -rf .testshards
 	rm -f tcl/*.tcl_i tcl/*.tcl_log tcl/*.tcl_m
 	rm -rf coverage
 # do not clean generated docs if not in git repository
@@ -1048,11 +1049,23 @@ test-deps: $(TEST_PREREQ)
 
 # if coverage enabled create markup file for better read coverage result
 test: $(TEST_PREREQ)
+ifeq ($(JOBS),)
 	TCLSH=$(TCLSH); export TCLSH; \
 	MODULECMD=$(MODULECMD); export MODULECMD; \
 	OBJDIR=`pwd -P`; export OBJDIR; \
 	TESTSUITEDIR=`cd testsuite;pwd -P`; export TESTSUITEDIR; \
 	runtest --srcdir $$TESTSUITEDIR --objdir $$OBJDIR $(RUNTESTFLAGS) --tool modules $(RUNTESTFILES)
+else
+ifeq ($(COVERAGE),y)
+	$(error Coverage mode (COVERAGE=y) cannot be combined with JOBS)
+endif
+	TCLSH=$(TCLSH); export TCLSH; \
+	MODULECMD=$(MODULECMD); export MODULECMD; \
+	OBJDIR=`pwd -P`; export OBJDIR; \
+	TESTSUITEDIR=`cd testsuite;pwd -P`; export TESTSUITEDIR; \
+	RUNTESTFLAGS="$(RUNTESTFLAGS)"; export RUNTESTFLAGS; \
+	expect script/mpt -j $(JOBS) $(RUNTESTFILES)
+endif
 ifeq ($(COVERAGE),y)
 	$(NAGELFAR) -markup tcl/cache.tcl
 	$(NAGELFAR) -markup tcl/coll.tcl
