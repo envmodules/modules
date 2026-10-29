@@ -914,6 +914,11 @@ The following command line switches appeared on Modules 5.
 
  Starting Modules 5.6, :subcmd:`spider` sub-command is supported.
 
+:option:`--terse`
+
+ Starting Modules 5.8, :subcmd:`search` and :subcmd:`whatis` sub-commands are
+ supported.
+
 :option:`--default`, :option:`--latest`, :option:`--indepth`,
 :option:`--no-indepth`
 
@@ -1066,6 +1071,9 @@ The following module sub-commands appeared on Modules 5.
 
  Starting Modules 5.8, name of each matching modulefile is reported once,
  followed by its :mfcmd:`module-whatis` lines wrapped to the terminal width.
+ The :option:`--terse` option reports each :mfcmd:`module-whatis` line on its
+ own output line prefixed by the module name, without wrapping or padding,
+ and the modulepath as a header line.
 
 Environment
 """""""""""

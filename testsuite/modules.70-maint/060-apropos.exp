@@ -72,6 +72,14 @@ testouterr_cmd_re "csh" "apropos token" "ERR" "$header\n$ts_1\n$ts_1a"
 testouterr_cmd_re "csh" "keyword token" "ERR" "$header\n$ts_1\n$ts_1a"
 testouterr_cmd_re "csh" "search token" "ERR" "$header\n$ts_1\n$ts_1a"
 
+# terse output mode: one line per whatis entry, each prefixed by module name
+# without padding nor wrapping, modulepath reported as header line
+set header_t "$modpathre:"
+set ts_1t "whatis/lines: Testsuite Whatis Modulefile\nwhatis/lines: Second line of whatis tokens"
+testouterr_cmd_re "csh" "-t search token" "ERR" "$header_t\n$ts_1t"
+testouterr_cmd_re "csh" "search -t token" "ERR" "$header_t\n$ts_1t"
+testouterr_cmd_re "csh" "-w 45 -t search Whatis" "ERR" "$header_t\n$ts_1t\nwhatis/multiple: Testsuite Whatis Modulefile\nwhatis/string: Testsuite Whatis Modulefile"
+
 # text is wrapped to terminal width
 testouterr_cmd_re "csh" "-w 45 search Whatis" "ERR" "$header\n        whatis/lines: Testsuite Whatis\n${text_pad}Modulefile\n${text_pad}Second line of whatis\n${text_pad}tokens\n     whatis/multiple: Testsuite Whatis\n${text_pad}Modulefile\n       whatis/string: Testsuite Whatis\n${text_pad}Modulefile"
 
@@ -83,6 +91,7 @@ set nohi [sgr 22]
 set header_sgr "$modlin [sgr {1;94}]$modpathre[sgr 0] $modlin"
 testouterr_cmd_re "csh" "-w 49 search token" "ERR" "$header_sgr\n        whatis/lines: Testsuite Whatis Modulefile\n${text_pad}Second line of whatis\n${text_pad}${hi}token${nohi}s"
 testouterr_cmd_re "csh" "-w 50 search token" "ERR" "$header_sgr\n        whatis/lines: Testsuite Whatis Modulefile\n${text_pad}Second line of whatis ${hi}token${nohi}s"
+testouterr_cmd_re "csh" "-w 49 -t search token" "ERR" "[sgr {1;94}]$modpathre[sgr 0]:\nwhatis/lines: Testsuite Whatis Modulefile\nwhatis/lines: Second line of whatis ${hi}token${nohi}s"
 setenv_var MODULES_COLOR never
 unsetenv_var MODULES_COLORS
 

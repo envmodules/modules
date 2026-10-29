@@ -22,6 +22,10 @@ Modules 5.8.0 (not yet released)
   each matching modulefile is reported once, followed by its
   :mfcmd:`module-whatis` lines wrapped to the terminal width. (fix issue
   #720)
+* Add support for the :option:`--terse` option on :subcmd:`whatis` and
+  :subcmd:`search` sub-commands to get one output line per
+  :mfcmd:`module-whatis` entry prefixed by module name, without wrapping or
+  padding, and modulepath reported as a header line. (fix issue #720)
 
 
 .. _5.7 release notes:

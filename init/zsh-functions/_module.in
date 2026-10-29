@@ -381,12 +381,14 @@ _module() {
             (whatis)
                _arguments \
                   '(-i --icase)'{-i,--icase}'[Case insensitive match]' \
+                  '(-t --terse)'{-t,--terse}'[Display output in terse format]' \
                   '(-j --json)'{-j,--json}'[Display output in JSON format]' \
                   '(-a --all)'{-a,--all}'[Include hidden modules in search]' \
                   "*::modulefile:{_module_avail_mods $cur}" && ret=0
                ;;
             (apropos|keyword|search)
                _arguments \
+                  '(-t --terse)'{-t,--terse}'[Display output in terse format]' \
                   '(-j --json)'{-j,--json}'[Display output in JSON format]' \
                   '(-a --all)'{-a,--all}'[Include hidden modules in search]' \
                   && ret=0

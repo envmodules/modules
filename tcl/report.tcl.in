@@ -2101,9 +2101,9 @@ Listing / Searching commands:
          [-i] [--indepth|--no-indepth] [mod ...]
                                     List all or matching available modules
   aliases         [-a]              List all module aliases
-  whatis [-a] [-i] [-j] [modulefile ...]
+  whatis [-a] [-i] [-j|-t] [modulefile ...]
                                     Print whatis information of modulefile(s)
-  apropos | keyword | search [-a] [-j] str
+  apropos | keyword | search [-a] [-j|-t] str
                                     Search all name and whatis containing str
   spider [-a] [-t|-l|-j] [-S|-C] [-d|-L] [-o LIST]
          [-i] [--indepth|--no-indepth] [mod ...]

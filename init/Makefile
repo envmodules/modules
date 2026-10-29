@@ -137,8 +137,8 @@ comp_stashlist_opts := -j -l -t --json --long --terse
 comp_clear_opts := --force -f
 comp_avail_opts := -a -C -d -i -j -L -l -o -S -t --all --contains --default --icase --json --latest --long --output --output= --starts-with --terse --indepth --no-indepth
 comp_mfile_opts := -i --icase
-comp_whatis_opts := -a -i -j --all --icase --json
-comp_search_opts := -a -j --all --json
+comp_whatis_opts := -a -i -j -t --all --icase --json --terse
+comp_search_opts := -a -j -t --all --json --terse
 comp_aliases_opts := -a --all
 comp_use_opts := -a --append -p --prepend
 comp_isavail_opts := -i --icase

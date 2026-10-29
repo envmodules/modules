@@ -645,8 +645,9 @@ switches are accepted:
 
 .. option:: --terse, -t
 
- Display :subcmd:`avail`, :subcmd:`list`, :subcmd:`savelist`, :subcmd:`spider`
- and :subcmd:`stashlist` output in short format.
+ Display :subcmd:`avail`, :subcmd:`list`, :subcmd:`savelist`,
+ :subcmd:`search`, :subcmd:`spider`, :subcmd:`stashlist` and :subcmd:`whatis`
+ output in short format.
 
  .. only:: html or latex
 
@@ -658,6 +659,9 @@ switches are accepted:
 
     .. versionchanged:: 5.6
        Support for :subcmd:`spider` sub-command added
+
+    .. versionchanged:: 5.8
+       Support for :subcmd:`search` and :subcmd:`whatis` sub-commands added
 
 .. option:: --timer
 
@@ -2670,7 +2674,7 @@ Module Sub-Commands
        ``__init__`` or when no collection name is specified and no *default*
        collection exists
 
-.. subcmd:: search [-a] [-j] string
+.. subcmd:: search [-a] [-t|-j] string
 
  Seeks through the :mfcmd:`module-whatis` information of all *modulefiles*
  for the specified *string*. All *module-whatis* information matching the
@@ -2679,7 +2683,10 @@ Module Sub-Commands
 
  Name of each matching *modulefile* is reported once, followed by its
  *module-whatis* lines. This text is wrapped to the terminal width and its
- continuation lines are aligned under the start of the first line text.
+ continuation lines are aligned under the start of the first line text. With
+ the :option:`--terse` option, each *module-whatis* line is reported on its
+ own output line prefixed by the module name, without wrapping or padding,
+ and the modulepath is reported as a header line.
 
  .. only:: html or latex
 
@@ -2695,7 +2702,9 @@ Module Sub-Commands
 
     .. versionchanged:: 5.8
        Module name is reported once with its *module-whatis* lines grouped
-       below and wrapped to terminal width
+       below and wrapped to terminal width; option
+       :option:`--terse`/:option:`-t` added to get one output line per
+       *module-whatis* line
 
 .. subcmd:: sh-to-mod shell script [arg...]
 
@@ -3174,7 +3183,7 @@ Module Sub-Commands
        :subcmd:`module use<use>` is called from the command-line or within an
        initialization modulefile script
 
-.. subcmd:: whatis [-a] [-j] [pattern...]
+.. subcmd:: whatis [-a] [-t|-j] [pattern...]
 
  Display the information set up by the :mfcmd:`module-whatis` commands inside
  *modulefiles* matching *pattern*. *pattern* may contain wildcard characters.
@@ -3182,7 +3191,10 @@ Module Sub-Commands
 
  Name of each matching *modulefile* is reported once, followed by its
  *module-whatis* lines. This text is wrapped to the terminal width and its
- continuation lines are aligned under the start of the first line text.
+ continuation lines are aligned under the start of the first line text. With
+ the :option:`--terse` option, each *module-whatis* line is reported on its
+ own output line prefixed by the module name, without wrapping or padding,
+ and the modulepath is reported as a header line.
 
  The parameter *pattern* may also be a symbolic modulefile name or a
  modulefile alias. It may also leverage a specific syntax to finely select
@@ -3212,7 +3224,9 @@ Module Sub-Commands
 
     .. versionchanged:: 5.8
        Module name is reported once with its *module-whatis* lines grouped
-       below and wrapped to terminal width
+       below and wrapped to terminal width; option
+       :option:`--terse`/:option:`-t` added to get one output line per
+       *module-whatis* line
 
 
 Modulefiles

@@ -91,9 +91,20 @@ testouterr_cmd_re "csh" "-w 30 whatis $module_8" "OK" "$header\n$module_8: modul
 testouterr_cmd_re "csh" "-w 10 whatis $module_8" "OK" "$header\n$module_8: module\n${text_pad_8}version\n${text_pad_8}sort\n${text_pad_8}test"
 testouterr_cmd_re "csh" "-w 1 whatis $module_8" "OK" "$header\n$module_8: module\n${text_pad_8}version\n${text_pad_8}sort\n${text_pad_8}test"
 
-# json output
+# terse output mode: one line per whatis entry, each prefixed by module name
+# without padding nor wrapping, modulepath reported as header line
+set header_t "$modpathre:"
+set ts_csh_5t "$header_t\n$module_5: Testsuite Whatis Modulefile\n$module_5: Second line of whatis tokens"
+testouterr_cmd_re "csh" "--terse whatis $module_5" "OK" "$ts_csh_5t"
+testouterr_cmd_re "csh" "-t whatis $module_5 $module_2" "OK" "$ts_csh_5t\n$module_2: Testsuite-Modulefile"
+testouterr_cmd_re "csh" "whatis -t $module_8" "OK" "$header_t\n$module_8: module version sort test"
+testouterr_cmd_re "csh" "-w 30 -t whatis $module_8" "OK" "$header_t\n$module_8: module version sort test"
+testouterr_cmd_re "csh" "-t whatis $module_1" "OK" "$ts_csh_1"
+
+# json output is not affected by terse mode
 set ts_json_5 "{\"$modpathre\": {\n\"$module_5\": { \"name\": \"$module_5\", \"whatis\": \\\[ \"Testsuite Whatis Modulefile\", \"Second line of whatis tokens\" \\\]}\n}}"
 testouterr_cmd_re "csh" "-j whatis $module_5" "OK" "$ts_json_5"
+testouterr_cmd_re "csh" "-t -j whatis $module_5" "OK" "$ts_json_5"
 
 # setup MODULEPATH with a trailing slash and an empty dir element
 setenv_path_var MODULEPATH {} "$modpath/"

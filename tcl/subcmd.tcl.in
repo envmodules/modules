@@ -217,6 +217,7 @@ proc cmdModuleSearch {args} {
    set mod_pattern_list [lassign $args search]
 
    set json [isStateEqual report_format json]
+   set terse [isStateEqual report_format terse]
    set icase [isIcase]
 
    lappend searchmod rc_defs_included
@@ -399,24 +400,32 @@ proc cmdModuleSearch {args} {
                      whatis a $::g_whatis 1]
                } else {
                   set eltsgr [string map $matchmodmap $elt]
-                  set eltpad [string repeat { } [expr {20 - [string length\
-                     $elt]}]]
+                  # one line per whatis entry, each prefixed by module name
+                  if {$terse} {
+                     foreach line $::g_whatis {
+                        set linesgr [string map $matchsearchmap $line]
+                        lappend display_list "$eltsgr: $linesgr"
+                     }
                   # module name on first line only, whatis text of next lines
                   # aligned under first line text and wrapped to term width
-                  set text_col [expr {[tcl::mathfunc::max 20 [string length\
-                     $elt]] + 2}]
-                  set text_pad [string repeat { } $text_col]
-                  set text_len [tcl::mathfunc::max [expr {[getState\
-                     term_columns] - $text_col}] 1]
-                  set first 1
-                  foreach entry $::g_whatis {
-                     foreach line [wrapTextToWidth [string map\
-                        $matchsearchmap $entry] $text_len] {
-                        if {$first} {
-                           set first 0
-                           lappend display_list "$eltpad$eltsgr: $line"
-                        } else {
-                           lappend display_list $text_pad$line
+                  } else {
+                     set eltpad [string repeat { } [expr {20 - [string length\
+                        $elt]}]]
+                     set text_col [expr {[tcl::mathfunc::max 20 [string\
+                        length $elt]] + 2}]
+                     set text_pad [string repeat { } $text_col]
+                     set text_len [tcl::mathfunc::max [expr {[getState\
+                        term_columns] - $text_col}] 1]
+                     set first 1
+                     foreach entry $::g_whatis {
+                        foreach line [wrapTextToWidth [string map\
+                           $matchsearchmap $entry] $text_len] {
+                           if {$first} {
+                              set first 0
+                              lappend display_list "$eltpad$eltsgr: $line"
+                           } else {
+                              lappend display_list $text_pad$line
+                           }
                         }
                      }
                   }
@@ -424,7 +433,8 @@ proc cmdModuleSearch {args} {
             }
          }
 
-         displayElementList $dir mp sepline 1 0 0 $display_list
+         displayElementList $dir mp [expr {$terse ? {terse} : {sepline}}] 1\
+            0 0 $display_list
       }
    }
    lpopState mode

@@ -161,7 +161,7 @@ testouterr_cmd sh {avail -i -t nOcAsE/vi} OK "$mp:\nnocase/virt"
 testouterr_cmd sh {avail -i -t NOCASE/Dee} OK "$mp:\nnocase/deep/(dirsym)\nnocase/deep/2\nnocase/deep/3"
 testouterr_cmd sh {avail -i -t NOcaSe2} OK "$mp:\nnocase2"
 testouterr_cmd sh {avail -i -t NOcase3} OK "$mp:\nnocase3(@)"
-testouterr_cmd_re sh {whatis -i -t noCASE/aL*} OK "$modlin $mpre $modlin\n\\s+nocase/1: nocase/1"
+testouterr_cmd_re sh {whatis -i -t noCASE/aL*} OK "$mpre:\nnocase/1: nocase/1"
 testouterr_cmd sh {paths -i noCASE/VE*} [list [list text $mp/nocase/1]] {}
 testouterr_cmd sh {whatis -i -t noCASE/aL} ERR $err_path'noCASE/aL'
 testouterr_cmd sh {paths -i noCASE/VE} OK {}
@@ -174,7 +174,7 @@ testouterr_cmd_re sh {whatis -i noCASE/.hiDden} OK "$modlin $mpre $modlin\n\\s+n
 
 # add a bit of wildcard characters in specification
 testouterr_cmd sh {avail -i -t nOcAsE/vi?} OK "$mp:\nnocase/virt"
-testouterr_cmd_re sh {whatis -i -t noCASE/a*L*} OK "$modlin $mpre $modlin\n\\s+nocase/1: nocase/1"
+testouterr_cmd_re sh {whatis -i -t noCASE/a*L*} OK "$mpre:\nnocase/1: nocase/1"
 testouterr_cmd sh {whatis -i -t noCASE/a*L} ERR $err_path'noCASE/a*L'
 testouterr_cmd sh {paths -i noCASE/V*E?} OK {}
 testouterr_cmd sh {paths -i noCASE/V*E*} [list [list text $mp/nocase/1]] {}
