@@ -100,9 +100,8 @@ and is what you pass to :file:`script/mt` to select a whole directory (e.g.
 Current ``modules.*`` series, in run order:
 
 ``00-init``
-    Testsuite bootstrap, plus a handful of standalone option/behavior
-    checks. Two files in this series matter beyond their own file number
-    because every other series relies on what they set up:
+    Testsuite bootstrap. Two files in this series matter beyond their own
+    file number because every other series relies on what they set up:
 
     - ``005-init_ts.exp`` defines the global variables and procedures
       shared by every test file for the whole run (paths, shell lists,
@@ -120,10 +119,14 @@ Current ``modules.*`` series, in run order:
     ``modulecmd.tcl`` (``006-procs.exp``, tool-specific -- see `Running
     the command and checking the result`_), builds further shared
     fixtures (module search path, module cache pre-build,
-    ``save_test_env`` checkpoint), and tests standalone command-line
-    switches and configuration behavior (pager, quarantine, siteconfig,
-    auto handling, color, access rights, multilib, cwd, logger, Tcl
-    extension library).
+    ``save_test_env`` checkpoint) and checks the few things that must be
+    tested before any initialization is done (version, shell type). As
+    every series relies on this bootstrap, nothing else belongs here.
+``01-general``
+    Standalone command-line switches and configuration behavior (bad
+    command name or argument number, pager, quarantine, siteconfig, auto
+    handling, color, access rights, multilib, cwd, logger, Tcl extension
+    library)
 ``10-use``
     ``module use``/``unuse``
 ``20-locate``
@@ -164,7 +167,8 @@ Current ``modules.*`` series, in run order:
 ``cookbook.00-init`` are each a single series (those tools are much smaller
 and don't need topic splitting).
 
-Every series directory ends with a ``999-cleanup.exp`` file (see `Test file
+Every series directory but ``00-init`` and ``01-general`` ends with a
+``999-cleanup.exp`` file (see `Test file
 anatomy`_) and, for the ``modules`` tool, most series begin with a
 ``0NN-init_ts.exp`` file that sets up whatever fixtures that series' tests
 need (e.g. :file:`modules.90-avail/010-init_ts.exp`).
@@ -722,7 +726,7 @@ calling ``make test`` directly when iterating on a specific area.
 
 Whichever files are selected, :file:`script/mt` always also runs the
 mandatory setup files for that tool (for ``modules``:
-``00/005 00/006 00/010 00/050 00/060 00/080 00/085``; for ``install``:
+``00/005 00/006 00/010 00/050 00/060 00/085``; for ``install``:
 ``00/005 00/006 00/010 00/011``; for ``lint``: ``00/005 00/006 00/011``; for
 ``completion``: ``00/005 00/006 00/007 00/008 00/010 00/011 00/020 00/030
 00/040 00/050``; for ``cookbook``: ``00/005 00/006 00/010 00/011``), plus

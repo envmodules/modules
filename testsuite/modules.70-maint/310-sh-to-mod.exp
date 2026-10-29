@@ -303,7 +303,7 @@ unsetenv_loaded_module
 # test unknown shell
 testouterr_shtomod unk {} ERR "$error_msgs: Shell 'unk' not supported" $testscriptsh
 
-# bad arg number has been checked in 00/071
+# bad arg number has been checked in 01/071
 
 # test unknown script
 testouterr_shtomod $onesh {} ERR "$error_msgs: Script '/path/to/unk' cannot be found" /path/to/unk
