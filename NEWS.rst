@@ -29,7 +29,8 @@ Modules 5.8.0 (not yet released)
 * Testsuite: add ``JOBS`` option to ``make test`` and ``-j`` option to
   :file:`script/mt` to run the test files of the ``modules`` testsuite
   concurrently, each group of files being run in a private copy of the
-  testsuite directory.
+  testsuite directory. Coverage mode (``COVERAGE=y``) is supported, the
+  coverage logs of each group of files are merged at the end of the run.
 
 
 .. _5.7 release notes:

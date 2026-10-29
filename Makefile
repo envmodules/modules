@@ -1056,9 +1056,6 @@ ifeq ($(JOBS),)
 	TESTSUITEDIR=`cd testsuite;pwd -P`; export TESTSUITEDIR; \
 	runtest --srcdir $$TESTSUITEDIR --objdir $$OBJDIR $(RUNTESTFLAGS) --tool modules $(RUNTESTFILES)
 else
-ifeq ($(COVERAGE),y)
-	$(error Coverage mode (COVERAGE=y) cannot be combined with JOBS)
-endif
 	TCLSH=$(TCLSH); export TCLSH; \
 	MODULECMD=$(MODULECMD); export MODULECMD; \
 	OBJDIR=`pwd -P`; export OBJDIR; \
