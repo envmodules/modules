@@ -280,9 +280,9 @@ Fixture and support directories
   :file:`modulefiles.4/`, and a number of single-purpose
   :file:`modulefiles.<name>/` directories (``.deep``, ``.deps``, ``.eb``,
   ``.spider1``/``.spider2``/``.spider3``, ``.rc``, ``.path1``/``.path2``/
-  ``.path3``, ``.memcache``, ``.indepth``, ``.allin``) hold the modulefiles
-  used as fixtures. See `Adding new test fixtures`_ below for which one to
-  add to.
+  ``.path3``, ``.memcache``, ``.indepth``, ``.allin``, ``.lint``) hold the
+  modulefiles used as fixtures. See `Adding new test fixtures`_ below for
+  which one to add to.
 - :file:`config/` holds the DejaGnu/Expect configuration shared by every
   ``.exp`` file: :file:`base-config.exp` (all the test procedures, see
   `Base test procedures`_) and :file:`unix.exp` (the low-level plumbing

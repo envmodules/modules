@@ -185,50 +185,76 @@ testouterr_cmd sh {lint -i lINt/1.2} ERR [msg_lint $mp/lint/1.2 {*}$lintmsg12]
 
 
 # full linting
-set lintmsgfoo10 [list "$warn_msgs line 21: Unknown command \"unk\""]
-set lintmsgloadany10 "$warn_msgs line 8: Unknown command \"unk\""
-set lintmsglist10 [list "$warn_msgs line 8: Command \"module list\" should not be used in modulefile"\
-"$warn_msgs line 11: Command \"module list\" should not be used in modulefile"\
-"$warn_msgs line 14: Command \"module list\" should not be used in modulefile"\
-"$warn_msgs line 17: Command \"module list\" should not be used in modulefile"\
-"$warn_msgs line 20: Command \"module list\" should not be used in modulefile"]
-set lintmsgmodrc [list {ERROR   line 35: Wrong number of arguments (3) to "module-alias"}\
-{ERROR   line 41: Wrong number of arguments (3) to "module-virtual"}]
-set tserr .*[escre [msg_lint $mp/foo/1.0 {*}$lintmsgfoo10]]\n.*[escre [msg_lint $mp/lint/1.0 $lintmsg10]\n\n[msg_lint $mp/lint/1.1 $lintmsg11]\n\n[msg_lint $mp/lint/1.2 {*}$lintmsg12]\n\n[msg_lint $mp/list/1.0 {*}$lintmsglist10]\n\n[msg_lint $mp/loadany/1.0 $lintmsgloadany10]].*
-testouterr_cmd_re sh {lint} ERR $tserr
+# every file found in modulepath is linted with a separate linter process, so
+# use a small dedicated modulepath to keep these tests fast
+set lintmp $modpath.lint
+setenv_path_var MODULEPATH $lintmp
+set lintmsgmodrc [list {ERROR   line 3: Wrong number of arguments (3) to "module-alias"}\
+{ERROR   line 4: Wrong number of arguments (3) to "module-virtual"}]
+set lintmsgtagrc [list {ERROR   line 8: Wrong number of arguments (0) to "module-tag"}\
+{ERROR   line 9: Wrong number of arguments (1) to "module-tag"}\
+{ERROR   line 10: Bad option --foo to "module-tag"}\
+{ERROR   line 11: Bad option --before to "module-tag"}\
+{ERROR   line 12: Bad option --after to "module-tag"}]
+set tserr [msg_lint $lintmp/.modulerc {*}$lintmsgmodrc]\n\n[msg_lint $lintmp/err/1.0 $lintmsg11]\n\n[msg_lint $lintmp/multi/1.0 {*}$lintmsg12]\n\n[msg_lint $lintmp/tag/.modulerc {*}$lintmsgtagrc]\n\n[msg_lint $lintmp/warn/1.0 $lintmsg10]
+testouterr_cmd sh {lint} ERR $tserr
+
+# expected output of a verbose lint of whole modulepath: files are reported
+# sorted by path, global rc files and modulecache included, with a blank line
+# around each file that gets messages
+proc msg_lint_all {entries} {
+    set res {}
+    set prev_msgs 0
+    foreach entry [lsort -dictionary -index 0 $entries] {
+        set path [lindex $entry 0]
+        set msgs [lrange $entry 1 end]
+        if {$res ne {}} {
+            append res [expr {($prev_msgs || [llength $msgs]) ? "\n\n" : "\n"}]
+        }
+        if {[string first { } $path] != -1} {
+            set path '$path'
+        }
+        append res [msg_lint $path {*}$msgs]
+        set prev_msgs [llength $msgs]
+    }
+    return $res
+}
+
+# global rc files reported on a whole modulepath lint
+set lintfull_rc [list [list $env(MODULERCFILE)]]
+if {$is_global_rc_file} {
+    lappend lintfull_rc [list $install_etcdir/rc]
+}
 
 # check modulepath and module-specific .modulerc
-set tserr [msg_lint $env(MODULERCFILE)]\n
-if {[file exists $mp/.modulecache]} {
-    append tserr [msg_lint $mpre/.modulecache]\n
+# forbid modules returned
+# alias and virtual targets returned only once
+set lintfull $lintfull_rc
+if {[file exists $lintmp/.modulecache]} {
+    lappend lintfull [list $lintmp/.modulecache]
 }
-append tserr \n[escre [msg_lint $mpre/.modulerc {*}$lintmsgmodrc]]\n\n[msg_lint $mpre/advvers/1.0]\n[msg_lint $mpre/advvers2/.modulerc].*
-testouterr_cmd_re sh {lint -v} ERR $tserr
+lappend lintfull [list $lintmp/.modulerc {*}$lintmsgmodrc] [list $lintmp/clean/1.0] [list $lintmp/err/1.0 $lintmsg11] [list $lintmp/hidden/.modulerc] [list $lintmp/multi/1.0 {*}$lintmsg12] [list $lintmp/tag/.modulerc {*}$lintmsgtagrc] [list $lintmp/tag/1.0] [list $lintmp/tag/4.0] [list $lintmp/tag/5.0] [list $lintmp/warn/1.0 $lintmsg10]
+testouterr_cmd sh {lint -v} ERR [msg_lint_all $lintfull]
 
 # check generated modulecache if any
-if {[file exists $mp/.modulecache]} {
-    testouterr_cmd sh "lint $mp/.modulecache" OK {}
-    testouterr_cmd sh "lint -v $mp/.modulecache" OK [msg_lint $mp/.modulecache]
+if {[file exists $lintmp/.modulecache]} {
+    testouterr_cmd sh "lint $lintmp/.modulecache" OK {}
+    testouterr_cmd sh "lint -v $lintmp/.modulecache" OK [msg_lint $lintmp/.modulecache]
 }
 
 # check modulepath without error or warning
 setenv_path_var MODULEPATH $modpath.path1
 testouterr_cmd sh {lint} OK {}
-setenv_path_var MODULEPATH $mp
+setenv_path_var MODULEPATH $lintmp
 
 # hidden module test
-set tserr .*[msg_lint $mpre/key/5.0].*[escre [msg_lint $mp/lint/1.0 $lintmsg10]\n\n[msg_lint $mp/lint/1.1 $lintmsg11]\n\n[msg_lint $mp/lint/1.2 {*}$lintmsg12]].*[msg_lint '$mpre/variant/.w\ s'].*
-testouterr_cmd_re sh {lint -v -a} ERR $tserr
-
-# forbid modules returned
-# alias and virtual targets returned only once
-set lintmsgtagrc [list {ERROR   line 14: Wrong number of arguments (0) to "module-tag"}\
-{ERROR   line 17: Wrong number of arguments (1) to "module-tag"}\
-{ERROR   line 20: Bad option --foo to "module-tag"}\
-{ERROR   line 23: Bad option --before to "module-tag"}\
-{ERROR   line 26: Bad option --after to "module-tag"}]
-set tserr .*[escre [msg_lint $mpre/tag/.modulerc {*}$lintmsgtagrc]]\n\n[msg_lint $mpre/tag/1.0]\n[msg_lint $mpre/tag/4.0]\n[msg_lint $mpre/tag/5.0]\n.*
-testouterr_cmd_re sh {lint -v} ERR $tserr
+set lintfull $lintfull_rc
+if {[file exists $lintmp/.modulecache]} {
+    lappend lintfull [list $lintmp/.modulecache]
+}
+lappend lintfull [list $lintmp/.modulerc {*}$lintmsgmodrc] [list $lintmp/clean/1.0] [list $lintmp/err/1.0 $lintmsg11] [list $lintmp/hidden/.modulerc] [list "$lintmp/hidden/.w s"] [list $lintmp/hidden/1.0] [list $lintmp/multi/1.0 {*}$lintmsg12] [list $lintmp/tag/.modulerc {*}$lintmsgtagrc] [list $lintmp/tag/1.0] [list $lintmp/tag/4.0] [list $lintmp/tag/5.0] [list $lintmp/warn/1.0 $lintmsg10]
+testouterr_cmd sh {lint -v -a} ERR [msg_lint_all $lintfull]
+setenv_path_var MODULEPATH $mp
 
 
 # ModuleVersion rename warning
@@ -303,29 +329,29 @@ testouterr_cmd sh "lint $mp/lint/1.0" ERR [err_permdenied $mp/lint/1.0]
 restore_file_perms $mp/lint/1.0
 
 # access denied on modulerc
-change_file_perms $mp/.modulerc $hide_perms
-change_file_perms $mp/advvers2/.modulerc $hide_perms
-set tserr [msg_lint $env(MODULERCFILE)]\n
-if {[file exists $mp/.modulecache]} {
-    append tserr [msg_lint $mpre/.modulecache]\n
+setenv_path_var MODULEPATH $lintmp
+change_file_perms $lintmp/.modulerc $hide_perms
+change_file_perms $lintmp/hidden/.modulerc $hide_perms
+set lintfull $lintfull_rc
+if {[file exists $lintmp/.modulecache]} {
+    lappend lintfull [list $lintmp/.modulecache]
 }
-append tserr [msg_lint $mpre/advvers/1.0]\n[msg_lint $mpre/advvers2/1.0]\n.*
-testouterr_cmd_re sh {lint -v} ERR $tserr
-restore_file_perms $mp/.modulerc
-restore_file_perms $mp/advvers2/.modulerc
+lappend lintfull [list $lintmp/clean/1.0] [list $lintmp/err/1.0 $lintmsg11] [list $lintmp/hidden/1.0] [list $lintmp/multi/1.0 {*}$lintmsg12] [list $lintmp/tag/.modulerc {*}$lintmsgtagrc] [list $lintmp/tag/1.0] [list $lintmp/tag/4.0] [list $lintmp/tag/5.0] [list $lintmp/warn/1.0 $lintmsg10]
+testouterr_cmd sh {lint -v} ERR [msg_lint_all $lintfull]
+restore_file_perms $lintmp/.modulerc
+restore_file_perms $lintmp/hidden/.modulerc
 
 end_ignore_modulecache_if_built
 
 # access denied on modulecache if any
-if {[file exists $mp/.modulecache]} {
-    change_file_perms $mp/.modulecache $hide_perms
-    set tserr [msg_lint $env(MODULERCFILE)]\n\n
-    append tserr [escre [msg_lint $mpre/.modulerc {*}$lintmsgmodrc]]\n\n
-    append tserr [msg_lint $mpre/advvers/1.0]\n
-    append tserr [msg_lint $mpre/advvers2/.modulerc]\n[msg_lint $mpre/advvers2/1.0]\n.*
-    testouterr_cmd_re sh {lint -v} ERR $tserr
-    restore_file_perms $mp/.modulecache
+if {[file exists $lintmp/.modulecache]} {
+    change_file_perms $lintmp/.modulecache $hide_perms
+    set lintfull $lintfull_rc
+    lappend lintfull [list $lintmp/.modulerc {*}$lintmsgmodrc] [list $lintmp/clean/1.0] [list $lintmp/err/1.0 $lintmsg11] [list $lintmp/hidden/.modulerc] [list $lintmp/multi/1.0 {*}$lintmsg12] [list $lintmp/tag/.modulerc {*}$lintmsgtagrc] [list $lintmp/tag/1.0] [list $lintmp/tag/4.0] [list $lintmp/tag/5.0] [list $lintmp/warn/1.0 $lintmsg10]
+    testouterr_cmd sh {lint -v} ERR [msg_lint_all $lintfull]
+    restore_file_perms $lintmp/.modulecache
 }
+setenv_path_var MODULEPATH $mp
 
 }
 

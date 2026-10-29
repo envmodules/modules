@@ -1,0 +1,5 @@
+#%Module
+if {[info exists env(TESTSUITE_LINT_RCERR)]} {
+    module-alias clean/al clean/1.0 extra
+    module-virtual clean/virt ./1.0 extra
+}
