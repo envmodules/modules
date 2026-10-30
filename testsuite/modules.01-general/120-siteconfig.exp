@@ -111,7 +111,7 @@ if {$pager_dfl_use} {
 lappend ans "DEBUG setState: is_stderr_tty set to '1'"
 lappend ans "DEBUG setState: paginate set to '1'"
 lappend ans "DEBUG setState: report_format set to 'regular'"
-lappend ans "DEBUG setState: reportfd set to 'file\\d'"
+lappend ans "DEBUG setState: reportfd set to 'file\\d+'"
 lappend ans "DEBUG setState: timer set to '0'"
 lappend ans $vers_reportre
 lappend ans "DEBUG setConf: logger set to '$install_loggercmd'"

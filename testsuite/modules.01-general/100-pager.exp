@@ -88,7 +88,7 @@ proc pager_test_case {modarg use paginate cmd opts {shell sh}} {
         lappend ans "$warn_msgs: couldn't execute \"$cmd\": no such file or directory"
         set reportfd stderr
     } elseif {$is_stderr_tty && $use && $paginate} {
-        set reportfd file\\d
+        set reportfd file\\d+
     } else {
         set reportfd stderr
     }
@@ -345,7 +345,7 @@ if {$paginate} {
 lappend anserr "DEBUG setState: paginate set to '$paginate'"
 lappend anserr "DEBUG setState: report_format set to 'regular'"
 if {$paginate} {
-    lappend anserr "DEBUG setState: reportfd set to 'file\\d'"
+    lappend anserr "DEBUG setState: reportfd set to 'file\\d+'"
 } else {
     lappend anserr "DEBUG setState: reportfd set to 'stderr'"
 }
