@@ -28,7 +28,9 @@ skip_if_quick_mode
 #
 
 set test_cols 201
-if {![info exists term_cols]} {
+if {$is_filesystem_icase} {
+    send_user "\tskipping icase tests as underlying filesystem is case-insensitive\n"
+} elseif {![info exists term_cols]} {
     # skip tests if current terminal width is unknown
     send_user "\tskipping terminal width-specific tests\n"
 # set a specific terminal width
