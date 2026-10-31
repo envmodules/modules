@@ -801,12 +801,13 @@ fly from Tcl, following the pattern in
 ``create_endspace_test_modulefiles``/``delete_endspace_test_modulefiles`` in
 :file:`config/base-config.exp`.
 
-Adding a new sub-command or config option
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Adding a new sub-command, config option or command line switch
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Don't improvise which testsuite files need touching for these two specific
-tasks -- :doc:`add-new-sub-command` and :doc:`add-new-config-option` each
-enumerate the exact list, in the "Testsuite" section of each document.
+Don't improvise which testsuite files need touching for these three specific
+tasks -- :doc:`add-new-sub-command`, :doc:`add-new-config-option` and
+:doc:`add-new-command-line-switch` each enumerate the exact list, in the
+"Testsuite" section of each document.
 
 Debugging a broken test
 -----------------------

@@ -26,6 +26,9 @@ Modules 5.8.0 (not yet released)
   :subcmd:`search` sub-commands to get one output line per
   :mfcmd:`module-whatis` entry prefixed by module name, without wrapping or
   padding, and modulepath reported as a header line. (fix issue #720)
+* Doc: add :ref:`add-new-command-line-switch` guide describing how to
+  contribute a new command line switch or accept an existing one on an
+  additional sub-command.
 
 
 .. _5.7 release notes:

@@ -118,6 +118,7 @@ howtos are also available:
 
 * :ref:`add-new-sub-command`
 * :ref:`add-new-config-option`
+* :ref:`add-new-command-line-switch`
 * :ref:`add-new-hook-event`
 * :ref:`devel-testsuite`
 
