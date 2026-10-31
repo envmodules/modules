@@ -49,7 +49,7 @@ jobs:
           done
           eval $EXTRA_SCRIPT_PRETEST
           make test-deps
-          script/mt
+          script/mt -j "$(sysctl -n hw.ncpu)"
           eval $EXTRA_SCRIPT_POSTTEST
       - name: Install Modules
         run: |
@@ -75,5 +75,7 @@ jobs:
           name: testsuite-logs-${{ github.job }}
           path: |
             modules.log
+            .testshards/*/modules.log
             install.log
           retention-days: 5
+          include-hidden-files: true
