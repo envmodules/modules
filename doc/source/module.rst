@@ -2732,6 +2732,8 @@ Module Sub-Commands
     configuration or profile. As a result, script does not have access to
     transient definitions that are only available in interactive sessions or
     profile files, such as shell aliases, functions, or completion settings.
+    *Shell* is also given an empty standard input, so *script* cannot read
+    from the terminal.
 
  .. only:: html or latex
 
@@ -2746,6 +2748,9 @@ Module Sub-Commands
 
     .. versionchanged:: 5.4
        Support for ``bash-eval`` shell mode added
+
+    .. versionchanged:: 5.8
+       *Shell* is given an empty standard input
 
 .. subcmd:: show modulefile...
 

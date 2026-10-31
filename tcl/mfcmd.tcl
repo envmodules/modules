@@ -1549,7 +1549,10 @@ proc execShAndGetEnv {elt_ignored_list shell script args} {
    set shellexec [list $shellpath {*}$shellopts -c $command]
 
    reportDebug "running '$shellexec'"
-   if {[catch {set output [exec {*}$shellexec]} output]} {
+   # script is given an empty standard input, as it is evaluated to collect
+   # environment changes, not to interact with user, and some shells start
+   # an interactive session when a terminal is found on stdin
+   if {[catch {set output [exec {*}$shellexec << {}]} output]} {
       set sherr 1
    }
 
