@@ -54,7 +54,7 @@ skip_if_quick_mode
 # also test via ml command
 testouterr_cmd_re sh {ml state} OK $tserr
 
-# see 00/071 for bad argument number test
+# see 01/071 for bad argument number test
 
 
 #

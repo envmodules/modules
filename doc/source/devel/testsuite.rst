@@ -100,9 +100,8 @@ and is what you pass to :file:`script/mt` to select a whole directory (e.g.
 Current ``modules.*`` series, in run order:
 
 ``00-init``
-    Testsuite bootstrap, plus a handful of standalone option/behavior
-    checks. Two files in this series matter beyond their own file number
-    because every other series relies on what they set up:
+    Testsuite bootstrap. Two files in this series matter beyond their own
+    file number because every other series relies on what they set up:
 
     - ``005-init_ts.exp`` defines the global variables and procedures
       shared by every test file for the whole run (paths, shell lists,
@@ -120,10 +119,14 @@ Current ``modules.*`` series, in run order:
     ``modulecmd.tcl`` (``006-procs.exp``, tool-specific -- see `Running
     the command and checking the result`_), builds further shared
     fixtures (module search path, module cache pre-build,
-    ``save_test_env`` checkpoint), and tests standalone command-line
-    switches and configuration behavior (pager, quarantine, siteconfig,
-    auto handling, color, access rights, multilib, cwd, logger, Tcl
-    extension library).
+    ``save_test_env`` checkpoint) and checks the few things that must be
+    tested before any initialization is done (version, shell type). As
+    every series relies on this bootstrap, nothing else belongs here.
+``01-general``
+    Standalone command-line switches and configuration behavior (bad
+    command name or argument number, pager, quarantine, siteconfig, auto
+    handling, color, access rights, multilib, cwd, logger, Tcl extension
+    library)
 ``10-use``
     ``module use``/``unuse``
 ``20-locate``
@@ -164,7 +167,8 @@ Current ``modules.*`` series, in run order:
 ``cookbook.00-init`` are each a single series (those tools are much smaller
 and don't need topic splitting).
 
-Every series directory ends with a ``999-cleanup.exp`` file (see `Test file
+Every series directory but ``00-init`` and ``01-general`` ends with a
+``999-cleanup.exp`` file (see `Test file
 anatomy`_) and, for the ``modules`` tool, most series begin with a
 ``0NN-init_ts.exp`` file that sets up whatever fixtures that series' tests
 need (e.g. :file:`modules.90-avail/010-init_ts.exp`).
@@ -280,9 +284,9 @@ Fixture and support directories
   :file:`modulefiles.4/`, and a number of single-purpose
   :file:`modulefiles.<name>/` directories (``.deep``, ``.deps``, ``.eb``,
   ``.spider1``/``.spider2``/``.spider3``, ``.rc``, ``.path1``/``.path2``/
-  ``.path3``, ``.memcache``, ``.indepth``, ``.allin``) hold the modulefiles
-  used as fixtures. See `Adding new test fixtures`_ below for which one to
-  add to.
+  ``.path3``, ``.memcache``, ``.indepth``, ``.allin``, ``.lint``) hold the
+  modulefiles used as fixtures. See `Adding new test fixtures`_ below for
+  which one to add to.
 - :file:`config/` holds the DejaGnu/Expect configuration shared by every
   ``.exp`` file: :file:`base-config.exp` (all the test procedures, see
   `Base test procedures`_) and :file:`unix.exp` (the low-level plumbing
@@ -704,6 +708,7 @@ calling ``make test`` directly when iterating on a specific area.
 .. code-block:: sh
 
     script/mt                     # same as: make test
+    script/mt -j 8                # same as: make test JOBS=8 (see below)
     script/mt quick               # same as: make test QUICKTEST=y
     script/mt cov                 # same as: make test COVERAGE=y
     script/mt install             # same as: make testinstall
@@ -722,7 +727,7 @@ calling ``make test`` directly when iterating on a specific area.
 
 Whichever files are selected, :file:`script/mt` always also runs the
 mandatory setup files for that tool (for ``modules``:
-``00/005 00/006 00/010 00/050 00/060 00/080 00/085``; for ``install``:
+``00/005 00/006 00/010 00/050 00/060 00/085``; for ``install``:
 ``00/005 00/006 00/010 00/011``; for ``lint``: ``00/005 00/006 00/011``; for
 ``completion``: ``00/005 00/006 00/007 00/008 00/010 00/011 00/020 00/030
 00/040 00/050``; for ``cookbook``: ``00/005 00/006 00/010 00/011``), plus
@@ -745,6 +750,58 @@ whenever a case other than all-pass completes. When done, it invokes
 test procedures and renders them as a diff (using ``icdiff`` if available --
 :file:`script/mt` auto-downloads it once and caches it as ``./icdiff`` --
 falling back to ``diff -u``).
+
+Running test files in parallel
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A full run spawns one ``modulecmd.tcl`` process per test case, so its
+duration is bound by the single CPU DejaGnu uses. The ``modules`` testsuite
+can instead be run by several concurrent ``runtest`` processes:
+
+.. code-block:: sh
+
+    make test JOBS=8                 # whole suite, 8 concurrent runtest
+    script/mt -j 8                   # same, with mt's review of failures
+    script/mt -j 4 50 70/420         # parallel run of a selection
+
+Both forms hand over to :file:`script/mpt`, which splits the selected
+test files into *shards* of at most 8 files from the same series (``-s``
+option of the script changes this size), each shard being run by its own
+``runtest`` process. Like :file:`script/mt` does, every shard also runs the
+bootstrap files of ``00-init`` first, plus the ``010-init_ts.exp`` and
+``999-cleanup.exp`` files of every series (DejaGnu matches bare file names
+in every series directory). Series whose files depend on each other
+(``60-initx`` and ``61-coll``) are always run as a single shard. Shards are
+started biggest first, each in its own directory under :file:`.testshards/`
+in the object directory, holding a private copy of :file:`testsuite/`
+(which is also the ``$HOME`` of tests) and of :file:`lib/` (some tests
+replace the Tcl extension library file) so that the files tests write never
+clash, plus a symbolic link to every other entry of the object directory.
+Each shard runs under a pseudo-terminal of its own, as some tests change
+the column number of the terminal attached to the test harness, and leaves
+its own ``modules.log`` and ``modules.sum`` files in its directory. Once
+all shards are done, their results are merged into the usual
+:file:`modules.log` and :file:`modules.sum` files, with a summary section
+reflecting the whole run, so :file:`script/mtreview` works unchanged on
+it. Interrupting a run (``Ctrl-C``) stops the running shards,
+merges the results obtained so far and cleans the shard directories like a
+complete run does. A shard whose log file stops growing for 10 minutes
+(``-t`` option of the script changes this delay) is considered stalled, for
+instance on a test waiting for an input: it is stopped and reported as
+such, so a hanging test does not block the run until its own timeout.
+
+Coverage mode combines with a parallel run (``make test COVERAGE=y JOBS=8``
+or ``script/mt -j 8 cov``). The instrumented scripts write their coverage
+logs in :file:`tcl/` relatively to their current directory, so each shard
+gets a :file:`tcl/` directory of its own, made of links to the files of the
+object directory one, and the logs each shard produces there are merged by
+:file:`script/mpt` into the :file:`tcl/*.tcl_log` files of the object
+directory, which are then marked up as usual.
+
+A parallel run requires symbolic link support and the ``expect`` command,
+and is only available for the ``modules`` testsuite. On MSYS2, where
+symbolic links are created as copies by default, set the ``MSYS``
+environment variable to ``winsymlinks:native`` beforehand.
 
 Coverage
 ~~~~~~~~

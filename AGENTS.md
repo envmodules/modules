@@ -52,6 +52,7 @@ a failing one.
 ```sh
 make test                  # full suite via DejaGnu (~25,000 cases, ~12 min)
 make test QUICKTEST=y      # quick mode, most essential tests (~1,900 cases, ~1 min)
+make test JOBS=8           # full suite, test files run concurrently by 8 jobs
 make testinstall           # test an already-`make install`ed tree
 ```
 
@@ -67,6 +68,7 @@ Coverage (uses Nagelfar):
 
 ```sh
 make test COVERAGE=y       # then inspect tcl/*.tcl_m for ';# Not covered' lines
+make test COVERAGE=y JOBS=8  # same, test files run concurrently by 8 jobs
 script/mt cov 70/{280,290} # coverage run on selected testfiles
 ```
 

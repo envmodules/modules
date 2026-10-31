@@ -116,7 +116,7 @@ not drop.
 #. Test the sub-command against an invalid number of arguments (too few and
    too many).
 
-    - File to edit: :file:`testsuite/modules.00-init/071-args.exp`
+    - File to edit: :file:`testsuite/modules.01-general/071-args.exp`
     - Example commit: :ghcommit:`086ac136`
 
 #. If the new sub-command cannot be called from a modulefile evaluation, test

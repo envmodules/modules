@@ -169,8 +169,9 @@ jobs:
         run: |
           bash -lc 'cd $(cygpath -u "$GITHUB_WORKSPACE") && ./configure && make'
       - name: Test Modules build
+        timeout-minutes: 60
         run: |
-          bash -lc 'cd $(cygpath -u "$GITHUB_WORKSPACE") && script/mt'
+          bash -lc 'cd $(cygpath -u "$GITHUB_WORKSPACE") && script/mt -j "$(nproc)"'
       - name: Install Modules
         run: |
           bash -lc 'cd $(cygpath -u "$GITHUB_WORKSPACE") && make install'
@@ -186,8 +187,10 @@ jobs:
           name: testsuite-logs-${{ github.job }}
           path: |
             modules.log
+            .testshards/*/modules.log
             install.log
           retention-days: 5
+          include-hidden-files: true
 
   msys:
     runs-on: windows-2022
@@ -215,8 +218,13 @@ jobs:
           make
       - name: Test Modules build
         shell: msys2 {0}
+        timeout-minutes: 60
+        # symbolic links are created as copies by default on MSYS2, which is
+        # unfit for the shard directories of a parallel run
+        env:
+          MSYS: winsymlinks:native
         run: |
-          script/mt
+          script/mt -j "$(nproc)"
       - name: Install Modules
         shell: msys2 {0}
         run: |
@@ -235,5 +243,7 @@ jobs:
           name: testsuite-logs-${{ github.job }}
           path: |
             modules.log
+            .testshards/*/modules.log
             install.log
           retention-days: 5
+          include-hidden-files: true

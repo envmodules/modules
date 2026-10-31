@@ -55,7 +55,10 @@ foreach sh $shtomod_supported_shells {
     set shbin [lindex [auto_execok $sh] 0]
     # mksh flavor of ksh is not supported
     # sh from FreeBSD is not supported too
-    if {$shbin ne {} && ($sh ne {ksh} || !$ksh_is_mksh) && ($sh ne {sh} || $os_name ne {freebsd})} {
+    # first run of fish on Cygwin starts an interactive session when a
+    # terminal is attached to stdin, which breaks the script evaluation
+    if {$shbin ne {} && ($sh ne {ksh} || !$ksh_is_mksh) && ($sh ne {sh} || $os_name ne {freebsd})\
+        && ($sh ne {fish} || $os_name ne {cygwin} || !$is_stdin_tty)} {
         lappend shtomod_avail_shells $sh
         set shell_pathname($sh) $shbin
     }
@@ -303,7 +306,7 @@ unsetenv_loaded_module
 # test unknown shell
 testouterr_shtomod unk {} ERR "$error_msgs: Shell 'unk' not supported" $testscriptsh
 
-# bad arg number has been checked in 00/071
+# bad arg number has been checked in 01/071
 
 # test unknown script
 testouterr_shtomod $onesh {} ERR "$error_msgs: Script '/path/to/unk' cannot be found" /path/to/unk

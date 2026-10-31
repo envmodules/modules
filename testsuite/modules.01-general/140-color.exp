@@ -2,7 +2,7 @@
 #   Modules Revision 3.0
 #   Providing a flexible user environment
 #
-#   File:		modules.00-init/%M%
+#   File:		modules.01-general/%M%
 #   Revision:		%I%
 #   First Edition:	2019/01/08
 #   Last Mod.:		%U%, %G%
@@ -405,7 +405,14 @@ colorset_test_case {avail -l loc_t} [list hi loc_t] ".*loc_tr.*loc_tr.*loc_tr.*l
 colorset_test_case {avail -t loc_t} [list hi loc_t] ".*loc_tr.*loc_tr.*loc_tr.*loc_tr.*loc_tr.*loc_tr.*loc_tr.*loc_tr.*"
 colorset_test_case {avail loc_tr} [list hi loc_tr] ".*loc_tr.*loc_tr.*loc_tr.*loc_tr.*loc_tr.*loc_tr.*loc_tr.*loc_tr.*"
 colorset_test_case {avail loc_tr/3 loc_tr/1} [list hi loc_tr/1 hi loc_tr/3] ".*loc_tr/1.0.*loc_tr/3.0.*"
+# the first run of the fish shell found on Cygwin starts an interactive
+# session when a terminal is attached to stdin, which blocks the scan
+# evaluation of the source-sh fixture modulefiles made by spider
+if {$os_name ne {cygwin} || !$is_stdin_tty} {
 colorset_test_case {spider loc_tr/3.0 loc_tr/1} [list hi loc_tr/1 hi loc_tr/3.0] ".*loc_tr/1.0.*loc_tr/3.0.*"
+} elseif {$verbose} {
+    send_user "\tSkip spider test as fish shell blocks with a terminal on Cygwin\n"
+}
 colorset_test_case {whatis loc_tr} [list hi loc_tr] ".*\\s+loc_tr/1.0: .*\\s+loc_tr/2.0: .*\\s+loc_tr/3.0: .*"
 colorset_test_case {whatis loc_tr/2.0 loc_tr/1.0} [list hi loc_tr/1.0 hi loc_tr/2.0] ".*\\s+loc_tr/1.0: .*\\s+loc_tr/2.0: .*"
 colorset_test_case {search loc_tr} [list hi loc_tr] ".*: loc_tr/1.0\n.*: loc_tr/2.0\n.*: loc_tr/3.0"

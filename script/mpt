@@ -1,0 +1,726 @@
+#!/usr/bin/env expect
+#
+# MPT, make parallel tests by running testsuite files in isolated shards
+# Copyright (C) 2026 Xavier Delaruelle
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+##########################################################################
+
+proc reportUsage {} {
+   puts "Usage: $::argv0 \[options\] -j jobs \[testfile...\]
+
+Run testsuite files of the 'modules' tool concurrently: files are split
+into shards, each run by its own 'runtest' process in a private copy of
+the testsuite directory. Shard results are then merged in the modules.log
+and modules.sum files of the object directory.
+
+The TCLSH, MODULECMD, OBJDIR and TESTSUITEDIR environment variables must
+be set like for a 'make test' run. RUNTESTFLAGS and RUNTESTFILES are
+honored the same way.
+
+Options:
+  -j, --jobs N    Number of shards to run concurrently
+  -s, --size N    Maximum number of test files per shard (default: 8)
+  -t, --timeout N Minutes without new result in a shard before it is
+                  considered stalled and stopped (default: 10)
+  -h, --help      Show this help message and exit
+
+Examples:
+  $::argv0 -j 8
+  $::argv0 -j 4 470-variant.exp 471-variant-shortcut.exp"
+}
+
+proc reportError {str} {
+   puts stderr "ERROR: $str"
+}
+
+proc exitOnError {str} {
+   reportError $str
+   exit 1
+}
+
+proc sgr {sgrcode str} {
+   return "\033\[${sgrcode}m$str\033\[0m"
+}
+
+# files of the testsuite bootstrap series that every shard needs to run
+# first (same list as in script/mt)
+set setup_serie modules.00-init
+set setup_files [list 005-init_ts.exp 006-procs.exp 010-environ.exp\
+   050-modpath.exp 060-build_cache.exp 085-save_test_env.exp]
+
+# series whose files depend on each other and must be run as a whole, in a
+# single shard
+set whole_series [list modules.60-initx modules.61-coll]
+
+# series-level init and cleanup files, added to every shard (DejaGnu matches
+# file names in every serie directory, so those files of every serie are run
+# by each shard, like script/mt does)
+set serie_init_file 010-init_ts.exp
+set serie_cleanup_file 999-cleanup.exp
+
+set tool modules
+
+# report progress as it happens even if output is not a terminal
+fconfigure stdout -buffering line
+
+# period in milliseconds between two activity checks of a running shard
+set watch_period 30000
+
+# delay in milliseconds given to the processes of a shard to end once asked
+set stop_period 30000
+
+# entries of object directory that tests alter (a broken Tcl extension
+# library is for instance checked by replacing its file), so they are copied
+# in shard directory rather than linked
+set copied_entries [list lib]
+
+# entries of object directory whose content is linked file by file rather
+# than the entry itself, so that files written there land in shard
+# directory: the instrumented scripts of coverage mode write their log in
+# tcl/ relative to current directory
+set linked_content_entries [list tcl]
+
+##########################################################################
+# parse arguments and environment
+
+set jobs {}
+set shard_size 8
+set shard_timeout 10
+set testfiles [list]
+set hintmsg "\n  Try '$argv0 --help' for more information."
+for {set i 0} {$i < $argc} {incr i} {
+   set arg [lindex $argv $i]
+   switch -glob -- $arg {
+      -h - --help {
+         reportUsage
+         exit 0
+      }
+      -j - --jobs {
+         set jobs [lindex $argv [incr i]]
+      }
+      -j* {
+         set jobs [string range $arg 2 end]
+      }
+      -s - --size {
+         set shard_size [lindex $argv [incr i]]
+      }
+      -t - --timeout {
+         set shard_timeout [lindex $argv [incr i]]
+      }
+      -* {
+         exitOnError "Invalid option '$arg'$hintmsg"
+      }
+      default {
+         lappend testfiles $arg
+      }
+   }
+}
+if {![string is integer -strict $jobs] || $jobs < 1} {
+   exitOnError "Invalid or missing number of jobs$hintmsg"
+}
+if {![string is integer -strict $shard_size] || $shard_size < 1} {
+   exitOnError "Invalid shard size '$shard_size'$hintmsg"
+}
+if {![string is integer -strict $shard_timeout] || $shard_timeout < 1} {
+   exitOnError "Invalid shard timeout '$shard_timeout'$hintmsg"
+}
+foreach var {TCLSH MODULECMD OBJDIR TESTSUITEDIR} {
+   if {![info exists env($var)] || ![string length $env($var)]} {
+      exitOnError "$var environment variable is not set"
+   }
+}
+set objdir [file normalize $env(OBJDIR)]
+set testsuitedir [file normalize $env(TESTSUITEDIR)]
+set runtestflags [expr {[info exists env(RUNTESTFLAGS)] ?\
+   $env(RUNTESTFLAGS) : {}}]
+if {![llength $testfiles] && [info exists env(RUNTESTFILES)]} {
+   set testfiles $env(RUNTESTFILES)
+}
+
+##########################################################################
+# gather test files and split them into shards
+
+# test files are referred to as 'serie/file' relatively to testsuite dir
+if {[llength $testfiles]} {
+   set selected [list]
+   foreach name $testfiles {
+      set name [file tail $name]
+      set found [glob -nocomplain -directory $testsuitedir -tails\
+         $tool.*/$name]
+      if {![llength $found]} {
+         exitOnError "Cannot find test file '$name' in $testsuitedir"
+      }
+      lappend selected {*}$found
+   }
+   set selected [lsort -unique $selected]
+} else {
+   set selected [lsort [glob -directory $testsuitedir -tails\
+      $tool.*/*.exp]]
+}
+
+# group files by serie
+set serie_files [dict create]
+foreach relfile $selected {
+   dict lappend serie_files [file dirname $relfile] [file tail $relfile]
+}
+
+# a shard is the list of test file names passed to one runtest process,
+# DejaGnu runs them sorted by serie then by file name
+set shards [list]
+foreach serie [lsort [dict keys $serie_files]] {
+   set files [lsort [dict get $serie_files $serie]]
+   if {$serie eq $setup_serie} {
+      # bootstrap serie is run as a whole to also check its own test files,
+      # unless only setup files are selected as every shard runs them
+      if {[llength $files] > [llength $setup_files]} {
+         lappend shards [list $serie $files]
+      }
+      continue
+   }
+   set others [lsearch -all -inline -not -exact [lsearch -all -inline\
+      -not -exact $files $serie_init_file] $serie_cleanup_file]
+   # nothing specific to run for serie, its init and cleanup files are run
+   # by every shard
+   if {![llength $others]} {
+      continue
+   }
+   if {$serie in $whole_series || [llength $others] <= $shard_size} {
+      set chunks [list $others]
+   } else {
+      set chunks [list]
+      for {set i 0} {$i < [llength $others]} {incr i $shard_size} {
+         lappend chunks [lrange $others $i [expr {$i + $shard_size - 1}]]
+      }
+   }
+   foreach chunk $chunks {
+      lappend shards [list $serie [list {*}$setup_files $serie_init_file\
+         {*}$chunk $serie_cleanup_file]]
+   }
+}
+
+# only setup, init or cleanup files are selected: run them in one shard,
+# like a sequential run does
+if {![llength $shards]} {
+   set names [list]
+   foreach relfile $selected {
+      lappend names [file tail $relfile]
+   }
+   lappend shards [list $setup_serie [lsort -unique [concat $setup_files\
+      $names]]]
+}
+
+# start with biggest shards to even out the load between jobs, test file
+# size being a rough estimate of its run time
+proc getShardWeight {shard} {
+   lassign $shard serie files
+   set weight 0
+   foreach file $files {
+      # setup files are not from shard serie and not every serie has init
+      # or cleanup file
+      set path [file join $::testsuitedir $serie $file]
+      if {[file exists $path]} {
+         incr weight [file size $path]
+      }
+   }
+   return $weight
+}
+set weighted [list]
+set id 0
+foreach shard $shards {
+   lappend weighted [list $id [getShardWeight $shard]]
+   incr id
+}
+set shard_order [list]
+foreach elt [lsort -integer -decreasing -index 1 $weighted] {
+   lappend shard_order [lindex $elt 0]
+}
+set nb_shards [llength $shards]
+
+proc getShardLabel {id} {
+   lassign [lindex $::shards $id] serie files
+   set serie [string range $serie [string length $::tool.] end]
+   if {$serie eq [string range $::setup_serie [string length $::tool.]\
+      end]} {
+      return $serie
+   }
+   # only keep files specific to shard
+   set own [list]
+   foreach file $files {
+      if {$file ni $::setup_files && $file ne $::serie_init_file && $file\
+         ne $::serie_cleanup_file} {
+         lappend own $file
+      }
+   }
+   if {![llength $own]} {
+      return $serie
+   }
+   set first [string range [lindex $own 0] 0 2]
+   set last [string range [lindex $own end] 0 2]
+   return [expr {$first eq $last ? "$serie/$first" :\
+      "$serie/$first-$last"}]
+}
+
+##########################################################################
+# run shards
+
+set sharddir [file join $objdir .testshards]
+file delete -force $sharddir
+file mkdir $sharddir
+
+# make sure a link is created rather than a copy of target, like MSYS2 does
+# by default: copying large object directory entries like .git for each
+# shard would be too slow and coverage logs written in shard directory would
+# not be seen
+proc linkEntry {link target} {
+   file link -symbolic $link $target
+   if {[file type $link] ne {link}} {
+      exitOnError "'$link' is not a symbolic link: symbolic link support\
+         is required (set MSYS=winsymlinks:native on MSYS2)"
+   }
+}
+
+proc setupShardDir {id} {
+   set dir [file join $::sharddir $id]
+   file mkdir $dir
+   # private copy of the testsuite directory as tests write into it (it is
+   # also used as HOME directory)
+   exec cp -R $::testsuitedir [file join $dir testsuite]
+   # link everything else from object directory (built modulecmd script,
+   # site.exp, linter, etc), unless tests alter it
+   foreach entry [glob -nocomplain -directory $::objdir -tails * .*] {
+      if {$entry in [list . .. testsuite .testshards] || [string match\
+         *.log $entry] || [string match *.sum $entry]} {
+         continue
+      }
+      if {$entry in $::copied_entries} {
+         exec cp -R [file join $::objdir $entry] [file join $dir $entry]
+      } elseif {$entry in $::linked_content_entries} {
+         file mkdir [file join $dir $entry]
+         foreach subentry [glob -nocomplain -directory [file join $::objdir\
+            $entry] -tails *] {
+            # leave out coverage logs and their lock file
+            if {[string match *_log $subentry] || [string match *.lck\
+               $subentry]} {
+               continue
+            }
+            linkEntry [file join $dir $entry $subentry] [file join $::objdir\
+               $entry $subentry]
+         }
+      } else {
+         linkEntry [file join $dir $entry] [file join $::objdir $entry]
+      }
+   }
+   return $dir
+}
+
+# expect script run after shard process is spawned to wait for its end
+# and exit with its status. It first reports the process id of the spawned
+# shell, which is also the id of the process group every process of the
+# shard belongs to. When asked to terminate, it stops this process group
+# itself, as the processes blocked on an input may survive the loss of
+# their terminal, and would then keep the shard directory busy
+##nagelfar syntax trap x x
+set expect_script {
+   puts [exp_pid]
+   flush stdout
+   trap {
+      catch {exec kill -TERM -- -[exp_pid]}
+      expect -timeout 5 eof
+      exit 1
+   } SIGTERM
+   expect -timeout -1 eof
+   lassign [wait] pid spawnid oserr status
+   exit [expr {$oserr == -1 ? 1 : $status}]
+}
+
+proc shellQuote {str} {
+   return '[string map {' '\\''} $str]'
+}
+
+proc startShard {id} {
+   set dir [setupShardDir $id]
+   lassign [lindex $::shards $id] serie files
+   set shardtsdir [file join $dir testsuite]
+   set cmd "cd [shellQuote $dir] && TESTSUITEDIR=[shellQuote $shardtsdir]\
+      OBJDIR=[shellQuote $dir] runtest --srcdir [shellQuote $shardtsdir]\
+      --objdir [shellQuote $dir] $::runtestflags --tool $::tool $files"
+   # run shard under a pseudo-terminal of its own, as some tests change the
+   # column number of the terminal attached to the test harness
+   set ecmd "[list spawn -noecho sh -c $cmd]\n$::expect_script"
+   set fid [open "|expect -c [list $ecmd] 2>@1" r]
+   fconfigure $fid -blocking 0
+   fileevent $fid readable [list onShardOutput $id $fid]
+   set ::running($id) $fid
+   set ::shard_logsize($id) -1
+   set ::shard_lastactive($id) [clock seconds]
+   set ::shard_watch($id) [after $::watch_period [list checkShardActivity\
+      $id]]
+}
+
+proc getLastLogLine {id} {
+   set last {}
+   catch {
+      set fid [open [file join $::sharddir $id $::tool.log] r]
+      foreach line [split [string trimright [read $fid] \n] \n] {
+         if {$line ne {}} {
+            set last $line
+         }
+      }
+      close $fid
+   }
+   return $last
+}
+
+# a test waiting for an input that never comes would hang the whole run, so
+# a shard is stopped when its log file, that runtest fills as tests
+# complete, stops growing for too long
+proc checkShardActivity {id} {
+   if {![info exists ::running($id)]} {
+      return
+   }
+   set logsize 0
+   catch {set logsize [file size [file join $::sharddir $id $::tool.log]]}
+   set now [clock seconds]
+   if {$logsize != $::shard_logsize($id)} {
+      set ::shard_logsize($id) $logsize
+      set ::shard_lastactive($id) $now
+   } elseif {$now - $::shard_lastactive($id) >= $::shard_timeout * 60} {
+      set ::shard_stalled($id) 1
+      puts "Shard [getShardLabel $id] stalled for $::shard_timeout min,\
+         stopping it (last log line: [getLastLogLine $id])"
+      foreach line [getShardProcesses $id] {
+         puts "   $line"
+      }
+      stopShard $id
+      return
+   }
+   set ::shard_watch($id) [after $::watch_period [list checkShardActivity\
+      $id]]
+}
+
+# processes of shard, found among the descendants of its wrapper
+proc getShardProcesses {id} {
+   set lines [list]
+   if {![catch {exec ps -ef} psout]} {
+      # columns are UID PID PPID then platform-specific ones and command
+      set procs [dict create]
+      foreach line [lrange [split $psout \n] 1 end] {
+         if {[regexp {^\s*\S+\s+(\d+)\s+(\d+)} $line match pid ppid]} {
+            dict set procs $pid [list $ppid [string trim $line]]
+         }
+      }
+      # process ids are not necessarily sorted parent first
+      set descendants [list [pid $::running($id)]]
+      set found 1
+      while {$found} {
+         set found 0
+         dict for {pid info} $procs {
+            if {[lindex $info 0] in $descendants && $pid ni $descendants} {
+               lappend descendants $pid
+               lappend lines [lindex $info 1]
+               set found 1
+            }
+         }
+      }
+   }
+   return $lines
+}
+
+# stop a running shard: its process group is terminated, then killed if it
+# is still there after a while, and the shard is eventually dropped if it
+# cannot be ended, so that a process that cannot be stopped does not block
+# the whole run
+proc stopShard {id} {
+   if {[info exists ::shard_pid($id)]} {
+      catch {exec kill -TERM -- -$::shard_pid($id)}
+   }
+   catch {exec kill -TERM [pid $::running($id)]}
+   set ::shard_stop($id) [after $::stop_period [list killShard $id]]
+}
+
+proc killShard {id} {
+   if {![info exists ::running($id)]} {
+      return
+   }
+   puts "Shard [getShardLabel $id] is still running, killing its processes"
+   if {[info exists ::shard_pid($id)]} {
+      catch {exec kill -KILL -- -$::shard_pid($id)}
+   }
+   catch {exec kill -KILL [pid $::running($id)]}
+   set ::shard_stop($id) [after $::stop_period [list dropShard $id]]
+}
+
+proc dropShard {id} {
+   if {![info exists ::running($id)]} {
+      return
+   }
+   puts "Shard [getShardLabel $id] cannot be ended, giving up on it"
+   set fid $::running($id)
+   fileevent $fid readable {}
+   after cancel $::shard_watch($id)
+   set ::shard_status($id) 1
+   endShard $id
+}
+
+# handle the end of a shard, whatever the way it ended
+proc endShard {id} {
+   if {[info exists ::shard_stop($id)]} {
+      after cancel $::shard_stop($id)
+      # processes of a stopped shard that ignored the termination request
+      # would keep the shard directory busy
+      if {[info exists ::shard_pid($id)]} {
+         catch {exec kill -KILL -- -$::shard_pid($id)}
+      }
+   }
+   unset ::running($id)
+   # an error here, like a shard directory left busy by a process that
+   # could not be stopped, must not prevent the run from completing
+   if {[catch {reportShardResult $id} msg]} {
+      reportError "Cannot handle result of shard [getShardLabel $id]: $msg"
+   }
+   startNextShard
+}
+
+proc onShardOutput {id fid} {
+   # the wrapper only reports the process group id of shard, runtest output
+   # goes to the pseudo-terminal and everything is in the shard log file
+   foreach line [split [read $fid] \n] {
+      if {[string is integer -strict $line]} {
+         set ::shard_pid($id) $line
+      }
+   }
+   if {[eof $fid]} {
+      after cancel $::shard_watch($id)
+      fconfigure $fid -blocking 1
+      if {[catch {close $fid} msg]} {
+         set ::shard_status($id) 1
+      } else {
+         set ::shard_status($id) 0
+      }
+      endShard $id
+   }
+}
+
+proc countResults {sumfile} {
+   set counts [dict create PASS 0 FAIL 0 XFAIL 0 XPASS 0 UNRESOLVED 0\
+      UNTESTED 0 UNSUPPORTED 0 ERROR 0]
+   if {[catch {open $sumfile r} fid]} {
+      return $counts
+   }
+   while {[gets $fid line] >= 0} {
+      set kind [string range $line 0 [expr {[string first : $line] - 1}]]
+      if {[dict exists $counts $kind]} {
+         dict incr counts $kind
+      }
+   }
+   close $fid
+   return $counts
+}
+
+# merge a coverage log file, made of incr and lappend commands over the
+# counters of instrumented lines, into a dictionary keyed by counter name
+proc readCovLog {file dictvar} {
+   upvar 1 $dictvar covlog
+   set fid [open $file r]
+   set content [read $fid]
+   close $fid
+   foreach line [split $content \n] {
+      switch -- [lindex $line 0] {
+         incr {
+            dict incr covlog [lindex $line 1] [lindex $line 2]
+         }
+         lappend {
+            dict lappend covlog [lindex $line 1] {*}[lrange $line 2 end]
+         }
+      }
+   }
+}
+
+# write coverage log file in the same format Nagelfar produces
+proc writeCovLog {file covlog} {
+   set fid [open $file w]
+   foreach var [lsort -dictionary [dict keys $covlog]] {
+      set val [dict get $covlog $var]
+      if {[string match {*,var)} $var]} {
+         puts $fid [linsert $val 0 lappend $var]
+      } else {
+         puts $fid [list incr $var $val]
+      }
+   }
+   close $fid
+}
+
+# collect coverage logs written by shard, which are merged with those
+# already in object directory, like instrumented scripts do when they exit
+proc mergeShardCovLogs {dir} {
+   foreach entry $::linked_content_entries {
+      foreach file [glob -nocomplain -directory [file join $dir $entry]\
+         -types f *_log] {
+         set relfile [file join $entry [file tail $file]]
+         if {![info exists ::covlog($relfile)]} {
+            set ::covlog($relfile) [dict create]
+            set objfile [file join $::objdir $relfile]
+            if {[file exists $objfile]} {
+               readCovLog $objfile ::covlog($relfile)
+            }
+         }
+         readCovLog $file ::covlog($relfile)
+      }
+      file delete -force [file join $dir $entry]
+   }
+}
+
+proc reportShardResult {id} {
+   set dir [file join $::sharddir $id]
+   set counts [countResults [file join $dir $::tool.sum]]
+   set ::shard_counts($id) $counts
+   incr ::nb_done
+   set res "pass=[dict get $counts PASS]"
+   set issue 0
+   foreach {kind label} {FAIL fail XFAIL xfail UNRESOLVED unresolved ERROR\
+      error} {
+      if {[dict get $counts $kind] > 0} {
+         append res ", $label=[dict get $counts $kind]"
+         set issue 1
+      }
+   }
+   if {[info exists ::shard_stalled($id)]} {
+      append res ", stalled for $::shard_timeout min then stopped"
+      set issue 1
+   } elseif {$::shard_status($id) && ![dict get $counts FAIL]} {
+      append res [expr {$::aborted ? {, aborted} : {, runtest exited in\
+         error}}]
+      set issue 1
+   }
+   set label [format "%*d/%d %s" [string length $::nb_shards] $::nb_done\
+      $::nb_shards [getShardLabel $id]]
+   if {$issue} {
+      puts "[sgr {1;31} $label]: $res"
+   } else {
+      puts "$label: $res"
+   }
+   mergeShardCovLogs $dir
+   # drop testsuite copy once run, shard logs are kept
+   file delete -force [file join $dir testsuite]
+}
+
+proc startNextShard {} {
+   if {[llength $::shard_order] && !$::aborted} {
+      set ::shard_order [lassign $::shard_order id]
+      startShard $id
+   } elseif {![array size ::running]} {
+      set ::all_done 1
+   }
+}
+
+# stop run on interruption signal: no new shard is started and running ones
+# are stopped. Results obtained so far are then merged and shard
+# directories cleaned like for a complete run
+proc abortRun {} {
+   if {$::aborted} {
+      return
+   }
+   set ::aborted 1
+   puts "\nRun interrupted, stopping running shards"
+   foreach id [array names ::running] {
+      stopShard $id
+   }
+}
+trap abortRun {SIGINT SIGTERM SIGHUP}
+
+# remove result files of a previous run, as an interrupted run may not
+# produce them
+file delete [file join $objdir $tool.log] [file join $objdir $tool.sum]
+
+puts "Running $nb_shards shards with $jobs jobs"
+set nb_done 0
+set all_done 0
+set aborted 0
+array set running {}
+array set shard_status {}
+array set shard_counts {}
+array set covlog {}
+for {set i 0} {$i < $jobs && [llength $shard_order]} {incr i} {
+   startNextShard
+}
+vwait all_done
+
+##########################################################################
+# merge shard results
+
+# append the test results of each shard, in run order, to the merged log
+# and sum files, dropping the summary section of each shard
+foreach ext {log sum} {
+   set outfid [open [file join $objdir $tool.$ext] w]
+   for {set id 0} {$id < $nb_shards} {incr id} {
+      set shardfile [file join $sharddir $id $tool.$ext]
+      if {[catch {open $shardfile r} fid]} {
+         continue
+      }
+      set content [read $fid]
+      close $fid
+      set sumidx [string first "\t\t=== $tool Summary ===" $content]
+      if {$sumidx != -1} {
+         set content [string range $content 0 [expr {$sumidx - 1}]]
+      }
+      puts -nonewline $outfid $content
+   }
+   set totals [dict create PASS 0 FAIL 0 XFAIL 0 XPASS 0 UNRESOLVED 0\
+      UNTESTED 0 UNSUPPORTED 0 ERROR 0]
+   foreach id [array names shard_counts] {
+      dict for {kind nb} $shard_counts($id) {
+         dict incr totals $kind $nb
+      }
+   }
+   puts $outfid "\n\t\t=== $tool Summary ===\n"
+   set summary [list]
+   foreach {kind label} {PASS {expected passes} FAIL {unexpected failures}\
+      XFAIL {expected failures} XPASS {unexpected successes} UNRESOLVED\
+      {unresolved testcases} UNTESTED {untested testcases} UNSUPPORTED\
+      {unsupported tests}} {
+      if {[dict get $totals $kind] > 0} {
+         lappend summary "# of $label\t\t[dict get $totals $kind]"
+      }
+   }
+   puts $outfid [join $summary \n]
+   if {$ext eq {log}} {
+      puts $outfid "runtest completed at [clock format [clock seconds]]"
+   }
+   close $outfid
+}
+
+# write merged coverage logs in object directory, for Nagelfar markup
+foreach relfile [array names covlog] {
+   writeCovLog [file join $objdir $relfile] $covlog($relfile)
+}
+
+# report summary like runtest does
+puts "\n\t\t=== $tool Summary ===\n"
+puts [join $summary \n]
+
+# shard log files are kept for review
+set exit_status $aborted
+foreach kind {FAIL XPASS UNRESOLVED ERROR} {
+   if {[dict get $totals $kind] > 0} {
+      set exit_status 1
+   }
+}
+foreach id [array names shard_status] {
+   if {$shard_status($id)} {
+      set exit_status 1
+   }
+}
+exit $exit_status
