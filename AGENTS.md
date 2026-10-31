@@ -214,12 +214,13 @@ list (immediately before the next `.. _X.Y release notes:` section marker),
 not inserted by topic or alphabetically — entries are in the order changes
 landed.
 
-## Adding a new `module` sub-command or config option
+## Adding a new `module` sub-command, config option or command line switch
 
-Don't improvise the file list — `doc/source/devel/add-new-sub-command.rst`
-and `doc/source/devel/add-new-config-option.rst` enumerate, in order, every
-file that needs a change: core Tcl (`main.tcl.in`/`subcmd.tcl.in` or
+Don't improvise the file list — `doc/source/devel/add-new-sub-command.rst`,
+`doc/source/devel/add-new-config-option.rst` and
+`doc/source/devel/add-new-command-line-switch.rst` enumerate, in order,
+every file that needs a change: core Tcl (`main.tcl.in`/`subcmd.tcl.in` or
 `init.tcl.in`), shell completion scripts, Nagelfar syntax db, man pages
 (`doc/source/module.rst`, `modulefile.rst`), `doc/source/changes.rst`, and
 the specific testsuite files/directories to extend. Read the relevant one
-before starting either task.
+before starting any of these tasks.
