@@ -915,6 +915,16 @@ testouterr_shtomod bash {} OK $tserr
 
 
 #
+# script reading standard input
+#
+
+# script is evaluated with an empty standard input, so it cannot read what is
+# passed to the module command
+set tserr "#%Module\nsetenv\t\tFOO read_"
+testinouterr_cmd sh "sh-to-mod $onesh testsuite/example/stdin-to-mod.sh" hello OK $tserr
+
+
+#
 #  Cleanup
 #
 
