@@ -1422,10 +1422,7 @@ lappend ans [list out {complete -e -c mycmd;}]
 lappend ans [list out {complete -c mycmd --exclusive --short-option 'h' --description 'Command help';}]
 }
 lappend ans [list chdir $mp]
-# following test is expected to fail on CYGWIN due to a packaging issue:
-# fish shell initialization script uses pgrep utility which is not available
-# see https://cygwin.com/pipermail/cygwin/2024-January/255154.html
-testouterr_cmd fish {load source-sh/7.2} $ans {} [expr {$os_name eq {cygwin} ? {xfail} : {}}]
+testouterr_cmd fish {load source-sh/7.2} $ans {}
 
 if {[info exists fish_version_ge31] && $fish_version_ge31} {
 set tserr_disp72 "-------------------------------------------------------------------
