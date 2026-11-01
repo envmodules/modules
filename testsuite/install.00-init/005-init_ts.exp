@@ -56,6 +56,20 @@ send_user "\tsh_kind is '$sh_kind'\n"
 # extract and format os name
 set os_name [string tolower [lindex [split $tcl_platform(os) _] 0]]
 
+# fish package on Cygwin ships a /etc/fish/conf.d/01_fish_variables.fish
+# snippet that, when executed, kills the other running fish processes and
+# leaves its own fish session without output, which breaks the fish-based
+# tests of test files run concurrently and the first fish-based test of a
+# run: mask this snippet with an empty file of the same name in a user
+# configuration directory set in testsuite directory, as fish only sources
+# the first snippet found for a given file name
+if {$os_name eq {cygwin}} {
+   set fish_confd $env(TESTSUITEDIR)/.config/fish/conf.d
+   file mkdir $fish_confd
+   close [open $fish_confd/01_fish_variables.fish w]
+   set env(XDG_CONFIG_HOME) $env(TESTSUITEDIR)/.config
+}
+
 # determine if sh-shell is a strict sh implementation
 if {$sh_kind eq "dash" || $os_name ni {linux darwin cygwin mingw msys}} {
    set sh_strict 1

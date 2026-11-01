@@ -216,6 +216,20 @@ unset test_perms_file
 unset orig_perms
 unset new_perms
 
+# fish package on Cygwin ships a /etc/fish/conf.d/01_fish_variables.fish
+# snippet that, when executed, kills the other running fish processes and
+# leaves its own fish session without output, which breaks the fish-based
+# tests of test files run concurrently and the first fish-based test of a
+# run: mask this snippet with an empty file of the same name in a user
+# configuration directory set in testsuite directory, as fish only sources
+# the first snippet found for a given file name
+if {$os_name eq {cygwin}} {
+   set fish_confd $env(TESTSUITEDIR)/.config/fish/conf.d
+   file mkdir $fish_confd
+   close [open $fish_confd/01_fish_variables.fish w]
+   set env(XDG_CONFIG_HOME) $env(TESTSUITEDIR)/.config
+}
+
 # check if module command is defined prior running tests
 set is_modules_defined [expr {![catch {exec $env(TESTSUITEDIR)/is_func_defined module}]}]
 set is_modules_defined_fish [expr {![catch {exec $env(TESTSUITEDIR)/is_func_defined.fish module}]}]
