@@ -995,8 +995,8 @@ instance :instopt:`--without-modulepath<--with-modulepath>`):
  Specify the content to report on avail sub-command JSON output in addition
  to the available module names. Elements accepted in LIST are:
  ``modulepath``, ``alias``, ``provided-alias``, ``dirwsym``, ``sym``,
- ``tag``, ``hidden``, ``variant``, ``variantifspec`` and ``via`` (elements in
- LIST are separated by ``:``). The order of the elements in LIST
+ ``tag``, ``hidden``, ``variant``, ``variantifspec``, ``via`` and ``mtime``
+ (elements in LIST are separated by ``:``). The order of the elements in LIST
  does not matter.
  (default=\ ``modulepath:alias:dirwsym:sym:tag:via``)
 
@@ -1279,8 +1279,8 @@ instance :instopt:`--without-modulepath<--with-modulepath>`):
 
  Specify the content to report on list sub-command JSON output in addition
  to the loaded module names. Elements accepted in LIST are:
- ``variant``, ``alias``, ``sym``, ``tag``, ``hidden`` and ``via`` (elements
- in LIST are separated by ``:``). The order of the elements in LIST
+ ``variant``, ``alias``, ``sym``, ``tag``, ``hidden``, ``via`` and ``mtime``
+ (elements in LIST are separated by ``:``). The order of the elements in LIST
  does not matter.
  (default=\ ``variant:sym:tag:via``)
 
@@ -1544,8 +1544,8 @@ instance :instopt:`--without-modulepath<--with-modulepath>`):
  Specify the content to report on spider sub-command JSON output in addition
  to the available module names. Elements accepted in LIST are:
  ``modulepath``, ``alias``, ``provided-alias``, ``dirwsym``, ``sym``,
- ``tag``, ``hidden``, ``variant``, ``variantifspec`` and ``via`` (elements in
- LIST are separated by ``:``). The order of the elements in LIST
+ ``tag``, ``hidden``, ``variant``, ``variantifspec``, ``via`` and ``mtime``
+ (elements in LIST are separated by ``:``). The order of the elements in LIST
  does not matter.
  (default=\ ``modulepath:alias:dirwsym:sym:tag:via``)
 

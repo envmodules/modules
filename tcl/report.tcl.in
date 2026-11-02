@@ -1378,7 +1378,9 @@ proc formatObjectValToJson {objlist} {
    return [expr {[info exists disp] ? "{ $disp }" : "{}"}]
 }
 
-# format an element with its syms for a json display in a list
+# format an element with its syms for a json display in a list (value type
+# is 'a' for array, 'o' for object, 's' for string or 'r' for raw value
+# already formatted in JSON)
 proc formatListEltToJsonDisplay {elt args} {
    set disp "\"$elt\": \{ \"name\": \"$elt\""
    foreach {key vtype val show} $args {
@@ -1390,6 +1392,7 @@ proc formatListEltToJsonDisplay {elt args} {
          a {append disp [formatArrayValToJson $val]}
          o {append disp [formatObjectValToJson $val]}
          s {append disp "\"$val\""}
+         r {append disp $val}
       }
    }
    append disp "\}"
@@ -1485,6 +1488,8 @@ proc reportModules {search_queries header hsgrkey hstyle show_mtime show_idx\
    set collect_variant_from [expr {[currentState commandname] in {avail\
       spider} ? {2} : {0}}]
    set report_via [isEltInReport via]
+   # modification time is a json-only element, not reported by default
+   set report_mtime [isEltInReport mtime 0]
 
    # prepare list of tag abbreviations that can be substituted and list of
    # tags whose name should be colored
@@ -1540,11 +1545,16 @@ proc reportModules {search_queries header hsgrkey hstyle show_mtime show_idx\
          }
          modulefile - virtual {
             if {$json} {
-               ##nagelfar ignore +4 Found constant
+               # null mtime if modulefile modification time cannot be fetched
+               set iso_mtime [expr {[lindex $mod_list($elt) 1] ne {} ?\
+                  "\"[clock format [lindex $mod_list($elt) 1] -format\
+                  %Y-%m-%dT%H:%M:%S%z]\"" : {null}}]
+               ##nagelfar ignore +5 Found constant
                set dispsgr [formatListEltToJsonDisplay $elt type s modulefile\
                   1 variants o $vr_list $report_variant symbols a $sym_list\
                   $report_sym tags a $tag_list $report_tag pathname s [lindex\
-                  $mod_list($elt) 2] 1 via a $via_list $report_via]
+                  $mod_list($elt) 2] 1 mtime r $iso_mtime $report_mtime via a\
+                  $via_list $report_via]
             } elseif {$show_mtime} {
                set clock_mtime [expr {[lindex $mod_list($elt) 1] ne {} ?\
                   [clock format [lindex $mod_list($elt) 1] -format {%Y/%m/%d\

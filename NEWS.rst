@@ -48,6 +48,9 @@ Modules 5.8.0 (not yet released)
   :envvar:`MODULES_LIST_JSON_OUTPUT` and :envvar:`MODULES_SPIDER_JSON_OUTPUT`
   environment variables or the :option:`--output` command line switch, which
   is now accepted on :option:`--json` output mode.
+* Add *mtime* element to the JSON output configuration of :subcmd:`avail`,
+  :subcmd:`list` and :subcmd:`spider` sub-commands to report the modification
+  time of modulefiles. (fix issue #615)
 
 
 .. _5.7 release notes:
