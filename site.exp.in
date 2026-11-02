@@ -122,6 +122,9 @@ set install_listoutput "@listoutput@"
 set install_listterseoutput "@listterseoutput@"
 set install_spideroutput "@spideroutput@"
 set install_spiderterseoutput "@spiderterseoutput@"
+set install_availjsonoutput "@availjsonoutput@"
+set install_listjsonoutput "@listjsonoutput@"
+set install_spiderjsonoutput "@spiderjsonoutput@"
 
 set install_variantshortcut "@variantshortcut@"
 

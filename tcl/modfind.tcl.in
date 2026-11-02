@@ -980,6 +980,9 @@ proc getVariantList {mod {report 0} {excl_dflval 0} {from 0}} {
          } elseif {$report == 3} {
             set vrarr($vrname) [list $vrvalue [expr {$vrvalisdfl > 0 &&\
                $vrvalisdfl < 3}]]
+         # all possible values are reported on json avail output
+         } elseif {$report == 4 && $from == 2} {
+            set vrarr($vrname) $vrvalues
          } else {
             set vrarr($vrname) $vrvalue
          }
@@ -989,7 +992,12 @@ proc getVariantList {mod {report 0} {excl_dflval 0} {from 0}} {
    set ret {}
    foreach vrname [lsort -dictionary [array names vrarr]] {
       switch -- $report {
-         4 {lappend ret $vrname $vrarr($vrname) $vrisbool($vrname)}
+         4 {
+            # value is an array of possible values on avail, a boolean or a
+            # string on list
+            lappend ret $vrname $vrarr($vrname) [expr {$from == 2 ? {a} :\
+               ($vrisbool($vrname) ? {b} : {s})}]
+         }
          3 {lappend ret $vrname [lindex $vrarr($vrname) 0] [lindex\
             $vrarr($vrname) 1]}
          2 {lappend ret [list $vrname 0 $vrisbool($vrname) $vrarr($vrname)]}

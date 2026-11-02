@@ -497,6 +497,9 @@ sed -e 's|@prefix@|$(prefix)|g' \
 	-e 's|@listterseoutput@|$(listterseoutput)|g' \
 	-e 's|@spideroutput@|$(spideroutput)|g' \
 	-e 's|@spiderterseoutput@|$(spiderterseoutput)|g' \
+	-e 's|@availjsonoutput@|$(availjsonoutput)|g' \
+	-e 's|@listjsonoutput@|$(listjsonoutput)|g' \
+	-e 's|@spiderjsonoutput@|$(spiderjsonoutput)|g' \
 	-e 's|@variantshortcut@|$(variantshortcut)|g' \
 	-e 's|@editor@|$(editor)|g' \
 	-e 's|@autohandling@|$(setautohandling)|g' \

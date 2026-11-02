@@ -392,10 +392,19 @@ set tserr "{\"$mp\": {
 }}"
 testouterr_cmd sh {avail -j variant} OK $tserr
 
-set tserr "{\"errors\": \[
-{ \"severity\": \"ERROR\", \"message\": \[ \"Unsupported option '-o' on json output mode\" \] } \]
-}"
-testouterr_cmd sh {avail -j -o variant variant} ERR $tserr
+set tserr "{\"variant/1.0\": { \"name\": \"variant/1.0\", \"type\": \"modulefile\", \"variants\": { \"bar\": \[ \"val1\", \"val2\", \"val3\" \], \"foo\": \[ \"val1\" \] }, \"pathname\": \"$mp/variant/1.0\"},
+\"variant/2.0\": { \"name\": \"variant/2.0\", \"type\": \"modulefile\", \"variants\": { \"foo\": \[ \"val1\" \] }, \"pathname\": \"$mp/variant/2.0\"},
+\"variant/2.1/2/1\": { \"name\": \"variant/2.1/2/1\", \"type\": \"modulefile\", \"variants\": {}, \"pathname\": \"$mp/variant/2.1/2/1\"},
+\"variant/3.0\": { \"name\": \"variant/3.0\", \"type\": \"modulefile\", \"variants\": { \"bar\": \[ \"val1\", \"val2\" \] }, \"pathname\": \"$mp/variant/3.0\"},
+\"variant/4.0\": { \"name\": \"variant/4.0\", \"type\": \"modulefile\", \"variants\": {}, \"pathname\": \"$mp/variant/4.0\"},
+\"variant/5.0\": { \"name\": \"variant/5.0\", \"type\": \"modulefile\", \"variants\": {}, \"pathname\": \"$mp/variant/5.0\"},
+\"variant/5.1\": { \"name\": \"variant/5.1\", \"type\": \"modulefile\", \"variants\": { \"foo\": \[ \"val1\", \"val2\", \"val3\" \] }, \"pathname\": \"$mp/variant/5.1\"},
+\"variant/6.0\": { \"name\": \"variant/6.0\", \"type\": \"modulefile\", \"variants\": {}, \"pathname\": \"$mp/variant/6.0\"},
+\"variant/7.0\": { \"name\": \"variant/7.0\", \"type\": \"modulefile\", \"variants\": { \"foo\": \[ \"val1\", \"val2\", \"val3\" \] }, \"pathname\": \"$mp/variant/7.0\"},
+\"variant/7.1\": { \"name\": \"variant/7.1\", \"type\": \"modulefile\", \"variants\": {}, \"pathname\": \"$mp/variant/7.1\"},
+\"variant/8.0\": { \"name\": \"variant/8.0\", \"type\": \"modulefile\", \"variants\": {}, \"pathname\": \"$mp/variant/8.0\"},
+\"variant/w s\": { \"name\": \"variant/w s\", \"type\": \"modulefile\", \"variants\": {}, \"pathname\": \"$mp/variant/w s\"}}"
+testouterr_cmd sh {avail -j -o variant variant} OK $tserr
 
 unsetenv_var TESTSUITE_VARIANT
 

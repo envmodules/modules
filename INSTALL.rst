@@ -990,6 +990,24 @@ instance :instopt:`--without-modulepath<--with-modulepath>`):
 
     .. versionadded:: 5.4
 
+.. instopt:: --with-avail-json-output=LIST
+
+ Specify the content to report on avail sub-command JSON output in addition
+ to the available module names. Elements accepted in LIST are:
+ ``modulepath``, ``alias``, ``provided-alias``, ``dirwsym``, ``sym``,
+ ``tag``, ``hidden``, ``variant``, ``variantifspec`` and ``via`` (elements in
+ LIST are separated by ``:``). The order of the elements in LIST
+ does not matter.
+ (default=\ ``modulepath:alias:dirwsym:sym:tag:via``)
+
+ This installation option defines the default value of the
+ :mconfig:`avail_json_output` configuration option which could be changed
+ after installation with the :subcmd:`config` sub-command.
+
+ .. only:: html or latex
+
+    .. versionadded:: 5.8
+
 .. instopt:: --with-avail-output=LIST
 
  Specify the content to report on avail sub-command regular output in addition
@@ -1257,6 +1275,23 @@ instance :instopt:`--without-modulepath<--with-modulepath>`):
     .. versionchanged:: 5.6
        Default ``nearly-forbidden`` tag color changed
 
+.. instopt:: --with-list-json-output=LIST
+
+ Specify the content to report on list sub-command JSON output in addition
+ to the loaded module names. Elements accepted in LIST are:
+ ``variant``, ``alias``, ``sym``, ``tag``, ``hidden`` and ``via`` (elements
+ in LIST are separated by ``:``). The order of the elements in LIST
+ does not matter.
+ (default=\ ``variant:sym:tag:via``)
+
+ This installation option defines the default value of the
+ :mconfig:`list_json_output` configuration option which could be changed
+ after installation with the :subcmd:`config` sub-command.
+
+ .. only:: html or latex
+
+    .. versionadded:: 5.8
+
 .. instopt:: --with-list-output=LIST
 
  Specify the content to report on list sub-command regular output in addition
@@ -1503,6 +1538,24 @@ instance :instopt:`--without-modulepath<--with-modulepath>`):
  .. only:: html or latex
 
     .. versionadded:: 4.3
+
+.. instopt:: --with-spider-json-output=LIST
+
+ Specify the content to report on spider sub-command JSON output in addition
+ to the available module names. Elements accepted in LIST are:
+ ``modulepath``, ``alias``, ``provided-alias``, ``dirwsym``, ``sym``,
+ ``tag``, ``hidden``, ``variant``, ``variantifspec`` and ``via`` (elements in
+ LIST are separated by ``:``). The order of the elements in LIST
+ does not matter.
+ (default=\ ``modulepath:alias:dirwsym:sym:tag:via``)
+
+ This installation option defines the default value of the
+ :mconfig:`spider_json_output` configuration option which could be changed
+ after installation with the :subcmd:`config` sub-command.
+
+ .. only:: html or latex
+
+    .. versionadded:: 5.8
 
 .. instopt:: --with-spider-output=LIST
 
@@ -1760,6 +1813,10 @@ installation.
 |                                   |                                              | :envvar:`MODULES_AVAIL_INDEPTH`,             |              |           |
 |                                   |                                              | :option:`--indepth`, :option:`--no-indepth`  |              |           |
 +-----------------------------------+----------------------------------------------+----------------------------------------------+--------------+-----------+
+| :mconfig:`avail_json_output`      | modulepath:alias:dirwsym:sym:tag:via         | :instopt:`--with-avail-json-output`,         |              |           |
+|                                   |                                              | :envvar:`MODULES_AVAIL_JSON_OUTPUT`,         |              |           |
+|                                   |                                              | :option:`--output`                           |              |           |
++-----------------------------------+----------------------------------------------+----------------------------------------------+--------------+-----------+
 | :mconfig:`avail_output`           | modulepath:alias:dirwsym:sym:tag:\           | :instopt:`--with-avail-output`,              |              |           |
 |                                   | variantifspec:key                            | :envvar:`MODULES_AVAIL_OUTPUT`,              |              |           |
 |                                   |                                              | :option:`--output`                           |              |           |
@@ -1836,6 +1893,10 @@ installation.
 |                                   |                                              | :envvar:`MODULES_INIT_ENVVARS`               |              |           |
 +-----------------------------------+----------------------------------------------+----------------------------------------------+--------------+-----------+
 | :mconfig:`linked_envvars`         | *Empty by default*                           | :envvar:`MODULES_LINKED_ENVVARS`             |              |           |
++-----------------------------------+----------------------------------------------+----------------------------------------------+--------------+-----------+
+| :mconfig:`list_json_output`       | variant:sym:tag:via                          | :instopt:`--with-list-json-output`,          |              |           |
+|                                   |                                              | :envvar:`MODULES_LIST_JSON_OUTPUT`,          |              |           |
+|                                   |                                              | :option:`--output`                           |              |           |
 +-----------------------------------+----------------------------------------------+----------------------------------------------+--------------+-----------+
 | :mconfig:`list_output`            | ``header:idx:variant:sym:tag:key``           | :instopt:`--with-list-output`,               |              |           |
 |                                   |                                              | :envvar:`MODULES_LIST_OUTPUT`,               |              |           |
@@ -1922,6 +1983,10 @@ installation.
 | :mconfig:`spider_indepth`         | ``1``                                        | :instopt:`--enable-spider-indepth`,          |              |           |
 |                                   |                                              | :envvar:`MODULES_SPIDER_INDEPTH`,            |              |           |
 |                                   |                                              | :option:`--indepth`, :option:`--no-indepth`  |              |           |
++-----------------------------------+----------------------------------------------+----------------------------------------------+--------------+-----------+
+| :mconfig:`spider_json_output`     | modulepath:alias:dirwsym:sym:tag:via         | :instopt:`--with-spider-json-output`,        |              |           |
+|                                   |                                              | :envvar:`MODULES_SPIDER_JSON_OUTPUT`,        |              |           |
+|                                   |                                              | :option:`--output`                           |              |           |
 +-----------------------------------+----------------------------------------------+----------------------------------------------+--------------+-----------+
 | :mconfig:`spider_output`          | modulepath:alias:dirwsym:sym:tag:\           | :instopt:`--with-spider-output`,             |              |           |
 |                                   | variantifspec:via:key                        | :envvar:`MODULES_SPIDER_OUTPUT`,             |              |           |

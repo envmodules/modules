@@ -58,12 +58,13 @@ testouterr_cmd sh {--output avail foo} ERR "$error_msgs: Missing value for '--ou
 # mix with --terse/--long/--json
 testouterr_cmd_re sh {avail -o sym --terse foo/1.0} OK $tserr_avail_terse_foo
 testouterr_cmd_re sh {avail -t --output=sym foo/1.0} OK $tserr_avail_terse_foo
-testouterr_cmd sh {avail -j --output=sym foo/1.0} ERR "{\"errors\": \[\n{ \"severity\": \"ERROR\", \"message\": \[ \"Unsupported option '--output' on json output mode\" \] } \]\n}"
+set tserr_avail_json_foo "{\"foo/1.0\": { \"name\": \"foo/1.0\", \"type\": \"modulefile\", \"symbols\": \[ \"bar\" \], \"pathname\": \"$mp/foo/1.0\"}}"
+testouterr_cmd sh {avail -j --output=sym foo/1.0} OK $tserr_avail_json_foo
 testouterr_cmd sh {avail -o sym -l foo/1.0} ERR "$error_msgs: Unsupported option '-o' on long output mode"
 testouterr_cmd sh {avail --long --output=sym foo/1.0} ERR "$error_msgs: Unsupported option '--output' on long output mode"
-testouterr_cmd sh {avail -j --output=sym foo/1.0} ERR "{\"errors\": \[\n{ \"severity\": \"ERROR\", \"message\": \[ \"Unsupported option '--output' on json output mode\" \] } \]\n}"
-testouterr_cmd sh {avail -o sym --json foo/1.0} ERR "{\"errors\": \[\n{ \"severity\": \"ERROR\", \"message\": \[ \"Unsupported option '-o' on json output mode\" \] } \]\n}"
-testouterr_cmd sh {avail -o sym --long -j foo/1.0} ERR "{\"errors\": \[\n{ \"severity\": \"ERROR\", \"message\": \[ \"Unsupported option '-o' on json output mode\" \] } \]\n}"
+testouterr_cmd sh {avail -o sym --json foo/1.0} OK $tserr_avail_json_foo
+testouterr_cmd sh {avail -o sym --long -j foo/1.0} OK $tserr_avail_json_foo
+testouterr_cmd sh {avail -o sym -j --long foo/1.0} ERR "$error_msgs: Unsupported option '-o' on long output mode"
 
 # test with ml shortcut command
 testouterr_cmd_re sh {ml av -o sym foo/1.0} OK $tserr_avail_foo
@@ -71,7 +72,7 @@ testouterr_cmd sh {ml av -o} ERR "$error_msgs: Missing value for '-o' option\n$e
 testouterr_cmd_re sh {ml --output=sym av foo/1.0} OK $tserr_avail_foo
 testouterr_cmd sh {--output ml av foo} ERR "$error_msgs: Missing value for '--output' option\n$err_typehelp"
 testouterr_cmd sh {ml av --long --output=sym foo/1.0} ERR "$error_msgs: Unsupported option '--output' on long output mode"
-testouterr_cmd sh {--json ml av -o sym foo/1.0} ERR "{\"errors\": \[\n{ \"severity\": \"ERROR\", \"message\": \[ \"Unsupported option '-o' on json output mode\" \] } \]\n}"
+testouterr_cmd sh {--json ml av -o sym foo/1.0} OK $tserr_avail_json_foo
 
 # test on a sub-command that does not support these options
 set ans [list]
@@ -105,6 +106,19 @@ testouterr_cmd sh {ml -o foo av foo} ERR $tserr_invalid_o_val
 testouterr_cmd sh {avail -o header foo} ERR $tserr_invalid_o_val
 testouterr_cmd sh {avail --output=idx foo} ERR $tserr_invalid_output_val
 testouterr_cmd sh {avail --output=header:key foo} ERR $tserr_invalid_output_val
+
+# invalid value set on json output mode
+set tserr_invalid_json_output_val "{\"errors\": \[\n{ \"severity\": \"ERROR\", \"message\": \[ \"Invalid element in value list for '--output' option on avail sub-command\", \"Allowed elements are: modulepath alias provided-alias dirwsym sym tag hidden variant variantifspec via (separated by ':')\" \] } \]\n}"
+set tserr_invalid_json_o_val "{\"errors\": \[\n{ \"severity\": \"ERROR\", \"message\": \[ \"Invalid element in value list for '-o' option on avail sub-command\", \"Allowed elements are: modulepath alias provided-alias dirwsym sym tag hidden variant variantifspec via (separated by ':')\" \] } \]\n}"
+testouterr_cmd sh {avail -j --output=foo foo} ERR $tserr_invalid_json_output_val
+testouterr_cmd sh {avail -j --output=sym,alias foo} ERR $tserr_invalid_json_output_val
+testouterr_cmd sh {avail -j -o foo foo} ERR $tserr_invalid_json_o_val
+testouterr_cmd sh {ml av -j -o +foo foo} ERR $tserr_invalid_json_o_val
+# element accepted on regular/terse output mode but not on json
+testouterr_cmd sh {avail -j --output=key foo} ERR $tserr_invalid_json_output_val
+testouterr_cmd sh {avail -j --output=sym:indesym foo} ERR $tserr_invalid_json_output_val
+testouterr_cmd sh {avail -j -o header foo} ERR $tserr_invalid_json_o_val
+testouterr_cmd sh {avail -j -o idx foo} ERR $tserr_invalid_json_o_val
 
 # test usage in modulefile
 set ans [list]
@@ -998,6 +1012,108 @@ setenv_var MODULES_AVAIL_TERSE_OUTPUT sym:tag
 testouterr_cmd sh {avail --output=+variant --terse variant/1.0} OK variant/1.0{foo=val1}
 testouterr_cmd sh {avail --output=+variant --terse foo/0.2} OK {foo/0.2(sym) <tag>}
 testouterr_cmd sh {avail -o -modulepath:sym:tag foo/0.2} OK {foo/0.2}
+
+
+#
+# MODULES_AVAIL_JSON_OUTPUT tests
+#
+
+set mp $modpath.3
+set mpre [regsub -all "\(\[.+?\]\)" $mp {\\\1}]
+setenv_path_var MODULEPATH $mp
+unsetenv_var MODULES_AVAIL_OUTPUT
+unsetenv_var MODULES_AVAIL_TERSE_OUTPUT
+unsetenv_var TESTSUITE_VARIANT
+setenv_var MODULES_ADVANCED_VERSION_SPEC 1
+setenv_var MODULES_IMPLICIT_DEFAULT 1
+setenv_var TESTSUITE_AVAIL_OUTPUT_FOO_SYM 1
+setenv_var TESTSUITE_AVAIL_OUTPUT_FOO_TAG 1
+
+# default content
+set tserr_avail_json "{\"$mp\": {
+\"foo/1.0\": { \"name\": \"foo/1.0\", \"type\": \"modulefile\", \"symbols\": \[ \"bar\" \], \"tags\": \[ \"baz\" \], \"pathname\": \"$mp/foo/1.0\", \"via\": \[\]}
+}}"
+testouterr_cmd sh {avail -j foo/1.0} OK $tserr_avail_json
+
+# only intrinsic keys are reported when no element is enabled
+set tserr_avail_json_min "{\"foo/1.0\": { \"name\": \"foo/1.0\", \"type\": \"modulefile\", \"pathname\": \"$mp/foo/1.0\"}}"
+testouterr_cmd sh {avail -j --output= foo/1.0} OK $tserr_avail_json_min
+testouterr_cmd sh {avail -j -o modulepath foo/1.0} OK "{\"$mp\": {\n\"foo/1.0\": { \"name\": \"foo/1.0\", \"type\": \"modulefile\", \"pathname\": \"$mp/foo/1.0\"}\n}}"
+
+setenv_var MODULES_AVAIL_JSON_OUTPUT tag:sym
+testouterr_cmd sh {avail -j foo/1.0} OK "{\"foo/1.0\": { \"name\": \"foo/1.0\", \"type\": \"modulefile\", \"symbols\": \[ \"bar\" \], \"tags\": \[ \"baz\" \], \"pathname\": \"$mp/foo/1.0\"}}"
+# no impact on regular/terse output
+testouterr_cmd_re sh {avail foo/1.0} OK "$modlin $mpre $modlin\nfoo/1.0\\(bar\\) <baz>\n\nKey:\n\\(symbolic-version\\)  <module-tag>"
+testouterr_cmd_re sh {avail -t foo/1.0} OK "$mpre:\nfoo/1.0\\(bar\\) <baz>"
+# -o/--output supersedes environment variable
+testouterr_cmd sh {avail -j -o modulepath foo/1.0} OK "{\"$mp\": {\n\"foo/1.0\": { \"name\": \"foo/1.0\", \"type\": \"modulefile\", \"pathname\": \"$mp/foo/1.0\"}\n}}"
+testouterr_cmd sh {avail -j --output=+modulepath foo/1.0} OK "{\"$mp\": {\n\"foo/1.0\": { \"name\": \"foo/1.0\", \"type\": \"modulefile\", \"symbols\": \[ \"bar\" \], \"tags\": \[ \"baz\" \], \"pathname\": \"$mp/foo/1.0\"}\n}}"
+testouterr_cmd sh {avail -j --output=-tag foo/1.0} OK "{\"foo/1.0\": { \"name\": \"foo/1.0\", \"type\": \"modulefile\", \"symbols\": \[ \"bar\" \], \"pathname\": \"$mp/foo/1.0\"}}"
+testouterr_cmd sh {ml av -j -o -tag:sym foo/1.0} OK $tserr_avail_json_min
+# invalid value set (ignored)
+setenv_var MODULES_AVAIL_JSON_OUTPUT foo
+testouterr_cmd sh {avail -j foo/1.0} OK $tserr_avail_json
+setenv_var MODULES_AVAIL_JSON_OUTPUT sym,tag
+testouterr_cmd sh {avail -j foo/1.0} OK $tserr_avail_json
+setenv_var MODULES_AVAIL_JSON_OUTPUT key:sym
+testouterr_cmd sh {avail -j foo/1.0} OK $tserr_avail_json
+unsetenv_var MODULES_AVAIL_JSON_OUTPUT
+
+# variant and variantifspec elements
+setenv_var TESTSUITE_VARIANT 13
+set tserr_avail_json_variant "{\"variant/1.0\": { \"name\": \"variant/1.0\", \"type\": \"modulefile\", \"variants\": { \"bar\": \[ \"val1\", \"val2\", \"val3\" \], \"foo\": \[ \"val1\" \] }, \"pathname\": \"$mp/variant/1.0\"}}"
+testouterr_cmd sh {avail -j -o variant variant/1.0} OK $tserr_avail_json_variant
+testouterr_cmd sh {avail -j -o variantifspec variant/1.0 foo=val1} OK $tserr_avail_json_variant
+testouterr_cmd sh {avail -j -o variantifspec variant/1.0} OK "{\"variant/1.0\": { \"name\": \"variant/1.0\", \"type\": \"modulefile\", \"pathname\": \"$mp/variant/1.0\"}}"
+# possible values of boolean variant
+testouterr_cmd sh {avail -j -o variant refresh/2.0} OK "{\"refresh/2.0\": { \"name\": \"refresh/2.0\", \"type\": \"modulefile\", \"variants\": { \"foo\": \[ \"on\", \"off\" \] }, \"pathname\": \"$mp/refresh/2.0\"}}"
+unsetenv_var TESTSUITE_VARIANT
+
+# hidden element
+set mp $modpath.2
+set mpre [regsub -all "\(\[.+?\]\)" $mp {\\\1}]
+setenv_path_var MODULEPATH $mp
+setenv_var TESTSUITE_HIDE2_SET1 1
+set tserr_hide2_json_10 "\"hide2/1.0\": { \"name\": \"hide2/1.0\", \"type\": \"modulefile\", \"pathname\": \"$mp/hide2/1.0\"}"
+set tserr_hide2_json_15 "\"hide2/1.5\": { \"name\": \"hide2/1.5\", \"type\": \"modulefile\", \"pathname\": \"$mp/hide2/1.0\"}"
+testouterr_cmd sh {avail -j -o modulepath hide2} OK "{\"$mp\": {\n$tserr_hide2_json_15\n}}"
+testouterr_cmd sh {avail -j -o modulepath:hidden hide2} OK "{\"$mp\": {\n$tserr_hide2_json_10,\n$tserr_hide2_json_15\n}}"
+testouterr_cmd sh {avail -j --all -o modulepath hide2} OK "{\"$mp\": {\n$tserr_hide2_json_10,\n$tserr_hide2_json_15\n}}"
+unsetenv_var TESTSUITE_HIDE2_SET1
+
+# alias element
+testouterr_cmd sh {avail -j -o modulepath hide2} OK "{\"$mp\": {\n$tserr_hide2_json_10,\n$tserr_hide2_json_15\n}}"
+testouterr_cmd sh {avail -j -o modulepath:alias hide2} OK "{\"$mp\": {\n$tserr_hide2_json_10,\n\"hide2/1.1\": { \"name\": \"hide2/1.1\", \"type\": \"alias\", \"target\": \"hide2/1.0\"},\n$tserr_hide2_json_15\n}}"
+testouterr_cmd sh {avail -j -o modulepath:alias:sym:tag hide2} OK "{\"$mp\": {
+\"hide2/1.0\": { \"name\": \"hide2/1.0\", \"type\": \"modulefile\", \"symbols\": \[ \"1.2\" \], \"tags\": \[\], \"pathname\": \"$mp/hide2/1.0\"},
+\"hide2/1.1\": { \"name\": \"hide2/1.1\", \"type\": \"alias\", \"symbols\": \[\], \"tags\": \[\], \"target\": \"hide2/1.0\"},
+\"hide2/1.5\": { \"name\": \"hide2/1.5\", \"type\": \"modulefile\", \"symbols\": \[\], \"tags\": \[\], \"pathname\": \"$mp/hide2/1.0\"}
+}}"
+
+# dirwsym element
+testouterr_cmd sh {avail -j -o modulepath:sym hide3/sub2} OK "{\"$mp\": {
+\"hide3/sub2/4.0\": { \"name\": \"hide3/sub2/4.0\", \"type\": \"modulefile\", \"symbols\": \[ \"default\", \"sym\" \], \"pathname\": \"$mp/hide3/sub2/4.0\"},
+\"hide3/sub2/5.0\": { \"name\": \"hide3/sub2/5.0\", \"type\": \"modulefile\", \"symbols\": \[ \"new\" \], \"pathname\": \"$mp/hide3/sub2/5.0\"}
+}}"
+testouterr_cmd sh {avail -j -o modulepath:dirwsym:sym hide3/sub2} OK "{\"$mp\": {
+\"hide3/sub2\": { \"name\": \"hide3/sub2\", \"type\": \"directory\", \"symbols\": \[ \"sym\" \]},
+\"hide3/sub2/4.0\": { \"name\": \"hide3/sub2/4.0\", \"type\": \"modulefile\", \"symbols\": \[ \"default\", \"sym\" \], \"pathname\": \"$mp/hide3/sub2/4.0\"},
+\"hide3/sub2/5.0\": { \"name\": \"hide3/sub2/5.0\", \"type\": \"modulefile\", \"symbols\": \[ \"new\" \], \"pathname\": \"$mp/hide3/sub2/5.0\"}
+}}"
+testouterr_cmd sh {avail -j -o modulepath:dirwsym hide3/sub2} OK "{\"$mp\": {
+\"hide3/sub2\": { \"name\": \"hide3/sub2\", \"type\": \"directory\"},
+\"hide3/sub2/4.0\": { \"name\": \"hide3/sub2/4.0\", \"type\": \"modulefile\", \"pathname\": \"$mp/hide3/sub2/4.0\"},
+\"hide3/sub2/5.0\": { \"name\": \"hide3/sub2/5.0\", \"type\": \"modulefile\", \"pathname\": \"$mp/hide3/sub2/5.0\"}
+}}"
+
+# provided-alias element
+set mp $modpath.4
+set mpre [regsub -all "\(\[.+?\]\)" $mp {\\\1}]
+setenv_path_var MODULEPATH $mp
+setenv_var TESTSUITE_PROVIDE multiple
+testouterr_cmd sh {avail -j -o modulepath:alias foo/1} OK "{\"$mp\": {\n\"foo/1.0\": { \"name\": \"foo/1.0\", \"type\": \"modulefile\", \"pathname\": \"$mp/foo/1.0\"}\n}}"
+testouterr_cmd sh {avail -j -o modulepath:provided-alias foo/1} OK "{\"$mp\": {\n\"foo/1\": { \"name\": \"foo/1\", \"type\": \"alias\", \"target\": \"provide/1\"},\n\"foo/1.0\": { \"name\": \"foo/1.0\", \"type\": \"modulefile\", \"pathname\": \"$mp/foo/1.0\"}\n}}"
+unsetenv_var TESTSUITE_PROVIDE
 
 
 #

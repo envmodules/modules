@@ -887,6 +887,9 @@ The following command line switches appeared on Modules 5.
 
  Starting Modules 5.6, :subcmd:`spider` sub-command is supported.
 
+ Starting Modules 5.8, this command line switch is accepted on JSON output
+ mode.
+
 :option:`--force`
 
  Starting Modules 5.4, this command line switch by-passes *abort on error*
@@ -913,6 +916,13 @@ The following command line switches appeared on Modules 5.
  Starting Modules 5.2, :subcmd:`stashlist` sub-command is supported.
 
  Starting Modules 5.6, :subcmd:`spider` sub-command is supported.
+
+:option:`--json`
+
+ Starting Modules 5.8, content of :subcmd:`avail`, :subcmd:`list` and
+ :subcmd:`spider` JSON output is defined by the :mconfig:`avail_json_output`,
+ :mconfig:`list_json_output` and :mconfig:`spider_json_output` configuration
+ options and the :option:`--output` command line switch is accepted.
 
 :option:`--terse`
 
@@ -1132,6 +1142,10 @@ The following environment variables appeared on Modules 5.
 |            | :envvar:`MODULES_DOMAINNAME`,                                   |
 |            | :envvar:`MODULES_MODULEPATH_IGNORE`,                            |
 |            | :envvar:`MODULES_IGNORE_CACHE_SUBCMDS`                          |
++------------+-----------------------------------------------------------------+
+| 5.8        | :envvar:`MODULES_AVAIL_JSON_OUTPUT`,                            |
+|            | :envvar:`MODULES_LIST_JSON_OUTPUT`,                             |
+|            | :envvar:`MODULES_SPIDER_JSON_OUTPUT`                            |
 +------------+-----------------------------------------------------------------+
 
 Modules Specific Tcl Commands
@@ -1354,6 +1368,9 @@ The following Modules configuration option has been introduced on Modules 5.
 |            | :mconfig:`linked_envvars`, :mconfig:`init_envvars`,             |
 |            | :mconfig:`domainname`, :mconfig:`modulepath_ignore`,            |
 |            | :mconfig:`ignore_cache_subcmds`                                 |
++------------+-----------------------------------------------------------------+
+| 5.8        | :mconfig:`avail_json_output`, :mconfig:`list_json_output`,      |
+|            | :mconfig:`spider_json_output`                                   |
 +------------+-----------------------------------------------------------------+
 
 :mconfig:`auto_handling`

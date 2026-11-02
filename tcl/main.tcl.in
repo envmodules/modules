@@ -300,7 +300,7 @@ proc parseModuleCommandArgs {topcall cmd ignerr ml_spec args} {
    }
 
    if {[info exists asked_output]} {
-      if {[getState report_format] in [list long json]} {
+      if {[isStateEqual report_format long]} {
          knerror "Unsupported option '$output_arg' on [getState\
             report_format] output mode"
       } else {

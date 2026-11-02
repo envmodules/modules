@@ -184,7 +184,9 @@ JSON output
   - *tag*: ``tags`` key is added to ``modulefile`` and ``alias`` objects
   - *variant*: ``variants`` key is added to ``modulefile`` objects
 
-    - Variants and their possible values on ``avail`` and ``spider``
+    - Variants and their possible values on ``avail`` and ``spider``, each
+      value list being a JSON array of strings (``on`` and ``off`` for a
+      Boolean variant, ``*`` denoting a free value variant)
     - Variant values selected for loaded modules on ``list``
 
   - *variantifspec*: like *variant* but only if a variant has been specified
@@ -203,6 +205,8 @@ JSON output
     used on ``--long`` mode
   - No ``mtime`` key is set on ``alias`` and ``directory`` objects, like
     ``--long`` mode which reports no modification time for them
+  - Value is ``null`` if modification time cannot be fetched, for instance
+    when the modulefile of a loaded module does not exist anymore
   - Modification time of virtual modules is the one of the modulefile they
     point to
   - Modification time is only fetched when *mtime* element is enabled, as it

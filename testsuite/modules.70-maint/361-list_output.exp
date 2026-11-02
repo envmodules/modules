@@ -57,7 +57,10 @@ testouterr_cmd sh {--output list} ERR "$error_msgs: Missing value for '--output'
 # mix with --terse/--long/--json
 testouterr_cmd sh {list -o sym --terse} OK $tserr_list_terse_foo
 testouterr_cmd sh {list --long --output=sym} ERR "$error_msgs: Unsupported option '--output' on long output mode"
-testouterr_cmd sh {list -j --output=sym} ERR "{\"errors\": \[\n{ \"severity\": \"ERROR\", \"message\": \[ \"Unsupported option '--output' on json output mode\" \] } \]\n}"
+set tserr_list_json_foo "{\"foo/1.0\": { \"name\": \"foo/1.0\", \"type\": \"modulefile\", \"symbols\": \[ \"bar\" \], \"pathname\": \"$mp/foo/1.0\"}}"
+testouterr_cmd sh {list -j --output=sym} OK $tserr_list_json_foo
+testouterr_cmd sh {list -o sym --long -j} OK $tserr_list_json_foo
+testouterr_cmd sh {list -o sym -j --long} ERR "$error_msgs: Unsupported option '-o' on long output mode"
 
 # test with ml shortcut command
 testouterr_cmd sh {ml -o sym} OK $tserr_list_foo
@@ -65,7 +68,7 @@ testouterr_cmd sh {ml -o} ERR "$error_msgs: Missing value for '-o' option\n$err_
 testouterr_cmd sh {ml --output=sym} OK $tserr_list_foo
 testouterr_cmd sh {--output ml} ERR "$error_msgs: Missing value for '--output' option\n$err_typehelp"
 testouterr_cmd sh {ml -l --output=sym} ERR "$error_msgs: Unsupported option '--output' on long output mode"
-testouterr_cmd sh {ml -o sym --json} ERR "{\"errors\": \[\n{ \"severity\": \"ERROR\", \"message\": \[ \"Unsupported option '-o' on json output mode\" \] } \]\n}"
+testouterr_cmd sh {ml -o sym --json} OK $tserr_list_json_foo
 
 # invalid value set
 set tserr_invalid_output_val "$error_msgs: Invalid element in value list for '--output' option on list sub-command
@@ -78,6 +81,21 @@ testouterr_cmd sh {list --output="sym alias"} ERR $tserr_invalid_output_val
 testouterr_cmd sh {list -o foo} ERR $tserr_invalid_o_val
 testouterr_cmd sh {list -o sym,alias} ERR $tserr_invalid_o_val
 testouterr_cmd sh {list -o "sym alias"} ERR $tserr_invalid_o_val
+
+# invalid value set on json output mode
+set tserr_invalid_json_output_val "{\"errors\": \[\n{ \"severity\": \"ERROR\", \"message\": \[ \"Invalid element in value list for '--output' option on list sub-command\", \"Allowed elements are: variant alias sym tag hidden via (separated by ':')\" \] } \]\n}"
+set tserr_invalid_json_o_val "{\"errors\": \[\n{ \"severity\": \"ERROR\", \"message\": \[ \"Invalid element in value list for '-o' option on list sub-command\", \"Allowed elements are: variant alias sym tag hidden via (separated by ':')\" \] } \]\n}"
+testouterr_cmd sh {list -j --output=foo} ERR $tserr_invalid_json_output_val
+testouterr_cmd sh {list -j --output=sym,alias} ERR $tserr_invalid_json_output_val
+testouterr_cmd sh {list -j -o foo} ERR $tserr_invalid_json_o_val
+testouterr_cmd sh {ml -j -o +foo} ERR $tserr_invalid_json_o_val
+# element accepted on regular/terse output mode but not on json
+testouterr_cmd sh {list -j --output=header} ERR $tserr_invalid_json_output_val
+testouterr_cmd sh {list -j --output=sym:idx} ERR $tserr_invalid_json_output_val
+testouterr_cmd sh {list -j -o key} ERR $tserr_invalid_json_o_val
+testouterr_cmd sh {list -j -o indesym} ERR $tserr_invalid_json_o_val
+# element accepted on json output mode only
+testouterr_cmd sh {list -t --output=via} ERR $tserr_invalid_output_val
 testouterr_cmd sh {list -o foo -l} ERR "$error_msgs: Unsupported option '-o' on long output mode"
 testouterr_cmd sh {ml -o foo} ERR $tserr_invalid_o_val
 
@@ -320,6 +338,58 @@ testouterr_cmd sh {list -t -o +sym:tag} OK "foo/1.0(bar) <baz>"
 
 testouterr_cmd sh {--output=+bar list} ERR $tserr_invalid_output_val
 testouterr_cmd sh {-t list -o -:sym} ERR $tserr_invalid_o_val
+
+
+#
+# MODULES_LIST_JSON_OUTPUT tests
+#
+
+setenv_loaded_module [list foo/1.0] [list $mp/foo/1.0]
+setenv_var __MODULES_LMALTNAME foo/1.0&foo/bar&foo&al|alfoo
+setenv_var __MODULES_LMTAG foo/1.0&baz
+setenv_var __MODULES_LMVARIANT foo/1.0&bar|1|1|0&baz|val|0|0
+unsetenv_var MODULES_LIST_OUTPUT
+unsetenv_var MODULES_LIST_TERSE_OUTPUT
+
+# default content
+set tserr_list_json "{\"foo/1.0\": { \"name\": \"foo/1.0\", \"type\": \"modulefile\", \"variants\": { \"bar\": true, \"baz\": \"val\" }, \"symbols\": \[ \"bar\" \], \"tags\": \[ \"baz\" \], \"pathname\": \"$mp/foo/1.0\", \"via\": \[\]}}"
+testouterr_cmd sh {list -j} OK $tserr_list_json
+
+# only intrinsic keys are reported when no element is enabled
+set tserr_list_json_min "{\"foo/1.0\": { \"name\": \"foo/1.0\", \"type\": \"modulefile\", \"pathname\": \"$mp/foo/1.0\"}}"
+testouterr_cmd sh {list -j --output=} OK $tserr_list_json_min
+testouterr_cmd sh {list -j -o -variant:sym:tag:via} OK $tserr_list_json_min
+
+setenv_var MODULES_LIST_JSON_OUTPUT tag
+testouterr_cmd sh {list -j} OK "{\"foo/1.0\": { \"name\": \"foo/1.0\", \"type\": \"modulefile\", \"tags\": \[ \"baz\" \], \"pathname\": \"$mp/foo/1.0\"}}"
+# no impact on regular/terse output
+testouterr_cmd sh {list -t} OK $cur_loaded\nfoo/1.0
+# -o/--output supersedes environment variable
+testouterr_cmd sh {list -j -o sym} OK $tserr_list_json_foo
+testouterr_cmd sh {list -j --output=+alias} OK "{\"alfoo\": { \"name\": \"alfoo\", \"type\": \"alias\", \"tags\": \[\], \"target\": \"foo/1.0\"},\n\"foo/1.0\": { \"name\": \"foo/1.0\", \"type\": \"modulefile\", \"tags\": \[ \"baz\" \], \"pathname\": \"$mp/foo/1.0\"}}"
+testouterr_cmd sh {ml -j --output=-tag} OK $tserr_list_json_min
+# invalid value set (ignored)
+setenv_var MODULES_LIST_JSON_OUTPUT foo
+testouterr_cmd sh {list -j} OK $tserr_list_json
+setenv_var MODULES_LIST_JSON_OUTPUT sym,tag
+testouterr_cmd sh {list -j} OK $tserr_list_json
+setenv_var MODULES_LIST_JSON_OUTPUT header:sym
+testouterr_cmd sh {list -j} OK $tserr_list_json
+unsetenv_var MODULES_LIST_JSON_OUTPUT
+
+# alias element
+testouterr_cmd sh {list -j -o alias:sym} OK "{\"alfoo\": { \"name\": \"alfoo\", \"type\": \"alias\", \"symbols\": \[\], \"target\": \"foo/1.0\"},\n\"foo/1.0\": { \"name\": \"foo/1.0\", \"type\": \"modulefile\", \"symbols\": \[ \"bar\" \], \"pathname\": \"$mp/foo/1.0\"}}"
+testouterr_cmd sh {list -j -o alias:sym al} OK "{\"alfoo\": { \"name\": \"alfoo\", \"type\": \"alias\", \"symbols\": \[\], \"target\": \"foo/1.0\"}}"
+
+# hidden element
+setenv_var __MODULES_LMTAG foo/1.0&hidden-loaded
+set tserr_list_json_hidden "{\"foo/1.0\": { \"name\": \"foo/1.0\", \"type\": \"modulefile\", \"tags\": \[ \"hidden-loaded\" \], \"pathname\": \"$mp/foo/1.0\"}}"
+testouterr_cmd sh {list -j -o tag} OK "{}"
+testouterr_cmd sh {list -j -o tag:hidden} OK $tserr_list_json_hidden
+testouterr_cmd sh {list -j --all -o tag} OK $tserr_list_json_hidden
+unsetenv_var __MODULES_LMTAG
+unsetenv_var __MODULES_LMVARIANT
+unsetenv_var __MODULES_LMALTNAME
 
 
 #

@@ -38,6 +38,16 @@ Modules 5.8.0 (not yet released)
   concurrently, each group of files being run in a private copy of the
   testsuite directory. Coverage mode (``COVERAGE=y``) is supported, the
   coverage logs of each group of files are merged at the end of the run.
+* Add :mconfig:`avail_json_output`, :mconfig:`list_json_output` and
+  :mconfig:`spider_json_output` configuration options to define the content
+  of the JSON output of :subcmd:`avail`, :subcmd:`list` and :subcmd:`spider`
+  sub-commands. Default value of these options can be set at installation
+  time with :instopt:`--with-avail-json-output`,
+  :instopt:`--with-list-json-output` and :instopt:`--with-spider-json-output`
+  options and superseded with the :envvar:`MODULES_AVAIL_JSON_OUTPUT`,
+  :envvar:`MODULES_LIST_JSON_OUTPUT` and :envvar:`MODULES_SPIDER_JSON_OUTPUT`
+  environment variables or the :option:`--output` command line switch, which
+  is now accepted on :option:`--json` output mode.
 
 
 .. _5.7 release notes:

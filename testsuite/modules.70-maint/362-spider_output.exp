@@ -58,12 +58,13 @@ testouterr_cmd sh {--output spider foo} ERR "$error_msgs: Missing value for '--o
 # mix with --terse/--long/--json
 testouterr_cmd_re sh {spider -o sym --terse foo/1.0} OK $tserr_spider_terse_foo
 testouterr_cmd_re sh {spider -t --output=sym foo/1.0} OK $tserr_spider_terse_foo
-testouterr_cmd sh {spider -j --output=sym foo/1.0} ERR "{\"errors\": \[\n{ \"severity\": \"ERROR\", \"message\": \[ \"Unsupported option '--output' on json output mode\" \] } \]\n}"
+set tserr_spider_json_foo "{\"foo/1.0\": { \"name\": \"foo/1.0\", \"type\": \"modulefile\", \"symbols\": \[ \"bar\" \], \"pathname\": \"$mp/foo/1.0\"}}"
+testouterr_cmd sh {spider -j --output=sym foo/1.0} OK $tserr_spider_json_foo
 testouterr_cmd sh {spider -o sym -l foo/1.0} ERR "$error_msgs: Unsupported option '-o' on long output mode"
 testouterr_cmd sh {spider --long --output=sym foo/1.0} ERR "$error_msgs: Unsupported option '--output' on long output mode"
-testouterr_cmd sh {spider -j --output=sym foo/1.0} ERR "{\"errors\": \[\n{ \"severity\": \"ERROR\", \"message\": \[ \"Unsupported option '--output' on json output mode\" \] } \]\n}"
-testouterr_cmd sh {spider -o sym --json foo/1.0} ERR "{\"errors\": \[\n{ \"severity\": \"ERROR\", \"message\": \[ \"Unsupported option '-o' on json output mode\" \] } \]\n}"
-testouterr_cmd sh {spider -o sym --long -j foo/1.0} ERR "{\"errors\": \[\n{ \"severity\": \"ERROR\", \"message\": \[ \"Unsupported option '-o' on json output mode\" \] } \]\n}"
+testouterr_cmd sh {spider -o sym --json foo/1.0} OK $tserr_spider_json_foo
+testouterr_cmd sh {spider -o sym --long -j foo/1.0} OK $tserr_spider_json_foo
+testouterr_cmd sh {spider -o sym -j --long foo/1.0} ERR "$error_msgs: Unsupported option '-o' on long output mode"
 
 # test with ml shortcut command
 testouterr_cmd_re sh {ml spi -o sym foo/1.0} OK $tserr_spider_foo
@@ -71,7 +72,7 @@ testouterr_cmd sh {ml spi -o} ERR "$error_msgs: Missing value for '-o' option\n$
 testouterr_cmd_re sh {ml --output=sym spi foo/1.0} OK $tserr_spider_foo
 testouterr_cmd sh {--output ml spi foo} ERR "$error_msgs: Missing value for '--output' option\n$err_typehelp"
 testouterr_cmd sh {ml spi --long --output=sym foo/1.0} ERR "$error_msgs: Unsupported option '--output' on long output mode"
-testouterr_cmd sh {--json ml spi -o sym foo/1.0} ERR "{\"errors\": \[\n{ \"severity\": \"ERROR\", \"message\": \[ \"Unsupported option '-o' on json output mode\" \] } \]\n}"
+testouterr_cmd sh {--json ml spi -o sym foo/1.0} OK $tserr_spider_json_foo
 
 # invalid value set
 set tserr_invalid_output_val "$error_msgs: Invalid element in value list for '--output' option on spider sub-command
@@ -91,6 +92,19 @@ testouterr_cmd sh {ml -o foo spi foo} ERR $tserr_invalid_o_val
 testouterr_cmd sh {spider -o header foo} ERR $tserr_invalid_o_val
 testouterr_cmd sh {spider --output=idx foo} ERR $tserr_invalid_output_val
 testouterr_cmd sh {spider --output=header:key foo} ERR $tserr_invalid_output_val
+
+# invalid value set on json output mode
+set tserr_invalid_json_output_val "{\"errors\": \[\n{ \"severity\": \"ERROR\", \"message\": \[ \"Invalid element in value list for '--output' option on spider sub-command\", \"Allowed elements are: modulepath alias provided-alias dirwsym sym tag hidden variant variantifspec via (separated by ':')\" \] } \]\n}"
+set tserr_invalid_json_o_val "{\"errors\": \[\n{ \"severity\": \"ERROR\", \"message\": \[ \"Invalid element in value list for '-o' option on spider sub-command\", \"Allowed elements are: modulepath alias provided-alias dirwsym sym tag hidden variant variantifspec via (separated by ':')\" \] } \]\n}"
+testouterr_cmd sh {spider -j --output=foo foo} ERR $tserr_invalid_json_output_val
+testouterr_cmd sh {spider -j --output=sym,alias foo} ERR $tserr_invalid_json_output_val
+testouterr_cmd sh {spider -j -o foo foo} ERR $tserr_invalid_json_o_val
+testouterr_cmd sh {ml spi -j -o +foo foo} ERR $tserr_invalid_json_o_val
+# element accepted on regular/terse output mode but not on json
+testouterr_cmd sh {spider -j --output=key foo} ERR $tserr_invalid_json_output_val
+testouterr_cmd sh {spider -j --output=sym:indesym foo} ERR $tserr_invalid_json_output_val
+testouterr_cmd sh {spider -j -o header foo} ERR $tserr_invalid_json_o_val
+testouterr_cmd sh {spider -j -o idx foo} ERR $tserr_invalid_json_o_val
 
 
 #
@@ -1002,6 +1016,47 @@ setenv_var MODULES_SPIDER_TERSE_OUTPUT sym:tag
 testouterr_cmd sh {spider --output=+variant --terse variant/1.0} OK variant/1.0{foo=val1}
 testouterr_cmd sh {spider --output=+variant --terse foo/0.2} OK {foo/0.2(sym) <tag>}
 testouterr_cmd sh {spider -o -modulepath:sym:tag foo/0.2} OK {foo/0.2}
+
+
+#
+# MODULES_SPIDER_JSON_OUTPUT tests
+#
+
+set mp $modpath.3
+set mpre [regsub -all "\(\[.+?\]\)" $mp {\\\1}]
+setenv_path_var MODULEPATH $mp
+unsetenv_var MODULES_SPIDER_OUTPUT
+unsetenv_var MODULES_SPIDER_TERSE_OUTPUT
+unsetenv_var TESTSUITE_VARIANT
+setenv_var TESTSUITE_AVAIL_OUTPUT_FOO_SYM 1
+setenv_var TESTSUITE_AVAIL_OUTPUT_FOO_TAG 1
+
+# default content
+set tserr_spider_json "{\"$mp\": {
+\"foo/1.0\": { \"name\": \"foo/1.0\", \"type\": \"modulefile\", \"symbols\": \[ \"bar\" \], \"tags\": \[ \"baz\" \], \"pathname\": \"$mp/foo/1.0\", \"via\": \[\]}
+}}"
+testouterr_cmd sh {spider -j foo/1.0} OK $tserr_spider_json
+
+# only intrinsic keys are reported when no element is enabled
+set tserr_spider_json_min "{\"foo/1.0\": { \"name\": \"foo/1.0\", \"type\": \"modulefile\", \"pathname\": \"$mp/foo/1.0\"}}"
+testouterr_cmd sh {spider -j --output= foo/1.0} OK $tserr_spider_json_min
+
+setenv_var MODULES_SPIDER_JSON_OUTPUT modulepath:via
+testouterr_cmd sh {spider -j foo/1.0} OK "{\"$mp\": {\n\"foo/1.0\": { \"name\": \"foo/1.0\", \"type\": \"modulefile\", \"pathname\": \"$mp/foo/1.0\", \"via\": \[\]}\n}}"
+# no impact on regular/terse output
+testouterr_cmd_re sh {spider -t foo/1.0} OK "$mpre:\nfoo/1.0\\(bar\\) <baz>"
+# -o/--output supersedes environment variable
+testouterr_cmd sh {spider -j -o sym foo/1.0} OK $tserr_spider_json_foo
+testouterr_cmd sh {spider -j --output=-via foo/1.0} OK "{\"$mp\": {\n\"foo/1.0\": { \"name\": \"foo/1.0\", \"type\": \"modulefile\", \"pathname\": \"$mp/foo/1.0\"}\n}}"
+testouterr_cmd sh {ml spi -j --output=+tag foo/1.0} OK "{\"$mp\": {\n\"foo/1.0\": { \"name\": \"foo/1.0\", \"type\": \"modulefile\", \"tags\": \[ \"baz\" \], \"pathname\": \"$mp/foo/1.0\", \"via\": \[\]}\n}}"
+# invalid value set (ignored)
+setenv_var MODULES_SPIDER_JSON_OUTPUT foo
+testouterr_cmd sh {spider -j foo/1.0} OK $tserr_spider_json
+setenv_var MODULES_SPIDER_JSON_OUTPUT sym,tag
+testouterr_cmd sh {spider -j foo/1.0} OK $tserr_spider_json
+setenv_var MODULES_SPIDER_JSON_OUTPUT indesym:sym
+testouterr_cmd sh {spider -j foo/1.0} OK $tserr_spider_json
+unsetenv_var MODULES_SPIDER_JSON_OUTPUT
 
 
 #
