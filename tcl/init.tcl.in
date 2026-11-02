@@ -81,7 +81,7 @@ array set g_config_defs [list\
    avail_indepth {MODULES_AVAIL_INDEPTH @availindepth@ 0 b {0 1}}\
    avail_json_output {MODULES_AVAIL_JSON_OUTPUT {@availjsonoutput@} 0 l\
       {modulepath alias provided-alias dirwsym sym tag hidden variant\
-      variantifspec via} {} {} eltlist}\
+      variantifspec via mtime} {} {} eltlist}\
    avail_output {MODULES_AVAIL_OUTPUT {@availoutput@} 0 l {modulepath alias\
       provided-alias dirwsym indesym sym tag key hidden variant variantifspec\
       via} {} {} eltlist}\
@@ -118,7 +118,7 @@ array set g_config_defs [list\
    linked_envvars {MODULES_LINKED_ENVVARS {} 0 l {} {}\
       initConfLinkedEnvvars}\
    list_json_output {MODULES_LIST_JSON_OUTPUT {@listjsonoutput@} 0 l\
-      {variant alias sym tag hidden via} {} {} eltlist}\
+      {variant alias sym tag hidden via mtime} {} {} eltlist}\
    list_output {MODULES_LIST_OUTPUT {@listoutput@} 0 l {header idx variant\
       alias indesym sym tag hidden key} {} {} eltlist}\
    list_terse_output {MODULES_LIST_TERSE_OUTPUT {@listterseoutput@} 0 l\
@@ -154,7 +154,7 @@ array set g_config_defs [list\
    spider_indepth {MODULES_SPIDER_INDEPTH @spiderindepth@ 0 b {0 1}}\
    spider_json_output {MODULES_SPIDER_JSON_OUTPUT {@spiderjsonoutput@} 0 l\
       {modulepath alias provided-alias dirwsym sym tag hidden variant\
-      variantifspec via} {} {} eltlist}\
+      variantifspec via mtime} {} {} eltlist}\
    spider_output {MODULES_SPIDER_OUTPUT {@spideroutput@} 0 l {modulepath\
       alias provided-alias dirwsym indesym sym tag key hidden variant\
       variantifspec via} {} {} eltlist}\

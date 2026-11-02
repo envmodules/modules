@@ -548,9 +548,9 @@ switches are accepted:
 
  On JSON output mode, accepted elements in *LIST* for :subcmd:`avail` and
  :subcmd:`spider` sub-command are: *modulepath*, *alias*, *provided-alias*,
- *dirwsym*, *sym*, *tag*, *hidden*, *variant*, *variantifspec* and *via*.
- Accepted elements for :subcmd:`list` sub-command are: *variant*, *alias*,
- *sym*, *tag*, *hidden* and *via*.
+ *dirwsym*, *sym*, *tag*, *hidden*, *variant*, *variantifspec*, *via* and
+ *mtime*. Accepted elements for :subcmd:`list` sub-command are: *variant*,
+ *alias*, *sym*, *tag*, *hidden*, *via* and *mtime*.
 
  The order of the elements in *LIST* does not matter. Module names are the
  only content reported when *LIST* is set to an empty value.
@@ -594,7 +594,7 @@ switches are accepted:
        :subcmd:`spider` sub-commands
 
     .. versionchanged:: 5.8
-       JSON output mode supported
+       JSON output mode supported and element *mtime* added for this mode
 
 .. option:: --paginate, -p
 
@@ -5077,6 +5077,10 @@ ENVIRONMENT
  * ``hidden``: show all hidden modules.
  * ``modulepath``: available modules grouped by modulepath, each modulepath
    name being a key of the top-level JSON object.
+ * ``mtime``: ``mtime`` key set on each modulefile JSON object, with
+   modulefile modification time as value. Time is a string in ISO 8601 format
+   (``YYYY-MM-DDTHH:MM:SS±hhmm``) or ``null`` if modification time cannot be
+   fetched.
  * ``sym``: ``symbols`` key set on each JSON object, with the symbolic
    versions associated with available module as value.
  * ``tag``: ``tags`` key set on each JSON object, with the tags associated
@@ -5683,6 +5687,10 @@ ENVIRONMENT
 
  * ``alias``: module aliases targeting loaded modules.
  * ``hidden``: show hidden loaded modules.
+ * ``mtime``: ``mtime`` key set on each modulefile JSON object, with
+   modulefile modification time as value. Time is a string in ISO 8601 format
+   (``YYYY-MM-DDTHH:MM:SS±hhmm``) or ``null`` if modification time cannot be
+   fetched.
  * ``sym``: ``symbols`` key set on each JSON object, with the symbolic
    versions associated with loaded module as value.
  * ``tag``: ``tags`` key set on each JSON object, with the tags associated

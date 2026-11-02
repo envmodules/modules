@@ -888,7 +888,8 @@ The following command line switches appeared on Modules 5.
  Starting Modules 5.6, :subcmd:`spider` sub-command is supported.
 
  Starting Modules 5.8, this command line switch is accepted on JSON output
- mode.
+ mode and the *mtime* element is added to report the modification time of
+ modulefiles in JSON output.
 
 :option:`--force`
 

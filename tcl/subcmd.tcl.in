@@ -37,12 +37,13 @@ proc cmdModuleList {show_oneperline show_mtime search_match args} {
    set report_indesym [isEltInReport indesym 0]
    set report_alias [expr {[isEltInReport alias 0] || [isEltInReport\
       provided-alias 0]}]
+   set fetch_mtime [expr {$show_mtime || [isEltInReport mtime 0]}]
 
    # build list of loaded modules and symbolics and aliases if reported
    set loadedmodlist [list]
    foreach mod [getEnvLoadedModulePropertyParsedList name] {
       set modfile [getModulefileFromLoadedModule $mod]
-      set mtime [expr {$show_mtime && [file exists $modfile] ?\
+      set mtime [expr {$fetch_mtime && [file exists $modfile] ?\
          [getFileMtime $modfile] : {}}]
       set mod_list($mod) [list modulefile $mtime $modfile]
 
@@ -1924,6 +1925,7 @@ proc cmdModuleAvail {show_oneperline show_mtime show_filter search_filter\
 
    # elements to include in output
    set report_modulepath [isEltInReport modulepath]
+   set fetch_mtime [expr {$show_mtime || [isEltInReport mtime 0]}]
 
    # consolidate search filters
    lappend search_filter $search_match wild
@@ -1934,7 +1936,7 @@ proc cmdModuleAvail {show_oneperline show_mtime show_filter search_filter\
    inhibitErrorReport
 
    # look if aliases have been defined in the global or user-specific rc
-   array set mod_list [getMatchingAnyModules {} $args $show_mtime\
+   array set mod_list [getMatchingAnyModules {} $args $fetch_mtime\
       $search_rc_filter $show_filter]
    if {$report_modulepath} {
       reportModules $args {global/user modulerc} hi $hstyle $show_mtime 0\
@@ -1942,7 +1944,7 @@ proc cmdModuleAvail {show_oneperline show_mtime show_filter search_filter\
    }
 
    foreach dir $modpath_list {
-      set dir_mod_list [getMatchingAnyModules $dir $args $show_mtime\
+      set dir_mod_list [getMatchingAnyModules $dir $args $fetch_mtime\
          $search_filter $show_filter]
       if {$report_modulepath} {
          array unset mod_list

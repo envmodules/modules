@@ -220,7 +220,7 @@ array set configvalid [list\
     advanced_version_spec     {0 1}\
     auto_handling             {0 1}\
     avail_indepth             {0 1}\
-    avail_json_output         {modulepath alias provided-alias dirwsym sym tag hidden variant variantifspec via}\
+    avail_json_output         {modulepath alias provided-alias dirwsym sym tag hidden variant variantifspec via mtime}\
     avail_output              {modulepath alias provided-alias dirwsym indesym sym tag key hidden variant variantifspec via}\
     avail_terse_output        {modulepath alias provided-alias dirwsym indesym sym tag key hidden variant variantifspec}\
     cache_buffer_bytes        {4096 1000000}\
@@ -237,7 +237,7 @@ array set configvalid [list\
     implicit_default          {0 1}\
     implicit_requirement      {0 1}\
     info_extension            {0 1}\
-    list_json_output          {variant alias sym tag hidden via}\
+    list_json_output          {variant alias sym tag hidden via mtime}\
     list_output               {header idx variant alias indesym sym tag hidden key}\
     list_terse_output         {header idx variant alias indesym sym tag hidden key}\
     logged_events             {auto_eval requested_eval requested_cmd}\
@@ -257,7 +257,7 @@ array set configvalid [list\
     silent_shell_debug        {0 1}\
     source_cache              {0 1}\
     spider_indepth            {0 1}\
-    spider_json_output        {modulepath alias provided-alias dirwsym sym tag hidden variant variantifspec via}\
+    spider_json_output        {modulepath alias provided-alias dirwsym sym tag hidden variant variantifspec via mtime}\
     spider_output             {modulepath alias provided-alias dirwsym indesym sym tag key hidden variant variantifspec via}\
     spider_terse_output       {modulepath alias provided-alias dirwsym indesym sym tag key hidden variant variantifspec}\
     sticky_purge              {error warning silent}\

@@ -94,8 +94,8 @@ testouterr_cmd sh {spider --output=idx foo} ERR $tserr_invalid_output_val
 testouterr_cmd sh {spider --output=header:key foo} ERR $tserr_invalid_output_val
 
 # invalid value set on json output mode
-set tserr_invalid_json_output_val "{\"errors\": \[\n{ \"severity\": \"ERROR\", \"message\": \[ \"Invalid element in value list for '--output' option on spider sub-command\", \"Allowed elements are: modulepath alias provided-alias dirwsym sym tag hidden variant variantifspec via (separated by ':')\" \] } \]\n}"
-set tserr_invalid_json_o_val "{\"errors\": \[\n{ \"severity\": \"ERROR\", \"message\": \[ \"Invalid element in value list for '-o' option on spider sub-command\", \"Allowed elements are: modulepath alias provided-alias dirwsym sym tag hidden variant variantifspec via (separated by ':')\" \] } \]\n}"
+set tserr_invalid_json_output_val "{\"errors\": \[\n{ \"severity\": \"ERROR\", \"message\": \[ \"Invalid element in value list for '--output' option on spider sub-command\", \"Allowed elements are: modulepath alias provided-alias dirwsym sym tag hidden variant variantifspec via mtime (separated by ':')\" \] } \]\n}"
+set tserr_invalid_json_o_val "{\"errors\": \[\n{ \"severity\": \"ERROR\", \"message\": \[ \"Invalid element in value list for '-o' option on spider sub-command\", \"Allowed elements are: modulepath alias provided-alias dirwsym sym tag hidden variant variantifspec via mtime (separated by ':')\" \] } \]\n}"
 testouterr_cmd sh {spider -j --output=foo foo} ERR $tserr_invalid_json_output_val
 testouterr_cmd sh {spider -j --output=sym,alias foo} ERR $tserr_invalid_json_output_val
 testouterr_cmd sh {spider -j -o foo foo} ERR $tserr_invalid_json_o_val
@@ -105,6 +105,9 @@ testouterr_cmd sh {spider -j --output=key foo} ERR $tserr_invalid_json_output_va
 testouterr_cmd sh {spider -j --output=sym:indesym foo} ERR $tserr_invalid_json_output_val
 testouterr_cmd sh {spider -j -o header foo} ERR $tserr_invalid_json_o_val
 testouterr_cmd sh {spider -j -o idx foo} ERR $tserr_invalid_json_o_val
+# element accepted on json output mode only
+testouterr_cmd sh {spider -o mtime foo} ERR $tserr_invalid_o_val
+testouterr_cmd sh {spider --output=mtime foo} ERR $tserr_invalid_output_val
 
 
 #
@@ -1056,6 +1059,15 @@ setenv_var MODULES_SPIDER_JSON_OUTPUT sym,tag
 testouterr_cmd sh {spider -j foo/1.0} OK $tserr_spider_json
 setenv_var MODULES_SPIDER_JSON_OUTPUT indesym:sym
 testouterr_cmd sh {spider -j foo/1.0} OK $tserr_spider_json
+unsetenv_var MODULES_SPIDER_JSON_OUTPUT
+
+# mtime element
+set foo_mtime [clock format [file mtime $mp/foo/1.0] -format %Y-%m-%dT%H:%M:%S%z]
+testouterr_cmd sh {spider -j -o mtime foo/1.0} OK "{\"foo/1.0\": { \"name\": \"foo/1.0\", \"type\": \"modulefile\", \"pathname\": \"$mp/foo/1.0\", \"mtime\": \"$foo_mtime\"}}"
+setenv_var MODULES_SPIDER_JSON_OUTPUT mtime:modulepath
+testouterr_cmd sh {spider -j foo/1.0} OK "{\"$mp\": {\n\"foo/1.0\": { \"name\": \"foo/1.0\", \"type\": \"modulefile\", \"pathname\": \"$mp/foo/1.0\", \"mtime\": \"$foo_mtime\"}\n}}"
+# no modification time on regular/terse output
+testouterr_cmd_re sh {spider -t foo/1.0} OK "$mpre:\nfoo/1.0\\(bar\\) <baz>"
 unsetenv_var MODULES_SPIDER_JSON_OUTPUT
 
 

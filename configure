@@ -373,8 +373,8 @@ Optional Packages:
                           JSON output. elements accepted in LIST are:
                           \`modulepath', \`alias', \`provided-alias',
                           \`dirwsym', \`sym', \`tag', \`hidden', \`variant',
-                          \`variantifspec' and \`via' (elements in LIST are
-                          separated by \`:')
+                          \`variantifspec', \`via' and \`mtime' (elements in
+                          LIST are separated by \`:')
                           [$availjsonoutput]
   --with-avail-output=LIST
                           specify content to report on avail sub-command
@@ -438,8 +438,9 @@ Optional Packages:
   --with-list-json-output=LIST
                           specify content to report on list sub-command
                           JSON output. elements accepted in LIST are:
-                          \`variant', \`alias', \`sym', \`tag', \`hidden' and
-                          \`via' (elements in LIST are separated by \`:')
+                          \`variant', \`alias', \`sym', \`tag', \`hidden',
+                          \`via' and \`mtime' (elements in LIST are separated
+                          by \`:')
                           [$listjsonoutput]
   --with-list-output=LIST
                           specify content to report on list sub-command
@@ -512,8 +513,8 @@ Optional Packages:
                           JSON output. elements accepted in LIST are:
                           \`modulepath', \`alias', \`provided-alias',
                           \`dirwsym', \`sym', \`tag', \`hidden', \`variant',
-                          \`variantifspec' and \`via' (elements in LIST are
-                          separated by \`:')
+                          \`variantifspec', \`via' and \`mtime' (elements in
+                          LIST are separated by \`:')
                           [$spiderjsonoutput]
   --with-spider-output=LIST
                           specify content to report on spider sub-command
@@ -999,13 +1000,13 @@ for arg in "$@"; do
       allowedval=" modulepath alias provided-alias dirwsym indesym sym tag key hidden variant variantifspec " ;
       check_and_get_package_value_list "spiderterseoutput" "$arg" "$allowedval" "" ;;
    --with-avail-json-output=*|--without-avail-json-output)
-      allowedval=" modulepath alias provided-alias dirwsym sym tag hidden variant variantifspec via " ;
+      allowedval=" modulepath alias provided-alias dirwsym sym tag hidden variant variantifspec via mtime " ;
       check_and_get_package_value_list "availjsonoutput" "$arg" "$allowedval" "" ;;
    --with-list-json-output=*|--without-list-json-output)
-      allowedval=" variant alias sym tag hidden via " ;
+      allowedval=" variant alias sym tag hidden via mtime " ;
       check_and_get_package_value_list "listjsonoutput" "$arg" "$allowedval" "" ;;
    --with-spider-json-output=*|--without-spider-json-output)
-      allowedval=" modulepath alias provided-alias dirwsym sym tag hidden variant variantifspec via " ;
+      allowedval=" modulepath alias provided-alias dirwsym sym tag hidden variant variantifspec via mtime " ;
       check_and_get_package_value_list "spiderjsonoutput" "$arg" "$allowedval" "" ;;
    --with-variant-shortcut=*|--without-variant-shortcut)
       variantshortcut=$(get_package_value "$arg" "") ;;
