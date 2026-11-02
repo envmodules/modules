@@ -160,6 +160,9 @@ listoutput := @listoutput@
 listterseoutput := @listterseoutput@
 spideroutput := @spideroutput@
 spiderterseoutput := @spiderterseoutput@
+availjsonoutput := @availjsonoutput@
+listjsonoutput := @listjsonoutput@
+spiderjsonoutput := @spiderjsonoutput@
 
 # variant configuration
 variantshortcut := @variantshortcut@

@@ -1360,16 +1360,18 @@ proc formatArrayValToJson {vallist} {
       {[]}}]
 }
 
+# format a list of key/value/type triplets as a json object (value type is
+# 'a' for array, 'b' for boolean or 's' for string)
 proc formatObjectValToJson {objlist} {
-   foreach {key val isbool} $objlist {
+   foreach {key val vtype} $objlist {
       if {[info exists disp]} {
          append disp {, }
       }
       append disp "\"$key\": "
-      if {$isbool} {
-         append disp [expr {$val ? {true} : {false}}]
-      } else {
-         append disp "\"$val\""
+      switch -- $vtype {
+         a {append disp [formatArrayValToJson $val]}
+         b {append disp [expr {$val ? {true} : {false}}]}
+         s {append disp "\"$val\""}
       }
    }
    ##nagelfar ignore Bad expression
@@ -1477,13 +1479,12 @@ proc reportModules {search_queries header hsgrkey hstyle show_mtime show_idx\
    set report_alias [expr {[isEltInReport alias] || [isEltInReport\
       provided-alias]}]
    # enable variant report if variantifspec configured and some variant is
-   # specified in query or variant configured for report or list sub-command
-   # json output
+   # specified in query or variant configured for report
    set report_variant [expr {($variant_spec_in_query && [isEltInReport\
-      variantifspec 0]) || [isEltInReport variant [expr {[currentState\
-      commandname] eq {list} && $json}]]}]
+      variantifspec 0]) || [isEltInReport variant]}]
    set collect_variant_from [expr {[currentState commandname] in {avail\
       spider} ? {2} : {0}}]
+   set report_via [isEltInReport via]
 
    # prepare list of tag abbreviations that can be substituted and list of
    # tags whose name should be colored
@@ -1498,8 +1499,8 @@ proc reportModules {search_queries header hsgrkey hstyle show_mtime show_idx\
       himatcharrvrmap himatcharrvrvalmap
    set clean_list {}
    set vr_list {}
-   set via_list [expr {[isEltInReport via] ? [getViaListModuleForModulepath\
-      $header] : {}}]
+   set via_list [expr {$report_via ? [getViaListModuleForModulepath $header]\
+      : {}}]
 
    # treat elements in specified order if any
    ##nagelfar ignore #2 Badly formed if statement
@@ -1525,7 +1526,8 @@ proc reportModules {search_queries header hsgrkey hstyle show_mtime show_idx\
             if {$json} {
                ##nagelfar ignore +2 Found constant
                set dispsgr [formatListEltToJsonDisplay $elt type s directory\
-                  1 symbols a $sym_list 1 via a $via_list 1]
+                  1 symbols a $sym_list $report_sym via a $via_list\
+                  $report_via]
             } elseif {$show_mtime} {
                # append / char after name to clearly indicate this is a dir
                lassign [formatListEltToLongDisplay $elt di / $sym_list sy {}\
@@ -1540,9 +1542,9 @@ proc reportModules {search_queries header hsgrkey hstyle show_mtime show_idx\
             if {$json} {
                ##nagelfar ignore +4 Found constant
                set dispsgr [formatListEltToJsonDisplay $elt type s modulefile\
-                  1 variants o $vr_list $report_variant symbols a $sym_list 1\
-                  tags a $tag_list 1 pathname s [lindex $mod_list($elt) 2] 1\
-                  via a $via_list 1]
+                  1 variants o $vr_list $report_variant symbols a $sym_list\
+                  $report_sym tags a $tag_list $report_tag pathname s [lindex\
+                  $mod_list($elt) 2] 1 via a $via_list $report_via]
             } elseif {$show_mtime} {
                set clock_mtime [expr {[lindex $mod_list($elt) 1] ne {} ?\
                   [clock format [lindex $mod_list($elt) 1] -format {%Y/%m/%d\
@@ -1560,11 +1562,12 @@ proc reportModules {search_queries header hsgrkey hstyle show_mtime show_idx\
             }
          }
          alias {
-            if {$json} {
+            if {$json && $report_alias} {
                ##nagelfar ignore +3 Found constant
                set dispsgr [formatListEltToJsonDisplay $elt type s alias 1\
-                  symbols a $sym_list 1 tags a $tag_list 1 target s [lindex\
-                  $mod_list($elt) 1] 1 via a $via_list 1]
+                  symbols a $sym_list $report_sym tags a $tag_list\
+                  $report_tag target s [lindex $mod_list($elt) 1] 1 via a\
+                  $via_list $report_via]
             } elseif {$show_mtime} {
                lassign [formatListEltToLongDisplay $elt al " -> [lindex\
                   $mod_list($elt) 1]" $sym_list sy {} $default_colored\

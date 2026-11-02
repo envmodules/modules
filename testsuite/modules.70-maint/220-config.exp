@@ -43,6 +43,9 @@ unsetenv_var MODULES_LIST_OUTPUT
 unsetenv_var MODULES_LIST_TERSE_OUTPUT
 unsetenv_var MODULES_SPIDER_OUTPUT
 unsetenv_var MODULES_SPIDER_TERSE_OUTPUT
+unsetenv_var MODULES_AVAIL_JSON_OUTPUT
+unsetenv_var MODULES_LIST_JSON_OUTPUT
+unsetenv_var MODULES_SPIDER_JSON_OUTPUT
 unsetenv_var MODULES_VARIANT_SHORTCUT
 if {[info exists env(MODULES_ICASE)]} {
     set saved_icase $env(MODULES_ICASE)
@@ -62,6 +65,7 @@ array set configdfl [list\
     advanced_version_spec     [expr {$install_advversspec eq {y}}]\
     auto_handling             [expr {$install_autohandling eq {y}}]\
     avail_indepth             [expr {$install_availindepth eq {y}}]\
+    avail_json_output         $install_availjsonoutput\
     avail_output              $install_availoutput\
     avail_terse_output        $install_availterseoutput\
     csh_limit                 4000\
@@ -90,6 +94,7 @@ array set configdfl [list\
     init_envvars              $install_initenvvars\
     info_extension            0\
     linked_envvars            {}\
+    list_json_output          $install_listjsonoutput\
     list_output               $install_listoutput\
     list_terse_output         $install_listterseoutput\
     locked_configs            $install_lockedconfigs\
@@ -118,6 +123,7 @@ array set configdfl [list\
     siteconfig                $siteconfig_filere\
     source_cache              [expr {$install_sourcecache eq {y}}]\
     spider_indepth            [expr {$install_spiderindepth eq {y}}]\
+    spider_json_output        $install_spiderjsonoutput\
     spider_output             $install_spideroutput\
     spider_terse_output       $install_spiderterseoutput\
     sticky_purge              $install_stickypurge\
@@ -139,6 +145,7 @@ array set configvar [list\
     advanced_version_spec     MODULES_ADVANCED_VERSION_SPEC\
     auto_handling             MODULES_AUTO_HANDLING\
     avail_indepth             MODULES_AVAIL_INDEPTH\
+    avail_json_output         MODULES_AVAIL_JSON_OUTPUT\
     avail_output              MODULES_AVAIL_OUTPUT\
     avail_terse_output        MODULES_AVAIL_TERSE_OUTPUT\
     cache_buffer_bytes        MODULES_CACHE_BUFFER_BYTES\
@@ -165,6 +172,7 @@ array set configvar [list\
     init_envvars              MODULES_INIT_ENVVARS\
     info_extension            MODULES_INFO_EXTENSION\
     linked_envvars            MODULES_LINKED_ENVVARS\
+    list_json_output          MODULES_LIST_JSON_OUTPUT\
     list_output               MODULES_LIST_OUTPUT\
     list_terse_output         MODULES_LIST_TERSE_OUTPUT\
     logged_events             MODULES_LOGGED_EVENTS\
@@ -191,6 +199,7 @@ array set configvar [list\
     silent_shell_debug        MODULES_SILENT_SHELL_DEBUG\
     source_cache              MODULES_SOURCE_CACHE\
     spider_indepth            MODULES_SPIDER_INDEPTH\
+    spider_json_output        MODULES_SPIDER_JSON_OUTPUT\
     spider_output             MODULES_SPIDER_OUTPUT\
     spider_terse_output       MODULES_SPIDER_TERSE_OUTPUT\
     sticky_purge              MODULES_STICKY_PURGE\
@@ -211,6 +220,7 @@ array set configvalid [list\
     advanced_version_spec     {0 1}\
     auto_handling             {0 1}\
     avail_indepth             {0 1}\
+    avail_json_output         {modulepath alias provided-alias dirwsym sym tag hidden variant variantifspec via}\
     avail_output              {modulepath alias provided-alias dirwsym indesym sym tag key hidden variant variantifspec via}\
     avail_terse_output        {modulepath alias provided-alias dirwsym indesym sym tag key hidden variant variantifspec}\
     cache_buffer_bytes        {4096 1000000}\
@@ -227,6 +237,7 @@ array set configvalid [list\
     implicit_default          {0 1}\
     implicit_requirement      {0 1}\
     info_extension            {0 1}\
+    list_json_output          {variant alias sym tag hidden via}\
     list_output               {header idx variant alias indesym sym tag hidden key}\
     list_terse_output         {header idx variant alias indesym sym tag hidden key}\
     logged_events             {auto_eval requested_eval requested_cmd}\
@@ -246,6 +257,7 @@ array set configvalid [list\
     silent_shell_debug        {0 1}\
     source_cache              {0 1}\
     spider_indepth            {0 1}\
+    spider_json_output        {modulepath alias provided-alias dirwsym sym tag hidden variant variantifspec via}\
     spider_output             {modulepath alias provided-alias dirwsym indesym sym tag key hidden variant variantifspec via}\
     spider_terse_output       {modulepath alias provided-alias dirwsym indesym sym tag key hidden variant variantifspec}\
     sticky_purge              {error warning silent}\
@@ -259,15 +271,18 @@ array set configvalid [list\
 
 array set configvalidkind [list\
     abort_on_error            eltlist\
+    avail_json_output         eltlist\
     avail_output              eltlist\
     avail_terse_output        eltlist\
     cache_buffer_bytes        intbe\
     cache_expiry_secs         intbe\
+    list_json_output          eltlist\
     list_output               eltlist\
     list_terse_output         eltlist\
     logged_events             eltlist\
     nearly_forbidden_days     intbe\
     shells_with_ksh_fpath     eltlist\
+    spider_json_output        eltlist\
     spider_output             eltlist\
     spider_terse_output       eltlist\
     term_width                intbe\
@@ -282,11 +297,13 @@ array set configlockable [list\
 
 array set configkind [list\
     abort_on_error            l\
+    avail_json_output         l\
     avail_output              l\
     avail_terse_output        l\
     colors                    l\
     init_envvars              l\
     linked_envvars            l\
+    list_json_output          l\
     list_output               l\
     list_terse_output         l\
     logged_events             l\
@@ -294,6 +311,7 @@ array set configkind [list\
     protected_envvars         l\
     rcfile                    l\
     shells_with_ksh_fpath     l\
+    spider_json_output        l\
     spider_output             l\
     spider_terse_output       l\
     tag_abbrev                l\

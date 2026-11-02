@@ -37,7 +37,8 @@ darkbgcolors lightbgcolors termbg lockedconfigs icase unloadmatchorder \
 searchmatch modulepath loadedmodules quarantinevars wa277 pathentryreorder advversspec ml \
 windowssupport nearlyforbiddendays implicitrequirement tagabbrev \
 tagcolorname mcookieversioncheck availoutput availterseoutput listoutput \
-listterseoutput editor variantshortcut bashcompletiondir fishcompletiondir \
+listterseoutput availjsonoutput listjsonoutput spiderjsonoutput editor \
+variantshortcut bashcompletiondir fishcompletiondir \
 zshcompletiondir tcllinter tcllinteropts nagelfardatadir nagelfaraddons \
 stickypurge uniquenameloaded abortonerror sourcecache logger loggeropts \
 loggedevents conflictunload spideroutput spiderterseoutput spiderindepth \
@@ -152,6 +153,9 @@ listoutput='header:idx:variant:sym:tag:key'
 listterseoutput='header'
 spideroutput='modulepath:alias:dirwsym:sym:tag:variantifspec:via:key'
 spiderterseoutput=$availterseoutput
+availjsonoutput='modulepath:alias:dirwsym:sym:tag:via'
+listjsonoutput='variant:sym:tag:via'
+spiderjsonoutput=$availjsonoutput
 editor='vi'
 variantshortcut=
 bashcompletiondir=
@@ -364,6 +368,14 @@ Optional Packages:
                           \`reload', \`switch', \`switch_unload', \`try-load'
                           and \`unload' (elements in LIST are separated by
                           \`:') [$abortonerror]
+  --with-avail-json-output=LIST
+                          specify content to report on avail sub-command
+                          JSON output. elements accepted in LIST are:
+                          \`modulepath', \`alias', \`provided-alias',
+                          \`dirwsym', \`sym', \`tag', \`hidden', \`variant',
+                          \`variantifspec' and \`via' (elements in LIST are
+                          separated by \`:')
+                          [$availjsonoutput]
   --with-avail-output=LIST
                           specify content to report on avail sub-command
                           regular output. elements accepted in LIST are:
@@ -423,6 +435,12 @@ Optional Packages:
                           color is defined to \`light'. Expect the same syntax
                           than described for \`--with-dark-background-colors'
                           [$lightbgcolors]
+  --with-list-json-output=LIST
+                          specify content to report on list sub-command
+                          JSON output. elements accepted in LIST are:
+                          \`variant', \`alias', \`sym', \`tag', \`hidden' and
+                          \`via' (elements in LIST are separated by \`:')
+                          [$listjsonoutput]
   --with-list-output=LIST
                           specify content to report on list sub-command
                           regular output. elements accepted in LIST are:
@@ -489,6 +507,14 @@ Optional Packages:
                           match the beginning of module name (\`starts_with')
                           or any part of module name (\`contains')
                           [$searchmatch]
+  --with-spider-json-output=LIST
+                          specify content to report on spider sub-command
+                          JSON output. elements accepted in LIST are:
+                          \`modulepath', \`alias', \`provided-alias',
+                          \`dirwsym', \`sym', \`tag', \`hidden', \`variant',
+                          \`variantifspec' and \`via' (elements in LIST are
+                          separated by \`:')
+                          [$spiderjsonoutput]
   --with-spider-output=LIST
                           specify content to report on spider sub-command
                           regular output. elements accepted in LIST are:
@@ -972,6 +998,15 @@ for arg in "$@"; do
    --with-spider-terse-output=*|--without-spider-terse-output)
       allowedval=" modulepath alias provided-alias dirwsym indesym sym tag key hidden variant variantifspec " ;
       check_and_get_package_value_list "spiderterseoutput" "$arg" "$allowedval" "" ;;
+   --with-avail-json-output=*|--without-avail-json-output)
+      allowedval=" modulepath alias provided-alias dirwsym sym tag hidden variant variantifspec via " ;
+      check_and_get_package_value_list "availjsonoutput" "$arg" "$allowedval" "" ;;
+   --with-list-json-output=*|--without-list-json-output)
+      allowedval=" variant alias sym tag hidden via " ;
+      check_and_get_package_value_list "listjsonoutput" "$arg" "$allowedval" "" ;;
+   --with-spider-json-output=*|--without-spider-json-output)
+      allowedval=" modulepath alias provided-alias dirwsym sym tag hidden variant variantifspec via " ;
+      check_and_get_package_value_list "spiderjsonoutput" "$arg" "$allowedval" "" ;;
    --with-variant-shortcut=*|--without-variant-shortcut)
       variantshortcut=$(get_package_value "$arg" "") ;;
    --with-editor=*|--without-editor)

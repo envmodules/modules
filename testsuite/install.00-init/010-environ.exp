@@ -151,6 +151,9 @@ setenv_var MODULES_LIST_OUTPUT {header:idx:variant:sym:tag:key}
 setenv_var MODULES_LIST_TERSE_OUTPUT {header}
 setenv_var MODULES_SPIDER_OUTPUT {modulepath:alias:dirwsym:sym:tag:variantifspec:via:key}
 setenv_var MODULES_SPIDER_TERSE_OUTPUT {modulepath:alias:dirwsym:sym:tag:variantifspec}
+setenv_var MODULES_AVAIL_JSON_OUTPUT {modulepath:alias:dirwsym:sym:tag:via}
+setenv_var MODULES_LIST_JSON_OUTPUT {variant:sym:tag:via}
+setenv_var MODULES_SPIDER_JSON_OUTPUT {modulepath:alias:dirwsym:sym:tag:via}
 
 # clean any variant config
 setenv_var MODULES_VARIANT_SHORTCUT {}

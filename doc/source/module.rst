@@ -422,6 +422,11 @@ switches are accepted:
  :subcmd:`search`, :subcmd:`spider`, :subcmd:`stashlist` and :subcmd:`whatis`
  output in JSON format.
 
+ Content of :subcmd:`avail`, :subcmd:`list` and :subcmd:`spider` JSON output
+ is defined by the :mconfig:`avail_json_output`, :mconfig:`list_json_output`
+ and :mconfig:`spider_json_output` configuration options, which can be
+ overridden with the :option:`--output`/:option:`-o` command line switches.
+
  .. only:: html or latex
 
     .. versionadded:: 4.5
@@ -431,6 +436,10 @@ switches are accepted:
 
     .. versionchanged:: 5.6
        Support for :subcmd:`spider` sub-command added
+
+    .. versionchanged:: 5.8
+       Options :option:`--output`/:option:`-o` supported on :subcmd:`avail`,
+       :subcmd:`list` and :subcmd:`spider` sub-commands
 
 
 .. option:: --latest, -L
@@ -525,9 +534,9 @@ switches are accepted:
 
  Define the content to report in addition to module names. This option is
  supported by :subcmd:`avail`, :subcmd:`list` and :subcmd:`spider`
- sub-commands on their regular or terse output modes. Accepted values are a
- *LIST* of elements to report separated by colon character (``:``). The order
- of the elements in *LIST* does not matter.
+ sub-commands on their regular, terse or JSON output modes. Accepted values
+ are a *LIST* of elements to report separated by colon character (``:``). The
+ order of the elements in *LIST* does not matter.
 
  Accepted elements in *LIST* for :subcmd:`avail` and :subcmd:`spider`
  sub-command are: *modulepath*, *alias*, *provided-alias*, *dirwsym*,
@@ -537,14 +546,21 @@ switches are accepted:
  Accepted elements in *LIST* for :subcmd:`list` sub-command are: *header*,
  *idx*, *variant*, *alias*, *indesym*, *sym*, *tag*, *hidden* and *key*.
 
+ On JSON output mode, accepted elements in *LIST* for :subcmd:`avail` and
+ :subcmd:`spider` sub-command are: *modulepath*, *alias*, *provided-alias*,
+ *dirwsym*, *sym*, *tag*, *hidden*, *variant*, *variantifspec* and *via*.
+ Accepted elements for :subcmd:`list` sub-command are: *variant*, *alias*,
+ *sym*, *tag*, *hidden* and *via*.
+
  The order of the elements in *LIST* does not matter. Module names are the
  only content reported when *LIST* is set to an empty value.
 
  *LIST* may be prefixed by ``+`` or ``-`` character to indicate respectively
  to append it to or subtract it from current configuration option value.
 
- See also :envvar:`MODULES_AVAIL_OUTPUT`, :envvar:`MODULES_LIST_OUTPUT` and
- :envvar:`MODULES_SPIDER_OUTPUT`.
+ See also :envvar:`MODULES_AVAIL_OUTPUT`, :envvar:`MODULES_LIST_OUTPUT`,
+ :envvar:`MODULES_SPIDER_OUTPUT`, :envvar:`MODULES_AVAIL_JSON_OUTPUT`,
+ :envvar:`MODULES_LIST_JSON_OUTPUT` and :envvar:`MODULES_SPIDER_JSON_OUTPUT`.
 
  .. only:: html or latex
 
@@ -576,6 +592,9 @@ switches are accepted:
     .. versionchanged:: 5.6
        Elements *provided-alias* and *via* added for :subcmd:`avail` and
        :subcmd:`spider` sub-commands
+
+    .. versionchanged:: 5.8
+       JSON output mode supported
 
 .. option:: --paginate, -p
 
@@ -860,6 +879,11 @@ Module Sub-Commands
        Results from a multi *pattern* search are consolidated under a single
        output
 
+    .. versionchanged:: 5.8
+       Option :option:`--output`/:option:`-o` compatible with JSON output
+       mode
+
+
 .. subcmd:: cachebuild [modulepath...]
 
  Build module cache file for designated modulepaths. If no argument is
@@ -983,6 +1007,23 @@ Module Sub-Commands
   its default value. The :option:`--indepth` and :option:`--no-indepth`
   command line switches change the value of this configuration option. See
   :envvar:`MODULES_AVAIL_INDEPTH` description for details.
+
+ .. mconfig:: avail_json_output
+
+  Content to report in addition to module names on :subcmd:`avail` sub-command
+  JSON output mode.
+
+  Default value is ``modulepath:alias:dirwsym:sym:tag:via``. It can be
+  changed at installation time with :instopt:`--with-avail-json-output`
+  option. The :envvar:`MODULES_AVAIL_JSON_OUTPUT` environment variable is
+  defined by :subcmd:`config` sub-command when changing this configuration
+  option from its default value. The :option:`--output`/:option:`-o` command
+  line switches change the value of this configuration option. See
+  :envvar:`MODULES_AVAIL_JSON_OUTPUT` description for details.
+
+  .. only:: html or latex
+
+     .. versionadded:: 5.8
 
  .. mconfig:: avail_output
 
@@ -1341,6 +1382,23 @@ Module Sub-Commands
   .. only:: html or latex
 
      .. versionadded:: 5.7
+
+ .. mconfig:: list_json_output
+
+  Content to report in addition to module names on :subcmd:`list` sub-command
+  JSON output mode.
+
+  Default value is ``variant:sym:tag:via``. It can be
+  changed at installation time with :instopt:`--with-list-json-output`
+  option. The :envvar:`MODULES_LIST_JSON_OUTPUT` environment variable is
+  defined by :subcmd:`config` sub-command when changing this configuration
+  option from its default value. The :option:`--output`/:option:`-o` command
+  line switches change the value of this configuration option. See
+  :envvar:`MODULES_LIST_JSON_OUTPUT` description for details.
+
+  .. only:: html or latex
+
+     .. versionadded:: 5.8
 
  .. mconfig:: list_output
 
@@ -1737,6 +1795,23 @@ Module Sub-Commands
   .. only:: html or latex
 
      .. versionadded:: 5.6
+
+ .. mconfig:: spider_json_output
+
+  Content to report in addition to module names on :subcmd:`spider` sub-command
+  JSON output mode.
+
+  Default value is ``modulepath:alias:dirwsym:sym:tag:via``. It can be
+  changed at installation time with :instopt:`--with-spider-json-output`
+  option. The :envvar:`MODULES_SPIDER_JSON_OUTPUT` environment variable is
+  defined by :subcmd:`config` sub-command when changing this configuration
+  option from its default value. The :option:`--output`/:option:`-o` command
+  line switches change the value of this configuration option. See
+  :envvar:`MODULES_SPIDER_JSON_OUTPUT` description for details.
+
+  .. only:: html or latex
+
+     .. versionadded:: 5.8
 
  .. mconfig:: spider_output
 
@@ -2207,6 +2282,11 @@ Module Sub-Commands
 
     .. versionchanged:: 5.3
        *pattern* may include variant specification to filter results
+
+    .. versionchanged:: 5.8
+       Option :option:`--output`/:option:`-o` compatible with JSON output
+       mode
+
 
 .. subcmd:: load [options] modulefile...
 
@@ -2858,6 +2938,11 @@ Module Sub-Commands
  .. only:: html or latex
 
     .. versionadded:: 5.6
+
+    .. versionchanged:: 5.8
+       Option :option:`--output`/:option:`-o` compatible with JSON output
+       mode
+
 
 .. subcmd:: stash [-f]
 
@@ -3701,9 +3786,14 @@ When a shortcut character is defined for a variant (see
 shortcut for *variant1*: ``foo/1.2{%value:+variant2}``.
 
 When the JSON output mode is enabled (with :option:`--json`), variants are
-reported under the ``variants`` JSON object as name/value pairs. Values of
-Boolean variant are set as JSON Boolean. Other values are set as JSON strings.
-Variant shortcut and color rendering do not apply on JSON output.
+reported under the ``variants`` JSON object as name/value pairs if the
+*variant* element is part of the JSON output configuration (see
+:envvar:`MODULES_AVAIL_JSON_OUTPUT` and :envvar:`MODULES_LIST_JSON_OUTPUT`).
+On :subcmd:`list` sub-command, values of Boolean variant are set as JSON
+Boolean and other values are set as JSON strings. On :subcmd:`avail` and
+:subcmd:`spider` sub-commands, the possible values of each variant are set as
+a JSON array of strings. Variant shortcut and color rendering do not apply on
+JSON output.
 
 .. only:: html or latex
 
@@ -4973,6 +5063,48 @@ ENVIRONMENT
 
     .. versionadded:: 4.3
 
+.. envvar:: MODULES_AVAIL_JSON_OUTPUT
+
+ A colon separated list of the elements to report in addition to module names
+ on :subcmd:`avail` sub-command JSON output mode.
+
+ Accepted elements that can be set in value list are:
+
+ * ``alias``: module aliases.
+ * ``provided-alias``: show module aliases and evaluate all modulefiles to get
+   aliases provided by them.
+ * ``dirwsym``: directories associated with symbolic versions.
+ * ``hidden``: show all hidden modules.
+ * ``modulepath``: available modules grouped by modulepath, each modulepath
+   name being a key of the top-level JSON object.
+ * ``sym``: ``symbols`` key set on each JSON object, with the symbolic
+   versions associated with available module as value.
+ * ``tag``: ``tags`` key set on each JSON object, with the tags associated
+   with available module as value.
+ * ``variant``: ``variants`` key set on each modulefile JSON object, with
+   the variants and their possible values as value.
+ * ``variantifspec``: like ``variant`` but only if a variant has been
+   specified in search query.
+ * ``via``: ``via`` key set on each JSON object, with the loaded modules that
+   enable the modulepath of available module as value.
+
+ The order of the elements in the list does not matter. Only the ``name``,
+ ``type``, ``pathname`` and ``target`` keys are reported on JSON objects when
+ *LIST* is set to an empty value.
+
+ In case the ``modulepath`` element is missing from value list, the available
+ modules from global/user rc and all enabled modulepaths are reported as a
+ single list, each module name being a key of the top-level JSON object.
+
+ This environment variable value supersedes the default value set in the
+ :mconfig:`avail_json_output` configuration option. It can be defined with
+ the :subcmd:`config` sub-command. The :option:`--output`/:option:`-o` command
+ line switches override this environment variable.
+
+ .. only:: html or latex
+
+    .. versionadded:: 5.8
+
 .. envvar:: MODULES_AVAIL_OUTPUT
 
  A colon separated list of the elements to report in addition to module names
@@ -5541,6 +5673,36 @@ ENVIRONMENT
  .. only:: html or latex
 
     .. versionadded:: 5.7
+
+.. envvar:: MODULES_LIST_JSON_OUTPUT
+
+ A colon separated list of the elements to report in addition to module names
+ on :subcmd:`list` sub-command JSON output mode.
+
+ Accepted elements that can be set in value list are:
+
+ * ``alias``: module aliases targeting loaded modules.
+ * ``hidden``: show hidden loaded modules.
+ * ``sym``: ``symbols`` key set on each JSON object, with the symbolic
+   versions associated with loaded module as value.
+ * ``tag``: ``tags`` key set on each JSON object, with the tags associated
+   with loaded module as value.
+ * ``variant``: ``variants`` key set on each modulefile JSON object, with
+   the variant values selected for loaded module as value.
+ * ``via``: ``via`` key set on each JSON object, currently always empty.
+
+ The order of the elements in the list does not matter. Only the ``name``,
+ ``type``, ``pathname`` and ``target`` keys are reported on JSON objects when
+ *LIST* is set to an empty value.
+
+ This environment variable value supersedes the default value set in the
+ :mconfig:`list_json_output` configuration option. It can be defined with the
+ :subcmd:`config` sub-command. The :option:`--output`/:option:`-o` command
+ line switches override this environment variable.
+
+ .. only:: html or latex
+
+    .. versionadded:: 5.8
 
 .. envvar:: MODULES_LIST_OUTPUT
 
@@ -6115,6 +6277,27 @@ ENVIRONMENT
  .. only:: html or latex
 
     .. versionadded:: 5.6
+
+.. envvar:: MODULES_SPIDER_JSON_OUTPUT
+
+ A colon separated list of the elements to report in addition to module names
+ on :subcmd:`spider` sub-command JSON output mode.
+
+ See :envvar:`MODULES_AVAIL_JSON_OUTPUT` to get the accepted elements that
+ can be set in value list.
+
+ The order of the elements in the list does not matter. Only the ``name``,
+ ``type``, ``pathname`` and ``target`` keys are reported on JSON objects when
+ *LIST* is set to an empty value.
+
+ This environment variable value supersedes the default value set in the
+ :mconfig:`spider_json_output` configuration option. It can be defined with
+ the :subcmd:`config` sub-command. The :option:`--output`/:option:`-o`
+ command line switches override this environment variable.
+
+ .. only:: html or latex
+
+    .. versionadded:: 5.8
 
 .. envvar:: MODULES_SPIDER_OUTPUT
 
