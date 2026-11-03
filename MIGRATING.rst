@@ -8,6 +8,66 @@ Modules. It provides an overview of the new features and changed behaviors
 that will be encountered when upgrading.
 
 
+v5.8
+----
+
+This new version is backward-compatible with previous version 5 release. It
+fixes bugs but also introduces new functionalities that are described in this
+section. See the :ref:`5.8 release notes<5.8 release notes>` for a complete
+list of the changes between Modules v5.7 and v5.8.
+
+Configuring JSON output content
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The content of the JSON output of :subcmd:`avail`, :subcmd:`list` and
+:subcmd:`spider` sub-commands can now be configured, like their regular and
+terse outputs. The new :mconfig:`avail_json_output`,
+:mconfig:`list_json_output` and :mconfig:`spider_json_output` configuration
+options define the elements to report in the JSON document. An element
+corresponds either to a key of the module JSON objects (``sym``, ``tag``,
+``variant``, ``via``), to a kind of entry to include (``alias``,
+``provided-alias``, ``dirwsym``, ``hidden``) or to the grouping of modules by
+modulepath (``modulepath``). The :option:`--output`/:option:`-o` command line
+switch is now accepted on :option:`--json` output mode to change the reported
+content for one command execution.
+
+By default, the same JSON document than previous versions is produced. When
+an element is not enabled, its key is omitted from the JSON objects. Without
+the ``modulepath`` element, the top-level JSON object is directly keyed by
+module names.
+
+.. parsed-literal::
+
+    :ps:`$` module avail --json foo
+    {"/path/to/modulefiles": {
+    "foo/1.0": { "name": "foo/1.0", "type": "modulefile", "symbols": [ "default" ], "tags": [], "pathname": "/path/to/modulefiles/foo/1.0", "via": []}
+    }}
+    :ps:`$` module avail --json -o sym foo
+    {"foo/1.0": { "name": "foo/1.0", "type": "modulefile", "symbols": [ "default" ], "pathname": "/path/to/modulefiles/foo/1.0"}}
+
+The new ``mtime`` element, specific to JSON output mode, reports the
+modification time of each modulefile as an ISO 8601 string. It is not part
+of the default content as it requires to stat every modulefile when no module
+cache file is available.
+
+.. parsed-literal::
+
+    :ps:`$` module config avail_json_output +mtime
+    :ps:`$` module avail --json foo
+    {"/path/to/modulefiles": {
+    "foo/1.0": { "name": "foo/1.0", "type": "modulefile", "symbols": [ "default" ], "tags": [], "pathname": "/path/to/modulefiles/foo/1.0", "mtime": "2026-09-22T21:03:28+0200", "via": []}
+    }}
+
+Variants are also reported on :subcmd:`avail` and :subcmd:`spider` JSON
+output when the ``variant`` or ``variantifspec`` element is enabled. The
+possible values of each variant are set as a JSON array.
+
+.. parsed-literal::
+
+    :ps:`$` module avail --json -o variant foo
+    {"foo/1.0": { "name": "foo/1.0", "type": "modulefile", "variants": { "arch": [ "x86_64", "arm64" ], "debug": [ "on", "off" ] }, "pathname": "/path/to/modulefiles/foo/1.0"}}
+
+
 v5.7
 ----
 
