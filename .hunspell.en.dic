@@ -1662,3 +1662,15 @@ parseModuleCommandArgs
 DDTHH
 hhmm
 22T21
+getModshareVarName
+getPriorityArray
+getPriorityVarName
+getReferenceCountArray
+parsePathCommandArgs
+setPriorityRecordValue
+setReferenceCountRecordValue
+runModuleUse
+TMOD
+getPathElementWeight
+withdrawPriorityDemands
+getPathWeightList
