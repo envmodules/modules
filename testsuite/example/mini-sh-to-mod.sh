@@ -9,4 +9,8 @@ if [ "${TESTSUITE_SOURCESH_ESCCHAR:+x}" = 'x' ]; then
    export FOOPATH=/path/\{\|:$FOOPATH:/path/\}\&
 fi
 
+if [ "${TESTSUITE_SOURCESH_PRIO:+x}" = 'x' ]; then
+   export __MODULES_PRIORITY_FOOPATH='/path/to/mini&|-10'
+fi
+
 # vim:set tabstop=3 shiftwidth=3 expandtab autoindent:

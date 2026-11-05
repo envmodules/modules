@@ -685,6 +685,9 @@ if {[catch {
       } elseif {[info exists nextargisextraargv]} {
          lappend extraargv $arg
          unset nextargisextraargv
+      } elseif {[info exists nextargisotherargv]} {
+         lappend otherargv $arg
+         unset nextargisotherargv
       } elseif {[info exists nextargisval]} {
          ##nagelfar vartype nextargisval varName
          set $nextargisval $arg
@@ -793,9 +796,15 @@ if {[catch {
             -a - --append - -append - --all - --prepend - -prepend - --delim\
             - -delim - --delim=* - -delim=* - --duplicates - --index -\
             --notuasked - --indepth - --no-indepth - --dump-state - --reset -\
-            --tag - --tag=* - --glob - --show_hidden {
+            --tag - --tag=* - --glob - --show_hidden - --priority=* {
                # command-specific switches interpreted later on
                lappend otherargv $arg
+            }
+            --priority {
+               # pass value following switch to command-specific parsing,
+               # whatever its form, to let this parsing report invalid value
+               lappend otherargv $arg
+               set nextargisotherargv 1
             }
             append-path - prepend-path - remove-path {
                # detect *-path commands to say -d means --delim, not --default

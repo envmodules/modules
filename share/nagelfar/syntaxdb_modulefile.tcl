@@ -128,7 +128,7 @@ set {::syntax(module initlist)} 0
 set {::syntax(module purge)} 0
 set {::syntax(module reload)} 0
 set {::syntax(module update)} 0
-set {::syntax(module use)} x*
+set {::syntax(module use)} {o* x* o*}
 set {::syntax(module available)} x*
 set {::syntax(module avail)} x*
 set {::syntax(module show)} x*
@@ -250,9 +250,11 @@ set ::subCmd(uname) {sysname nodename domain release version machine}
 # option
 set ::option(always-load) {--optional --tag}
 set {::option(always-load --tag)} 1
-set ::option(append-path) {-d --delim --duplicates --ignore-refcount}
+set ::option(append-path) {-d --delim --duplicates --ignore-refcount\
+   --priority}
 set {::option(append-path -d)} 1
 set {::option(append-path --delim)} 1
+set {::option(append-path --priority)} 1
 set ::option(depends-on) {--optional --tag}
 set {::option(depends-on --tag)} 1
 set ::option(depends-on-any) {--optional --tag}
@@ -285,6 +287,8 @@ set {::option(module switch)} {--tag --not-req}
 set {::option(module switch --tag)} 1
 set {::option(module unuse)} {--remove-on-unload --noop-on-unload\
    --append-on-unload --prepend-on-unload}
+set {::option(module use)} {-a --append -p --prepend --priority}
+set {::option(module use --priority)} 1
 set ::option(module-forbid) {--user --group --not-user --not-group --after\
    --before --message --nearly-message}
 set {::option(module-forbid --user)} 1
@@ -314,9 +318,11 @@ set {::option(module-warn --not-user)} 1
 set {::option(module-warn --not-group)} 1
 set {::option(module-warn --after)} 1
 set {::option(module-warn --before)} 1
-set ::option(prepend-path) {-d --delim --duplicates --ignore-refcount}
+set ::option(prepend-path) {-d --delim --duplicates --ignore-refcount\
+   --priority}
 set {::option(prepend-path -d)} 1
 set {::option(prepend-path --delim)} 1
+set {::option(prepend-path --priority)} 1
 set ::option(prereq) {--optional --tag}
 set {::option(prereq --tag)} 1
 set ::option(prereq-all) {--optional --tag}

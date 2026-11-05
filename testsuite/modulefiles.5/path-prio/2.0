@@ -1,0 +1,4 @@
+#%Module
+setenv FOO /bin
+prepend-path --priority 100 FOO /path/to/foo
+prepend-path FOO /path/to/bar

@@ -1,0 +1,103 @@
+#%Module
+if {[info exists env(TESTSUITE_PATH_PRIO)]} {
+    switch -- $env(TESTSUITE_PATH_PRIO) {
+        prepend1 {
+            prepend-path --priority 100 FOO /path/to/foo
+        }
+        prepend2 {
+            prepend-path --priority=10 FOO /path/to/foo /path/to/bar
+        }
+        append1 {
+            append-path --priority 100 FOO /path/to/foo
+        }
+        append2 {
+            append-path --priority=10 FOO /path/to/foo /path/to/bar
+        }
+        mix1 {
+            prepend-path --priority 100 FOO /path/to/foo
+            prepend-path FOO /path/to/bar
+            append-path --priority 10 FOO /path/to/baz
+            append-path FOO /path/to/qux
+            prepend-path --priority 10 FOO /path/to/quux
+            append-path --priority 100 FOO /path/to/corge
+        }
+        zero {
+            prepend-path --priority 0 FOO /path/to/foo
+        }
+        lead0 {
+            prepend-path --priority 007 FOO /path/to/foo
+        }
+        neg {
+            prepend-path --priority -5 FOO /path/to/foo
+        }
+        nan {
+            prepend-path --priority abc FOO /path/to/foo
+        }
+        noval {
+            prepend-path --priority
+        }
+        remove1 {
+            remove-path --priority 5 FOO /path/to/foo
+        }
+        delim {
+            prepend-path -d , --priority 5 FOO /path/to/foo
+        }
+        postvar {
+            prepend-path FOO --priority 5
+        }
+        dup {
+            prepend-path --duplicates --priority 5 FOO /path/to/foo
+        }
+        empty {
+            prepend-path --priority 5 FOO {}
+        }
+        setenv1 {
+            setenv FOO /path/to/foo
+        }
+        unsetenv1 {
+            unsetenv FOO
+        }
+        pushenv1 {
+            pushenv FOO /path/to/foo
+        }
+        modulepath {
+            prepend-path --priority 100 MODULEPATH /path/to/site
+        }
+        use1 {
+            module use --priority 100 /path/to/site
+        }
+        use2 {
+            module use --append --priority=10 /path/to/site
+        }
+        use3 {
+            module use --priority abc /path/to/site
+        }
+        unuse1 {
+            module unuse --priority 100 /path/to/site
+        }
+        plain {
+            prepend-path FOO /path/to/foo
+        }
+        privvar {
+            prepend-path --priority 5 MODULES_FOO /path/to/foo
+            prepend-path --priority 5 __MODULES_FOO /path/to/foo
+        }
+        escape {
+            prepend-path -d , --priority 5 FOO /path/to/co:lon /path/to/we&ird
+        }
+        dup2 {
+            prepend-path --duplicates --priority 100 FOO /path/to/foo
+            append-path --duplicates --priority 10 FOO /path/to/foo
+        }
+        remove_aou {
+            remove-path FOO /path/to/foo --append-on-unload /path/to/bar
+        }
+        big {
+            prepend-path --priority 99999999999999999999 FOO /path/to/foo
+        }
+        rmidx {
+            prepend-path --priority 5 FOO /path/to/foo
+            remove-path --index FOO 0
+        }
+    }
+}

@@ -52,6 +52,14 @@ Modules 5.8.0 (not yet released)
   :subcmd:`list` and :subcmd:`spider` sub-commands to report the modification
   time of modulefiles. (fix issue #615)
 * Doc: add :ref:`path-priority` design notes.
+* Add ``--priority`` option to :mfcmd:`prepend-path` and :mfcmd:`append-path`
+  modulefile commands and sub-commands and to :subcmd:`use` sub-command to
+  assign a priority to the added path elements. Elements are ordered in the
+  path-like variable by priority: the prepended elements with the highest
+  priority stay first and the appended elements with the highest priority
+  stay last, whatever the modulefiles loaded afterward. Priority of elements
+  is recorded in the :envvar:`__MODULES_PRIORITY_\<VAR\>` environment
+  variable. (fix issue #185)
 
 
 .. _5.7 release notes:

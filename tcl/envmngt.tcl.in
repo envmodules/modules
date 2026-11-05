@@ -1570,6 +1570,29 @@ proc getModshareVarName {var} {
    }
 }
 
+# priority record follows the same rules than reference counter record
+proc getPriorityVarName {var} {
+   return [expr {[getModshareVarName $var] eq {} ? {} :\
+      "__MODULES_PRIORITY_$var"}]
+}
+
+# check priority value is a non-negative integer bounded to 1000000, which
+# fits the 'string is integer' check made on the priority record on every
+# Tcl version (32-bit values only on Tcl 8), and return it normalized
+proc checkPriorityValue {cmd val} {
+   if {![string is digit -strict $val]} {
+      knerror "$cmd should get a non-negative integer as priority value"
+   }
+   # leading zeros are stripped as value is recorded as-is
+   set val [string trimleft $val 0]
+   if {$val eq {}} {
+      set val 0
+   } elseif {$val > 1000000} {
+      knerror "$cmd should get a priority value not greater than 1000000"
+   }
+   return $val
+}
+
 # path fiddling
 proc getReferenceCountArray {var separator} {
    # get reference counter set in environment
@@ -1660,12 +1683,140 @@ proc setReferenceCountRecordValue {sharevar countlist} {
    }
 }
 
+# get priority demands of elements currently in path variable, as recorded in
+# priority variable: for each element, ordered list of {modname weight} pairs
+# (negative weight for prepended element, positive for appended one)
+proc getPriorityArray {var separator} {
+   set priovar [getPriorityVarName $var]
+   array set recarr {}
+   if {[isEnvVarDefined $priovar]} {
+      foreach rec [psplit $::env($priovar) [getState path_separator]] {
+         set demand_list [list]
+         set demand_str_list [lassign [psplit $rec &] elt]
+         foreach demand $demand_str_list {
+            # weight follows the last '|' character, module name is before
+            set sepidx [string last | $demand]
+            set weight [string range $demand $sepidx+1 end]
+            if {$sepidx == -1 || ![string is integer -strict $weight] ||\
+               $weight == 0} {
+               reportDebug "Priority value in '$priovar' is erroneous ($rec)"
+               set demand_list [list]
+               break
+            }
+            lappend demand_list [list [string range $demand 0 $sepidx-1]\
+               $weight]
+         }
+         if {[llength $demand_list]} {
+            set recarr($elt) $demand_list
+         }
+      }
+   }
+
+   array set prioarr {}
+   if {[array size recarr] && [isEnvVarDefined $var]} {
+      # empty env value may mean an empty path entry (see
+      # getReferenceCountArray)
+      if {$::env($var) eq {} && [info exists recarr()]} {
+         set eltlist [list {}]
+      } else {
+         set eltlist [split $::env($var) $separator]
+      }
+
+      # elements recorded but not found in variable anymore are dropped
+      foreach elt $eltlist {
+         if {[info exists recarr($elt)]} {
+            set prioarr($elt) $recarr($elt)
+         }
+      }
+   }
+
+   set prio_list [array get prioarr]
+   reportDebug "(var=$var, delim=$separator) got '$prio_list'"
+
+   return $prio_list
+}
+
+# weight of path element from its priority demands: first demand decides if
+# element position is not changed when added again, last demand otherwise
+proc getPathElementWeight {demand_list} {
+   if {![llength $demand_list]} {
+      return 0
+   } elseif {[getConf path_entry_reorder]} {
+      return [lindex $demand_list end 1]
+   } else {
+      return [lindex $demand_list 0 1]
+   }
+}
+
+# get weight of each element from priority demand list
+proc getPathWeightList {priolist} {
+   set weight_list [list]
+   foreach {elt demand_list} $priolist {
+      lappend weight_list $elt [getPathElementWeight $demand_list]
+   }
+   return $weight_list
+}
+
+# generate priority record to export in user environment
+proc setPriorityRecordValue {priovar priolist} {
+   foreach {elt demand_list} $priolist {
+      if {[llength $demand_list]} {
+         set rec [list $elt]
+         foreach demand $demand_list {
+            lappend rec [join $demand |]
+         }
+         lappend rec_list $rec
+      }
+   }
+
+   if {[info exists rec_list]} {
+      # sort record by element to get a stable value
+      foreach rec [lsort -index 0 $rec_list] {
+         lappend reclist [pjoin $rec &]
+      }
+      set-env $priovar [pjoin $reclist [getState path_separator]]
+   # unset priority var if found set whereas no element has a priority
+   } elseif {[isEnvVarDefined $priovar]} {
+      unset-env $priovar 1
+   }
+}
+
+# withdraw priority demands of module on given elements, demands of other
+# modules are kept to be applied again when they become first or last
+proc withdrawPriorityDemands {priolist modname elt_list} {
+   set res [list]
+   foreach {elt demand_list} $priolist {
+      if {$elt in $elt_list} {
+         set demand_list [lsearch -all -inline -not -exact -index 0\
+            $demand_list $modname]
+      }
+      lappend res $elt $demand_list
+   }
+   return $res
+}
+
+# order elements of path value by increasing weight, elements with same
+# weight keep their relative order (lsort is a stable sort)
+proc sortPathValueByPriority {val separator priolist} {
+   array set prioarr $priolist
+   set pair_list [list]
+   foreach elt [split $val $separator] {
+      lappend pair_list [list $elt [expr {[info exists prioarr($elt)] ?\
+         $prioarr($elt) : 0}]]
+   }
+   set elt_list [list]
+   foreach pair [lsort -integer -index 1 $pair_list] {
+      lappend elt_list [lindex $pair 0]
+   }
+   return [join $elt_list $separator]
+}
+
 proc unload-path {cmd mode dflbhv args} {
    reportDebug "($args) cmd=$cmd, mode=$mode, dflbhv=$dflbhv"
 
    lassign [parsePathCommandArgs $cmd $mode $dflbhv {*}$args] separator\
       allow_dup idx_val ign_refcount val_set_is_delim glob_match bhv var\
-      path_list
+      path_list priority
 
    # indicate env var name to configured traces
    setState current_envvar $var
@@ -1719,6 +1870,7 @@ proc unload-path {cmd mode dflbhv args} {
 
    # build list of index to remove from variable
    set del_idx_list [list]
+   set elt_list [list]
    foreach dir $path_list {
       # retrieve dir value if working on an index list
       if {$idx_val} {
@@ -1731,6 +1883,8 @@ proc unload-path {cmd mode dflbhv args} {
             set dir [lindex $dir_list $idx]
          }
       }
+      # element names are needed to withdraw priority demands made on them
+      lappend elt_list $dir
 
       # update reference counter array
       if {[info exists countarr($dir)]} {
@@ -1811,6 +1965,20 @@ proc unload-path {cmd mode dflbhv args} {
 
    if {$isrefcount} {
       setReferenceCountRecordValue $sharevar [array get countarr]
+      # drop priority demands of current module and of elements not in
+      # variable anymore
+      set prio_list [withdrawPriorityDemands [getPriorityArray $var\
+         $separator] [currentState modulename] $elt_list]
+      setPriorityRecordValue [getPriorityVarName $var] $prio_list
+      # move elements whose applying demand has changed, if elements are
+      # moved when added again (otherwise they move at next addition)
+      if {[getConf path_entry_reorder] && [llength $newpath]} {
+         set val [sortPathValueByPriority [join $newpath $separator]\
+            $separator [getPathWeightList $prio_list]]
+         if {$val ne [join $newpath $separator]} {
+            set-env $var $val
+         }
+      }
    }
    return [list $bhv $var]
 }
@@ -1825,10 +1993,11 @@ proc add-path {cmd mode dflbhv args} {
       set ign_refcount 0
       set val_set_is_delim 0
       set bhv $dflbhv
+      set priority 0
    } else {
       lassign [parsePathCommandArgs $cmd $mode $dflbhv {*}$args] separator\
          allow_dup idx_val ign_refcount val_set_is_delim glob_match bhv var\
-         path_list
+         path_list priority
    }
 
    # indicate env var name to configured traces
@@ -1853,15 +2022,38 @@ proc add-path {cmd mode dflbhv args} {
    # no reference count management when no share variable is returned
    if {$isrefcount} {
       array set countarr [getReferenceCountArray $var $separator]
+      array set prioarr [getPriorityArray $var $separator]
    }
 
    if {$bhv eq {prepend}} {
       set path_list [lreverse $path_list]
    }
 
+   # weight of added elements: prepended element with highest priority goes
+   # first, appended element with highest priority goes last
+   set weight [expr {$bhv eq {prepend} ? -$priority : $priority}]
+
    set val [get-env $var]
 
+   set modname [currentState modulename]
+
    foreach dir $path_list {
+      # record priority demand of current module on element: its previous
+      # demand if any is withdrawn, so new demand is the most recent one. No
+      # demand is recorded on an element already in variable if this element
+      # is not moved when added again, as its priority is then set by the
+      # module that first added it
+      if {$isrefcount && $weight != 0 && (![info exists countarr($dir)] ||\
+         [getConf path_entry_reorder])} {
+         if {![info exists prioarr($dir)]} {
+            set prioarr($dir) [list]
+         }
+         set idx [lsearch -exact -index 0 $prioarr($dir) $modname]
+         if {$idx != -1} {
+            set prioarr($dir) [lreplace $prioarr($dir) $idx $idx]
+         }
+         lappend prioarr($dir) [list $modname $weight]
+      }
       # remove $dir from path only if path_entry_reorder is true and
       # $dir is already in path and duplicates are NOT allowed.
       if {[getConf path_entry_reorder] && [info exists countarr($dir)]\
@@ -1902,9 +2094,17 @@ proc add-path {cmd mode dflbhv args} {
       }
    }
 
+   # order elements by weight only if some have a priority, so variable
+   # without priority is left untouched
+   if {$isrefcount && [array size prioarr]} {
+      set val [sortPathValueByPriority $val $separator [getPathWeightList\
+         [array get prioarr]]]
+   }
+
    set-env $var $val
    if {$isrefcount} {
       setReferenceCountRecordValue $sharevar [array get countarr]
+      setPriorityRecordValue [getPriorityVarName $var] [array get prioarr]
    }
 
    if {$var eq {MODULEPATH}} {
@@ -1919,6 +2119,7 @@ proc add-path {cmd mode dflbhv args} {
 proc parsePathCommandArgs {cmd mode dflbhv args} {
    # parse argument list
    set next_is_delim 0
+   set next_is_priority 0
    set next_is_ignored 0
    set next_is_reset 0
    set allow_dup 0
@@ -1999,6 +2200,12 @@ proc parsePathCommandArgs {cmd mode dflbhv args} {
             --delim=* {
                set delim [string range $arg 8 end]
             }
+            --priority {
+               set next_is_priority 1
+            }
+            --priority=* {
+               set priority [string range $arg 11 end]
+            }
             --ignore-refcount {
                set ign_refcount 1
             }
@@ -2017,12 +2224,21 @@ proc parsePathCommandArgs {cmd mode dflbhv args} {
                set bhvopt $arg
             }
             -* {
-               knerror "invalid option '$arg' for $cmd"
+               # negative priority value is reported as an invalid priority
+               if {$next_is_priority} {
+                  set priority $arg
+                  set next_is_priority 0
+               } else {
+                  knerror "invalid option '$arg' for $cmd"
+               }
             }
             default {
                if {$next_is_delim} {
                   set delim $arg
                   set next_is_delim 0
+               } elseif {$next_is_priority} {
+                  set priority $arg
+                  set next_is_priority 0
                } else {
                   set var $arg
                }
@@ -2036,6 +2252,14 @@ proc parsePathCommandArgs {cmd mode dflbhv args} {
       set delim [getState path_separator]
    } elseif {$delim eq {}} {
       knerror "$cmd should get a non-empty path delimiter"
+   }
+   if {![info exists priority]} {
+      set priority 0
+   } elseif {$cmd eq {remove-path}} {
+      reportWarning "--priority option has no effect on $cmd"
+      set priority 0
+   } else {
+      set priority [checkPriorityValue $cmd $priority]
    }
    if {![info exists var]} {
       knerror "$cmd should get an environment variable name"
@@ -2098,10 +2322,10 @@ proc parsePathCommandArgs {cmd mode dflbhv args} {
    reportDebug "(delim=$delim, allow_dup=$allow_dup, idx_val=$idx_val,\
       ign_refcount=$ign_refcount, val_set_is_delim=$val_set_is_delim,\
       glob_match=$glob_match, bhv=$bhv, var=$var, val=$val_list,\
-      nbval=[llength $val_list])"
+      nbval=[llength $val_list], priority=$priority)"
 
    return [list $delim $allow_dup $idx_val $ign_refcount $val_set_is_delim\
-      $glob_match $bhv $var $val_list]
+      $glob_match $bhv $var $val_list $priority]
 }
 
 # get list of Modules-specific environment variable in glob form

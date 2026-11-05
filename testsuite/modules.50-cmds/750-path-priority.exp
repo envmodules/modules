@@ -1,0 +1,1646 @@
+##############################################################################
+#   Modules Revision 3.0
+#   Providing a flexible user environment
+#
+#   File:		modules.50-cmds/%M%
+#   Revision:		%I%
+#   First Edition:	2026/11/04
+#   Last Mod.:		%U%, %G%
+#
+#   Authors:		Xavier Delaruelle, xavier.delaruelle@cea.fr
+#
+#   Description:	Testuite testsequence
+#   Command:		load, unload, display, help, test, whatis, refresh, avail
+#   Modulefiles:    path-prio
+#   Sub-Command:
+#
+#   Comment:	%C{
+#         Test --priority option of prepend-path and append-path modulefile
+#         commands
+#		}C%
+#
+##############################################################################
+
+set mp $modpath.5
+set mpre [regsub -all "\(\[.+?\]\)" $mp {\\\1}]
+setenv_path_var MODULEPATH $mp
+
+set mod path-prio/1.0
+set modfile $mp/path-prio/1.0
+
+# tests are made with path_entry_reorder disabled unless otherwise set
+setenv_var MODULES_PATH_ENTRY_REORDER 0
+
+
+#
+# prepended element with priority goes first
+#
+
+setenv_var TESTSUITE_PATH_PRIO prepend1
+
+setenv_var FOO /path/to/bar:/bin
+unsetenv_var __MODULES_PRIORITY_FOO
+set ans [list]
+lappend ans [list set FOO /path/to/foo:/path/to/bar:/bin]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/foo&$mod|-100"]
+testouterr_cmd sh "load $mod" $ans {}
+
+# variable not defined yet
+unsetenv_var FOO
+set ans [list]
+lappend ans [list set FOO /path/to/foo]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/foo&$mod|-100"]
+testouterr_cmd sh "load $mod" $ans {}
+
+# other element with higher priority already in variable
+setenv_var FOO /path/to/bar:/bin
+setenv_var __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|-1000"
+set ans [list]
+lappend ans [list set FOO /path/to/bar:/path/to/foo:/bin]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|-1000:/path/to/foo&$mod|-100"]
+testouterr_cmd sh "load $mod" $ans {}
+
+# other element with lower priority already in variable
+setenv_var __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|-10"
+set ans [list]
+lappend ans [list set FOO /path/to/foo:/path/to/bar:/bin]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|-10:/path/to/foo&$mod|-100"]
+testouterr_cmd sh "load $mod" $ans {}
+
+# other element with same priority already in variable
+setenv_var __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|-100"
+set ans [list]
+lappend ans [list set FOO /path/to/foo:/path/to/bar:/bin]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|-100:/path/to/foo&$mod|-100"]
+testouterr_cmd sh "load $mod" $ans {}
+
+skip_if_quick_mode
+
+# other appended element with priority already in variable
+setenv_var FOO /bin:/path/to/bar
+setenv_var __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|100"
+set ans [list]
+lappend ans [list set FOO /path/to/foo:/bin:/path/to/bar]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|100:/path/to/foo&$mod|-100"]
+testouterr_cmd sh "load $mod" $ans {}
+
+# element already in variable without priority: no demand recorded when
+# path_entry_reorder is disabled as element is not moved when added again
+setenv_var FOO /path/to/bar:/path/to/foo:/bin
+unsetenv_var __MODULES_PRIORITY_FOO
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO /path/to/foo:2]
+lappend ans [list set FOO /path/to/bar:/path/to/foo:/bin]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+testouterr_cmd sh "load $mod" $ans {}
+
+# element gets the priority when path_entry_reorder is enabled
+setenv_var MODULES_PATH_ENTRY_REORDER 1
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO /path/to/foo:2]
+lappend ans [list set FOO /path/to/foo:/path/to/bar:/bin]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/foo&$mod|-100"]
+testouterr_cmd sh "load $mod" $ans {}
+setenv_var MODULES_PATH_ENTRY_REORDER 0
+
+# variable modified outside of module command is reordered
+setenv_var FOO /path/to/baz:/path/to/foo:/bin
+setenv_var __MODULES_PRIORITY_FOO "/path/to/foo&$mod|-100"
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO /path/to/foo:2]
+lappend ans [list set FOO /path/to/foo:/path/to/baz:/bin]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/foo&$mod|-100"]
+testouterr_cmd sh "load $mod" $ans {}
+
+# stale or erroneous record entries are dropped
+setenv_var FOO /path/to/bar:/bin
+setenv_var __MODULES_PRIORITY_FOO "/path/to/gone&other/1.0|-10:/path/to/bar&other/1.0|abc:/bin&other/1.0|0:/bin&other/1.0"
+set ans [list]
+lappend ans [list set FOO /path/to/foo:/path/to/bar:/bin]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/foo&$mod|-100"]
+testouterr_cmd sh "load $mod" $ans {}
+
+# unload
+setenv_loaded_module [list $mod] [list $modfile]
+setenv_var FOO /path/to/foo:/path/to/bar:/bin
+setenv_var __MODULES_PRIORITY_FOO "/path/to/foo&$mod|-100"
+unsetenv_var __MODULES_SHARE_FOO
+set ans [list]
+lappend ans [list set FOO /path/to/bar:/bin]
+lappend ans [list unset _LMFILES_]
+lappend ans [list unset LOADEDMODULES]
+lappend ans [list unset __MODULES_PRIORITY_FOO]
+testouterr_cmd sh "unload $mod" $ans {}
+
+# unload, other element with priority remains
+setenv_var __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|-10:/path/to/foo&$mod|-100"
+set ans [list]
+lappend ans [list set FOO /path/to/bar:/bin]
+lappend ans [list unset _LMFILES_]
+lappend ans [list unset LOADEDMODULES]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|-10"]
+testouterr_cmd sh "unload $mod" $ans {}
+
+# unload, element still in variable, demand of unloaded module is withdrawn
+setenv_var __MODULES_PRIORITY_FOO "/path/to/foo&$mod|-100"
+setenv_var __MODULES_SHARE_FOO /path/to/foo:2
+set ans [list]
+lappend ans [list unset __MODULES_SHARE_FOO]
+lappend ans [list set FOO /path/to/foo:/path/to/bar:/bin]
+lappend ans [list unset _LMFILES_]
+lappend ans [list unset LOADEDMODULES]
+lappend ans [list unset __MODULES_PRIORITY_FOO]
+testouterr_cmd sh "unload $mod" $ans {}
+
+# unload, element still in variable, demand of other module is kept
+setenv_var __MODULES_PRIORITY_FOO "/path/to/foo&other/1.0|-10&$mod|-100"
+set ans [list]
+lappend ans [list unset __MODULES_SHARE_FOO]
+lappend ans [list set FOO /path/to/foo:/path/to/bar:/bin]
+lappend ans [list unset _LMFILES_]
+lappend ans [list unset LOADEDMODULES]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/foo&other/1.0|-10"]
+testouterr_cmd sh "unload $mod" $ans {}
+unsetenv_var __MODULES_SHARE_FOO
+
+# unload, variable becomes empty
+setenv_var FOO /path/to/foo
+setenv_var __MODULES_PRIORITY_FOO "/path/to/foo&$mod|-100"
+set ans [list]
+lappend ans [list unset FOO]
+lappend ans [list unset _LMFILES_]
+lappend ans [list unset LOADEDMODULES]
+lappend ans [list unset __MODULES_PRIORITY_FOO]
+testouterr_cmd sh "unload $mod" $ans {}
+
+# refresh
+testouterr_cmd sh {refresh} OK {}
+
+unsetenv_loaded_module
+unsetenv_var FOO
+unsetenv_var __MODULES_PRIORITY_FOO
+
+# whatis
+testouterr_cmd sh "whatis $mod" OK {}
+
+# display
+set tserr "$modlin
+$mpre/$mod:
+
+prepend-path\t--priority 100 FOO /path/to/foo
+$modlin"
+testouterr_cmd_re sh "display $mod" OK $tserr
+
+# help
+set tserr "$modlin
+Module Specific Help for $mpre/$mod:
+
+$warn_msgs: Unable to find ModulesHelp in $mpre/$mod.
+$modlin"
+testouterr_cmd_re sh "help $mod" OK $tserr
+
+# test
+set tserr "$modlin
+Module Specific Test for $mpre/$mod:
+
+$warn_msgs: Unable to find ModulesTest in $mpre/$mod.
+$modlin"
+testouterr_cmd_re sh "test $mod" OK $tserr
+
+# scan
+set tserr "$mpre:
+$mod"
+testouterr_cmd_re sh "avail -t $mod prepend-path:FOO" OK $tserr
+
+
+#
+# element already in variable with a priority set by another module
+#
+
+# element is not moved when path_entry_reorder is disabled, so the new
+# demand is not recorded and the existing demand still applies
+setenv_var TESTSUITE_PATH_PRIO prepend1
+
+# same side, weaker existing demand
+setenv_var FOO /path/to/bar:/path/to/foo:/bin
+setenv_var __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|-50:/path/to/foo&other/1.0|-5"
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO /path/to/foo:2]
+lappend ans [list set FOO /path/to/bar:/path/to/foo:/bin]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|-50:/path/to/foo&other/1.0|-5"]
+testouterr_cmd sh "load $mod" $ans {}
+
+# same side, stronger existing demand
+setenv_var FOO /path/to/bar:/path/to/foo:/bin
+setenv_var __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|-500:/path/to/foo&other/1.0|-5"
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO /path/to/foo:2]
+lappend ans [list set FOO /path/to/bar:/path/to/foo:/bin]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|-500:/path/to/foo&other/1.0|-5"]
+testouterr_cmd sh "load $mod" $ans {}
+
+# prepend on appended element
+setenv_var FOO /path/to/bar:/bin:/path/to/foo
+setenv_var __MODULES_PRIORITY_FOO "/path/to/foo&other/1.0|10"
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO /path/to/foo:2]
+lappend ans [list set FOO /path/to/bar:/bin:/path/to/foo]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/foo&other/1.0|10"]
+testouterr_cmd sh "load $mod" $ans {}
+
+# append on prepended element
+setenv_var TESTSUITE_PATH_PRIO append1
+setenv_var FOO /path/to/foo:/path/to/bar:/bin
+setenv_var __MODULES_PRIORITY_FOO "/path/to/foo&other/1.0|-10"
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO /path/to/foo:2]
+lappend ans [list set FOO /path/to/foo:/path/to/bar:/bin]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/foo&other/1.0|-10"]
+testouterr_cmd sh "load $mod" $ans {}
+
+# last demand decides when path_entry_reorder is enabled, element is moved
+setenv_var MODULES_PATH_ENTRY_REORDER 1
+setenv_var TESTSUITE_PATH_PRIO prepend1
+
+# same side, weaker existing demand
+setenv_var FOO /path/to/foo:/path/to/bar:/bin
+setenv_var __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|-50:/path/to/foo&other/1.0|-5"
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO /path/to/foo:2]
+lappend ans [list set FOO /path/to/foo:/path/to/bar:/bin]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|-50:/path/to/foo&other/1.0|-5&$mod|-100"]
+testouterr_cmd sh "load $mod" $ans {}
+
+# same side, stronger existing demand
+setenv_var FOO /path/to/bar:/path/to/foo:/bin
+setenv_var __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|-500:/path/to/foo&other/1.0|-5"
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO /path/to/foo:2]
+lappend ans [list set FOO /path/to/bar:/path/to/foo:/bin]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|-500:/path/to/foo&other/1.0|-5&$mod|-100"]
+testouterr_cmd sh "load $mod" $ans {}
+
+# same side, weaker demand on stronger existing demand
+setenv_var FOO /path/to/foo:/path/to/bar:/bin
+setenv_var __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|-50:/path/to/foo&other/1.0|-500"
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO /path/to/foo:2]
+lappend ans [list set FOO /path/to/foo:/path/to/bar:/bin]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|-50:/path/to/foo&other/1.0|-500&$mod|-100"]
+testouterr_cmd sh "load $mod" $ans {}
+
+# prepend on appended element
+setenv_var FOO /path/to/bar:/bin:/path/to/foo
+setenv_var __MODULES_PRIORITY_FOO "/path/to/foo&other/1.0|10"
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO /path/to/foo:2]
+lappend ans [list set FOO /path/to/foo:/path/to/bar:/bin]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/foo&other/1.0|10&$mod|-100"]
+testouterr_cmd sh "load $mod" $ans {}
+
+# append on prepended element
+setenv_var TESTSUITE_PATH_PRIO append1
+setenv_var FOO /path/to/foo:/path/to/bar:/bin
+setenv_var __MODULES_PRIORITY_FOO "/path/to/foo&other/1.0|-10"
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO /path/to/foo:2]
+lappend ans [list set FOO /path/to/bar:/bin:/path/to/foo]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/foo&other/1.0|-10&$mod|100"]
+testouterr_cmd sh "load $mod" $ans {}
+
+# append on prepended element with a weaker priority
+setenv_var __MODULES_PRIORITY_FOO "/path/to/foo&other/1.0|-1000"
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO /path/to/foo:2]
+lappend ans [list set FOO /path/to/bar:/bin:/path/to/foo]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/foo&other/1.0|-1000&$mod|100"]
+testouterr_cmd sh "load $mod" $ans {}
+setenv_var MODULES_PATH_ENTRY_REORDER 0
+
+# module sets a different priority on an element it already prioritized:
+# ignored when path_entry_reorder is disabled as element is not moved
+setenv_var TESTSUITE_PATH_PRIO lead0
+setenv_var FOO /path/to/foo:/path/to/bar:/bin
+setenv_var __MODULES_PRIORITY_FOO "/path/to/foo&$mod|-100"
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO /path/to/foo:2]
+lappend ans [list set FOO /path/to/foo:/path/to/bar:/bin]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/foo&$mod|-100"]
+testouterr_cmd sh "load $mod" $ans {}
+unsetenv_var __MODULES_SHARE_FOO
+
+# previous demand is replaced when path_entry_reorder is enabled
+setenv_var MODULES_PATH_ENTRY_REORDER 1
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO /path/to/foo:2]
+lappend ans [list set FOO /path/to/foo:/path/to/bar:/bin]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/foo&$mod|-7"]
+testouterr_cmd sh "load $mod" $ans {}
+setenv_var MODULES_PATH_ENTRY_REORDER 0
+unsetenv_var __MODULES_SHARE_FOO
+
+# other module demanded after the module: nothing changes when
+# path_entry_reorder is disabled
+setenv_var FOO /path/to/foo:/path/to/bar:/bin
+setenv_var __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|-10:/path/to/foo&$mod|-100&other/1.0|-20"
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO /path/to/foo:2]
+lappend ans [list set FOO /path/to/foo:/path/to/bar:/bin]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|-10:/path/to/foo&$mod|-100&other/1.0|-20"]
+testouterr_cmd sh "load $mod" $ans {}
+unsetenv_var __MODULES_SHARE_FOO
+
+# when path_entry_reorder is enabled, the previous demand of module is
+# withdrawn and its new demand is the most recent one, so it applies
+setenv_var MODULES_PATH_ENTRY_REORDER 1
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO /path/to/foo:2]
+lappend ans [list set FOO /path/to/bar:/path/to/foo:/bin]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|-10:/path/to/foo&other/1.0|-20&$mod|-7"]
+testouterr_cmd sh "load $mod" $ans {}
+setenv_var MODULES_PATH_ENTRY_REORDER 0
+unsetenv_var __MODULES_SHARE_FOO
+
+
+#
+# element added with the same priority than another element
+#
+
+# elements of same priority form a group, prepended element is placed first
+# in its group whether path_entry_reorder is enabled or not
+setenv_var TESTSUITE_PATH_PRIO prepend1
+setenv_var FOO /path/to/bar:/bin
+setenv_var __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|-100"
+set ans [list]
+lappend ans [list set FOO /path/to/foo:/path/to/bar:/bin]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|-100:/path/to/foo&$mod|-100"]
+testouterr_cmd sh "load $mod" $ans {}
+setenv_var MODULES_PATH_ENTRY_REORDER 1
+testouterr_cmd sh "load $mod" $ans {}
+setenv_var MODULES_PATH_ENTRY_REORDER 0
+
+# group is placed after elements with higher priority
+setenv_var FOO /path/to/baz:/path/to/bar:/bin
+setenv_var __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|-100:/path/to/baz&other/1.0|-1000"
+set ans [list]
+lappend ans [list set FOO /path/to/baz:/path/to/foo:/path/to/bar:/bin]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|-100:/path/to/baz&other/1.0|-1000:/path/to/foo&$mod|-100"]
+testouterr_cmd sh "load $mod" $ans {}
+setenv_var MODULES_PATH_ENTRY_REORDER 1
+testouterr_cmd sh "load $mod" $ans {}
+setenv_var MODULES_PATH_ENTRY_REORDER 0
+
+# appended element is placed last in its group
+setenv_var TESTSUITE_PATH_PRIO append1
+setenv_var FOO /bin:/path/to/bar
+setenv_var __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|100"
+set ans [list]
+lappend ans [list set FOO /bin:/path/to/bar:/path/to/foo]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|100:/path/to/foo&$mod|100"]
+testouterr_cmd sh "load $mod" $ans {}
+setenv_var MODULES_PATH_ENTRY_REORDER 1
+testouterr_cmd sh "load $mod" $ans {}
+setenv_var MODULES_PATH_ENTRY_REORDER 0
+
+# element already in variable with same priority set by another module: no
+# move and no demand recorded when path_entry_reorder is disabled
+setenv_var TESTSUITE_PATH_PRIO prepend1
+setenv_var FOO /path/to/bar:/path/to/foo:/bin
+setenv_var __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|-100:/path/to/foo&other/1.0|-100"
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO /path/to/foo:2]
+lappend ans [list set FOO /path/to/bar:/path/to/foo:/bin]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|-100:/path/to/foo&other/1.0|-100"]
+testouterr_cmd sh "load $mod" $ans {}
+
+# element is moved first in its group when path_entry_reorder is enabled
+setenv_var MODULES_PATH_ENTRY_REORDER 1
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO /path/to/foo:2]
+lappend ans [list set FOO /path/to/foo:/path/to/bar:/bin]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|-100:/path/to/foo&other/1.0|-100&$mod|-100"]
+testouterr_cmd sh "load $mod" $ans {}
+
+# moved first in its group, not first in variable
+setenv_var FOO /path/to/baz:/path/to/bar:/path/to/foo:/bin
+setenv_var __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|-100:/path/to/baz&other/1.0|-1000:/path/to/foo&other/1.0|-100"
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO /path/to/foo:2]
+lappend ans [list set FOO /path/to/baz:/path/to/foo:/path/to/bar:/bin]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|-100:/path/to/baz&other/1.0|-1000:/path/to/foo&other/1.0|-100&$mod|-100"]
+testouterr_cmd sh "load $mod" $ans {}
+setenv_var MODULES_PATH_ENTRY_REORDER 0
+
+# appended element already in variable with same priority set by another
+# module: no move when path_entry_reorder is disabled
+setenv_var TESTSUITE_PATH_PRIO append1
+setenv_var FOO /bin:/path/to/foo:/path/to/bar
+setenv_var __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|100:/path/to/foo&other/1.0|100"
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO /path/to/foo:2]
+lappend ans [list set FOO /bin:/path/to/foo:/path/to/bar]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|100:/path/to/foo&other/1.0|100"]
+testouterr_cmd sh "load $mod" $ans {}
+
+# element is moved last in its group when path_entry_reorder is enabled
+setenv_var MODULES_PATH_ENTRY_REORDER 1
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO /path/to/foo:2]
+lappend ans [list set FOO /bin:/path/to/bar:/path/to/foo]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|100:/path/to/foo&other/1.0|100&$mod|100"]
+testouterr_cmd sh "load $mod" $ans {}
+setenv_var MODULES_PATH_ENTRY_REORDER 0
+
+# unload: element removed, other element of same priority is not moved
+setenv_var TESTSUITE_PATH_PRIO prepend1
+setenv_loaded_module [list $mod] [list $modfile]
+setenv_var FOO /path/to/foo:/path/to/bar:/bin
+setenv_var __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|-100:/path/to/foo&$mod|-100"
+set ans [list]
+lappend ans [list set FOO /path/to/bar:/bin]
+lappend ans [list unset _LMFILES_]
+lappend ans [list unset LOADEDMODULES]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|-100"]
+testouterr_cmd sh "unload $mod" $ans {}
+setenv_var MODULES_PATH_ENTRY_REORDER 1
+testouterr_cmd sh "unload $mod" $ans {}
+setenv_var MODULES_PATH_ENTRY_REORDER 0
+
+# unload: element still in variable, demand of unloaded module is withdrawn
+# but same priority remains from other module so element is not moved
+setenv_var __MODULES_SHARE_FOO /path/to/foo:2
+setenv_var __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|-100:/path/to/foo&other/1.0|-100&$mod|-100"
+set ans [list]
+lappend ans [list unset __MODULES_SHARE_FOO]
+lappend ans [list set FOO /path/to/foo:/path/to/bar:/bin]
+lappend ans [list unset _LMFILES_]
+lappend ans [list unset LOADEDMODULES]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|-100:/path/to/foo&other/1.0|-100"]
+testouterr_cmd sh "unload $mod" $ans {}
+setenv_var MODULES_PATH_ENTRY_REORDER 1
+testouterr_cmd sh "unload $mod" $ans {}
+
+# same when element is not first in its group
+setenv_var FOO /path/to/bar:/path/to/foo:/bin
+setenv_var __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|-100:/path/to/foo&$mod|-100&other/1.0|-100"
+set ans [list]
+lappend ans [list unset __MODULES_SHARE_FOO]
+lappend ans [list set FOO /path/to/bar:/path/to/foo:/bin]
+lappend ans [list unset _LMFILES_]
+lappend ans [list unset LOADEDMODULES]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|-100:/path/to/foo&other/1.0|-100"]
+testouterr_cmd sh "unload $mod" $ans {}
+setenv_var MODULES_PATH_ENTRY_REORDER 0
+testouterr_cmd sh "unload $mod" $ans {}
+
+# unload: appended element still in variable, same priority remains
+setenv_var TESTSUITE_PATH_PRIO append1
+setenv_var FOO /bin:/path/to/foo:/path/to/bar
+setenv_var __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|100:/path/to/foo&other/1.0|100&$mod|100"
+set ans [list]
+lappend ans [list unset __MODULES_SHARE_FOO]
+lappend ans [list set FOO /bin:/path/to/foo:/path/to/bar]
+lappend ans [list unset _LMFILES_]
+lappend ans [list unset LOADEDMODULES]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|100:/path/to/foo&other/1.0|100"]
+testouterr_cmd sh "unload $mod" $ans {}
+setenv_var MODULES_PATH_ENTRY_REORDER 1
+testouterr_cmd sh "unload $mod" $ans {}
+setenv_var MODULES_PATH_ENTRY_REORDER 0
+unsetenv_loaded_module
+unsetenv_var __MODULES_SHARE_FOO
+
+
+#
+# masked priority demand is restored when module that set the effective
+# one is unloaded
+#
+
+setenv_var TESTSUITE_PATH_PRIO append1
+setenv_loaded_module [list $mod] [list $modfile]
+setenv_var __MODULES_SHARE_FOO /path/to/foo:2
+
+# demand of unloaded module withdrawn, element is not moved yet
+setenv_var FOO /path/to/bar:/bin:/path/to/foo
+setenv_var __MODULES_PRIORITY_FOO "/path/to/foo&other/1.0|-10&$mod|100"
+set ans [list]
+lappend ans [list unset __MODULES_SHARE_FOO]
+lappend ans [list set FOO /path/to/bar:/bin:/path/to/foo]
+lappend ans [list unset _LMFILES_]
+lappend ans [list unset LOADEDMODULES]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/foo&other/1.0|-10"]
+testouterr_cmd sh "unload $mod" $ans {}
+unsetenv_loaded_module
+
+# restored demand applies at next change of variable
+unsetenv_var __MODULES_SHARE_FOO
+setenv_var __MODULES_PRIORITY_FOO "/path/to/foo&other/1.0|-10"
+set ans [list]
+lappend ans [list set FOO /path/to/foo:/path/to/baz:/path/to/bar:/bin]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/foo&other/1.0|-10"]
+testouterr_cmd sh {prepend-path FOO /path/to/baz} $ans {}
+
+# element is moved at unload when path_entry_reorder is enabled
+setenv_var MODULES_PATH_ENTRY_REORDER 1
+setenv_loaded_module [list $mod] [list $modfile]
+setenv_var __MODULES_SHARE_FOO /path/to/foo:2
+setenv_var FOO /path/to/bar:/bin:/path/to/foo
+setenv_var __MODULES_PRIORITY_FOO "/path/to/foo&other/1.0|-10&$mod|100"
+set ans [list]
+lappend ans [list unset __MODULES_SHARE_FOO]
+lappend ans [list set FOO /path/to/foo:/path/to/bar:/bin]
+lappend ans [list unset _LMFILES_]
+lappend ans [list unset LOADEDMODULES]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/foo&other/1.0|-10"]
+testouterr_cmd sh "unload $mod" $ans {}
+
+# other element with priority already in its group, moved element is last
+setenv_var FOO /path/to/bar:/bin:/path/to/foo
+setenv_var __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|-10:/path/to/foo&other/1.0|-10&$mod|100"
+set ans [list]
+lappend ans [list unset __MODULES_SHARE_FOO]
+lappend ans [list set FOO /path/to/bar:/path/to/foo:/bin]
+lappend ans [list unset _LMFILES_]
+lappend ans [list unset LOADEDMODULES]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|-10:/path/to/foo&other/1.0|-10"]
+testouterr_cmd sh "unload $mod" $ans {}
+
+# no demand remains: element is not moved
+setenv_var FOO /path/to/bar:/bin:/path/to/foo
+setenv_var __MODULES_PRIORITY_FOO "/path/to/foo&$mod|100"
+set ans [list]
+lappend ans [list unset __MODULES_SHARE_FOO]
+lappend ans [list set FOO /path/to/bar:/bin:/path/to/foo]
+lappend ans [list unset _LMFILES_]
+lappend ans [list unset LOADEDMODULES]
+lappend ans [list unset __MODULES_PRIORITY_FOO]
+testouterr_cmd sh "unload $mod" $ans {}
+unsetenv_loaded_module
+setenv_var MODULES_PATH_ENTRY_REORDER 0
+
+# other way: first demand withdrawn, later demand becomes effective
+setenv_var TESTSUITE_PATH_PRIO prepend1
+setenv_loaded_module [list $mod] [list $modfile]
+setenv_var __MODULES_SHARE_FOO /path/to/foo:2
+setenv_var FOO /path/to/foo:/path/to/bar:/bin
+setenv_var __MODULES_PRIORITY_FOO "/path/to/foo&$mod|-100&other/1.0|50"
+set ans [list]
+lappend ans [list unset __MODULES_SHARE_FOO]
+lappend ans [list set FOO /path/to/foo:/path/to/bar:/bin]
+lappend ans [list unset _LMFILES_]
+lappend ans [list unset LOADEDMODULES]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/foo&other/1.0|50"]
+testouterr_cmd sh "unload $mod" $ans {}
+unsetenv_loaded_module
+
+unsetenv_var __MODULES_SHARE_FOO
+setenv_var __MODULES_PRIORITY_FOO "/path/to/foo&other/1.0|50"
+set ans [list]
+lappend ans [list set FOO /path/to/baz:/path/to/bar:/bin:/path/to/foo]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/foo&other/1.0|50"]
+testouterr_cmd sh {prepend-path FOO /path/to/baz} $ans {}
+
+# element is moved at unload when path_entry_reorder is enabled
+setenv_var MODULES_PATH_ENTRY_REORDER 1
+setenv_loaded_module [list $mod] [list $modfile]
+setenv_var __MODULES_SHARE_FOO /path/to/foo:2
+setenv_var FOO /path/to/foo:/path/to/bar:/bin
+setenv_var __MODULES_PRIORITY_FOO "/path/to/foo&$mod|-100&other/1.0|50"
+set ans [list]
+lappend ans [list unset __MODULES_SHARE_FOO]
+lappend ans [list set FOO /path/to/bar:/bin:/path/to/foo]
+lappend ans [list unset _LMFILES_]
+lappend ans [list unset LOADEDMODULES]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/foo&other/1.0|50"]
+testouterr_cmd sh "unload $mod" $ans {}
+unsetenv_loaded_module
+setenv_var MODULES_PATH_ENTRY_REORDER 0
+unsetenv_var __MODULES_SHARE_FOO
+
+
+#
+# multiple prepended elements with priority, --priority=N form
+#
+
+setenv_var TESTSUITE_PATH_PRIO prepend2
+
+setenv_var FOO /path/to/baz:/bin
+setenv_var __MODULES_PRIORITY_FOO "/path/to/baz&other/1.0|-100"
+set ans [list]
+lappend ans [list set FOO /path/to/baz:/path/to/foo:/path/to/bar:/bin]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/bar&$mod|-10:/path/to/baz&other/1.0|-100:/path/to/foo&$mod|-10"]
+testouterr_cmd sh "load $mod" $ans {}
+
+setenv_var __MODULES_PRIORITY_FOO "/path/to/baz&other/1.0|-5"
+set ans [list]
+lappend ans [list set FOO /path/to/foo:/path/to/bar:/path/to/baz:/bin]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/bar&$mod|-10:/path/to/baz&other/1.0|-5:/path/to/foo&$mod|-10"]
+testouterr_cmd sh "load $mod" $ans {}
+
+
+#
+# appended element with priority goes last
+#
+
+setenv_var TESTSUITE_PATH_PRIO append1
+
+setenv_var FOO /bin:/path/to/bar
+unsetenv_var __MODULES_PRIORITY_FOO
+set ans [list]
+lappend ans [list set FOO /bin:/path/to/bar:/path/to/foo]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/foo&$mod|100"]
+testouterr_cmd sh "load $mod" $ans {}
+
+setenv_var __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|1000"
+set ans [list]
+lappend ans [list set FOO /bin:/path/to/foo:/path/to/bar]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|1000:/path/to/foo&$mod|100"]
+testouterr_cmd sh "load $mod" $ans {}
+
+setenv_var __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|10"
+set ans [list]
+lappend ans [list set FOO /bin:/path/to/bar:/path/to/foo]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|10:/path/to/foo&$mod|100"]
+testouterr_cmd sh "load $mod" $ans {}
+
+# prepended element with priority already in variable
+setenv_var FOO /path/to/bar:/bin
+setenv_var __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|-100"
+set ans [list]
+lappend ans [list set FOO /path/to/bar:/bin:/path/to/foo]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|-100:/path/to/foo&$mod|100"]
+testouterr_cmd sh "load $mod" $ans {}
+
+# unload
+setenv_loaded_module [list $mod] [list $modfile]
+setenv_var FOO /path/to/bar:/bin:/path/to/foo
+setenv_var __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|-100:/path/to/foo&$mod|100"
+set ans [list]
+lappend ans [list set FOO /path/to/bar:/bin]
+lappend ans [list unset _LMFILES_]
+lappend ans [list unset LOADEDMODULES]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|-100"]
+testouterr_cmd sh "unload $mod" $ans {}
+unsetenv_loaded_module
+
+# display
+set tserr "$modlin
+$mpre/$mod:
+
+append-path\t--priority 100 FOO /path/to/foo
+$modlin"
+testouterr_cmd_re sh "display $mod" OK $tserr
+
+
+#
+# multiple appended elements with priority, --priority=N form
+#
+
+setenv_var TESTSUITE_PATH_PRIO append2
+
+setenv_var FOO /bin:/path/to/baz
+setenv_var __MODULES_PRIORITY_FOO "/path/to/baz&other/1.0|100"
+set ans [list]
+lappend ans [list set FOO /bin:/path/to/foo:/path/to/bar:/path/to/baz]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/bar&$mod|10:/path/to/baz&other/1.0|100:/path/to/foo&$mod|10"]
+testouterr_cmd sh "load $mod" $ans {}
+
+
+#
+# mix of prepended and appended elements with or without priority
+#
+
+setenv_var TESTSUITE_PATH_PRIO mix1
+
+setenv_var FOO /bin
+unsetenv_var __MODULES_PRIORITY_FOO
+set ans [list]
+lappend ans [list set FOO /path/to/foo:/path/to/quux:/path/to/bar:/bin:/path/to/qux:/path/to/baz:/path/to/corge]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/baz&$mod|10:/path/to/corge&$mod|100:/path/to/foo&$mod|-100:/path/to/quux&$mod|-10"]
+testouterr_cmd sh "load $mod" $ans {}
+
+# unload
+setenv_loaded_module [list $mod] [list $modfile]
+setenv_var FOO /path/to/foo:/path/to/quux:/path/to/bar:/bin:/path/to/qux:/path/to/baz:/path/to/corge
+setenv_var __MODULES_PRIORITY_FOO "/path/to/baz&$mod|10:/path/to/corge&$mod|100:/path/to/foo&$mod|-100:/path/to/quux&$mod|-10"
+set ans [list]
+lappend ans [list set FOO /bin]
+lappend ans [list unset _LMFILES_]
+lappend ans [list unset LOADEDMODULES]
+lappend ans [list unset __MODULES_PRIORITY_FOO]
+testouterr_cmd sh "unload $mod" $ans {}
+unsetenv_loaded_module
+
+
+#
+# priority value
+#
+
+# zero priority means no priority
+setenv_var TESTSUITE_PATH_PRIO zero
+
+setenv_var FOO /path/to/bar:/bin
+unsetenv_var __MODULES_PRIORITY_FOO
+set ans [list]
+lappend ans [list set FOO /path/to/foo:/path/to/bar:/bin]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+testouterr_cmd sh "load $mod" $ans {}
+
+# leading zeros are stripped
+setenv_var TESTSUITE_PATH_PRIO lead0
+
+set ans [list]
+lappend ans [list set FOO /path/to/foo:/path/to/bar:/bin]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/foo&$mod|-7"]
+testouterr_cmd sh "load $mod" $ans {}
+
+# negative value
+setenv_var TESTSUITE_PATH_PRIO neg
+
+set ln [expr {[cmpversion $tclsh_version 8.6] == -1 ? 2 : 31}]
+set tserr [escre [msg_load $mod [msg_moderr {prepend-path should get a non-negative integer as priority value} {prepend-path --priority -5 FOO /path/to/foo<EXM>} $modfile $ln]]]
+testouterr_cmd_re sh "load $mod" ERR $tserr
+
+# not a number
+setenv_var TESTSUITE_PATH_PRIO nan
+
+set ln [expr {[cmpversion $tclsh_version 8.6] == -1 ? 2 : 34}]
+set tserr [escre [msg_load $mod [msg_moderr {prepend-path should get a non-negative integer as priority value} {prepend-path --priority abc FOO /path/to/foo<EXM>} $modfile $ln]]]
+testouterr_cmd_re sh "load $mod" ERR $tserr
+
+# value too large
+setenv_var TESTSUITE_PATH_PRIO big
+
+set ln [expr {[cmpversion $tclsh_version 8.6] == -1 ? 2 : 96}]
+set tserr [escre [msg_load $mod [msg_moderr {prepend-path should get a priority value not greater than 1000000} {prepend-path --priority 99999999999999999999 FOO /path/to/foo<EXM>} $modfile $ln]]]
+testouterr_cmd_re sh "load $mod" ERR $tserr
+
+# largest value accepted
+setenv_var FOO /path/to/bar:/bin
+unsetenv_var __MODULES_PRIORITY_FOO
+set ans [list]
+lappend ans [list set FOO /path/to/foo:/path/to/bar:/bin]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/foo&|-1000000"]
+testouterr_cmd sh {prepend-path --priority 1000000 FOO /path/to/foo} $ans {}
+testouterr_cmd sh {prepend-path --priority 1000001 FOO /path/to/foo} ERR {ERROR: prepend-path should get a priority value not greater than 1000000}
+testouterr_cmd sh {prepend-path --priority 0001000000 FOO /path/to/foo} $ans {}
+
+# no value
+setenv_var TESTSUITE_PATH_PRIO noval
+
+set ln [expr {[cmpversion $tclsh_version 8.6] == -1 ? 2 : 37}]
+set tserr [escre [msg_load $mod [msg_moderr {prepend-path should get an environment variable name} {prepend-path --priority<EXM>} $modfile $ln]]]
+testouterr_cmd_re sh "load $mod" ERR $tserr
+
+
+#
+# option has no effect on remove-path
+#
+
+setenv_var TESTSUITE_PATH_PRIO remove1
+
+setenv_var FOO /path/to/foo:/bin
+setenv_var __MODULES_PRIORITY_FOO "/path/to/foo&other/1.0|-100"
+set ans [list]
+lappend ans [list set FOO /bin]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list unset __MODULES_PRIORITY_FOO]
+testouterr_cmd sh "load $mod" $ans [msg_load $mod "$warn_msgs: --priority option has no effect on remove-path"]
+
+
+#
+# demand of module is withdrawn when it removes the element by index
+#
+
+setenv_var TESTSUITE_PATH_PRIO rmidx
+
+# path_entry_reorder is enabled to get a demand recorded on an element
+# already in variable
+setenv_var MODULES_PATH_ENTRY_REORDER 1
+setenv_var FOO /path/to/foo:/bin
+unsetenv_var __MODULES_PRIORITY_FOO
+set ans [list]
+lappend ans [list unset __MODULES_SHARE_FOO]
+lappend ans [list set FOO /path/to/foo:/bin]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list unset __MODULES_PRIORITY_FOO]
+testouterr_cmd sh "load $mod" $ans {}
+setenv_var MODULES_PATH_ENTRY_REORDER 0
+
+
+#
+# option mixed with delimiter option
+#
+
+setenv_var TESTSUITE_PATH_PRIO delim
+
+setenv_var FOO /path/to/bar,/bin
+unsetenv_var __MODULES_PRIORITY_FOO
+set ans [list]
+lappend ans [list set FOO /path/to/foo,/path/to/bar,/bin]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/foo&$mod|-5"]
+testouterr_cmd sh "load $mod" $ans {}
+
+
+#
+# option set after variable name is considered a value
+#
+
+setenv_var TESTSUITE_PATH_PRIO postvar
+
+setenv_var FOO /bin
+set ans [list]
+lappend ans [list set FOO --priority:5:/bin]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+testouterr_cmd sh "load $mod" $ans {}
+
+
+#
+# option mixed with --duplicates: all occurrences share same priority
+#
+
+setenv_var TESTSUITE_PATH_PRIO dup
+
+# element already in variable: new occurrence is added but no demand is
+# recorded when path_entry_reorder is disabled
+setenv_var FOO /path/to/bar:/path/to/foo:/bin
+unsetenv_var __MODULES_PRIORITY_FOO
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO /path/to/foo:2]
+lappend ans [list set FOO /path/to/foo:/path/to/bar:/path/to/foo:/bin]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+testouterr_cmd sh "load $mod" $ans {}
+
+# both occurrences get the priority when path_entry_reorder is enabled
+setenv_var MODULES_PATH_ENTRY_REORDER 1
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO /path/to/foo:2]
+lappend ans [list set FOO /path/to/foo:/path/to/foo:/path/to/bar:/bin]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/foo&$mod|-5"]
+testouterr_cmd sh "load $mod" $ans {}
+setenv_var MODULES_PATH_ENTRY_REORDER 0
+
+# unload: one occurrence removed, demand withdrawn, remaining occurrence
+# (added without priority) is not moved
+setenv_loaded_module [list $mod] [list $modfile]
+setenv_var __MODULES_SHARE_FOO /path/to/foo:2
+setenv_var FOO /path/to/foo:/path/to/foo:/path/to/bar:/bin
+setenv_var __MODULES_PRIORITY_FOO "/path/to/foo&$mod|-5"
+set ans [list]
+lappend ans [list unset __MODULES_SHARE_FOO]
+lappend ans [list set FOO /path/to/foo:/path/to/bar:/bin]
+lappend ans [list unset _LMFILES_]
+lappend ans [list unset LOADEDMODULES]
+lappend ans [list unset __MODULES_PRIORITY_FOO]
+testouterr_cmd sh "unload $mod" $ans {}
+setenv_var MODULES_PATH_ENTRY_REORDER 1
+testouterr_cmd sh "unload $mod" $ans {}
+setenv_var MODULES_PATH_ENTRY_REORDER 0
+unsetenv_loaded_module
+unsetenv_var __MODULES_SHARE_FOO
+
+# occurrence already in variable with a demand of another module: the
+# element weight follows the demand rules, not the occurrence added by
+# current module (no demand recorded when path_entry_reorder is disabled,
+# existing demand applies to both occurrences)
+setenv_var FOO /path/to/bar:/bin:/path/to/foo
+setenv_var __MODULES_PRIORITY_FOO "/path/to/foo&other/1.0|10"
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO /path/to/foo:2]
+lappend ans [list set FOO /path/to/bar:/bin:/path/to/foo:/path/to/foo]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/foo&other/1.0|10"]
+testouterr_cmd sh "load $mod" $ans {}
+
+# last demand applies when path_entry_reorder is enabled
+setenv_var MODULES_PATH_ENTRY_REORDER 1
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO /path/to/foo:2]
+lappend ans [list set FOO /path/to/foo:/path/to/foo:/path/to/bar:/bin]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/foo&other/1.0|10&$mod|-5"]
+testouterr_cmd sh "load $mod" $ans {}
+setenv_var MODULES_PATH_ENTRY_REORDER 0
+unsetenv_var __MODULES_SHARE_FOO
+
+# same module adds two occurrences with different priorities: its second
+# demand is ignored when path_entry_reorder is disabled as element is
+# already in variable, first demand applies to both occurrences
+setenv_var TESTSUITE_PATH_PRIO dup2
+setenv_var FOO /bin
+unsetenv_var __MODULES_PRIORITY_FOO
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO /path/to/foo:2]
+lappend ans [list set FOO /path/to/foo:/path/to/foo:/bin]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/foo&$mod|-100"]
+testouterr_cmd sh "load $mod" $ans {}
+
+# second demand replaces the first and applies to both occurrences when
+# path_entry_reorder is enabled
+setenv_var MODULES_PATH_ENTRY_REORDER 1
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO /path/to/foo:2]
+lappend ans [list set FOO /bin:/path/to/foo:/path/to/foo]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/foo&$mod|10"]
+testouterr_cmd sh "load $mod" $ans {}
+setenv_var MODULES_PATH_ENTRY_REORDER 0
+
+# unload: both occurrences removed
+setenv_loaded_module [list $mod] [list $modfile]
+setenv_var __MODULES_SHARE_FOO /path/to/foo:2
+setenv_var FOO /bin:/path/to/foo:/path/to/foo
+setenv_var __MODULES_PRIORITY_FOO "/path/to/foo&$mod|10"
+set ans [list]
+lappend ans [list unset __MODULES_SHARE_FOO]
+lappend ans [list set FOO /bin]
+lappend ans [list unset _LMFILES_]
+lappend ans [list unset LOADEDMODULES]
+lappend ans [list unset __MODULES_PRIORITY_FOO]
+testouterr_cmd sh "unload $mod" $ans {}
+unsetenv_loaded_module
+unsetenv_var __MODULES_SHARE_FOO
+
+
+#
+# empty element with priority
+#
+
+setenv_var TESTSUITE_PATH_PRIO empty
+
+setenv_var FOO /path/to/bar:/bin
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO :1]
+lappend ans [list set FOO :/path/to/bar:/bin]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "&$mod|-5"]
+testouterr_cmd sh "load $mod" $ans {}
+
+setenv_loaded_module [list $mod] [list $modfile]
+setenv_var FOO :/path/to/bar:/bin
+setenv_var __MODULES_PRIORITY_FOO "&$mod|-5"
+setenv_var __MODULES_SHARE_FOO :1
+set ans [list]
+lappend ans [list unset __MODULES_SHARE_FOO]
+lappend ans [list set FOO /path/to/bar:/bin]
+lappend ans [list unset _LMFILES_]
+lappend ans [list unset LOADEDMODULES]
+lappend ans [list unset __MODULES_PRIORITY_FOO]
+testouterr_cmd sh "unload $mod" $ans {}
+unsetenv_loaded_module
+unsetenv_var __MODULES_SHARE_FOO
+
+# variable only holds the empty element: its demand is found in record
+setenv_var TESTSUITE_PATH_PRIO plain
+setenv_var FOO {}
+setenv_var __MODULES_SHARE_FOO :1
+setenv_var __MODULES_PRIORITY_FOO "&other/1.0|-5"
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO :1]
+lappend ans [list set FOO :/path/to/foo]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "&other/1.0|-5"]
+testouterr_cmd sh "load $mod" $ans {}
+
+# unload: empty element removed, variable and record unset
+setenv_var TESTSUITE_PATH_PRIO empty
+setenv_loaded_module [list $mod] [list $modfile]
+setenv_var __MODULES_PRIORITY_FOO "&$mod|-5"
+set ans [list]
+lappend ans [list unset __MODULES_SHARE_FOO]
+lappend ans [list unset FOO]
+lappend ans [list unset _LMFILES_]
+lappend ans [list unset LOADEDMODULES]
+lappend ans [list unset __MODULES_PRIORITY_FOO]
+testouterr_cmd sh "unload $mod" $ans {}
+unsetenv_loaded_module
+unsetenv_var __MODULES_SHARE_FOO
+
+
+#
+# priority record is cleared by setenv, unsetenv and pushenv
+#
+
+setenv_var TESTSUITE_PATH_PRIO setenv1
+
+setenv_var FOO /path/to/bar:/bin
+setenv_var __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|-5"
+set ans [list]
+lappend ans [list set FOO /path/to/foo]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list unset __MODULES_PRIORITY_FOO]
+testouterr_cmd sh "load $mod" $ans {}
+
+setenv_loaded_module [list $mod] [list $modfile]
+set ans [list]
+lappend ans [list unset FOO]
+lappend ans [list unset _LMFILES_]
+lappend ans [list unset LOADEDMODULES]
+lappend ans [list unset __MODULES_PRIORITY_FOO]
+testouterr_cmd sh "unload $mod" $ans {}
+unsetenv_loaded_module
+
+setenv_var TESTSUITE_PATH_PRIO unsetenv1
+
+set ans [list]
+lappend ans [list unset FOO]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list unset __MODULES_PRIORITY_FOO]
+testouterr_cmd sh "load $mod" $ans {}
+
+setenv_var TESTSUITE_PATH_PRIO pushenv1
+
+setenv_var FOO /path/to/bar
+set ans [list]
+lappend ans [list set FOO /path/to/foo]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PUSHENV_FOO "$mod&/path/to/foo:&/path/to/bar"]
+lappend ans [list unset __MODULES_PRIORITY_FOO]
+testouterr_cmd sh "load $mod" $ans {}
+
+setenv_loaded_module [list $mod] [list $modfile]
+setenv_var __MODULES_PUSHENV_FOO "$mod&/path/to/foo:&/path/to/bar"
+setenv_var FOO /path/to/foo
+set ans [list]
+lappend ans [list set FOO /path/to/bar]
+lappend ans [list unset _LMFILES_]
+lappend ans [list unset LOADEDMODULES]
+lappend ans [list unset __MODULES_PUSHENV_FOO]
+lappend ans [list unset __MODULES_PRIORITY_FOO]
+testouterr_cmd sh "unload $mod" $ans {}
+unsetenv_loaded_module
+unsetenv_var __MODULES_PUSHENV_FOO
+unsetenv_var __MODULES_PRIORITY_FOO
+unsetenv_var FOO
+
+
+#
+# priority on MODULEPATH is honored by use sub-command
+#
+
+setenv_var TESTSUITE_PATH_PRIO modulepath
+
+unsetenv_var __MODULES_PRIORITY_MODULEPATH
+set ans [list]
+lappend ans [list set __MODULES_LMUSE "$mod&/path/to/site"]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_MODULEPATH "/path/to/site&$mod|-100"]
+lappend ans [list set MODULEPATH /path/to/site:$mp]
+testouterr_cmd sh "load $mod" $ans {}
+
+setenv_path_var MODULEPATH /path/to/site $mp
+setenv_var __MODULES_PRIORITY_MODULEPATH "/path/to/site&$mod|-100"
+set ans [list]
+lappend ans [list set __MODULES_PRIORITY_MODULEPATH "/path/to/site&$mod|-100"]
+lappend ans [list set MODULEPATH /path/to/site:/path/to/other:$mp]
+testouterr_cmd sh {use /path/to/other} $ans {}
+
+set ans [list]
+lappend ans [list set __MODULES_PRIORITY_MODULEPATH "/path/to/site&$mod|-100"]
+lappend ans [list set MODULEPATH /path/to/site:$mp:/path/to/other]
+testouterr_cmd sh {use --append /path/to/other} $ans {}
+
+set ans [list]
+lappend ans [list unset __MODULES_PRIORITY_MODULEPATH]
+lappend ans [list set MODULEPATH $mp]
+testouterr_cmd sh {unuse /path/to/site} $ans {}
+
+
+#
+# --priority option of use sub-command
+#
+
+setenv_path_var MODULEPATH $mp
+unsetenv_var __MODULES_PRIORITY_MODULEPATH
+set ans [list]
+lappend ans [list set __MODULES_PRIORITY_MODULEPATH "/path/to/site&|-100"]
+lappend ans [list set MODULEPATH /path/to/site:$mp]
+testouterr_cmd sh {use --priority 100 /path/to/site} $ans {}
+testouterr_cmd sh {use --priority=100 /path/to/site} $ans {}
+testouterr_cmd sh {use /path/to/site --priority 100} $ans {}
+testouterr_cmd sh {use -p --priority 100 /path/to/site} $ans {}
+
+set ans [list]
+lappend ans [list set __MODULES_PRIORITY_MODULEPATH "/path/to/site&|10"]
+lappend ans [list set MODULEPATH $mp:/path/to/site]
+testouterr_cmd sh {use -a --priority 10 /path/to/site} $ans {}
+testouterr_cmd sh {use --append --priority=10 /path/to/site} $ans {}
+
+# priority of already enabled modulepath: ignored when path_entry_reorder
+# is disabled, as modulepath is not moved when enabled again
+setenv_path_var MODULEPATH $mp /path/to/site
+set ans [list]
+lappend ans [list set MODULEPATH $mp:/path/to/site]
+testouterr_cmd sh {use --priority 100 /path/to/site} $ans {}
+setenv_var MODULES_PATH_ENTRY_REORDER 1
+set ans [list]
+lappend ans [list set __MODULES_PRIORITY_MODULEPATH "/path/to/site&|-100"]
+lappend ans [list set MODULEPATH /path/to/site:$mp]
+testouterr_cmd sh {use --priority 100 /path/to/site} $ans {}
+setenv_var MODULES_PATH_ENTRY_REORDER 0
+setenv_path_var MODULEPATH $mp
+
+# invalid usage
+testouterr_cmd sh {use --priority} ERR [err_misoptval --priority]
+testouterr_cmd sh {use --priority abc /path/to/site} ERR "$error_msgs: use should get a non-negative integer as priority value"
+testouterr_cmd sh {use --priority=abc /path/to/site} ERR "$error_msgs: use should get a non-negative integer as priority value"
+testouterr_cmd sh {use --priority= /path/to/site} ERR "$error_msgs: use should get a non-negative integer as priority value"
+testouterr_cmd sh {use --priority 1000001 /path/to/site} ERR "$error_msgs: use should get a priority value not greater than 1000000"
+testouterr_cmd sh {use --priority=99999999999999999999 /path/to/site} ERR "$error_msgs: use should get a priority value not greater than 1000000"
+testouterr_cmd sh {use --priority -10 /path/to/site} ERR "$error_msgs: use should get a non-negative integer as priority value"
+testouterr_cmd sh {use --priority=-10 /path/to/site} ERR "$error_msgs: use should get a non-negative integer as priority value"
+testouterr_cmd sh {unuse --priority 100 /path/to/site} ERR "$error_msgs: Invalid option '--priority'"
+testouterr_cmd sh {unuse --priority=100 /path/to/site} ERR "$error_msgs: Invalid option '--priority=100'"
+
+# from modulefile
+setenv_var TESTSUITE_PATH_PRIO use1
+
+set ans [list]
+lappend ans [list set __MODULES_LMUSE "$mod&/path/to/site"]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_MODULEPATH "/path/to/site&$mod|-100"]
+lappend ans [list set MODULEPATH /path/to/site:$mp]
+testouterr_cmd sh "load $mod" $ans {}
+
+setenv_loaded_module [list $mod] [list $modfile]
+setenv_var __MODULES_LMUSE "$mod&/path/to/site"
+setenv_path_var MODULEPATH /path/to/site $mp
+setenv_var __MODULES_PRIORITY_MODULEPATH "/path/to/site&$mod|-100"
+set ans [list]
+lappend ans [list unset __MODULES_LMUSE]
+lappend ans [list unset _LMFILES_]
+lappend ans [list unset LOADEDMODULES]
+lappend ans [list unset __MODULES_PRIORITY_MODULEPATH]
+lappend ans [list set MODULEPATH $mp]
+testouterr_cmd sh "unload $mod" $ans {}
+unsetenv_loaded_module
+unsetenv_var __MODULES_LMUSE
+setenv_path_var MODULEPATH $mp
+unsetenv_var __MODULES_PRIORITY_MODULEPATH
+
+set tserr "$modlin
+$mpre/$mod:
+
+module\t\tuse --priority 100 /path/to/site
+$modlin"
+testouterr_cmd_re sh "display $mod" OK $tserr
+
+setenv_var TESTSUITE_PATH_PRIO use2
+
+set ans [list]
+lappend ans [list set __MODULES_LMUSE "$mod&/path/to/site"]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_MODULEPATH "/path/to/site&$mod|10"]
+lappend ans [list set MODULEPATH $mp:/path/to/site]
+testouterr_cmd sh "load $mod" $ans {}
+
+setenv_var TESTSUITE_PATH_PRIO use3
+
+set ln [expr {[cmpversion $tclsh_version 8.6] == -1 ? 2 : 73}]
+set tserr [escre [msg_load $mod [msg_moderr {use should get a non-negative integer as priority value} {module use --priority abc /path/to/site<EXM>} $modfile $ln]]]
+testouterr_cmd_re sh "load $mod" ERR $tserr
+
+setenv_var TESTSUITE_PATH_PRIO unuse1
+
+set ln [expr {[cmpversion $tclsh_version 8.6] == -1 ? 2 : 76}]
+set tserr [escre [msg_load $mod [msg_moderr {Invalid option '--priority'} {module unuse --priority 100 /path/to/site<EXM>} $modfile $ln]]]
+testouterr_cmd_re sh "load $mod" ERR $tserr
+
+
+#
+# element added again without priority: existing demands are kept
+#
+
+setenv_var TESTSUITE_PATH_PRIO plain
+set mod path-prio/1.0
+set modfile $mp/path-prio/1.0
+
+setenv_var FOO /path/to/bar:/path/to/foo:/bin
+setenv_var __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|-100:/path/to/foo&other/1.0|-10"
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO /path/to/foo:2]
+lappend ans [list set FOO /path/to/bar:/path/to/foo:/bin]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|-100:/path/to/foo&other/1.0|-10"]
+testouterr_cmd sh "load $mod" $ans {}
+
+# element is moved first in its group when path_entry_reorder is enabled
+setenv_var MODULES_PATH_ENTRY_REORDER 1
+setenv_var FOO /path/to/bar:/path/to/baz:/path/to/foo:/bin
+setenv_var __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|-100:/path/to/baz&other/1.0|-10:/path/to/foo&other/1.0|-10"
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO /path/to/foo:2]
+lappend ans [list set FOO /path/to/bar:/path/to/foo:/path/to/baz:/bin]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|-100:/path/to/baz&other/1.0|-10:/path/to/foo&other/1.0|-10"]
+testouterr_cmd sh "load $mod" $ans {}
+setenv_var MODULES_PATH_ENTRY_REORDER 0
+
+# unload: no demand to withdraw
+setenv_loaded_module [list $mod] [list $modfile]
+setenv_var __MODULES_SHARE_FOO /path/to/foo:2
+setenv_var FOO /path/to/bar:/path/to/foo:/bin
+setenv_var __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|-100:/path/to/foo&other/1.0|-10"
+set ans [list]
+lappend ans [list unset __MODULES_SHARE_FOO]
+lappend ans [list set FOO /path/to/bar:/path/to/foo:/bin]
+lappend ans [list unset _LMFILES_]
+lappend ans [list unset LOADEDMODULES]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|-100:/path/to/foo&other/1.0|-10"]
+testouterr_cmd sh "unload $mod" $ans {}
+unsetenv_loaded_module
+unsetenv_var __MODULES_SHARE_FOO
+unsetenv_var __MODULES_PRIORITY_FOO
+
+
+#
+# no priority record for Modules-specific variables
+#
+
+setenv_var TESTSUITE_PATH_PRIO privvar
+
+setenv_var MODULES_FOO /path/to/bar
+setenv_var __MODULES_FOO /path/to/bar
+set ans [list]
+lappend ans [list set MODULES_FOO /path/to/foo:/path/to/bar]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_FOO /path/to/foo:/path/to/bar]
+testouterr_cmd sh "load $mod" $ans {}
+unsetenv_var MODULES_FOO
+unsetenv_var __MODULES_FOO
+
+
+#
+# separator characters in path element are escaped in priority record
+#
+
+setenv_var TESTSUITE_PATH_PRIO escape
+
+unsetenv_var FOO
+set ans [list]
+lappend ans [list set FOO "/path/to/co:lon,/path/to/we&ird"]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/co\\:lon&$mod|-5:/path/to/we\\&ird&$mod|-5"]
+testouterr_cmd sh "load $mod" $ans {}
+
+# escaped record is correctly read: demand of other module is found
+setenv_var FOO "/bin,/path/to/we&ird"
+setenv_var __MODULES_PRIORITY_FOO "/path/to/we\\&ird&other/1.0|-5"
+set ans [list]
+lappend ans [list set __MODULES_SHARE_FOO "/path/to/we&ird:2"]
+lappend ans [list set FOO "/path/to/co:lon,/path/to/we&ird,/bin"]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/co\\:lon&$mod|-5:/path/to/we\\&ird&other/1.0|-5"]
+testouterr_cmd sh "load $mod" $ans {}
+
+# unload
+setenv_loaded_module [list $mod] [list $modfile]
+setenv_var FOO "/path/to/co:lon,/path/to/we&ird,/bin"
+setenv_var __MODULES_PRIORITY_FOO "/path/to/co\\:lon&$mod|-5:/path/to/we\\&ird&$mod|-5"
+set ans [list]
+lappend ans [list set FOO /bin]
+lappend ans [list unset _LMFILES_]
+lappend ans [list unset LOADEDMODULES]
+lappend ans [list unset __MODULES_PRIORITY_FOO]
+testouterr_cmd sh "unload $mod" $ans {}
+unsetenv_loaded_module
+
+
+#
+# malformed record is reported in debug output
+#
+
+setenv_var TESTSUITE_PATH_PRIO prepend1
+
+setenv_var FOO /path/to/bar:/bin
+setenv_var __MODULES_PRIORITY_FOO "/path/to/bar&other/1.0|abc"
+set ans [list]
+lappend ans [list set FOO /path/to/foo:/path/to/bar:/bin]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/foo&$mod|-100"]
+set tserr ".*
+DEBUG \\\[#1:load:path-prio/1.0\\\] getPriorityArray: Priority value in '__MODULES_PRIORITY_FOO' is erroneous \\(/path/to/bar&other/1.0\\|abc\\)
+.*"
+testouterr_cmd_re sh "-D load $mod" $ans $tserr
+
+
+#
+# initial value of variable gets no priority
+#
+
+setenv_var MODULES_INIT_ENVVARS FOO=/path/to/init
+unsetenv_var FOO
+unsetenv_var __MODULES_PRIORITY_FOO
+set ans [list]
+lappend ans [list set FOO /path/to/foo:/path/to/init]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/foo&$mod|-100"]
+testouterr_cmd sh "load $mod" $ans {}
+
+# appended element with priority goes after initial value
+setenv_var TESTSUITE_PATH_PRIO append1
+set ans [list]
+lappend ans [list set FOO /path/to/init:/path/to/foo]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/foo&$mod|100"]
+testouterr_cmd sh "load $mod" $ans {}
+
+# unload: variable and record are cleared when back to initial value
+setenv_loaded_module [list $mod] [list $modfile]
+setenv_var FOO /path/to/init:/path/to/foo
+setenv_var __MODULES_PRIORITY_FOO "/path/to/foo&$mod|100"
+set ans [list]
+lappend ans [list unset FOO]
+lappend ans [list unset _LMFILES_]
+lappend ans [list unset LOADEDMODULES]
+lappend ans [list unset __MODULES_PRIORITY_FOO]
+testouterr_cmd sh "unload $mod" $ans {}
+unsetenv_loaded_module
+unsetenv_var MODULES_INIT_ENVVARS
+
+
+#
+# priority applies to linked variables
+#
+
+setenv_var MODULES_LINKED_ENVVARS FOO&BAR
+setenv_var TESTSUITE_PATH_PRIO prepend1
+
+setenv_var FOO /path/to/bar:/bin
+setenv_var BAR /path/to/baz:/bin
+unsetenv_var __MODULES_PRIORITY_FOO
+setenv_var __MODULES_PRIORITY_BAR "/path/to/baz&other/1.0|-1000"
+set ans [list]
+lappend ans [list set __MODULES_PRIORITY_BAR "/path/to/baz&other/1.0|-1000:/path/to/foo&$mod|-100"]
+lappend ans [list set FOO /path/to/foo:/path/to/bar:/bin]
+lappend ans [list set BAR /path/to/baz:/path/to/foo:/bin]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/foo&$mod|-100"]
+testouterr_cmd sh "load $mod" $ans {}
+
+# unload
+setenv_loaded_module [list $mod] [list $modfile]
+setenv_var FOO /path/to/foo:/path/to/bar:/bin
+setenv_var BAR /path/to/baz:/path/to/foo:/bin
+setenv_var __MODULES_PRIORITY_FOO "/path/to/foo&$mod|-100"
+setenv_var __MODULES_PRIORITY_BAR "/path/to/baz&other/1.0|-1000:/path/to/foo&$mod|-100"
+set ans [list]
+lappend ans [list set __MODULES_PRIORITY_BAR "/path/to/baz&other/1.0|-1000"]
+lappend ans [list set FOO /path/to/bar:/bin]
+lappend ans [list set BAR /path/to/baz:/bin]
+lappend ans [list unset _LMFILES_]
+lappend ans [list unset LOADEDMODULES]
+lappend ans [list unset __MODULES_PRIORITY_FOO]
+testouterr_cmd sh "unload $mod" $ans {}
+unsetenv_loaded_module
+unsetenv_var MODULES_LINKED_ENVVARS
+unsetenv_var BAR
+unsetenv_var __MODULES_PRIORITY_BAR
+
+
+#
+# element added back at unload by remove-path gets no priority
+#
+
+setenv_var TESTSUITE_PATH_PRIO remove_aou
+
+# load: element removed, demand of other module on remaining element kept
+setenv_var FOO /bin:/path/to/foo:/path/to/baz
+setenv_var __MODULES_PRIORITY_FOO "/path/to/baz&other/1.0|10"
+set ans [list]
+lappend ans [list set FOO /bin:/path/to/baz]
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/baz&other/1.0|10"]
+testouterr_cmd sh "load $mod" $ans {}
+
+# unload: element appended without priority, placed before prioritized one
+setenv_loaded_module [list $mod] [list $modfile]
+setenv_var FOO /bin:/path/to/baz
+set ans [list]
+lappend ans [list set FOO /bin:/path/to/bar:/path/to/baz]
+lappend ans [list unset _LMFILES_]
+lappend ans [list unset LOADEDMODULES]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/baz&other/1.0|10"]
+testouterr_cmd sh "unload $mod" $ans {}
+unsetenv_loaded_module
+unsetenv_var __MODULES_PRIORITY_FOO
+unsetenv_var FOO
+
+
+#
+# priority record is ignored by sh-to-mod and source-sh
+#
+
+setenv_var TESTSUITE_SOURCESH_PRIO 1
+setenv_var FOOPATH /path/to/dir
+
+set tserr "#%Module
+prepend-path\tFOOPATH /path/to/mini
+set-alias\talmini {echo mini}
+setenv\t\tFOOMINI value"
+testouterr_cmd sh {sh-to-mod sh testsuite/example/mini-sh-to-mod.sh} OK $tserr
+
+setenv_path_var MODULEPATH $modpath.2
+set ans [list]
+lappend ans [list set FOOMINI value]
+lappend ans [list set FOOPATH /path/to/mini:/path/to/dir]
+lappend ans [list set __MODULES_LMREFRESH source-sh/2]
+lappend ans [list set _LMFILES_ $modpath.2/source-sh/2]
+lappend ans [list set LOADEDMODULES source-sh/2]
+lappend ans [list set __MODULES_LMSOURCESH source-sh/2\&sh\ testsuite/example/mini-sh-to-mod.sh\|prepend-path\ FOOPATH\ /path/to/mini\|set-alias\ almini\ \{\}\|setenv\ FOOMINI\ value]
+lappend ans [list alias almini {echo mini}]
+testouterr_cmd sh {load source-sh/2} $ans {}
+setenv_path_var MODULEPATH $mp
+
+unsetenv_var TESTSUITE_SOURCESH_PRIO
+unsetenv_var FOOPATH
+
+
+#
+# priority of modulepath is not saved in collection
+#
+
+set collfile $env(TESTSUITEDIR)/path-prio-coll
+setenv_path_var MODULEPATH /path/to/site $mp
+setenv_var __MODULES_PRIORITY_MODULEPATH "/path/to/site&|-100"
+setenv_loaded_module [list path-prio/2.0] [list $mp/path-prio/2.0]
+set tscoll "module use --append /path/to/site
+module use --append $mp
+module load path-prio[if_implicitdefault {} /2.0]
+"
+testoutfile_cmd sh "save $collfile" OK $collfile $tscoll
+unsetenv_loaded_module
+
+# restore: modulepaths are enabled in collection order without priority,
+# demand on currently enabled modulepath is lost as it is disabled then
+# enabled again to reach collection order
+setenv_path_var MODULEPATH $mp
+setenv_var __MODULES_PRIORITY_MODULEPATH "$mp&|-100"
+unsetenv_var FOO
+set ans [list]
+lappend ans [list set FOO /path/to/foo:/path/to/bar:/bin]
+if {[is_conf_enabled advversspec implicitdefault]} {
+    lappend ans [list set __MODULES_LMALTNAME path-prio/2.0&as|path-prio/default&as|path-prio/latest]
+}
+lappend ans [list set _LMFILES_ $mp/path-prio/2.0]
+lappend ans [list set LOADEDMODULES path-prio/2.0]
+lappend ans [list unset __MODULES_PRIORITY_MODULEPATH]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/foo&path-prio/2.0|-100"]
+lappend ans [list set MODULEPATH /path/to/site:$mp]
+testouterr_cmd sh "restore $collfile" $ans [msg_load path-prio/2.0]
+file delete $collfile
+unsetenv_var __MODULES_PRIORITY_MODULEPATH
+setenv_path_var MODULEPATH $mp
+
+
+#
+# lint knows the --priority option
+#
+
+set nafelgar_script [glob -nocomplain nagelfar*/nagelfar.tcl]
+if {[string length $nafelgar_script]} {
+    setenv_var MODULES_TCL_LINTER $nafelgar_script
+    testouterr_cmd sh "lint $mp/path-prio/2.0" OK {}
+    testouterr_cmd sh "lint $mp/hier/core/gcc/1.0" OK {}
+    unsetenv_var MODULES_TCL_LINTER
+}
+
+
+#
+# example from issue #185
+#
+
+unsetenv_var TESTSUITE_PATH_PRIO
+set mod path-prio/2.0
+set modfile $mp/path-prio/2.0
+
+unsetenv_var FOO
+set ans [list]
+lappend ans [list set FOO /path/to/foo:/path/to/bar:/bin]
+if {[is_conf_enabled advversspec implicitdefault]} {
+    lappend ans [list set __MODULES_LMALTNAME path-prio/2.0&as|path-prio/default&as|path-prio/latest]
+}
+lappend ans [list set _LMFILES_ $modfile]
+lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/foo&$mod|-100"]
+testouterr_cmd sh "load $mod" $ans {}
+
+
+#
+#  Cleanup
+#
+
+reset_test_env

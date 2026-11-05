@@ -58,7 +58,8 @@ proc setenv-sc {args} {
 
 proc edit-path-sc {cmd args} {
    lassign [parsePathCommandArgs $cmd load noop {*}$args] separator allow_dup\
-      idx_val ign_refcount val_set_is_delim glob_match bhv var path_list
+      idx_val ign_refcount val_set_is_delim glob_match bhv var path_list\
+      priority
 
    # indicate env var name to configured traces
    setState current_envvar $var

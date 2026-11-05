@@ -700,6 +700,9 @@ Module Sub-Commands
  a modulefile evaluation. In such context, a :subcmd:`module use<use>` will
  not increase the reference counter of a path entry already defined.
 
+ Starting with version ``5.8``, the ``--priority`` option is added to assign
+ a priority to added modulepaths.
+
 :subcmd:`unuse`
 
  Reference counting mechanism is ignored when sub-command is not called during
@@ -720,6 +723,11 @@ Modules Specific Tcl Commands
  times to the path-like variable. When an element is removed from a path-like
  variable, this element is removed from the reference counter variable when
  its counter is equal to 1.
+
+ Starting with version ``5.8``, the ``--priority`` option is added to assign
+ a priority to added elements, which are ordered in the path-like variable
+ according to it. Priority is recorded in the
+ :envvar:`__MODULES_PRIORITY_\<VAR\>` environment variable.
 
 :mfcmd:`chdir`, :mfcmd:`module`, ``module-trace``, ``module-verbosity``,
 ``module-user``, ``module-log``
@@ -1146,7 +1154,8 @@ The following environment variables appeared on Modules 5.
 +------------+-----------------------------------------------------------------+
 | 5.8        | :envvar:`MODULES_AVAIL_JSON_OUTPUT`,                            |
 |            | :envvar:`MODULES_LIST_JSON_OUTPUT`,                             |
-|            | :envvar:`MODULES_SPIDER_JSON_OUTPUT`                            |
+|            | :envvar:`MODULES_SPIDER_JSON_OUTPUT`,                           |
+|            | :envvar:`__MODULES_PRIORITY_\<VAR\>`                            |
 +------------+-----------------------------------------------------------------+
 
 Modules Specific Tcl Commands

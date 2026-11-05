@@ -117,6 +117,7 @@ lappend ans [list unset __MODULES_SHARE_FOO]
 lappend ans [list set FOO /foo]
 testouterr_cmd_re "sh" "remove-path FOO $path1" $ans ""
 testouterr_cmd_re "sh" "remove-path --duplicates FOO $path1" $ans "$warn_msgs: --duplicates option has no effect on remove-path"
+testouterr_cmd_re "sh" "remove-path --priority 10 FOO $path1" $ans "$warn_msgs: --priority option has no effect on remove-path"
 
 
 #
