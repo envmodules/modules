@@ -1,0 +1,7 @@
+#%Module
+set branch $env(TESTSUITEDIR)/modulefiles.5/hier/gcc
+if {[info exists env(TESTSUITE_HIER_PRIO)]} {
+    module use --priority $env(TESTSUITE_HIER_PRIO) $branch
+} else {
+    module use $branch
+}

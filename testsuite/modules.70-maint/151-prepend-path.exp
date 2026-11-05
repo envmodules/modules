@@ -347,6 +347,31 @@ testouterr_cmd sh {prepend-path MODULEPATH /path/to/dir} $ans {}
 
 
 #
+# test --priority option
+#
+
+setenv_var FOO /path/to/dir1:/path/to/dir2
+unsetenv_var __MODULES_PRIORITY_FOO
+
+set ans [list]
+lappend ans [list set FOO /path/to/dir3:/path/to/dir1:/path/to/dir2]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/dir3&|-10"]
+testouterr_cmd sh {prepend-path --priority 10 FOO /path/to/dir3} $ans {}
+testouterr_cmd sh {prepend-path --priority=10 FOO /path/to/dir3} $ans {}
+
+setenv_var __MODULES_PRIORITY_FOO "/path/to/dir2&other/1.0|-100"
+set ans [list]
+lappend ans [list set FOO /path/to/dir2:/path/to/dir3:/path/to/dir1]
+lappend ans [list set __MODULES_PRIORITY_FOO "/path/to/dir2&other/1.0|-100:/path/to/dir3&|-10"]
+testouterr_cmd sh {prepend-path --priority 10 FOO /path/to/dir3} $ans {}
+
+testouterr_cmd sh {prepend-path --priority -10 FOO /path/to/dir3} ERR {ERROR: prepend-path should get a non-negative integer as priority value}
+testouterr_cmd sh {prepend-path --priority FOO /path/to/dir3} ERR {ERROR: prepend-path should get a non-negative integer as priority value}
+unsetenv_var __MODULES_PRIORITY_FOO
+unsetenv_var FOO
+
+
+#
 #  Cleanup
 #
 

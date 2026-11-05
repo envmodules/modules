@@ -603,6 +603,7 @@ proc setenv {args} {
    if {$bhv eq {set}} {
       # clean any previously defined reference counter array
       unset-env [getModshareVarName $var] 1
+      unset-env [getPriorityVarName $var] 1
 
       # clean any previously defined pushenv stack
       unset-env [getPushenvVarName $var] 1
@@ -623,6 +624,7 @@ proc setenv-un {args} {
 
    # clean any existing reference counter array
    unset-env [getModshareVarName $var] 1
+   unset-env [getPriorityVarName $var] 1
 
    # clean any previously defined pushenv stack
    unset-env [getPushenvVarName $var] 1
@@ -761,6 +763,7 @@ proc unsetenv {args} {
 
    # clean any existing reference counter array
    unset-env [getModshareVarName $var] 1
+   unset-env [getPriorityVarName $var] 1
 
    # clean any previously defined pushenv stack
    unset-env [getPushenvVarName $var] 1
@@ -979,7 +982,8 @@ proc remove-path-un {args} {
 proc edit-path-wh {cmd args} {
    # get variable name
    lassign [parsePathCommandArgs $cmd load noop {*}$args] separator allow_dup\
-      idx_val ign_refcount val_set_is_delim glob_match bhv var path_list
+      idx_val ign_refcount val_set_is_delim glob_match bhv var path_list\
+      priority
 
    # indicate env var name to configured traces
    setState current_envvar $var
@@ -2251,6 +2255,7 @@ proc pushenv {var val} {
 
    # clean any previously defined reference counter array
    unset-env [getModshareVarName $var] 1
+   unset-env [getPriorityVarName $var] 1
 
    # Set the variable for later use during the modulefile evaluation
    set-env $var $val
@@ -2269,6 +2274,7 @@ proc pushenv {var val} {
 proc pushenv-un {var val} {
    # clean any existing reference counter array
    unset-env [getModshareVarName $var] 1
+   unset-env [getPriorityVarName $var] 1
 
    # update value stack
    set pushvar [getPushenvVarName $var]

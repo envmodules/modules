@@ -167,6 +167,7 @@ complete -c module -l ignore-user-rc --description 'Skip evaluation of user-spec
 complete -c module -l no-modulepath-ignore --description 'Do not apply modulepath-ignore pattern definitions'
 complete -c module -l append --description 'Append directory to MODULEPATH'
 complete -c module -l prepend --description 'Prepend directory to MODULEPATH'
+complete -c module -l priority --description 'Set priority of path element'
 complete -c module -l timer --description 'Report execution times'
 complete -c module -l redirect --description 'Send output to stdout'
 complete -c module -l no-redirect --description 'Send output to stderr'

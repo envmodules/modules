@@ -2142,9 +2142,9 @@ Collection of modules handling commands:
   stashlist [-t|-l|-j]              List all stash collections
 
 Environment direct handling commands:
-  prepend-path [-d c] [--duplicates] var val [...]
+  prepend-path [-d c] [--duplicates] [--priority N] var val [...]
                                     Prepend value to environment variable
-  append-path [-d c] [--duplicates] var val [...]
+  append-path [-d c] [--duplicates] [--priority N] var val [...]
                                     Append value to environment variable
   remove-path [-d c] [--index] var val [...]
                                     Remove value from environment variable
@@ -2158,7 +2158,8 @@ Other commands:
   display | show  [-i] modulefile [...]
                                     Display information about modulefile(s)
   test       [-i] [modulefile ...]  Test modulefile(s)
-  use     [-a|-p] dir [...]         Add dir(s) to MODULEPATH variable
+  use     [-a|-p] [--priority N] dir [...]
+                                    Add dir(s) to MODULEPATH variable
   unuse           dir [...]         Remove dir(s) from MODULEPATH variable
   is-used         [dir ...]         Is any of the dir(s) enabled in MODULEPATH
   path       [-i] modulefile        Print modulefile path
@@ -2206,6 +2207,8 @@ Switches:
                   'append-path' or 'remove-path' sub-commands)
   --duplicates    Allow duplicate entries (on 'prepend-path' or 'append-path'
                   sub-commands)
+  --priority N    Set priority of path elements (on 'use', 'prepend-path' or
+                  'append-path' sub-commands)
   --index         Given value is an index in the variable's list, instead of
                   a value to look up (on 'remove-path' sub-command)
 

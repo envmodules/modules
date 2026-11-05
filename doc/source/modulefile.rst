@@ -130,7 +130,7 @@ the *modulefile* is being loaded.
     .. versionchanged:: 5.5
        Option ``--modulepath`` added
 
-.. mfcmd:: append-path [-d C|--delim C|--delim=C] [--duplicates] variable value...
+.. mfcmd:: append-path [-d C|--delim C|--delim=C] [--duplicates] [--priority N|--priority=N] variable value...
 
  See :mfcmd:`prepend-path`.
 
@@ -1254,7 +1254,7 @@ the *modulefile* is being loaded.
     .. versionchanged:: 5.6
        Label also applied on :subcmd:`whatis` and :subcmd:`search` output
 
-.. mfcmd:: prepend-path [-d C|--delim C|--delim=C] [--duplicates] variable value...
+.. mfcmd:: prepend-path [-d C|--delim C|--delim=C] [--duplicates] [--priority N|--priority=N] variable value...
 
  Append or prepend *value* to environment *variable*. The
  *variable* is a colon, or *delimiter*, separated list such as
@@ -1280,6 +1280,31 @@ the *modulefile* is being loaded.
 
  If *value* corresponds to the concatenation of multiple elements separated by
  colon, or *delimiter*, character, each element is treated separately.
+
+ The ``--priority`` option assigns a priority *N* to the added *value*.
+ Priority is an integer between ``0`` and ``1000000``. ``0`` is the default
+ priority meaning no priority. Elements of *variable* are ordered by priority:
+ the prepended elements with the highest priority are placed first in
+ *variable*, the appended elements with the highest priority are placed last
+ and the elements without priority are placed in between. Elements with the
+ same priority are ordered as usual, the last prepended element is placed
+ first and the last appended element is placed last. The whole *variable* is
+ reordered each time an element is added to it with :mfcmd:`prepend-path` or
+ :mfcmd:`append-path`, as long as at least one of its element has a priority.
+
+ Priority of the elements of *variable* is recorded in a priority environment
+ variable named by prefixing *variable* by
+ :envvar:`__MODULES_PRIORITY_<__MODULES_PRIORITY_\<VAR\>>`, to keep the same
+ ordering across modulefile evaluations. Each priority set on *value* is
+ recorded along with the name of the *modulefile* setting it. When *value* is
+ added with a priority whereas it is already defined in *variable*, the new
+ priority is ignored and *value* is not moved, unless the
+ :mconfig:`path_entry_reorder` configuration option is enabled in which case
+ the priority set last applies and *value* is moved accordingly. When the
+ *modulefile* is unloaded, its priority on *value* is withdrawn and the
+ priority set by another *modulefile*, if any, applies: *value* is moved
+ accordingly if the :mconfig:`path_entry_reorder` configuration option is
+ enabled, otherwise it is moved at the next modification of *variable*.
 
  The provided *value* is used as-is. If any path resolution is required, it
  must be performed within the *modulefile* itself. Use caution when including
@@ -1312,6 +1337,9 @@ the *modulefile* is being loaded.
        When :mconfig:`require_via` configuration option is enabled, a
        modulefile adding path to :envvar:`MODULEPATH` environment variable is
        considered a requirement of modulefiles stored in this path.
+
+    .. versionchanged:: 5.8
+       Option ``--priority`` added
 
 .. mfcmd:: prereq [options] modulefile...
 
@@ -2492,7 +2520,9 @@ value currently in use.
 
 The third optional argument of :mfcmd:`append-path` and :mfcmd:`prepend-path`
 commands corresponds to a priority specification on Lmod whereas these two
-commands accept multiple path element arguments on Modules.
+commands accept multiple path element arguments on Modules. Priority is
+specified on Modules with the ``--priority`` option of these commands. The
+same meaning is given to priority values on both tools.
 
 The :mfcmd:`prereq` command is equivalent to the :mfcmd:`prereq-any` command
 on Modules whereas on Lmod it is equivalent to the :mfcmd:`prereq-all`

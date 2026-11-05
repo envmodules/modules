@@ -1,0 +1,222 @@
+##############################################################################
+#   Modules Revision 3.0
+#   Providing a flexible user environment
+#
+#   File:		modules.50-cmds/%M%
+#   Revision:		%I%
+#   First Edition:	2026/11/04
+#   Last Mod.:		%U%, %G%
+#
+#   Authors:		Xavier Delaruelle, xavier.delaruelle@cea.fr
+#
+#   Description:	Testuite testsequence
+#   Command:		load, unload, use, avail
+#   Modulefiles:    hier/core/gcc, hier/core/lib, hier/gcc/lib, hier/gcc/mpi
+#   Sub-Command:
+#
+#   Comment:	%C{
+#         Test impact of a priority set on MODULEPATH elements over a
+#         module hierarchy: a core modulepath holds a compiler module
+#         enabling a branch modulepath, both modulepaths provide a module
+#         with the same name
+#		}C%
+#
+##############################################################################
+
+skip_if_quick_mode
+
+set mp $modpath.5
+set core $mp/hier/core
+set branch $mp/hier/gcc
+set corere [regsub -all "\(\[.+?\]\)" $core {\\\1}]
+set branchre [regsub -all "\(\[.+?\]\)" $branch {\\\1}]
+
+# modules loaded from a modulepath enabled by a module depend on this module
+setenv_var MODULES_REQUIRE_VIA 1
+
+
+#
+# no priority: branch enabled by compiler module shadows core modules
+#
+
+setenv_path_var MODULEPATH $core
+
+set ans [list]
+lappend ans [list set __MODULES_LMUSE "gcc/1.0&$branch"]
+lappend ans [list set _LMFILES_ $core/gcc/1.0]
+lappend ans [list set LOADEDMODULES gcc/1.0]
+lappend ans [list set MODULEPATH $branch:$core]
+testouterr_cmd sh {load gcc/1.0} $ans {}
+
+setenv_path_var MODULEPATH $branch $core
+setenv_var __MODULES_LMUSE "gcc/1.0&$branch"
+setenv_loaded_module [list gcc/1.0] [list $core/gcc/1.0]
+
+# branch comes first
+set tserr "$branchre:
+lib/1.0
+lib/2.0
+
+$corere:
+lib/1.0
+lib/2.0"
+testouterr_cmd_re sh {avail -t --indepth lib} OK $tserr
+
+# lib is resolved from branch
+set ans [list]
+lappend ans [list set TS_LIB gcc]
+lappend ans [list set _LMFILES_ $core/gcc/1.0:$branch/lib/1.0]
+lappend ans [list set LOADEDMODULES gcc/1.0:lib/1.0]
+testouterr_cmd sh {load lib/1.0} $ans {}
+
+# lib from branch depends on compiler module
+setenv_loaded_module [list gcc/1.0 lib/1.0] [list $core/gcc/1.0 $branch/lib/1.0]
+setenv_var TS_LIB gcc
+set ans [list]
+lappend ans [list unset __MODULES_LMUSE]
+lappend ans [list unset TS_LIB]
+lappend ans [list unset _LMFILES_]
+lappend ans [list unset LOADEDMODULES]
+lappend ans [list set MODULEPATH $core]
+set tserr [msg_top_unload gcc/1.0 lib/1.0 {} {}]
+testouterr_cmd sh {unload --auto gcc/1.0} $ans $tserr
+
+unsetenv_loaded_module
+unsetenv_var __MODULES_LMUSE
+unsetenv_var TS_LIB
+
+
+#
+# core modulepath with priority: it stays first whatever the branches
+# enabled afterward, so core modules shadow branch modules
+#
+
+unsetenv_var MODULEPATH
+
+# enable core modulepath with priority
+set ans [list]
+lappend ans [list set __MODULES_PRIORITY_MODULEPATH "$core&|-100"]
+lappend ans [list set MODULEPATH $core]
+testouterr_cmd sh "use --priority 100 $core" $ans {}
+
+setenv_path_var MODULEPATH $core
+setenv_var __MODULES_PRIORITY_MODULEPATH "$core&|-100"
+
+# branch is still enabled when compiler module loads, but placed after core
+set ans [list]
+lappend ans [list set __MODULES_LMUSE "gcc/1.0&$branch"]
+lappend ans [list set _LMFILES_ $core/gcc/1.0]
+lappend ans [list set LOADEDMODULES gcc/1.0]
+lappend ans [list set __MODULES_PRIORITY_MODULEPATH "$core&|-100"]
+lappend ans [list set MODULEPATH $core:$branch]
+testouterr_cmd sh {load gcc/1.0} $ans {}
+
+setenv_path_var MODULEPATH $core $branch
+setenv_var __MODULES_LMUSE "gcc/1.0&$branch"
+setenv_loaded_module [list gcc/1.0] [list $core/gcc/1.0]
+
+# core comes first
+set tserr "$corere:
+lib/1.0
+lib/2.0
+
+$branchre:
+lib/1.0
+lib/2.0"
+testouterr_cmd_re sh {avail -t --indepth lib} OK $tserr
+
+# lib is resolved from core, mpi only exists in branch
+set ans [list]
+lappend ans [list set TS_MPI gcc]
+lappend ans [list set TS_LIB core]
+lappend ans [list set _LMFILES_ $core/gcc/1.0:$core/lib/1.0:$branch/mpi/1.0]
+lappend ans [list set LOADEDMODULES gcc/1.0:lib/1.0:mpi/1.0]
+testouterr_cmd sh {load lib/1.0 mpi/1.0} $ans {}
+
+# modulepath enabled from command line is placed after prioritized core
+set ans [list]
+lappend ans [list set __MODULES_PRIORITY_MODULEPATH "$core&|-100"]
+lappend ans [list set MODULEPATH $core:/path/to/other:$branch]
+testouterr_cmd sh {use /path/to/other} $ans {}
+
+# dependency mechanism is unchanged: branch is disabled and module loaded
+# from it is unloaded, module loaded from core is kept
+setenv_loaded_module [list gcc/1.0 lib/1.0 mpi/1.0] [list $core/gcc/1.0\
+   $core/lib/1.0 $branch/mpi/1.0]
+setenv_var TS_LIB core
+setenv_var TS_MPI gcc
+set ans [list]
+lappend ans [list unset __MODULES_LMUSE]
+lappend ans [list unset TS_MPI]
+lappend ans [list set __MODULES_PRIORITY_MODULEPATH "$core&|-100"]
+lappend ans [list set _LMFILES_ $core/lib/1.0]
+lappend ans [list set LOADEDMODULES lib/1.0]
+lappend ans [list set MODULEPATH $core]
+set tserr [msg_top_unload gcc/1.0 mpi/1.0 {} {}]
+testouterr_cmd sh {unload --auto gcc/1.0} $ans $tserr
+
+unsetenv_loaded_module
+unsetenv_var __MODULES_LMUSE
+unsetenv_var TS_LIB
+unsetenv_var TS_MPI
+
+
+#
+# branch enabled with a priority by compiler module: branch is placed
+# relatively to core depending on their priority values
+#
+
+setenv_path_var MODULEPATH $core
+setenv_var __MODULES_PRIORITY_MODULEPATH "$core&|-100"
+
+# lower priority than core
+setenv_var TESTSUITE_HIER_PRIO 10
+set ans [list]
+lappend ans [list set __MODULES_LMUSE "gcc/1.0&$branch"]
+lappend ans [list set _LMFILES_ $core/gcc/1.0]
+lappend ans [list set LOADEDMODULES gcc/1.0]
+lappend ans [list set __MODULES_PRIORITY_MODULEPATH "$core&|-100:$branch&gcc/1.0|-10"]
+lappend ans [list set MODULEPATH $core:$branch]
+testouterr_cmd sh {load gcc/1.0} $ans {}
+
+# higher priority than core
+setenv_var TESTSUITE_HIER_PRIO 1000
+set ans [list]
+lappend ans [list set __MODULES_LMUSE "gcc/1.0&$branch"]
+lappend ans [list set _LMFILES_ $core/gcc/1.0]
+lappend ans [list set LOADEDMODULES gcc/1.0]
+lappend ans [list set __MODULES_PRIORITY_MODULEPATH "$core&|-100:$branch&gcc/1.0|-1000"]
+lappend ans [list set MODULEPATH $branch:$core]
+testouterr_cmd sh {load gcc/1.0} $ans {}
+
+setenv_path_var MODULEPATH $branch $core
+setenv_var __MODULES_PRIORITY_MODULEPATH "$core&|-100:$branch&gcc/1.0|-1000"
+setenv_var __MODULES_LMUSE "gcc/1.0&$branch"
+setenv_loaded_module [list gcc/1.0] [list $core/gcc/1.0]
+
+# lib is resolved from branch again
+set ans [list]
+lappend ans [list set TS_LIB gcc]
+lappend ans [list set _LMFILES_ $core/gcc/1.0:$branch/lib/1.0]
+lappend ans [list set LOADEDMODULES gcc/1.0:lib/1.0]
+testouterr_cmd sh {load lib/1.0} $ans {}
+
+# priority of branch is dropped from record when branch is disabled
+setenv_loaded_module [list gcc/1.0 lib/1.0] [list $core/gcc/1.0 $branch/lib/1.0]
+setenv_var TS_LIB gcc
+set ans [list]
+lappend ans [list unset __MODULES_LMUSE]
+lappend ans [list unset TS_LIB]
+lappend ans [list set __MODULES_PRIORITY_MODULEPATH "$core&|-100"]
+lappend ans [list unset _LMFILES_]
+lappend ans [list unset LOADEDMODULES]
+lappend ans [list set MODULEPATH $core]
+set tserr [msg_top_unload gcc/1.0 lib/1.0 {} {}]
+testouterr_cmd sh {unload --auto gcc/1.0} $ans $tserr
+
+
+#
+#  Cleanup
+#
+
+reset_test_env

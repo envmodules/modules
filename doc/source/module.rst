@@ -3242,7 +3242,7 @@ Module Sub-Commands
 
     .. versionadded:: 5.6
 
-.. subcmd:: use [-a|--append|-p|--prepend] directory...
+.. subcmd:: use [-a|--append|-p|--prepend] [--priority N|--priority=N] directory...
 
  Prepend one or more *directories* to the :envvar:`MODULEPATH` environment
  variable. The ``--append``/``-a`` flag will append the *directory* to
@@ -3251,6 +3251,17 @@ Module Sub-Commands
 
  When *directory* is already defined in :envvar:`MODULEPATH`, it is not added
  again or moved at the end or at the beginning of the environment variable.
+
+ The ``--priority`` option assigns a priority *N* to the added *directory*,
+ like the ``--priority`` option of :mfcmd:`prepend-path` and
+ :mfcmd:`append-path` modulefile commands. Prepended *directories* with the
+ highest priority are kept first in :envvar:`MODULEPATH` and appended
+ *directories* with the highest priority are kept last, whatever the
+ modulepaths enabled afterward. The priority set on an already enabled
+ *directory* is ignored unless the :mconfig:`path_entry_reorder`
+ configuration option is enabled. Priority is recorded in the
+ :envvar:`__MODULES_PRIORITY_MODULEPATH<__MODULES_PRIORITY_\<VAR\>>`
+ environment variable.
 
  If :mfcmd:`module use<module>` is called during a modulefile evaluation, the
  reference counter environment variable
@@ -3272,6 +3283,9 @@ Module Sub-Commands
        Reference counter value of *directory* is not anymore increased if
        :subcmd:`module use<use>` is called from the command-line or within an
        initialization modulefile script
+
+    .. versionchanged:: 5.8
+       Option ``--priority`` added
 
 .. subcmd:: whatis [-a] [-t|-j] [pattern...]
 
@@ -4770,6 +4784,26 @@ ENVIRONMENT
  .. only:: html or latex
 
     .. versionadded:: 5.1
+
+.. envvar:: __MODULES_PRIORITY_<VAR>
+
+ Priority record variable for path-like variable :envvar:`<VAR>`. A colon
+ separated list of records sorted by path element. A record is formed by a
+ path element followed by the priority demands set on it, in the order they
+ were made. An ampersand character separates the path element and each
+ demand. A demand is formed by the name of the module setting the priority,
+ which is empty when set from the command line, followed by a pipe character
+ and the weight of the element: the priority set with the ``--priority``
+ option of :mfcmd:`prepend-path`, :mfcmd:`append-path` or :mfcmd:`module
+ use<module>` modulefile commands, negated for a prepended element.
+
+ Only the elements with a priority are recorded. The demands of a module are
+ withdrawn when this module is unloaded. The variable is unset when no
+ element of :envvar:`<VAR>` has a priority anymore.
+
+ .. only:: html or latex
+
+    .. versionadded:: 5.8
 
 .. envvar:: __MODULES_QUAR_<VAR>
 

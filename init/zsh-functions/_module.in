@@ -362,6 +362,7 @@ _module() {
                _arguments \
                   '(-a --append)'{-a,--append}'[Append directory to MODULEPATH]' \
                   '(-p --prepend)'{-p,--prepend}'[Prepend directory to MODULEPATH]' \
+                  '--priority[Set priority of directory in MODULEPATH]' \
                   '*:modulepath:_files -/' && ret=0
                ;;
             (cachebuild)
@@ -397,6 +398,7 @@ _module() {
                _arguments \
                   '(-d --delim)'{-d,--delim}'[Path element separator]' \
                   '--duplicates[Duplicate existing element]' \
+                  '--priority[Set priority of path element]' \
                   && ret=0
                ;;
             (remove-path)

@@ -67,6 +67,35 @@ possible values of each variant are set as a JSON array.
     :ps:`$` module avail --json -o variant foo
     {"foo/1.0": { "name": "foo/1.0", "type": "modulefile", "variants": { "arch": [ "x86_64", "arm64" ], "debug": [ "on", "off" ] }, "pathname": "/path/to/modulefiles/foo/1.0"}}
 
+Priority of path elements
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The :mfcmd:`prepend-path` and :mfcmd:`append-path` modulefile commands accept
+a new ``--priority`` option to assign a priority to the path elements they
+add. The prepended elements with the highest priority are kept at the
+beginning of the path-like variable and the appended elements with the
+highest priority are kept at its end, whatever the modules loaded afterward.
+Elements without priority are placed in between and ordered as usual.
+
+.. parsed-literal::
+
+    :ps:`$` cat /path/to/modulefiles/wrapper/1.0
+    #%Module
+    prepend-path --priority 100 PATH /path/to/wrapper/bin
+    :ps:`$` cat /path/to/modulefiles/foo/1.0
+    #%Module
+    prepend-path PATH /path/to/foo/bin
+    :ps:`$` module load wrapper foo
+    :ps:`$` echo $PATH
+    /path/to/wrapper/bin:/path/to/foo/bin:/usr/bin:/bin
+
+Priority is a number between ``0`` and ``1000000``. The priority of the
+elements of a variable is recorded in the
+:envvar:`__MODULES_PRIORITY_\<VAR\>` environment variable, so the ordering is
+kept across module evaluations. The ``--priority`` option is also available on
+the :subcmd:`prepend-path`, :subcmd:`append-path` and :subcmd:`use`
+sub-commands.
+
 
 v5.7
 ----

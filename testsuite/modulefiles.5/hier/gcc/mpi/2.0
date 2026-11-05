@@ -1,0 +1,2 @@
+#%Module
+setenv TS_MPI gcc

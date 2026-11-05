@@ -1980,7 +1980,15 @@ proc runModuleUse {cmd mode pos args} {
    if {$args eq {}} {
       showModulePath
    } else {
+      set next_is_priority 0
+      set prio_optlist [list]
       foreach path $args {
+         if {$next_is_priority} {
+            set next_is_priority 0
+            set prio_optlist [list --priority [checkPriorityValue $cmd\
+               $path]]
+            continue
+         }
          switch -glob -- $path {
             --remove-on-unload - --append-on-unload - --prepend-on-unload -\
             --noop-on-unload {
@@ -1988,6 +1996,21 @@ proc runModuleUse {cmd mode pos args} {
                   knerror "Invalid option '$path'"
                } else {
                   lappend pathlist $path
+               }
+            }
+            --priority {
+               if {$cmd ne {use}} {
+                  knerror "Invalid option '$path'"
+               } else {
+                  set next_is_priority 1
+               }
+            }
+            --priority=* {
+               if {$cmd ne {use}} {
+                  knerror "Invalid option '$path'"
+               } else {
+                  set prio_optlist [list --priority [checkPriorityValue\
+                     $cmd [string range $path 11 end]]]
                }
             }
             -* {
@@ -2021,10 +2044,15 @@ proc runModuleUse {cmd mode pos args} {
          }
       }
 
+      if {$next_is_priority} {
+         knerror "Missing value for '--priority' option"
+      }
+
       # added directory may not exist at this time
       # pass all paths specified at once to append-path/prepend-path
       if {[info exists pathlist]} {
-         set optlist [list]
+         # priority is meaningless when removing paths (unload of use)
+         set optlist [expr {$pos eq {remove} ? {} : $prio_optlist}]
          # define path command to call
          set pathcmd [expr {$pos eq {remove} ? {unload-path} : {add-path}}]
 
