@@ -51,6 +51,7 @@ Modules 5.8.0 (not yet released)
 * Add *mtime* element to the JSON output configuration of :subcmd:`avail`,
   :subcmd:`list` and :subcmd:`spider` sub-commands to report the modification
   time of modulefiles. (fix issue #615)
+* Doc: add :ref:`path-priority` design notes.
 
 
 .. _5.7 release notes:
