@@ -1272,7 +1272,10 @@ the *modulefile* is being loaded.
  When *value* is already defined in environment *variable*, it is not added
  again or moved at the end or at the beginning of *variable*. Exception is
  made when the ``--duplicates`` option is set in which case *value* is added
- again to *variable*.
+ again to *variable*. When the :mconfig:`path_entry_reorder` configuration
+ option is enabled, *value* is moved at the beginning of *variable* with
+ :mfcmd:`prepend-path` or at its end with :mfcmd:`append-path`, unless the
+ ``--duplicates`` option is set.
 
  If the *variable* is not set, it is created. When a *modulefile* is
  unloaded, :mfcmd:`append-path` and :mfcmd:`prepend-path` become
@@ -1337,6 +1340,10 @@ the *modulefile* is being loaded.
        When :mconfig:`require_via` configuration option is enabled, a
        modulefile adding path to :envvar:`MODULEPATH` environment variable is
        considered a requirement of modulefiles stored in this path.
+
+    .. versionchanged:: 5.7
+       *value* already defined in *variable* is moved when
+       :mconfig:`path_entry_reorder` configuration option is enabled
 
     .. versionchanged:: 5.8
        Option ``--priority`` added

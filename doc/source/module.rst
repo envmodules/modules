@@ -3250,7 +3250,10 @@ Module Sub-Commands
  requests the default prepend behavior.
 
  When *directory* is already defined in :envvar:`MODULEPATH`, it is not added
- again or moved at the end or at the beginning of the environment variable.
+ again or moved at the end or at the beginning of the environment variable,
+ unless the :mconfig:`path_entry_reorder` configuration option is enabled, in
+ which case *directory* is moved at the beginning of :envvar:`MODULEPATH` or
+ at its end if the ``--append`` flag is set.
 
  The ``--priority`` option assigns a priority *N* to the added *directory*,
  like the ``--priority`` option of :mfcmd:`prepend-path` and
@@ -3283,6 +3286,10 @@ Module Sub-Commands
        Reference counter value of *directory* is not anymore increased if
        :subcmd:`module use<use>` is called from the command-line or within an
        initialization modulefile script
+
+    .. versionchanged:: 5.7
+       *directory* already defined in :envvar:`MODULEPATH` is moved when
+       :mconfig:`path_entry_reorder` configuration option is enabled
 
     .. versionchanged:: 5.8
        Option ``--priority`` added
