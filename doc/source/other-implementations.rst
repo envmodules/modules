@@ -42,7 +42,6 @@ table highlights features that are unique to each implementation.
        * Save configuration under :envvar:`XDG_CONFIG_HOME`
        * `i18n`_
        * `Find best module`_
-       * `Path entry priorities`_
        * ``--regexp`` search option
        * `settarg`_
        * `MarkDown support in module help and whatis`_
@@ -76,7 +75,6 @@ table highlights features that are unique to each implementation.
 .. _Inactive modules: https://lmod.readthedocs.io/en/latest/010_user.html#module-hierarchy
 .. _Find best module: https://lmod.readthedocs.io/en/latest/060_locating.html
 .. _i18n: https://lmod.readthedocs.io/en/latest/185_localization.html
-.. _Path entry priorities: https://lmod.readthedocs.io/en/latest/077_ref_counting.html#specifying-priorities-for-path-entries
 .. _Update path entry order: https://lmod.readthedocs.io/en/latest/077_ref_counting.html
 .. _settarg: https://lmod.readthedocs.io/en/latest/310_settarg.html
 .. _Hook functions: https://lmod.readthedocs.io/en/latest/170_hooks.html#hook-functions
@@ -218,6 +216,8 @@ implementation.
      - |foo@5.0:7.0|_
    * - ``latest("foo")``
      - |foo@latest|_
+   * - ``prepend_path{"PATH","/foo",priority=100}``
+     - :mfcmd:`prepend-path` ``--priority 100 PATH /foo``
    * - ``myModuleFullName()``
      - :mfcmd:`module-info name<module-info>`
    * - ``myModuleName()``
@@ -300,5 +300,5 @@ additional tools that enhance how modulefiles are handled.
 If you're aware of a ``module``-related project missing from this list, feel
 free to :ref:`contact us<Community>` so we can add it.
 
-.. |modules_version| replace:: Modules 5.7.0
-.. |lmod_version| replace:: Lmod 9.4.2
+.. |modules_version| replace:: Modules 5.8.0 (not yet released)
+.. |lmod_version| replace:: Lmod 9.4.5
