@@ -1674,3 +1674,6 @@ TMOD
 getPathElementWeight
 withdrawPriorityDemands
 getPathWeightList
+ENVI
+ENDEVAL
+EXITEVAL
