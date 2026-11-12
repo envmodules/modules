@@ -238,7 +238,7 @@ Build the docs in the ``doc`` directory using Sphinx::
    cd doc
    make html
 
-Open ``_build/html/index.html`` in your browser to view the docs.
+Open ``build/index.html`` in your browser to view the docs.
 
 Read more about `Sphinx`_.
 

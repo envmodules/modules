@@ -33,7 +33,7 @@ library in `lib/`).
 
 ```
 init -> util -> envmngt -> report -> interp -> mfcmd -> modscan ->
-modfind -> modeval -> modspec -> cache -> coll -> main -> subcmd
+modfind -> modeval -> modspec -> cache -> coll -> subcmd -> main
 ```
 
 Always edit the individual source file in `tcl/` (e.g. `tcl/main.tcl.in`,
@@ -91,7 +91,7 @@ script/mb profile
 ## Docs
 
 ```sh
-cd doc && make html   # requires Sphinx >= 1.0; output in doc/_build/html
+cd doc && make html   # requires Sphinx >= 1.0; output in doc/build
 ```
 
 In `.rst` files, make a section title's underline exactly as long as the
@@ -120,7 +120,7 @@ added or its text edited.
   - `util.tcl` — generic helpers
   - `syntaxdb.tcl` — generated Nagelfar syntax DB for linting (do not hand-edit)
 - `init/` — per-shell init/wrapper scripts (`bash.in`, `csh.in`, `fish.in`,
-  `tcsh.in`, `zsh.in`, `pwsh.ps1.in`, `perl.pm.in`, `r.R.in`, `ruby.rb.in`,
+  `zsh.in`, `pwsh.ps1.in`, `perl.pm.in`, `r.R.in`, `ruby.rb.in`,
   `cmake.in`, ...) and shell completion scripts
   (`bash_completion.in`, `fish_completion`, `tcsh_completion.in`,
   `zsh-functions/_module.in`)
@@ -136,8 +136,8 @@ added or its text edited.
   numbered/prefixed (e.g. `470-variant.exp`); `script/mt 50/470` targets it.
   `modulefiles*/` subdirectories hold fixture modulefiles used by the tests.
   Add fixture modulefiles for a *new* test under the highest-numbered
-  `modulefiles.N` directory (e.g. `modulefiles.4`; check for a higher one
-  first) rather than the default `modulefiles/` directory — many existing
+  `modulefiles.N` directory (list `testsuite/` to find it) rather than
+  the default `modulefiles/` directory — many existing
   tests (`aliases`, `avail`, `spider`, `scan_eval`, ...) enumerate a
   modulepath's *entire* content, so adding to the heavily shared default dir
   changes their expected output. Even a numbered dir gets referenced
@@ -196,8 +196,9 @@ added or its text edited.
 - The project follows the Linux kernel's policy on AI coding assistants (see
   "AI coding assistants" in `CONTRIBUTING.rst`): never add a
   `Signed-off-by:` trailer on behalf of the AI — only the human committer
-  signs off — and disclose AI involvement with an `Assisted-by:` trailer,
-  e.g. `Assisted-by: Claude:claude-sonnet-5`.
+  signs off — and disclose AI involvement with an `Assisted-by:` trailer
+  naming the model that did the work, in the form
+  `Assisted-by: Claude:<model-id>`.
 
 ## Pull request descriptions
 
