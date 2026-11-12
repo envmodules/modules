@@ -324,8 +324,13 @@ proc runModuleUse {cmd mode pos args} {
                }
                lappend pathlist {*}[overlay-get-moddirs $pos $arg]
                if {$arg ni $::g_UsedOverlays && $arg ne {base}} {
-                  module prepend-path __MODULES_OVERLAYS $arg
-	       }
+                  if {[info procs cmdModuleResurface] ne {}} {
+                     cmdModuleResurface prepend-path __MODULES_OVERLAYS $arg
+                  } else {
+                     # for when running on envmodules pre 5.7.*
+                     module prepend-path __MODULES_OVERLAYS $arg
+                  }
+                }
                if {[llength $pathlist] > 0} {
                   set call_ModuleUse 1
                }
