@@ -229,6 +229,7 @@ Specification
   - ``--group``: specify a list of groups whose member are specifically affected by hide mechanism
   - ``--before``: enables hide mechanism until a given date
   - ``--after``: enables hide mechanism after a given date
+  - ``--regexp``: module arguments are regular expressions designating the modules to hide
 
 - ``module-forbid`` accepts options that change its behavior:
 
@@ -240,6 +241,12 @@ Specification
   - ``--after``: enables forbid mechanism after a given date
   - ``--message``: supplements error message obtained when trying to evaluate a forbidden module with given text message
   - ``--nearly-message``: supplements warning message obtained when evaluating a nearly forbidden module with given text message
+  - ``--regexp``: module arguments are regular expressions designating the modules to forbid
+
+- ``--regexp`` option selects modules with regular expressions rather than module specifications
+
+  - See :ref:`module-tags` design notes for the description of this option, as it is shared by ``module-hide``, ``module-forbid``, ``module-tag`` and ``module-warn``
+  - Hiding level set through regular expressions is compared to the levels set on module specifications and on full path designation: the strongest matching level is retained
 
 - Each use case expressed above are covered by following command:
 

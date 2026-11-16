@@ -43,6 +43,8 @@ inhibit or enable specifically the warning mechanism.
 * ``--before``: enables warn mechanism until a given date
 * ``--after``: enables warn mechanism after a given date
 * ``--message``: warning message to print
+* ``--regexp``: module arguments are regular expressions designating the
+  modules to warn about (see :ref:`module-tags`)
 
 ``warning`` tag
 ---------------

@@ -155,7 +155,7 @@ set {::syntax(module test)} x*
 set {::syntax(module whatis)} x*
 set ::syntax(module-alias) 2
 # module-forbid accepts option at any position
-set ::syntax(module-forbid) {p* x p* x* p*}
+set ::syntax(module-forbid) {o* x o* x* o*}
 set ::syntax(module-help) 1
 # module-hide accepts option at any position
 set ::syntax(module-hide) {o* x o* x* o*}
@@ -177,11 +177,11 @@ set {::syntax(module-info usergroups)} x?
 set {::syntax(module-info username)} x?
 set {::syntax(module-info version)} 1
 # module-tag accepts option at any position
-set ::syntax(module-tag) {p* x p* x p* x* p*}
+set ::syntax(module-tag) {o* x o* x o* x* o*}
 set ::syntax(module-version) {x x x*}
 set ::syntax(module-virtual) 2
 # module-warn accepts option at any position
-set ::syntax(module-warn) {p* x p* x* p*}
+set ::syntax(module-warn) {o* x o* x* o*}
 set ::syntax(module-whatis) 1
 set ::syntax(modulepath-label) 2
 set ::syntax(prepend-path) {o* x x x*}
@@ -290,34 +290,37 @@ set {::option(module unuse)} {--remove-on-unload --noop-on-unload\
 set {::option(module use)} {-a --append -p --prepend --priority}
 set {::option(module use --priority)} 1
 set ::option(module-forbid) {--user --group --not-user --not-group --after\
-   --before --message --nearly-message}
+   --before --message --nearly-message --regexp}
 set {::option(module-forbid --user)} 1
 set {::option(module-forbid --group)} 1
 set {::option(module-forbid --not-user)} 1
 set {::option(module-forbid --not-group)} 1
 set {::option(module-forbid --after)} 1
 set {::option(module-forbid --before)} 1
+set {::option(module-forbid --message)} 1
+set {::option(module-forbid --nearly-message)} 1
 set ::option(module-hide) {--user --group --not-user --not-group --after\
-   --before --soft --hard --hidden-loaded}
+   --before --soft --hard --hidden-loaded --regexp}
 set {::option(module-hide --user)} 1
 set {::option(module-hide --group)} 1
 set {::option(module-hide --not-user)} 1
 set {::option(module-hide --not-group)} 1
 set {::option(module-hide --after)} 1
 set {::option(module-hide --before)} 1
-set ::option(module-tag) {--user --group --not-user --not-group}
+set ::option(module-tag) {--user --group --not-user --not-group --regexp}
 set {::option(module-tag --user)} 1
 set {::option(module-tag --group)} 1
 set {::option(module-tag --not-user)} 1
 set {::option(module-tag --not-group)} 1
 set ::option(module-warn) {--user --group --not-user --not-group --after\
-   --before --message}
+   --before --message --regexp}
 set {::option(module-warn --user)} 1
 set {::option(module-warn --group)} 1
 set {::option(module-warn --not-user)} 1
 set {::option(module-warn --not-group)} 1
 set {::option(module-warn --after)} 1
 set {::option(module-warn --before)} 1
+set {::option(module-warn --message)} 1
 set ::option(prepend-path) {-d --delim --duplicates --ignore-refcount\
    --priority}
 set {::option(prepend-path -d)} 1

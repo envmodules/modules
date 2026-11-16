@@ -265,6 +265,7 @@ proc __parseDateTimeArg {opt datetime} {
 # parse application criteria arguments and determine if command applies
 proc parseApplicationCriteriaArgs {aftbef nearsec args} {
    set otherargs {}
+   set is_regexp 0
 
    # parse argument list
    foreach arg $args {
@@ -296,6 +297,9 @@ proc parseApplicationCriteriaArgs {aftbef nearsec args} {
                } else {
                   set nextargisval [string map {- {}} $arg]list
                }
+            }
+            --regexp {
+               set is_regexp 1
             }
             default {
                lappend otherargs $arg
@@ -347,14 +351,32 @@ proc parseApplicationCriteriaArgs {aftbef nearsec args} {
       set afterraw {}
    }
 
-   return [list $apply $isnearly $afterraw $otherargs]
+   return [list $apply $isnearly $afterraw $otherargs $is_regexp]
 }
 
-proc setModspecTag {modspec tag {props {}}} {
+# parse module arguments of a module-* command: module specifications, or
+# regular expressions if is_regexp is enabled, which are only checked valid
+proc parseModuleSpecificationOrRegexp {is_regexp args} {
+   if {!$is_regexp} {
+      return [parseModuleSpecification 0 0 0 0 {*}$args]
+   }
+   foreach re $args {
+      if {[catch {regexp -- $re {}}]} {
+         knerror "Invalid regular expression '$re'"
+      }
+   }
+   return $args
+}
+
+proc setModspecTag {modspec tag {props {}} {is_regexp 0}} {
    reportDebug "Set tag '$tag' with properties '$props' on module\
       specification '$modspec'"
 
-   if {[isModuleFullPath $modspec]} {
+   if {$is_regexp} {
+      # no module root can be extracted from a regular expression, so these
+      # specs are kept apart and tested against every module
+      lappend ::g_moduleTagRegexp $tag $modspec $props
+   } elseif {[isModuleFullPath $modspec]} {
       # use dedicated structure for full path module specifications
       if {![info exists ::g_moduleTagFullPath($modspec)] || $tag ni\
          $::g_moduleTagFullPath($modspec)} {
@@ -401,7 +423,7 @@ proc module-forbid {args} {
    # parse application criteria arguments to determine if command apply
    lassign [parseApplicationCriteriaArgs 1 [expr {[getConf\
       nearly_forbidden_days] * 86400}] {*}$args] apply isnearly after\
-      otherargs
+      otherargs is_regexp
 
    # parse remaining argument list, do it even if command does not apply to
    # raise any command specification error
@@ -419,7 +441,11 @@ proc module-forbid {args} {
                set nextargisval message
             }
             -* {
-               knerror "Invalid option '$arg'"
+               # a regular expression may start with a dash character
+               if {!$is_regexp} {
+                  knerror "Invalid option '$arg'"
+               }
+               lappend modarglist $arg
             }
             default {
                lappend modarglist $arg
@@ -446,8 +472,9 @@ proc module-forbid {args} {
       }
 
       # record each forbid spec after parsing them
-      foreach modarg [parseModuleSpecification 0 0 0 0 {*}$modarglist] {
-         setModspecTag $modarg forbidden $proplist
+      foreach modarg [parseModuleSpecificationOrRegexp $is_regexp\
+         {*}$modarglist] {
+         setModspecTag $modarg forbidden $proplist $is_regexp
       }
    } elseif {$isnearly} {
       ##nagelfar ignore Found constant
@@ -457,8 +484,9 @@ proc module-forbid {args} {
          lappend proplist message $nearlymessage
       }
       # record each nearly forbid spec after parsing them
-      foreach modarg [parseModuleSpecification 0 0 0 0 {*}$modarglist] {
-         setModspecTag $modarg nearly-forbidden $proplist
+      foreach modarg [parseModuleSpecificationOrRegexp $is_regexp\
+         {*}$modarglist] {
+         setModspecTag $modarg nearly-forbidden $proplist $is_regexp
       }
    }
 }
@@ -469,7 +497,7 @@ proc module-hide {args} {
 
    # parse application criteria arguments to determine if command apply
    lassign [parseApplicationCriteriaArgs 1 0 {*}$args] apply isnearly after\
-      otherargs
+      otherargs is_regexp
 
    # parse remaining argument list, do it even if command does not apply to
    # raise any command specification error
@@ -488,7 +516,11 @@ proc module-hide {args} {
             set hiddenloaded 1
          }
          -* {
-            knerror "Invalid option '$arg'"
+            # a regular expression may start with a dash character
+            if {!$is_regexp} {
+               knerror "Invalid option '$arg'"
+            }
+            lappend modarglist $arg
          }
          default {
             lappend modarglist $arg
@@ -503,10 +535,11 @@ proc module-hide {args} {
    # skip hide spec record if application criteria are not met
    if {$apply} {
       # record each hide spec after parsing them
-      foreach modarg [parseModuleSpecification 0 0 0 0 {*}$modarglist] {
-         setModspecHidingLevel $modarg $hidinglvl
+      foreach modarg [parseModuleSpecificationOrRegexp $is_regexp\
+         {*}$modarglist] {
+         setModspecHidingLevel $modarg $hidinglvl $is_regexp
          if {$hiddenloaded} {
-            setModspecTag $modarg hidden-loaded
+            setModspecTag $modarg hidden-loaded {} $is_regexp
          }
       }
    }
@@ -519,14 +552,18 @@ proc hide-modulefile {modfile} {
 proc module-tag {args} {
    # parse application criteria arguments to determine if command apply
    lassign [parseApplicationCriteriaArgs 0 0 {*}$args] apply isnearly after\
-      otherargs
+      otherargs is_regexp
 
    # parse remaining argument list, do it even if command does not apply to
    # raise any command specification error
    foreach arg $otherargs {
       switch -glob -- $arg {
          -* {
-            knerror "Invalid option '$arg'"
+            # a regular expression may start with a dash character
+            if {!$is_regexp} {
+               knerror "Invalid option '$arg'"
+            }
+            lappend modarglist $arg
          }
          default {
             if {![info exists tag]} {
@@ -552,8 +589,9 @@ proc module-tag {args} {
    # skip tag record if application criteria are not met
    if {$apply} {
       # record each hide spec after parsing them
-      foreach modarg [parseModuleSpecification 0 0 0 0 {*}$modarglist] {
-         setModspecTag $modarg $tag
+      foreach modarg [parseModuleSpecificationOrRegexp $is_regexp\
+         {*}$modarglist] {
+         setModspecTag $modarg $tag {} $is_regexp
       }
    }
 }
@@ -2546,7 +2584,7 @@ proc add-property {name value} {
 proc module-warn {args} {
    # parse application criteria arguments to determine if command apply
    lassign [parseApplicationCriteriaArgs 1 0 {*}$args] apply isnearly after\
-      otherargs
+      otherargs is_regexp
 
    # parse remaining argument list, do it even if command does not apply to
    # raise any command specification error
@@ -2561,7 +2599,11 @@ proc module-warn {args} {
                set nextargisval message
             }
             -* {
-               knerror "Invalid option '$arg'"
+               # a regular expression may start with a dash character
+               if {!$is_regexp} {
+                  knerror "Invalid option '$arg'"
+               }
+               lappend modarglist $arg
             }
             default {
                lappend modarglist $arg
@@ -2586,8 +2628,9 @@ proc module-warn {args} {
       ##nagelfar ignore Found constant
       set proplist [list message $message]
       # record each hide spec after parsing them
-      foreach modarg [parseModuleSpecification 0 0 0 0 {*}$modarglist] {
-         setModspecTag $modarg warning $proplist
+      foreach modarg [parseModuleSpecificationOrRegexp $is_regexp\
+         {*}$modarglist] {
+         setModspecTag $modarg warning $proplist $is_regexp
       }
    }
 }

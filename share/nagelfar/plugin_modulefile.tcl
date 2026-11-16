@@ -49,8 +49,9 @@ proc statementWords {words info} {
    return $res
 }
 
-# translate known '--option=value' arguments into '--option value' to
-# correctly check them with Nagelfar
+# adapt statements that Nagelfar cannot correctly check as is: translate
+# known '--option=value' arguments into '--option value' and hide the leading
+# dash of regular expression arguments
 proc statementRaw {stmt info} {
    set res {}
    regexp {^(.+?)\s} $stmt match cmd
@@ -59,6 +60,20 @@ proc statementRaw {stmt info} {
       if {[regsub -all {(--(delim|tag))=} $stmt {\1 } newstmt]} {
          set res [list replace $newstmt]
       }
+   } elseif {$cmd in {module-forbid module-hide module-tag module-warn}} {
+      set res [stripRegexpLeadingDash $stmt]
+   }
+   return $res
+}
+
+# when --regexp option is set, module arguments are regular expressions that
+# may start with a dash character. Nagelfar would report them as bad options,
+# so this leading dash is removed unless argument looks like a long option
+proc stripRegexpLeadingDash {stmt} {
+   set res {}
+   if {[regexp {\s--regexp(\s|$)} $stmt] && [regsub -all\
+      {(\s[\{"]?)-(?!-[a-z])} $stmt {\1} newstmt]} {
+      set res [list replace $newstmt]
    }
    return $res
 }

@@ -93,6 +93,51 @@ Defining
   - ``--not-group``: specify a list of groups whose member are unaffected by specified tagging
   - ``--user``: specify a list of users specifically affected by specified tagging
   - ``--group``: specify a list of groups whose member are specifically affected by specified tagging
+  - ``--regexp``: module arguments are regular expressions designating the modules to tag
+
+- ``--regexp`` option designates target modules with regular expressions
+
+  - Useful to target with a single statement modules that have no name or version prefix in common (e.g., all the ``-debug`` versions)
+  - Option is available on all the commands relying on the tag mechanism to select modules: ``module-tag``, ``module-forbid``, ``module-hide`` and ``module-warn``
+  - Implemented as a flag that changes the meaning of all the ``modspec`` arguments of the command
+
+    - Wherever the flag is positioned on the command line
+    - Regular expressions and module specifications cannot be mixed on the same command
+    - At least one ``modspec`` argument is still required
+    - For ``module-tag``, first argument that does not start with ``-`` is still the tag name
+
+  - A regular expression may start with a ``-`` character (e.g., ``-debug$``)
+
+    - When ``--regexp`` is set, an argument starting with ``-`` that is not an option known by the command is considered a regular expression
+    - Rather than raising an *invalid option* error
+    - Drawback: a misspelled option is silently taken as a regular expression when ``--regexp`` is set
+    - A regular expression equal to an option name of the command cannot be expressed as is (``[-]-hard`` should be written instead of ``--hard``)
+    - Nagelfar linter reports such argument as a bad option: lint plugins remove the leading ``-`` of the arguments that do not look like a long option when ``--regexp`` is set
+
+  - Regular expressions are Tcl regular expressions
+
+    - Matched with ``regexp`` Tcl command against the name and version of module
+    - Variants of loaded modules are not part of the tested string
+    - Not anchored: ``^`` and ``$`` have to be used to match the whole module name and version
+    - Case insensitive match is applied when ``icase`` option enables it for the current context
+    - Validity is checked when regular expressions are recorded, an error is raised if one is incorrect
+    - Like module specifications, they are not checked if application criteria of the command (user, group, time frame) are not met
+
+  - No module root name can be extracted from a regular expression
+
+    - Tags defined on module specifications are stored per module root name to only test the specifications that may match a given module
+    - Regular expressions are stored in a separate list and each of them is tested against every module looked at
+    - Cost is thus proportional to the number of regular expressions defined, which is expected to be small
+
+  - When both module specifications and regular expressions match a module for a given tag, properties (e.g., message) defined for the module specification are retained
+
+    - Among regular expressions, the first one defined that matches wins
+    - Same precedence principle than full path designation over module specification: the more precise designation wins
+
+  - Regular expressions are not recorded as stickiness rule in loaded environment
+
+    - Stickiness set through a regular expression is satisfied only if the same module is reloaded
+    - Recording them would require to distinguish regular expressions from module specifications in ``__MODULES_LMSTICKYRULE``
 
 - ``--user``, ``--group``, ``--not-user`` and ``--not-group`` specification is only supported on Unix platform
 

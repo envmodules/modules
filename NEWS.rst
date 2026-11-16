@@ -65,6 +65,10 @@ Modules 5.8.0 (not yet released)
   of the module providing a family in addition to its name. For compatibility
   with Lmod, the :envvar:`LMOD_FAMILY_\<NAME\>_VERSION` environment variable
   is also defined and set to the same value.
+* Add ``--regexp`` option to :mfcmd:`module-forbid`, :mfcmd:`module-hide`,
+  :mfcmd:`module-tag` and :mfcmd:`module-warn` modulefile commands to
+  designate the modules they apply to with a regular expression matched
+  against module name and version.
 
 
 .. _5.7 release notes:

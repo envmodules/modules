@@ -1,0 +1,390 @@
+##############################################################################
+#   Modules Revision 3.0
+#   Providing a flexible user environment
+#
+#   File:		modules.20-locate/%M%
+#   Revision:		%I%
+#   First Edition:	2026/11/16
+#   Last Mod.:		%U%, %G%
+#
+#   Authors:		Xavier Delaruelle, xavier.delaruelle@cea.fr
+#
+#   Description:	Testuite testsequence
+#   Command:
+#   Modulefiles:    tag
+#   Sub-Command:    avail, load, unload, switch
+#
+#   Comment:	%C{
+#           Check --regexp option of module-hide, module-forbid,
+#           module-tag and module-warn modulefile commands
+#		}C%
+#
+##############################################################################
+
+skip_if_quick_mode
+
+set mp $modpath.4
+set mpre $modpathre.4
+
+# setup specific environment
+setenv_path_var MODULEPATH $mp
+
+# ensure we get nearly-forbidden notices
+setenv_var MODULES_NEARLY_FORBIDDEN_DAYS 4
+
+# ensure default tag abbreviation is defined
+setenv_var MODULES_TAG_ABBREV {auto-loaded=aL:loaded=L:hidden=H:hidden-loaded=H:forbidden=F:nearly-forbidden=nF:sticky=S:super-sticky=sS:keep-loaded=kL:warning=W}
+
+# ensure expected results whatever the default configuration
+setenv_var MODULES_AVAIL_INDEPTH 1
+setenv_var MODULES_IMPLICIT_DEFAULT 1
+setenv_var MODULES_ADVANCED_VERSION_SPEC 1
+setenv_var MODULES_SEARCH_MATCH starts_with
+
+# regular expressions are matched in a case sensitive way unless stated
+setenv_var MODULES_ICASE never
+
+set rcfile $mp/tag/.modulerc
+
+
+#
+# module-hide
+#
+
+setenv_var TESTSUITE_FPMOD_TAG regexp1
+
+set tserr "$mp:
+tag/1.0
+tag/1.2.sub/1.0"
+testouterr_cmd sh {avail -t tag} OK $tserr
+
+set tserr "$mp:
+tag/1.0
+tag/1.2.sub/1.0
+tag/2.0 <H>
+tag/2.1 <H>"
+testouterr_cmd sh {avail -t -a tag} OK $tserr
+
+# hidden module is unveiled when precisely designated
+set tserr "$mp:
+tag/2.1 <H>"
+testouterr_cmd sh {avail -t tag/2.1} OK $tserr
+
+set ans [list]
+lappend ans [list set __MODULES_LMALTNAME tag/2.0&as|tag/default&as|tag/latest]
+lappend ans [list set _LMFILES_ $mp/tag/2.0]
+lappend ans [list set LOADEDMODULES tag/2.0]
+testouterr_cmd sh {load tag/2.0} $ans {}
+
+# hidden modules are not selected as default version
+set ans [list]
+lappend ans [list set __MODULES_LMALTNAME tag/1.2.sub/1.0&as|tag/default&as|tag/latest&as|tag/1.2.sub/default&as|tag/1.2.sub/latest]
+lappend ans [list set _LMFILES_ $mp/tag/1.2.sub/1.0]
+lappend ans [list set LOADEDMODULES tag/1.2.sub/1.0]
+testouterr_cmd sh {load tag} $ans {}
+
+# hard hiding
+setenv_var TESTSUITE_FPMOD_TAG regexp2
+
+set tserr "$mp:
+tag/1.0
+tag/1.2.sub/1.0
+tag/2.0"
+testouterr_cmd sh {avail -t -a tag} OK $tserr
+
+testouterr_cmd sh {load tag/2.1} ERR [err_unablelocate tag/2.1]
+
+# hidden once loaded
+setenv_var TESTSUITE_FPMOD_TAG regexp3
+
+set tserr "$mp:
+tag/1.0
+tag/1.2.sub/1.0
+tag/2.0 <H>
+tag/2.1"
+testouterr_cmd sh {avail -t -a tag} OK $tserr
+
+set ans [list]
+lappend ans [list set _LMFILES_ $mp/tag/2.0]
+lappend ans [list set LOADEDMODULES tag/2.0]
+lappend ans [list set __MODULES_LMTAG tag/2.0&hidden-loaded]
+testouterr_cmd sh {load tag/2.0} $ans {}
+
+# regular expression starting with dash character
+setenv_var TESTSUITE_FPMOD_TAG regexp15
+
+set tserr "$mp:
+tag/1.0
+tag/1.2.sub/1.0
+tag/2.0 <H>
+tag/2.1"
+testouterr_cmd sh {avail -t -a tag} OK $tserr
+
+# unknown option is considered a regular expression
+setenv_var TESTSUITE_FPMOD_TAG regexp16
+
+set tserr "$mp:
+tag/1.0
+tag/1.2.sub/1.0
+tag/2.0 <H>
+tag/2.1 <H>"
+testouterr_cmd sh {avail -t -a tag} OK $tserr
+
+# highest hiding level among matching regular expressions and regular module
+# specifications applies
+setenv_var TESTSUITE_FPMOD_TAG regexp12
+
+set tserr "$mp:
+tag/1.0
+tag/1.2.sub/1.0
+tag/2.0"
+testouterr_cmd sh {avail -t tag} OK $tserr
+testouterr_cmd sh {avail -t -a tag} OK $tserr
+
+# application criteria not met
+setenv_var TESTSUITE_FPMOD_TAG regexp13
+
+set tserr "$mp:
+tag/1.0 <foo>
+tag/1.2.sub/1.0 <foo>
+tag/2.0
+tag/2.1"
+testouterr_cmd sh {avail -t tag} OK $tserr
+
+# like module specifications, regular expressions are not checked when
+# application criteria are not met
+setenv_var TESTSUITE_FPMOD_TAG regexp17
+
+set tserr "$mp:
+tag/1.0
+tag/1.2.sub/1.0
+tag/2.0
+tag/2.1"
+testouterr_cmd sh {avail -t -a tag} OK $tserr
+
+
+#
+# module-forbid
+#
+
+# several regular expressions
+setenv_var TESTSUITE_FPMOD_TAG regexp4
+
+set tserr "$mp:
+tag/1.0 <F>
+tag/1.2.sub/1.0
+tag/2.0 <F>
+tag/2.1 <F>"
+testouterr_cmd sh {avail -t tag} OK $tserr
+
+testouterr_cmd sh {load tag/2.1} ERR [err_accessdenied tag/2.1 my-forbid-msg]
+testouterr_cmd sh {load tag/1.0} ERR [err_accessdenied tag/1.0 my-forbid-msg]
+
+# nearly forbidden
+setenv_var TESTSUITE_FPMOD_TAG regexp5
+
+set tserr "$mp:
+tag/1.0
+tag/1.2.sub/1.0
+tag/2.0 <nF>
+tag/2.1 <nF>"
+testouterr_cmd sh {avail -t tag} OK $tserr
+
+set ans [list]
+lappend ans [list set __MODULES_LMALTNAME tag/2.1&as|tag/default&as|tag/latest]
+lappend ans [list set _LMFILES_ $mp/tag/2.1]
+lappend ans [list set LOADEDMODULES tag/2.1]
+lappend ans [list set __MODULES_LMTAG tag/2.1&nearly-forbidden]
+set tomorrow [clock format [expr {[clock seconds]+86400}] -format %Y-%m-%d]
+set tserr [msg_load {tag/2.1 <nF>} [err_accessnearlydenied $tomorrow my-nearly-forbid-msg]]
+testouterr_cmd sh {load tag/2.1} $ans $tserr
+
+# first matching regular expression wins, regular module specification has
+# precedence over regular expressions
+setenv_var TESTSUITE_FPMOD_TAG regexp14
+
+testouterr_cmd sh {load tag/2.0} ERR [err_accessdenied tag/2.0 my-forbid-msg1]
+testouterr_cmd sh {load tag/2.1} ERR [err_accessdenied tag/2.1 my-forbid-msg3]
+
+
+#
+# module-tag
+#
+
+setenv_var TESTSUITE_FPMOD_TAG regexp6
+
+set tserr "$mp:
+tag/1.0 <bar>
+tag/1.2.sub/1.0 <bar>
+tag/2.0 <bar>
+tag/2.1 <bar:foo>"
+testouterr_cmd sh {avail -t tag} OK $tserr
+
+set ans [list]
+lappend ans [list set _LMFILES_ $mp/tag/1.0]
+lappend ans [list set LOADEDMODULES tag/1.0]
+lappend ans [list set __MODULES_LMTAG tag/1.0&bar]
+testouterr_cmd sh {load tag/1.0} $ans {}
+
+# case insensitive match
+setenv_var MODULES_ICASE search
+
+set tserr "$mp:
+tag/1.0 <bar:foo>
+tag/1.2.sub/1.0 <bar:foo>
+tag/2.0 <bar>
+tag/2.1 <bar:foo>"
+testouterr_cmd sh {avail -t tag} OK $tserr
+testouterr_cmd sh {load tag/1.0} $ans {}
+
+setenv_var MODULES_ICASE always
+
+set ans [list]
+lappend ans [list set _LMFILES_ $mp/tag/1.0]
+lappend ans [list set LOADEDMODULES tag/1.0]
+lappend ans [list set __MODULES_LMTAG tag/1.0&foo&bar]
+testouterr_cmd sh {load tag/1.0} $ans {}
+
+setenv_var MODULES_ICASE never
+
+# stickiness set with a regular expression is only satisfied by the reload
+# of the same module
+setenv_var TESTSUITE_FPMOD_TAG regexp11
+
+set ans [list]
+lappend ans [list set _LMFILES_ $mp/tag/1.0]
+lappend ans [list set LOADEDMODULES tag/1.0]
+lappend ans [list set __MODULES_LMTAG tag/1.0&sticky]
+testouterr_cmd sh {load tag/1.0} $ans {}
+
+setenv_loaded_module [list tag/1.0] [list $mp/tag/1.0]
+setenv_var __MODULES_LMTAG tag/1.0&sticky
+
+set tserr [msg_unload {tag/1.0 <S>} $err_stickyunload]
+testouterr_cmd sh {unload tag/1.0} ERR $tserr
+
+set tserr [msg_unload {tag/1.0 <S>} $err_stickyunload]\n\n[msg_switch {tag/1.0 <S>} tag/2.0 [err_swoff tag/1.0]]
+testouterr_cmd sh {switch tag/1.0 tag/2.0} ERR $tserr
+
+testouterr_cmd sh {switch tag/1.0 tag/1.0} $ans {}
+
+unsetenv_loaded_module
+unsetenv_var __MODULES_LMTAG
+
+
+#
+# module-warn
+#
+
+setenv_var TESTSUITE_FPMOD_TAG regexp7
+
+set tserr "$mp:
+tag/1.0 <W>
+tag/1.2.sub/1.0
+tag/2.0 <W>
+tag/2.1"
+testouterr_cmd sh {avail -t tag} OK $tserr
+
+set ans [list]
+lappend ans [list set _LMFILES_ $mp/tag/1.0]
+lappend ans [list set LOADEDMODULES tag/1.0]
+lappend ans [list set __MODULES_LMTAG tag/1.0&warning]
+set tserr [msg_load {tag/1.0 <W>} "$warn_msgs: my-warn-msg"]
+testouterr_cmd sh {load tag/1.0} $ans $tserr
+
+
+#
+# case sensitivity of module-hide, module-forbid and module-warn
+#
+
+setenv_var TESTSUITE_FPMOD_TAG regexp18
+
+set ans_load21 [list]
+lappend ans_load21 [list set __MODULES_LMALTNAME tag/2.1&as|tag/default&as|tag/latest]
+lappend ans_load21 [list set _LMFILES_ $mp/tag/2.1]
+lappend ans_load21 [list set LOADEDMODULES tag/2.1]
+set ans_load10 [list]
+lappend ans_load10 [list set _LMFILES_ $mp/tag/1.0]
+lappend ans_load10 [list set LOADEDMODULES tag/1.0]
+set ans_load10_warn $ans_load10
+lappend ans_load10_warn [list set __MODULES_LMTAG tag/1.0&warning]
+
+set tserr_avail_sensitive "$mp:
+tag/1.0
+tag/1.2.sub/1.0
+tag/2.0
+tag/2.1"
+set tserr_avail_icase "$mp:
+tag/1.0 <W>
+tag/1.2.sub/1.0
+tag/2.1 <F>"
+set tserr_avail_all_icase "$mp:
+tag/1.0 <W>
+tag/1.2.sub/1.0
+tag/2.0 <H>
+tag/2.1 <F>"
+set tserr_load10_warn [msg_load {tag/1.0 <W>} "$warn_msgs: my-warn-msg"]
+set tserr_load21_forbid [err_accessdenied tag/2.1 my-forbid-msg]
+
+# case sensitive match
+testouterr_cmd sh {avail -t tag} OK $tserr_avail_sensitive
+testouterr_cmd sh {avail -t -a tag} OK $tserr_avail_sensitive
+testouterr_cmd sh {load tag/2.1} $ans_load21 {}
+testouterr_cmd sh {load tag/1.0} $ans_load10 {}
+
+# case insensitive match on search contexts only
+setenv_var MODULES_ICASE search
+
+testouterr_cmd sh {avail -t tag} OK $tserr_avail_icase
+testouterr_cmd sh {avail -t -a tag} OK $tserr_avail_all_icase
+testouterr_cmd sh {load tag/2.1} $ans_load21 {}
+testouterr_cmd sh {load tag/1.0} $ans_load10 {}
+
+# case insensitive match on all contexts
+setenv_var MODULES_ICASE always
+
+testouterr_cmd sh {avail -t tag} OK $tserr_avail_icase
+testouterr_cmd sh {avail -t -a tag} OK $tserr_avail_all_icase
+testouterr_cmd sh {load tag/2.1} ERR $tserr_load21_forbid
+testouterr_cmd sh {load tag/1.0} $ans_load10_warn $tserr_load10_warn
+
+# case insensitive match enabled from command line
+setenv_var MODULES_ICASE never
+
+testouterr_cmd sh {avail -t -i tag} OK $tserr_avail_icase
+testouterr_cmd sh {avail -t -a --icase tag} OK $tserr_avail_all_icase
+testouterr_cmd sh {load -i tag/2.1} ERR $tserr_load21_forbid
+testouterr_cmd sh {load --icase tag/1.0} $ans_load10_warn $tserr_load10_warn
+
+
+#
+# bad specifications
+#
+
+set ans [list]
+lappend ans [list set _LMFILES_ $mp/tag/1.0]
+lappend ans [list set LOADEDMODULES tag/1.0]
+lappend ans [list ERR]
+
+setenv_var TESTSUITE_FPMOD_TAG regexp8
+
+set tserr [escre [msg_moderr {Invalid regular expression 'tag/(2'} {module-hide --regexp {tag/(2}"<EXM>} $rcfile 2 {  }]]
+testouterr_cmd_re sh {load tag/1.0} $ans $tserr
+
+setenv_var TESTSUITE_FPMOD_TAG regexp9
+
+set tserr [escre [msg_moderr {No module specified in argument} {module-forbid --regexp"<EXM>} $rcfile 2 {  }]]
+testouterr_cmd_re sh {load tag/1.0} $ans $tserr
+
+setenv_var TESTSUITE_FPMOD_TAG regexp10
+
+# single argument is the tag name
+set tserr [escre [msg_moderr {No module specified in argument} {module-tag --regexp {tag/2}"<EXM>} $rcfile 2 {  }]]
+testouterr_cmd_re sh {load tag/1.0} $ans $tserr
+
+
+#
+#  Cleanup
+#
+
+reset_test_env

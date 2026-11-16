@@ -589,7 +589,25 @@ proc getModuleTag {mod full_path_mod tag} {
          return [list $tag $tag_props]
       }
    }
+   foreach {re_tag re tag_props} [getModuleRegexpTagSpecList] {
+      if {$re_tag eq $tag && [isModuleMatchingRegexp $re $mod]} {
+         return [list $tag $tag_props]
+      }
+   }
    return {}
+}
+
+proc getModuleRegexpTagSpecList {} {
+   return [expr {[info exists ::g_moduleTagRegexp] ? $::g_moduleTagRegexp :\
+      {}}]
+}
+
+# test if name and version of module matches regular expression. variants of
+# mod are ignored.
+proc isModuleMatchingRegexp {re mod} {
+   set mod [getModuleNameAndVersFromVersSpec $mod]
+   return [expr {[isIcase] ? [regexp -nocase -- $re $mod] : [regexp -- $re\
+      $mod]}]
 }
 
 proc getModuleTagRuleList {mod full_path_mod tag} {
@@ -692,6 +710,11 @@ proc getMatchingTagList {mod {known_tag_list {}}} {
                }
             }
          }
+      }
+   }
+   foreach {tag re tprops} [getModuleRegexpTagSpecList] {
+      if {$tag ni $tag_list && [isModuleMatchingRegexp $re $mod]} {
+         lappend tag_list $tag
       }
    }
    return $tag_list
@@ -1116,6 +1139,14 @@ proc getModuleHidingLevel {mod fpmod} {
       ::g_moduleHideFullPath($fpmod)] ? $::g_moduleHideFullPath($fpmod) :\
       {-1}}]
 
+   if {[info exists ::g_moduleHideRegexp]} {
+      foreach {re lvl} $::g_moduleHideRegexp {
+         if {$lvl > $baselvl && [isModuleMatchingRegexp $re $mod]} {
+            set baselvl $lvl
+         }
+      }
+   }
+
    set modroot [lindex [file split $mod] 0]
    # look if mod matches one of the hidden module specs applying to mod root
    if {[info exists ::g_moduleHideRoot($modroot)]} {
@@ -1135,7 +1166,13 @@ proc getModuleHidingLevel {mod fpmod} {
    return $baselvl
 }
 
-proc setModspecHidingLevel {modspec lvl} {
+proc setModspecHidingLevel {modspec lvl {is_regexp 0}} {
+   if {$is_regexp} {
+      reportDebug "Record hidden module regular expression '$modspec'\
+         (lvl=$lvl)"
+      lappend ::g_moduleHideRegexp $modspec $lvl
+      return
+   }
    # skip record if an higher hiding level is already set
    if {![info exists ::g_moduleHide($modspec)] || $lvl >\
       $::g_moduleHide($modspec)} {

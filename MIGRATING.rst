@@ -96,6 +96,33 @@ kept across module evaluations. The ``--priority`` option is also available on
 the :subcmd:`prepend-path`, :subcmd:`append-path` and :subcmd:`use`
 sub-commands.
 
+Selecting modules with regular expression
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The :mfcmd:`module-hide`, :mfcmd:`module-forbid`, :mfcmd:`module-tag` and
+:mfcmd:`module-warn` modulefile commands accept a new ``--regexp`` option to
+designate the modules they apply to with regular expressions. They are
+matched against the name and version of modules, which helps to target modules
+that do not share the same name or version prefix.
+
+.. parsed-literal::
+
+    :ps:`$` cat /path/to/modulefiles/.modulerc
+    #%Module
+    module-hide --regexp {-debug$}
+    module-forbid --regexp {^(foo|bar)/1\\.} --message {Version 1 is retired}
+    :ps:`$` module avail -a
+    --------------- /path/to/modulefiles ---------------
+    bar/1.4 <F>  bar/2.0-debug <H>  foo/1.0 <F>  foo/2.1
+    bar/2.0      baz/3.2            foo/2.0      foo/2.1-debug <H>
+    :ps:`$` module load foo/1.0
+    :sgrer:`ERROR`: Access to module foo/1.0 is denied
+      Version 1 is retired
+
+When ``--regexp`` option is set, all the module arguments of the command are
+regular expressions. See the :ref:`Regular expression module selection`
+section for details.
+
 
 v5.7
 ----
