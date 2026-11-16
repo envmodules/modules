@@ -1155,7 +1155,8 @@ The following environment variables appeared on Modules 5.
 | 5.8        | :envvar:`MODULES_AVAIL_JSON_OUTPUT`,                            |
 |            | :envvar:`MODULES_LIST_JSON_OUTPUT`,                             |
 |            | :envvar:`MODULES_SPIDER_JSON_OUTPUT`,                           |
-|            | :envvar:`__MODULES_PRIORITY_\<VAR\>`                            |
+|            | :envvar:`__MODULES_PRIORITY_\<VAR\>`,                           |
+|            | :envvar:`MODULES_FAMILY_\<NAME\>_VERSION`                       |
 +------------+-----------------------------------------------------------------+
 
 Modules Specific Tcl Commands
@@ -1313,6 +1314,13 @@ The following modulefile Tcl commands appeared on Modules 5.
  Starting with version ``5.5``, if :mconfig:`conflict_unload` and
  :mconfig:`auto_handling` configuration options are enabled, all matching
  loaded modules are unloaded.
+
+:mfcmd:`family`
+
+ Starting with version ``5.8``, the
+ :envvar:`MODULES_FAMILY_\<NAME\>_VERSION` and
+ :envvar:`LMOD_FAMILY_\<NAME\>_VERSION` environment variables are also
+ defined and set to the version of the loading module.
 
 :mfcmd:`modulepath-label`
 

@@ -296,8 +296,26 @@ Lmod Tcl modulefile compatibility
   This way existing scripts or modulefiles relying on this variable do not
   need to be changed to be compatible with Modules.
 
-- When modulefile is unloaded, the ``MODULES_FAMILY_<NAME>`` and
-  ``LMOD_FAMILY_<NAME>`` environment variables are unset
+- The :envvar:`MODULES_FAMILY_\<NAME\>_VERSION` environment variable is set
+  to the version of the currently loading module, which is the part of its
+  name following the last ``/`` character.
+
+  - With :envvar:`MODULES_FAMILY_\<NAME\>`, it gives the two elements
+    hierarchical modulefiles commonly join to build the path of the
+    directory to enable
+  - Variable is set to an empty string if loading module has no version, to
+    be safely referred in a modulefile whatever the module providing the
+    family
+  - Lmod sets its variable to the ``false`` string in this situation, which
+    is not reproduced
+
+- The :envvar:`LMOD_FAMILY_\<NAME\>_VERSION` environment variable is also
+  set in addition to :envvar:`MODULES_FAMILY_\<NAME\>_VERSION` and set to
+  the same value.
+
+- When modulefile is unloaded, the ``MODULES_FAMILY_<NAME>``,
+  ``MODULES_FAMILY_<NAME>_VERSION``, ``LMOD_FAMILY_<NAME>`` and
+  ``LMOD_FAMILY_<NAME>_VERSION`` environment variables are unset
 
 - This command is intended for use only within modulefile evaluation context
   (not within modulerc)

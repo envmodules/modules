@@ -299,6 +299,14 @@ the *modulefile* is being loaded.
  environment variable is also defined and set to the same value than
  :envvar:`MODULES_FAMILY_\<NAME\>`.
 
+ The :envvar:`MODULES_FAMILY_\<NAME\>_VERSION` environment variable is also
+ defined and set to the version of the currently loading module. With the
+ above example, :envvar:`MODULES_FAMILY_BAR_VERSION
+ <MODULES_FAMILY_\<NAME\>_VERSION>` will be set to the ``1.0`` value. This
+ variable is set to an empty string if loading module has no version. For
+ compatibility, the :envvar:`LMOD_FAMILY_\<NAME\>_VERSION` environment
+ variable is also defined and set to the same value.
+
  *name* should be a non-empty string only containing characters that could be
  part of an environment variable name (i.e., *[a-zA-Z0-9_]*).
 
@@ -315,6 +323,11 @@ the *modulefile* is being loaded.
        An attempt to unload module defining same family is made if
        :mconfig:`conflict_unload` and :mconfig:`auto_handling` configuration
        options are enabled
+
+    .. versionchanged:: 5.8
+       :envvar:`MODULES_FAMILY_\<NAME\>_VERSION` and
+       :envvar:`LMOD_FAMILY_\<NAME\>_VERSION` environment variables are
+       defined
 
 .. mfcmd:: getenv [--return-value] variable [value]
 
@@ -2518,8 +2531,11 @@ whereas the Lmod implementation also aborts *unload* and *display*
 evaluations.
 
 When processing a :mfcmd:`family` command, the :envvar:`LMOD_FAMILY_\<NAME\>`
-environment variable is also defined to be compatible with modulefiles or
-scripts relying on such variable.
+and :envvar:`LMOD_FAMILY_\<NAME\>_VERSION` environment variables are also
+defined to be compatible with modulefiles or scripts relying on such
+variables. When loading module has no version,
+:envvar:`LMOD_FAMILY_\<NAME\>_VERSION` is set to an empty string on Modules
+whereas it is set to the ``false`` string on Lmod.
 
 When unloading a modulefile, the :mfcmd:`pushenv` command does not update the
 value of the environment variable if this modulefile was not defining the
