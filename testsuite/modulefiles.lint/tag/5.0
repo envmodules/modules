@@ -1,1 +1,2 @@
 #%Module
+module-warn --regexp --message {text} {-old$}

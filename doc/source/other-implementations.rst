@@ -147,6 +147,9 @@ implementation.
      - :ref:`Change modulefile command behavior`
    * - `NAG file`_
      - :mfcmd:`module-forbid`, :mfcmd:`module-warn` modulefile commands
+   * - ``module-forbid-regex``, ``module-hide-regex`` modulefile commands
+     - ``--regexp`` option of :mfcmd:`module-forbid` and :mfcmd:`module-hide`
+       modulefile commands
    * - Lmod + `XALT`_
      - :ref:`Logging activity`
    * - `Hook functions`_

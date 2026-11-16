@@ -1303,6 +1303,10 @@ The following modulefile Tcl commands appeared on Modules 5.
    environment.
  * options ``--user`` and ``--group`` are added.
 
+ Starting with version ``5.8``, the ``--regexp`` option is added to designate
+ the modules these commands apply to with a regular expression. This option
+ is also added to :mfcmd:`module-warn`.
+
 :mfcmd:`break`
 
  Starting with version 5.4, a modulefile using :mfcmd:`break` may be unloaded

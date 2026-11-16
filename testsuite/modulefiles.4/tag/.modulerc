@@ -158,5 +158,70 @@ if {[info exists env(TESTSUITE_FPMOD_TAG)]} {
             module-tag super-sticky [file dirname $ModulesCurrentModulefile]
             module-virtual tag/1.1 ./1.0
         }
+        regexp1 {
+            module-hide --regexp {^tag/2\.}
+        }
+        regexp2 {
+            module-hide --hard --regexp {/2\.1$}
+        }
+        regexp3 {
+            module-hide --regexp {2\.0} --hidden-loaded
+        }
+        regexp4 {
+            module-forbid --message my-forbid-msg {^tag/2} --regexp {^tag/1\.0$} {-unk$}
+        }
+        regexp5 {
+            set tomorrow [clock format [expr {[clock seconds]+86400}] -format %Y-%m-%d]
+            module-forbid --nearly-message my-nearly-forbid-msg --after $tomorrow\
+                --regexp {^tag/2}
+        }
+        regexp6 {
+            module-tag --regexp foo {^TAG/1} {-unk$}
+            module-tag bar {\.[01]$} {^tag} --regexp
+            module-tag foo --regexp {/2\.1}
+        }
+        regexp7 {
+            module-warn --regexp {-unk$} {^tag/[12]\.0$} --message my-warn-msg
+        }
+        regexp8 {
+            module-hide --regexp {tag/(2}
+        }
+        regexp9 {
+            module-forbid --regexp
+        }
+        regexp10 {
+            module-tag --regexp {tag/2}
+        }
+        regexp11 {
+            module-tag sticky --regexp {^tag/}
+        }
+        regexp12 {
+            module-hide --soft --regexp {^tag/2}
+            module-hide --regexp {^tag/2\.1}
+            module-hide --hard tag/2.1
+        }
+        regexp13 {
+            module-hide --regexp {^tag/2} --user unknownuser
+            module-tag foo --not-group unknowngroup --regexp {^tag/1}
+        }
+        regexp14 {
+            module-forbid --message my-forbid-msg1 --regexp {^tag/2}
+            module-forbid --message my-forbid-msg2 --regexp {^tag/2\.0}
+            module-forbid --message my-forbid-msg3 tag/2.1
+        }
+        regexp15 {
+            module-hide --regexp {-?2\.0$}
+        }
+        regexp16 {
+            module-hide --regexp --sotf {^tag/2}
+        }
+        regexp17 {
+            module-hide --hard {^tag/2} --regexp --user unknownuser {tag/(1}
+        }
+        regexp18 {
+            module-hide --regexp {^TAG/2\.0}
+            module-forbid --regexp {^TAG/2\.1} --message my-forbid-msg
+            module-warn --regexp {^TAG/1\.0$} --message my-warn-msg
+        }
     }
 }

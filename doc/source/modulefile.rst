@@ -647,6 +647,7 @@ the *modulefile* is being loaded.
  * ``--group {group...}``
  * ``--message {text message}``
  * ``--nearly-message {text message}``
+ * ``--regexp``
 
  If ``--after`` option is set, forbidding is only effective after specified
  date time. Following the same principle, if ``--before`` option is set,
@@ -695,6 +696,10 @@ the *modulefile* is being loaded.
  ``nearly-forbidden`` tag applied to them. See :ref:`Module tags` section in
  :ref:`module(1)`.
 
+ If ``--regexp`` option is set, each *modulefile* argument is a regular
+ expression and forbidding applies to the modules whose name and version match
+ it. See `Regular expression module selection`_ section below.
+
  The parameter *modulefile* may leverage a specific syntax to finely select
  module version (see `Advanced module version specifiers`_ section below). It
  may also be a full path file name to precisely designate one module in a
@@ -709,6 +714,9 @@ the *modulefile* is being loaded.
 
     .. versionchanged:: 5.4
        Options ``--user`` and ``--group`` added
+
+    .. versionchanged:: 5.8
+       Option ``--regexp`` added
 
 .. mfcmd:: module-help string
 
@@ -738,6 +746,7 @@ the *modulefile* is being loaded.
 
  * ``--soft|--hard``
  * ``--hidden-loaded``
+ * ``--regexp``
  * ``--after datetime``
  * ``--before datetime``
  * ``--not-user {user...}``
@@ -815,6 +824,10 @@ the *modulefile* is being loaded.
  reported on :subcmd:`avail` or :subcmd:`spider` sub-commands context. See
  :ref:`Module tags` section in :ref:`module(1)`.
 
+ If ``--regexp`` option is set, each *modulefile* argument is a regular
+ expression and hiding applies to the modules whose name and version match it.
+ See `Regular expression module selection`_ section below.
+
  The parameter *modulefile* may also be a symbolic modulefile name or a
  modulefile alias. It may also leverage a specific syntax to finely select
  module version (see `Advanced module version specifiers`_ section below).
@@ -833,6 +846,9 @@ the *modulefile* is being loaded.
 
     .. versionchanged:: 5.4
        Options ``--user`` and ``--group`` added
+
+    .. versionchanged:: 5.8
+       Option ``--regexp`` added
 
 .. mfcmd:: module-info option [info-args]
 
@@ -1054,6 +1070,7 @@ the *modulefile* is being loaded.
  * ``--not-group {group...}``
  * ``--user {user...}``
  * ``--group {group...}``
+ * ``--regexp``
 
  If ``--not-user`` option is set, the tag is not applied if the username of
  the user currently running :file:`modulecmd.tcl` is part of the list of
@@ -1071,6 +1088,10 @@ the *modulefile* is being loaded.
  and ``--not-user`` options, ``--user`` prevails over ``--not-user``. If the
  same group name is set on both ``--group`` and ``--not-group``, ``--group``
  prevails over ``--not-group``.
+
+ If ``--regexp`` option is set, each *modulefile* argument is a regular
+ expression and *tag* is applied to the modules whose name and version match
+ it. See `Regular expression module selection`_ section below.
 
  The parameter *modulefile* may also be a symbolic modulefile name or a
  modulefile alias. It may also leverage a specific syntax to finely select
@@ -1102,6 +1123,9 @@ the *modulefile* is being loaded.
 
     .. versionchanged:: 5.4
        Options ``--user`` and ``--group`` added
+
+    .. versionchanged:: 5.8
+       Option ``--regexp`` added
 
 .. mfcmd:: module-version modulefile version-name...
 
@@ -1155,6 +1179,7 @@ the *modulefile* is being loaded.
  * ``--not-group {group...}``
  * ``--user {user...}``
  * ``--group {group...}``
+ * ``--regexp``
 
  If ``--after`` option is set, warning is only effective after specified date
  time. Following the same principle, if ``--before`` option is set, warning is
@@ -1184,6 +1209,10 @@ the *modulefile* is being loaded.
  or :subcmd:`spider` sub-commands are reported with a ``warning`` tag applied
  to them. See :ref:`Module tags` section in :ref:`module(1)`.
 
+ If ``--regexp`` option is set, each *modulefile* argument is a regular
+ expression and warning applies to the modules whose name and version match
+ it. See `Regular expression module selection`_ section below.
+
  The parameter *modulefile* may leverage a specific syntax to finely select
  module version (see `Advanced module version specifiers`_ section below). It
  may also be a full path file name to precisely designate one module in a
@@ -1192,6 +1221,9 @@ the *modulefile* is being loaded.
  .. only:: html or latex
 
     .. versionadded:: 5.6
+
+    .. versionchanged:: 5.8
+       Option ``--regexp`` added
 
 .. mfcmd:: module-whatis string
 
@@ -2328,6 +2360,66 @@ a valid variant name (e.g., *name+*, *name++*, *name/version+1*).
    .. versionchanged:: 5.5
       ``+`` and ``~`` characters are allowed in module name or version if not
       followed by a valid variant name
+
+.. _Regular expression module selection:
+
+Regular expression module selection
+-----------------------------------
+
+The :mfcmd:`module-forbid`, :mfcmd:`module-hide`, :mfcmd:`module-tag` and
+:mfcmd:`module-warn` modulefile commands accept a ``--regexp`` option to
+designate the modules they apply to with regular expressions instead of
+module specifications. It helps to target with a single statement modules
+that do not share the same name or the same version prefix.
+
+.. code-block:: text
+
+    # hide all debug builds
+    module-hide --regexp {-debug$}
+    # forbid version 1 of several software
+    module-forbid --regexp {^(foo|bar)/1\.}
+
+When ``--regexp`` option is set, all the *modulefile* arguments of the
+command are regular expressions, wherever the option is placed on the command
+line. Each of them is a Tcl regular expression (see :manpage:`re_syntax(n)`)
+matched against the name and version of modules (e.g., ``foo/1.2``), whatever
+their variants. As for any regular expression, a match is found if it matches
+any part of this string. Use the ``^`` and ``$`` anchors to match from the
+start or up to the end of the module name and version. It is advised to
+enclose regular expressions in curly-braces to protect their special
+characters from Tcl interpretation.
+
+A regular expression may start with a ``-`` character. As a consequence, when
+``--regexp`` option is set, an argument starting with ``-`` that does not
+correspond to an option of the command is considered a regular expression
+rather than reported as an invalid option.
+
+Match is case sensitive unless if the :mconfig:`icase` configuration option
+enables case insensitive match in the current context.
+
+Symbolic versions and module aliases are not resolved: regular expressions
+are matched against the name and version of the evaluated modulefile. A
+symbolic version or a module alias is hidden by :mfcmd:`module-hide` if its
+own name matches.
+
+When several statements match a module:
+
+* the strongest hiding level among the matching :mfcmd:`module-hide`
+  statements is retained, like for regular module specifications;
+* properties of a tag (like the message of :mfcmd:`module-forbid` or
+  :mfcmd:`module-warn`) are those of the statement set with a matching
+  module specification if any, otherwise those of the first evaluated
+  statement set with a matching regular expression.
+
+A ``sticky`` or ``super-sticky`` tag applied through a regular expression is
+only satisfied by the reload of the same module, not by the load of another
+module matching this regular expression.
+
+An error is raised if an argument is not a valid regular expression.
+
+.. only:: html or latex
+
+   .. versionadded:: 5.8
 
 .. _Dependencies between modulefiles:
 

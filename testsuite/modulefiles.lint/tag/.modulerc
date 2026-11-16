@@ -11,3 +11,7 @@ if {[info exists env(TESTSUITE_LINT_TAGERR)]} {
     module-tag --before 2020-11-01 foo tag/5.0
     module-tag --after 2020-11-01 foo tag/5.0
 }
+module-tag bar --regexp {^tag/5}
+module-forbid --regexp {^tag/6} {-old$}
+module-warn --regexp --message {text} {-old$} --user foo
+module-hide {-old$} --regexp --hard
