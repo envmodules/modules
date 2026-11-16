@@ -158,9 +158,11 @@ set ans [list]
 lappend ans [list set LMOD_FAMILY_FOO provide]
 lappend ans [list set __MODULES_LMALTNAME provide/1&al|foo]
 lappend ans [list set __MODULES_LMCONFLICT provide/1&foo]
+lappend ans [list set LMOD_FAMILY_FOO_VERSION 1]
 lappend ans [list set MODULES_FAMILY_FOO provide]
 lappend ans [list set _LMFILES_ $mp/provide/1]
 lappend ans [list set LOADEDMODULES provide/1]
+lappend ans [list set MODULES_FAMILY_FOO_VERSION 1]
 testouterr_cmd bash {load provide/1} $ans {}
 
 setenv_var TESTSUITE_PROVIDE duplicate_with_family2
@@ -317,6 +319,8 @@ setenv_var __MODULES_LMALTNAME bar/1&al|foo
 setenv_var __MODULES_LMCONFLICT bar/1&foo
 setenv_var MODULES_FAMILY_FOO bar
 setenv_var LMOD_FAMILY_FOO bar
+setenv_var MODULES_FAMILY_FOO_VERSION 1
+setenv_var LMOD_FAMILY_FOO_VERSION 1
 
 set tserr [msg_load provide/1 [err_conflict bar/1]]
 testouterr_cmd bash {load provide/1} ERR $tserr
@@ -326,6 +330,8 @@ unsetenv_var __MODULES_LMALTNAME
 unsetenv_var __MODULES_LMCONFLICT
 unsetenv_var MODULES_FAMILY_FOO
 unsetenv_var LMOD_FAMILY_FOO
+unsetenv_var MODULES_FAMILY_FOO_VERSION
+unsetenv_var LMOD_FAMILY_FOO_VERSION
 
 
 setenv_var TESTSUITE_PROVIDE duplicate_with_ext_same_alias
@@ -577,6 +583,8 @@ setenv_var __MODULES_LMALTNAME bar/1&al|foo
 setenv_var __MODULES_LMCONFLICT bar/1&foo
 setenv_var MODULES_FAMILY_FOO bar
 setenv_var LMOD_FAMILY_FOO bar
+setenv_var MODULES_FAMILY_FOO_VERSION 1
+setenv_var LMOD_FAMILY_FOO_VERSION 1
 
 set ans [list]
 lappend ans [list set __MODULES_LMPREREQ reqa/1&foo]
@@ -589,6 +597,8 @@ unsetenv_var __MODULES_LMALTNAME
 unsetenv_var __MODULES_LMCONFLICT
 unsetenv_var MODULES_FAMILY_FOO
 unsetenv_var LMOD_FAMILY_FOO
+unsetenv_var MODULES_FAMILY_FOO_VERSION
+unsetenv_var LMOD_FAMILY_FOO_VERSION
 
 
 setenv_var TESTSUITE_PROVIDE duplicate_with_ext_same_alias

@@ -60,6 +60,11 @@ Modules 5.8.0 (not yet released)
   stay last, whatever the modulefiles loaded afterward. Priority of elements
   is recorded in the :envvar:`__MODULES_PRIORITY_\<VAR\>` environment
   variable. (fix issue #185)
+* Define the :envvar:`MODULES_FAMILY_\<NAME\>_VERSION` environment variable
+  when processing the :mfcmd:`family` modulefile command, to get the version
+  of the module providing a family in addition to its name. For compatibility
+  with Lmod, the :envvar:`LMOD_FAMILY_\<NAME\>_VERSION` environment variable
+  is also defined and set to the same value.
 
 
 .. _5.7 release notes:

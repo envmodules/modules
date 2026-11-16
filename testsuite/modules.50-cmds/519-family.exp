@@ -44,9 +44,11 @@ set ans [list]
 lappend ans [list set LMOD_FAMILY_FAM $modname]
 lappend ans [list set __MODULES_LMALTNAME $mod&al|fam]
 lappend ans [list set __MODULES_LMCONFLICT $mod&fam]
+lappend ans [list set LMOD_FAMILY_FAM_VERSION 1.8]
 lappend ans [list set MODULES_FAMILY_FAM $modname]
 lappend ans [list set _LMFILES_ $modfile]
 lappend ans [list set LOADEDMODULES $mod]
+lappend ans [list set MODULES_FAMILY_FAM_VERSION 1.8]
 testouterr_cmd sh "load $mod" $ans {}
 
 set tserr $err_path'fam'
@@ -60,14 +62,18 @@ setenv_path_var __MODULES_LMALTNAME $mod&al|fam
 setenv_path_var __MODULES_LMCONFLICT $mod&fam
 setenv_var LMOD_FAMILY_FAM $mod
 setenv_var MODULES_FAMILY_FAM $mod
+setenv_var LMOD_FAMILY_FAM_VERSION 1.8
+setenv_var MODULES_FAMILY_FAM_VERSION 1.8
 
 set ans [list]
 lappend ans [list unset LMOD_FAMILY_FAM]
 lappend ans [list unset __MODULES_LMALTNAME]
 lappend ans [list unset __MODULES_LMCONFLICT]
+lappend ans [list unset LMOD_FAMILY_FAM_VERSION]
 lappend ans [list unset MODULES_FAMILY_FAM]
 lappend ans [list unset _LMFILES_]
 lappend ans [list unset LOADEDMODULES]
+lappend ans [list unset MODULES_FAMILY_FAM_VERSION]
 testouterr_cmd sh "unload $mod" $ans {}
 testouterr_cmd sh "unload fam" $ans {}
 
@@ -79,15 +85,19 @@ unsetenv_path_var __MODULES_LMALTNAME
 unsetenv_path_var __MODULES_LMCONFLICT
 unsetenv_var LMOD_FAMILY_FAM
 unsetenv_var MODULES_FAMILY_FAM
+unsetenv_var LMOD_FAMILY_FAM_VERSION
+unsetenv_var MODULES_FAMILY_FAM_VERSION
 
 # test flat module name
 set ans [list]
 lappend ans [list set LMOD_FAMILY_FAM $flatmod]
 lappend ans [list set __MODULES_LMALTNAME $flatmod&al|fam]
 lappend ans [list set __MODULES_LMCONFLICT $flatmod&fam]
+lappend ans [list set LMOD_FAMILY_FAM_VERSION {}]
 lappend ans [list set MODULES_FAMILY_FAM $flatmod]
 lappend ans [list set _LMFILES_ $flatmodfile]
 lappend ans [list set LOADEDMODULES $flatmod]
+lappend ans [list set MODULES_FAMILY_FAM_VERSION {}]
 testouterr_cmd sh "load $flatmod" $ans {}
 
 setenv_loaded_module [list $flatmod] [list $flatmodfile]
@@ -95,14 +105,18 @@ setenv_path_var __MODULES_LMALTNAME $flatmod&al|fam
 setenv_path_var __MODULES_LMCONFLICT $flatmod&fam
 setenv_var LMOD_FAMILY_FAM $flatmod
 setenv_var MODULES_FAMILY_FAM $flatmod
+setenv_var LMOD_FAMILY_FAM_VERSION {}
+setenv_var MODULES_FAMILY_FAM_VERSION {}
 
 set ans [list]
 lappend ans [list unset LMOD_FAMILY_FAM]
 lappend ans [list unset __MODULES_LMALTNAME]
 lappend ans [list unset __MODULES_LMCONFLICT]
+lappend ans [list unset LMOD_FAMILY_FAM_VERSION]
 lappend ans [list unset MODULES_FAMILY_FAM]
 lappend ans [list unset _LMFILES_]
 lappend ans [list unset LOADEDMODULES]
+lappend ans [list unset MODULES_FAMILY_FAM_VERSION]
 testouterr_cmd sh "unload $flatmod" $ans {}
 testouterr_cmd sh "unload fam" $ans {}
 
@@ -111,15 +125,19 @@ unsetenv_path_var __MODULES_LMALTNAME
 unsetenv_path_var __MODULES_LMCONFLICT
 unsetenv_var LMOD_FAMILY_FAM
 unsetenv_var MODULES_FAMILY_FAM
+unsetenv_var LMOD_FAMILY_FAM_VERSION
+unsetenv_var MODULES_FAMILY_FAM_VERSION
 
 # test deep module name
 set ans [list]
 lappend ans [list set LMOD_FAMILY_FAM $deepmodname]
 lappend ans [list set __MODULES_LMALTNAME $deepmod&al|fam]
 lappend ans [list set __MODULES_LMCONFLICT $deepmod&fam]
+lappend ans [list set LMOD_FAMILY_FAM_VERSION 1.9]
 lappend ans [list set MODULES_FAMILY_FAM $deepmodname]
 lappend ans [list set _LMFILES_ $deepmodfile]
 lappend ans [list set LOADEDMODULES $deepmod]
+lappend ans [list set MODULES_FAMILY_FAM_VERSION 1.9]
 testouterr_cmd sh "load $deepmod" $ans {}
 
 setenv_loaded_module [list $deepmod] [list $deepmodfile]
@@ -127,14 +145,18 @@ setenv_path_var __MODULES_LMALTNAME $deepmod&al|fam
 setenv_path_var __MODULES_LMCONFLICT $deepmod&fam
 setenv_var LMOD_FAMILY_FAM $deepmod
 setenv_var MODULES_FAMILY_FAM $deepmod
+setenv_var LMOD_FAMILY_FAM_VERSION 1.9
+setenv_var MODULES_FAMILY_FAM_VERSION 1.9
 
 set ans [list]
 lappend ans [list unset LMOD_FAMILY_FAM]
 lappend ans [list unset __MODULES_LMALTNAME]
 lappend ans [list unset __MODULES_LMCONFLICT]
+lappend ans [list unset LMOD_FAMILY_FAM_VERSION]
 lappend ans [list unset MODULES_FAMILY_FAM]
 lappend ans [list unset _LMFILES_]
 lappend ans [list unset LOADEDMODULES]
+lappend ans [list unset MODULES_FAMILY_FAM_VERSION]
 testouterr_cmd sh "unload $deepmod" $ans {}
 testouterr_cmd sh "unload fam" $ans {}
 
@@ -143,6 +165,8 @@ unsetenv_path_var __MODULES_LMALTNAME
 unsetenv_path_var __MODULES_LMCONFLICT
 unsetenv_var LMOD_FAMILY_FAM
 unsetenv_var MODULES_FAMILY_FAM
+unsetenv_var LMOD_FAMILY_FAM_VERSION
+unsetenv_var MODULES_FAMILY_FAM_VERSION
 
 # whatis
 set tserr "$modlin $mpre $modlin

@@ -2202,10 +2202,13 @@ proc family {name} {
    lassign [getModuleNameVersion] mod modname modversion
    if {$modname eq {.}} {
       set modname [currentState modulename]
+      set modversion {}
    }
    setenv MODULES_FAMILY_$upname $modname
-   # also set Lmod-specific variable for compatibility
+   setenv MODULES_FAMILY_${upname}_VERSION $modversion
+   # also set Lmod-specific variables for compatibility
    setenv LMOD_FAMILY_$upname $modname
+   setenv LMOD_FAMILY_${upname}_VERSION $modversion
 }
 
 proc family-un {name} {
@@ -2217,7 +2220,9 @@ proc family-un {name} {
    # unset family-related environment variable
    set upname [string toupper $name]
    unsetenv MODULES_FAMILY_$upname
+   unsetenv MODULES_FAMILY_${upname}_VERSION
    unsetenv LMOD_FAMILY_$upname
+   unsetenv LMOD_FAMILY_${upname}_VERSION
 }
 
 proc complete {shell name body} {

@@ -87,9 +87,11 @@ setenv_var __MODULES_LMALTNAME foo/1.0&al|conun
 
 setenv_var TESTSUITE_CONFLICT_UNLOAD family1
 set ans [list]
+lappend ans [list set LMOD_FAMILY_CONUN_VERSION 1]
 lappend ans [list set MODULES_FAMILY_CONUN conun]
 lappend ans [list set __MODULES_LMCONFLICT conun/1&conun]
 lappend ans [list set __MODULES_LMALTNAME conun/1&al|conun]
+lappend ans [list set MODULES_FAMILY_CONUN_VERSION 1]
 lappend ans [list set _LMFILES_ $mp/conun/1]
 lappend ans [list set LOADEDMODULES conun/1]
 lappend ans [list set LMOD_FAMILY_CONUN conun]
@@ -104,15 +106,19 @@ setenv_var __MODULES_LMALTNAME foo/2.0&al|foo:conun/2&al|conun
 setenv_var TESTSUITE_CONFLICT_UNLOAD family_dep1
 set ans [list]
 lappend ans [list set LMOD_FAMILY_FOO foo]
-lappend ans [list set MODULES_FAMILY_CONUN conun]
-lappend ans [list set __MODULES_LMCONFLICT foo/1.0&foo:conun/1&conun]
-lappend ans [list set MODULES_FAMILY_FOO foo]
-lappend ans [list set __MODULES_LMALTNAME foo/1.0&al|foo:conun/1&al|conun]
-lappend ans [list set __MODULES_LMPREREQ conun/1&foo/1.0]
-lappend ans [list set _LMFILES_ $mp/foo/1.0:$mp/conun/1]
+lappend ans [list set MODULES_FAMILY_CONUN_VERSION 1]
 lappend ans [list set LOADEDMODULES foo/1.0:conun/1]
+lappend ans [list set _LMFILES_ $mp/foo/1.0:$mp/conun/1]
 lappend ans [list set __MODULES_LMTAG foo/1.0&auto-loaded]
+lappend ans [list set MODULES_FAMILY_FOO foo]
+lappend ans [list set LMOD_FAMILY_FOO_VERSION 1.0]
+lappend ans [list set __MODULES_LMPREREQ conun/1&foo/1.0]
 lappend ans [list set LMOD_FAMILY_CONUN conun]
+lappend ans [list set __MODULES_LMALTNAME foo/1.0&al|foo:conun/1&al|conun]
+lappend ans [list set __MODULES_LMCONFLICT foo/1.0&foo:conun/1&conun]
+lappend ans [list set MODULES_FAMILY_FOO_VERSION 1.0]
+lappend ans [list set MODULES_FAMILY_CONUN conun]
+lappend ans [list set LMOD_FAMILY_CONUN_VERSION 1]
 set tserr [msg_top_load_conun conun/1 {} {conun/2 foo/2.0} {} {foo/1.0} {} {}]
 testouterr_cmd bash {load conun/1} $ans $tserr
 
@@ -951,9 +957,11 @@ setenv_var TESTSUITE_CONFLICT_UNLOAD setenv_before_family1
 setenv_var MODULES_FAMILY_CONUN foo
 setenv_var __MODULES_LMALTNAME foo/1.0&al|conun
 set ans [list]
+lappend ans [list set LMOD_FAMILY_CONUN_VERSION 1]
 lappend ans [list set MODULES_FAMILY_CONUN conun]
 lappend ans [list set __MODULES_LMCONFLICT conun/1&conun]
 lappend ans [list set __MODULES_LMALTNAME conun/1&al|conun]
+lappend ans [list set MODULES_FAMILY_CONUN_VERSION 1]
 lappend ans [list set _LMFILES_ $mp/conun/1]
 lappend ans [list set LOADEDMODULES conun/1]
 lappend ans [list unset TSCONUN]
