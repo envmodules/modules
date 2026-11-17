@@ -859,8 +859,12 @@ proc resetInterpState {itrp fresh dumpVarsVN dumpArrayVarsVN untrackVarsVN\
       reportDebug "saving for $itrp command list $dumpCommands"
    # if current interpreter command list does not match initial list it
    # means that at least one command has been altered so we need to recreate
-   # interpreter to guaranty proper functioning
-   } elseif {$dumpCommands ne [$itrp eval {info commands}]} {
+   # interpreter to guaranty proper functioning. commands are returned in an
+   # unspecified order that may change when some are deleted then defined
+   # again, so lists are sorted when they differ to only detect a change in
+   # their content
+   } elseif {$dumpCommands ne [set cmd_list [$itrp eval {info commands}]]\
+      && [lsort $dumpCommands] ne [lsort $cmd_list]} {
       reportDebug "missing command(s), recreating interp $itrp"
       interp delete $itrp
       createInterp $itrp
