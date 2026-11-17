@@ -49,8 +49,8 @@ if {[lsearch -exact $auto_path $env(TESTSUITEDIR)] > -1} {
 }
 
 # test if specific or overridden interpreter alias command have spread here
-set existing_proc [lindex [info procs] 0]
-# test if first proc defined has been altered
+set existing_proc auto_load_index
+# test if a pre-existing proc has been altered
 if {[info procs $existing_proc] ne $existing_proc} {
     puts stderr "procedure $existing_proc does not exist"
 # env variable spread across interpretation and even between interpreters
