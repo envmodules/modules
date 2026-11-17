@@ -123,6 +123,10 @@ When ``--regexp`` option is set, all the module arguments of the command are
 regular expressions. See the :ref:`Regular expression module selection`
 section for details.
 
+The :mfcmd:`module-hide-regex` and :mfcmd:`module-forbid-regex` commands are
+also introduced as aliases of :mfcmd:`module-hide` and :mfcmd:`module-forbid`
+with ``--regexp`` option set.
+
 
 v5.7
 ----

@@ -37,5 +37,30 @@ if {[info exists env(TESTSUITE_HIDE)]} {
         hide_version4 {
             hide-version hid
         }
+        hide_regex_bad1 {
+            module-hide-regex
+        }
+        hide_regex_bad2 {
+            module-hide-regex {hide/(1}
+        }
+        hide_regex1 {
+            module-hide-regex {^hide/1$}
+        }
+        hide_regex2 {
+            module-hide-regex --hard {-unk$} {^HIDE/2}
+        }
+        hide_regex3 {
+            module-hide-regex {^hide/} --user unknownuser
+        }
+        forbid_regex_bad1 {
+            module-forbid-regex --message my-forbid-msg
+        }
+        forbid_regex1 {
+            module-forbid-regex {-unk$} --message my-forbid-msg {^hide/2}
+        }
+        forbid_regex2 {
+            set tomorrow [clock format [expr {[clock seconds]+86400}] -format %Y-%m-%d]
+            module-forbid-regex --after $tomorrow {^hide/1}
+        }
     }
 }

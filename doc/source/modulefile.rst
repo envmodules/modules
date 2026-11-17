@@ -718,6 +718,17 @@ the *modulefile* is being loaded.
     .. versionchanged:: 5.8
        Option ``--regexp`` added
 
+.. mfcmd:: module-forbid-regex [options] pattern...
+
+ Alias of :mfcmd:`module-forbid --regexp<module-forbid>` command: forbid use
+ of the modules whose name and version match one of the *pattern* regular
+ expressions. All the options of :mfcmd:`module-forbid` are accepted. See
+ `Regular expression module selection`_ section below.
+
+ .. only:: html or latex
+
+    .. versionadded:: 5.8
+
 .. mfcmd:: module-help string
 
  Defines a string which is displayed in case of the invocation of the
@@ -849,6 +860,17 @@ the *modulefile* is being loaded.
 
     .. versionchanged:: 5.8
        Option ``--regexp`` added
+
+.. mfcmd:: module-hide-regex [options] pattern...
+
+ Alias of :mfcmd:`module-hide --regexp<module-hide>` command: hide the
+ modules whose name and version match one of the *pattern* regular
+ expressions. All the options of :mfcmd:`module-hide` are accepted. See
+ `Regular expression module selection`_ section below.
+
+ .. only:: html or latex
+
+    .. versionadded:: 5.8
 
 .. mfcmd:: module-info option [info-args]
 
@@ -1994,7 +2016,8 @@ for each interpretation context.
 | and standard Tcl commands | :mfcmd:`hide-version`, :mfcmd:`is-loaded`,          |
 |                           | :mfcmd:`is-used`, :mfcmd:`lsb-release`,             |
 |                           | :mfcmd:`module-alias`, :mfcmd:`module-forbid`,      |
-|                           | :mfcmd:`module-hide`, :mfcmd:`module-info`,         |
+|                           | :mfcmd:`module-forbid-regex`, :mfcmd:`module-hide`, |
+|                           | :mfcmd:`module-hide-regex`, :mfcmd:`module-info`,   |
 |                           | :mfcmd:`module-tag`, :mfcmd:`module-version`,       |
 |                           | :mfcmd:`module-virtual`, :mfcmd:`module-warn`,      |
 |                           | :mfcmd:`modulepath-ignore`,                         |
@@ -2417,6 +2440,10 @@ module matching this regular expression.
 
 An error is raised if an argument is not a valid regular expression.
 
+The :mfcmd:`module-forbid-regex` and :mfcmd:`module-hide-regex` commands are
+respectively equivalent to :mfcmd:`module-forbid` and :mfcmd:`module-hide`
+with ``--regexp`` option set.
+
 .. only:: html or latex
 
    .. versionadded:: 5.8
@@ -2606,6 +2633,13 @@ user to determine whether :envvar:`MODULEPATH` is updated.
 The :mfcmd:`break` command does not accept any argument. A ``msg`` argument
 can be set on Lmod to provide a customized break error message.
 
+The arguments of the :mfcmd:`module-forbid-regex` and
+:mfcmd:`module-hide-regex` commands are Tcl regular expressions on Modules
+whereas they are Lua patterns on Lmod. Simple expressions have the same
+meaning on both tools (e.g., ``^foo/2`` or ``foo/.*``). Others have to be
+adapted, like special characters that are escaped with ``%`` on Lmod and with
+``\`` on Modules (e.g., ``foo%-app`` should be written ``foo\-app``).
+
 The :mfcmd:`setenv`, :mfcmd:`unsetenv`, :mfcmd:`prepend-path`,
 :mfcmd:`append-path`, :mfcmd:`remove-path`, :mfcmd:`pushenv` and ``module``
 :mfcmd:`load<module>`, :mfcmd:`load-any<module>`, :mfcmd:`try-load<module>`
@@ -2675,6 +2709,10 @@ the dependent module will get automatically reloaded.
    .. versionchanged:: 5.6
       Modulefile commands :mfcmd:`add-property`, :mfcmd:`depends-on-any` and
       :mfcmd:`haveDynamicMPATH` implemented
+
+   .. versionchanged:: 5.8
+      Modulefile commands :mfcmd:`module-forbid-regex` and
+      :mfcmd:`module-hide-regex` implemented
 
 .. _Shell support:
 

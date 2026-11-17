@@ -1187,7 +1187,8 @@ The following modulefile Tcl commands appeared on Modules 5.
 | 5.7        | :mfcmd:`modulepath-ignore`                                      |
 +------------+-----------------------------------------------------------------+
 | 5.8        | :mfcmd:`module-info modulename<module-info>`,                   |
-|            | :mfcmd:`module-info moduleversion<module-info>`                 |
+|            | :mfcmd:`module-info moduleversion<module-info>`,                |
+|            | :mfcmd:`module-forbid-regex`, :mfcmd:`module-hide-regex`        |
 +------------+-----------------------------------------------------------------+
 
 :mfcmd:`system`, :mfcmd:`is-used`

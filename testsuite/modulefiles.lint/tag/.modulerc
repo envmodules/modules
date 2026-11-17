@@ -15,3 +15,5 @@ module-tag bar --regexp {^tag/5}
 module-forbid --regexp {^tag/6} {-old$}
 module-warn --regexp --message {text} {-old$} --user foo
 module-hide {-old$} --regexp --hard
+module-hide-regex --soft {-old$} {^tag/7}
+module-forbid-regex {^tag/7} --message {text} {-old$}

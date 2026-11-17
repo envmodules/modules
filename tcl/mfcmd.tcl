@@ -549,6 +549,14 @@ proc hide-modulefile {modfile} {
    module-hide $modfile
 }
 
+proc module-hide-regex {args} {
+   module-hide --regexp {*}$args
+}
+
+proc module-forbid-regex {args} {
+   module-forbid --regexp {*}$args
+}
+
 proc module-tag {args} {
    # parse application criteria arguments to determine if command apply
    lassign [parseApplicationCriteriaArgs 0 0 {*}$args] apply isnearly after\

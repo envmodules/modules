@@ -18,7 +18,8 @@ syn keyword modCommand  add-property always-load append-path chdir complete conf
 syn keyword modCommand  depends-on depends-on-any extensions family getenv getvariant
 syn keyword modCommand  haveDynamicMPATH hide-modulefile hide-version is-avail is-loaded
 syn keyword modCommand  is-saved is-used lsb-release module module-alias module-forbid
-syn keyword modCommand  module-help module-hide module-info module-tag module-version
+syn keyword modCommand  module-forbid-regex module-help module-hide module-hide-regex
+syn keyword modCommand  module-info module-tag module-version
 syn keyword modCommand  module-virtual module-warn module-whatis modulepath-ignore modulepath-label
 syn keyword modCommand  prepend-path prereq prereq-all prereq-any provide pushenv
 syn keyword modCommand  remove-path reportError reportWarning require-fullname set-alias

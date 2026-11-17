@@ -69,6 +69,10 @@ Modules 5.8.0 (not yet released)
   :mfcmd:`module-tag` and :mfcmd:`module-warn` modulefile commands to
   designate the modules they apply to with a regular expression matched
   against module name and version.
+* Add :mfcmd:`module-forbid-regex` and :mfcmd:`module-hide-regex` modulerc
+  commands to support modulerc files written for Lmod. They are aliases of
+  :mfcmd:`module-forbid` and :mfcmd:`module-hide` with ``--regexp`` option
+  set.
 
 
 .. _5.7 release notes:

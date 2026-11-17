@@ -161,6 +161,87 @@ testouterr_cmd sh {avail -t hide} OK $tserr
 
 
 #
+# module-hide-regex
+#
+
+setenv_var MODULES_ICASE never
+
+set ans [list]
+lappend ans [list set _LMFILES_ $mp/hide/1]
+lappend ans [list set LOADEDMODULES hide/1]
+lappend ans [list ERR]
+
+setenv_var TESTSUITE_HIDE hide_regex_bad1
+
+set line_num [expr {[cmpversion $tclsh_version 8.6] == -1 ? 2 : 41}]
+set tserr [escre [msg_moderr {No module specified in argument} {module-hide --regexp {*}$args"<EXM>} $mp/hide/.modulerc $line_num {  }]]
+testouterr_cmd_re sh {load hide/1} $ans $tserr
+
+setenv_var TESTSUITE_HIDE hide_regex_bad2
+
+set line_num [expr {[cmpversion $tclsh_version 8.6] == -1 ? 2 : 44}]
+set tserr [escre [msg_moderr {Invalid regular expression 'hide/(1'} {module-hide --regexp {*}$args"<EXM>} $mp/hide/.modulerc $line_num {  }]]
+testouterr_cmd_re sh {load hide/1} $ans $tserr
+
+setenv_var TESTSUITE_HIDE hide_regex1
+
+set tserr "$mp:\nhide/2"
+testouterr_cmd sh {avail -t hide} OK $tserr
+
+set tserr "$mp:\nhide/1 <H>\nhide/2"
+testouterr_cmd sh {avail -t -a hide} OK $tserr
+
+# options of module-hide, regular expression starting with dash character
+setenv_var TESTSUITE_HIDE hide_regex2
+
+set tserr "$mp:\nhide/1\nhide/2"
+testouterr_cmd sh {avail -t -a hide} OK $tserr
+
+setenv_var MODULES_ICASE always
+
+set tserr "$mp:\nhide/1"
+testouterr_cmd sh {avail -t -a hide} OK $tserr
+testouterr_cmd sh {load hide/2} ERR [err_unablelocate hide/2]
+
+setenv_var MODULES_ICASE never
+
+# application criteria not met
+setenv_var TESTSUITE_HIDE hide_regex3
+
+set tserr "$mp:\nhide/1\nhide/2"
+testouterr_cmd sh {avail -t hide} OK $tserr
+
+
+#
+# module-forbid-regex
+#
+
+setenv_var TESTSUITE_HIDE forbid_regex_bad1
+
+set line_num [expr {[cmpversion $tclsh_version 8.6] == -1 ? 2 : 56}]
+set tserr [escre [msg_moderr {No module specified in argument} {module-forbid --regexp {*}$args"<EXM>} $mp/hide/.modulerc $line_num {  }]]
+testouterr_cmd_re sh {load hide/1} $ans $tserr
+
+setenv_var TESTSUITE_HIDE forbid_regex1
+
+testouterr_cmd sh {load hide/2} ERR [err_accessdenied hide/2 my-forbid-msg]
+
+set ans [list]
+lappend ans [list set _LMFILES_ $mp/hide/1]
+lappend ans [list set LOADEDMODULES hide/1]
+testouterr_cmd sh {load hide/1} $ans {}
+
+# nearly forbidden
+setenv_var TESTSUITE_HIDE forbid_regex2
+setenv_var MODULES_NEARLY_FORBIDDEN_DAYS 4
+
+lappend ans [list set __MODULES_LMTAG hide/1&nearly-forbidden]
+set tomorrow [clock format [expr {[clock seconds]+86400}] -format %Y-%m-%d]
+set tserr [msg_load {hide/1 <nF>} [err_accessnearlydenied $tomorrow]]
+testouterr_cmd sh {load hide/1} $ans $tserr
+
+
+#
 #  Cleanup
 #
 
