@@ -31,7 +31,9 @@ is-used
 lsb-release
 module-alias
 module-forbid
+module-forbid-regex
 module-hide
+module-hide-regex
 module-info
 module-tag
 module-version
@@ -53,8 +55,12 @@ set ::syntax(lsb-release) s
 set ::syntax(module-alias) 2
 # module-forbid accepts option at any position
 set ::syntax(module-forbid) {o* x o* x* o*}
+# module-forbid-regex accepts option at any position
+set ::syntax(module-forbid-regex) {o* x o* x* o*}
 # module-hide accepts option at any position
 set ::syntax(module-hide) {o* x o* x* o*}
+# module-hide-regex accepts option at any position
+set ::syntax(module-hide-regex) {o* x o* x* o*}
 set ::syntax(module-info) {s x?}
 set {::syntax(module-info alias)} 1
 set {::syntax(module-info command)} x?
@@ -114,6 +120,16 @@ set {::option(module-forbid --after)} 1
 set {::option(module-forbid --before)} 1
 set {::option(module-forbid --message)} 1
 set {::option(module-forbid --nearly-message)} 1
+set ::option(module-forbid-regex) {--user --group --not-user --not-group\
+   --after --before --message --nearly-message}
+set {::option(module-forbid-regex --user)} 1
+set {::option(module-forbid-regex --group)} 1
+set {::option(module-forbid-regex --not-user)} 1
+set {::option(module-forbid-regex --not-group)} 1
+set {::option(module-forbid-regex --after)} 1
+set {::option(module-forbid-regex --before)} 1
+set {::option(module-forbid-regex --message)} 1
+set {::option(module-forbid-regex --nearly-message)} 1
 set ::option(module-hide) {--user --group --not-user --not-group --after\
    --before --soft --hard --hidden-loaded --regexp}
 set {::option(module-hide --user)} 1
@@ -122,6 +138,14 @@ set {::option(module-hide --not-user)} 1
 set {::option(module-hide --not-group)} 1
 set {::option(module-hide --after)} 1
 set {::option(module-hide --before)} 1
+set ::option(module-hide-regex) {--user --group --not-user --not-group\
+   --after --before --soft --hard --hidden-loaded}
+set {::option(module-hide-regex --user)} 1
+set {::option(module-hide-regex --group)} 1
+set {::option(module-hide-regex --not-user)} 1
+set {::option(module-hide-regex --not-group)} 1
+set {::option(module-hide-regex --after)} 1
+set {::option(module-hide-regex --before)} 1
 set ::option(module-tag) {--user --group --not-user --not-group --regexp}
 set {::option(module-tag --user)} 1
 set {::option(module-tag --group)} 1

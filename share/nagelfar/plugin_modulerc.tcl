@@ -38,16 +38,19 @@ proc statementRaw {stmt info} {
    if {[regexp {^(module-forbid|module-hide|module-tag|module-warn)\s}\
       $stmt]} {
       set res [stripRegexpLeadingDash $stmt]
+   } elseif {[regexp {^(module-forbid-regex|module-hide-regex)\s} $stmt]} {
+      set res [stripRegexpLeadingDash $stmt 1]
    }
    return $res
 }
 
-# when --regexp option is set, module arguments are regular expressions that
-# may start with a dash character. Nagelfar would report them as bad options,
-# so this leading dash is removed unless argument looks like a long option
-proc stripRegexpLeadingDash {stmt} {
+# when --regexp option is set or implied (is_regexp), module arguments are
+# regular expressions that may start with a dash character. Nagelfar would
+# report them as bad options, so this leading dash is removed unless argument
+# looks like a long option
+proc stripRegexpLeadingDash {stmt {is_regexp 0}} {
    set res {}
-   if {[regexp {\s--regexp(\s|$)} $stmt] && [regsub -all\
+   if {($is_regexp || [regexp {\s--regexp(\s|$)} $stmt]) && [regsub -all\
       {(\s[\{"]?)-(?!-[a-z])} $stmt {\1} newstmt]} {
       set res [list replace $newstmt]
    }

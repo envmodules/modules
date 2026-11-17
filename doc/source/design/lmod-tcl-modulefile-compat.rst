@@ -25,6 +25,8 @@ Lmod Tcl modulefile compatibility
   - ``family``
   - ``hide-version``
   - ``hide-modulefile``
+  - ``module-hide-regex``
+  - ``module-forbid-regex``
 
 - See :ref:`Compatibility with Lmod Tcl modulefile` section in
   :ref:`modulefile(5)` man page for the current state of support.
@@ -393,6 +395,39 @@ Lmod Tcl modulefile compatibility
   - the full path name of a modulefile for :mfcmd:`hide-modulefile`
 
 - These two commands are implemented by simply calling :mfcmd:`module-hide`
+
+- These commands are intended for use only within modulerc evaluation context
+  (not within modulefile)
+
+
+``module-hide-regex``/``module-forbid-regex``
+---------------------------------------------
+
+- Hide or forbid the modules whose name and version match a regular
+  expression.
+
+- Accept the same options than :mfcmd:`module-hide` and
+  :mfcmd:`module-forbid` respectively, and one or several regular expressions
+
+- These two commands are implemented by simply calling :mfcmd:`module-hide`
+  or :mfcmd:`module-forbid` with their ``--regexp`` option set
+
+  - No specific code, behavior is the one described for ``--regexp`` option in
+    :ref:`module-tags` design notes
+  - As a consequence, an argument starting with ``-`` that is not a known
+    option is considered a regular expression, which is also the behavior of
+    Lmod for these commands
+
+- Regular expressions are Tcl regular expressions on Modules whereas they are
+  Lua patterns on Lmod
+
+  - No translation is attempted between the two syntaxes
+  - Simple expressions have the same meaning on both tools: literal
+    characters, ``^`` and ``$`` anchors, ``.``, ``*``, ``+``, ``?`` and
+    bracket expressions like ``[Ff]``
+  - Others have to be adapted: Lua escapes special characters with ``%``
+    where Tcl uses ``\``, ``-`` is a quantifier in Lua, ``|`` alternation and
+    ``{}`` bounds do not exist in Lua
 
 - These commands are intended for use only within modulerc evaluation context
   (not within modulefile)
