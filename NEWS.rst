@@ -77,6 +77,12 @@ Modules 5.8.0 (not yet released)
   option is changed with the :subcmd:`config` sub-command from an
   initialization rc file or a sourced modulefile. (fix issue #740 with
   contribution from Achim Gsell)
+* Install: add installation option :instopt:`--enable-like-lmod` that enables
+  all the options making the :command:`module` command behave similarly to
+  Lmod: *abort on error* on :subcmd:`load` and :subcmd:`switch` sub-commands,
+  *conflict unload* and *require via* mechanisms, one module loaded per module
+  name, path entry reordering, *contains* search match and sticky modules kept
+  with a warning on :subcmd:`purge`.
 
 
 .. _5.7 release notes:

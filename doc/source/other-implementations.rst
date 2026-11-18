@@ -225,6 +225,11 @@ implementation.
    * - ``myModuleVersion()``
      - :mfcmd:`module-info moduleversion<module-info>`
 
+Several Modules features that correspond to Lmod behaviors are not enabled by
+default. The :instopt:`--enable-like-lmod` installation option enables all of
+them at once to get a :command:`module` command that behaves similarly to
+Lmod.
+
 .. _Irreversible module actions: https://lmod.readthedocs.io/en/latest/370_irreversible.html
 .. _NAG file: https://lmod.readthedocs.io/en/latest/140_deprecating_modules.html
 .. _Custom labels for avail: https://lmod.readthedocs.io/en/latest/200_avail_custom.html
