@@ -672,6 +672,26 @@ instance :instopt:`--disable-set-manpath<--enable-set-manpath>`):
 
     .. versionadded:: 4.3
 
+.. instopt:: --enable-like-lmod
+
+ Enable all options that make the :command:`module` command behave similarly
+ to Lmod, the alternative :command:`module` implementation developed in Lua.
+ This option is equivalent to the cumulative use of
+ :instopt:`--with-abort-on-error=load:ml:reload:switch<--with-abort-on-error>`,
+ :instopt:`--enable-conflict-unload`, :instopt:`--enable-path-entry-reorder`,
+ :instopt:`--enable-require-via`,
+ :instopt:`--with-search-match=contains<--with-search-match>`,
+ :instopt:`--with-sticky-purge=warning<--with-sticky-purge>` and
+ :instopt:`--enable-unique-name-loaded`. (default=no)
+
+ An installation option set after :instopt:`--enable-like-lmod` on the
+ :command:`configure` command line supersedes the value defined by this
+ option.
+
+ .. only:: html or latex
+
+    .. versionadded:: 5.8
+
 .. instopt:: --enable-mcookie-version-check
 
  Enable check of the version specified right after Modules magic cookie

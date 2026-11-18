@@ -296,6 +296,8 @@ Optional Features:
   --enable-libtclenvmodules
                           build and install the Modules Tcl extension library
                           and enable its load in modulecmd.tcl [yes]
+  --enable-like-lmod      enable all options that make module command behave
+                          similarly to Lmod [no]
   --enable-mcookie-version-check
                           enable check of the version specified right after
                           Modules magic cookie in modulefiles, which defines
@@ -936,6 +938,23 @@ for arg in "$@"; do
          conflictunload=y ;
          # shellcheck disable=SC2034
          requirevia=y ;
+      fi ;;
+   --enable-like-lmod*|--disable-like-lmod)
+      val=$(get_feature_value "$arg") ;
+      if [ "$val" = 'y' ]; then
+         abortonerror='load:ml:reload:switch' ;
+         # shellcheck disable=SC2034
+         conflictunload=y ;
+         # shellcheck disable=SC2034
+         pathentryreorder=y ;
+         # shellcheck disable=SC2034
+         requirevia=y ;
+         # shellcheck disable=SC2034
+         searchmatch=contains ;
+         # shellcheck disable=SC2034
+         stickypurge=warning ;
+         # shellcheck disable=SC2034
+         uniquenameloaded=y ;
       fi ;;
    --with-dark-background-colors=*|--without-dark-background-colors)
       darkbgcolors=$(get_package_value "$arg" "") ;;
