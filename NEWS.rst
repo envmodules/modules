@@ -73,6 +73,10 @@ Modules 5.8.0 (not yet released)
   commands to support modulerc files written for Lmod. They are aliases of
   :mfcmd:`module-forbid` and :mfcmd:`module-hide` with ``--regexp`` option
   set.
+* Fix error raised when the :mconfig:`implicit_requirement` configuration
+  option is changed with the :subcmd:`config` sub-command from an
+  initialization rc file or a sourced modulefile. (fix issue #740 with
+  contribution from Achim Gsell)
 
 
 .. _5.7 release notes:
