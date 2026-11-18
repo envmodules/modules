@@ -498,6 +498,27 @@ unsetenv_loaded_module
 
 
 #
+# change implicit_requirement with config sub-command from sourced file
+#
+
+set modfile [file join [pwd] impreqconfig.mod]
+set fid [open $modfile w]
+puts $fid {#%Module
+module config implicit_requirement $env(TESTSUITE_IMPLICIT_REQ)}
+close $fid
+
+foreach {cur new} {1 0 0 1 1 1 0 0} {
+    setenv_var MODULES_IMPLICIT_REQUIREMENT $cur
+    setenv_var TESTSUITE_IMPLICIT_REQ $new
+    set ans [list [list set MODULES_IMPLICIT_REQUIREMENT $new]]
+    testouterr_cmd sh "source $modfile" $ans {}
+}
+
+unsetenv_var TESTSUITE_IMPLICIT_REQ
+file delete $modfile
+
+
+#
 #  Cleanup
 #
 

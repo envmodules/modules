@@ -2705,7 +2705,9 @@ proc module {command args} {
       knerrorModule 0 "Command '$command' not supported"
    }
    # no requirement should be recorded this module load/unload/switch cmd
-   if {$not_req || ![getConf implicit_requirement]} {
+   # test made once as config sub-command may change implicit_requirement
+   set inhibit_req [expr {$not_req || ![getConf implicit_requirement]}]
+   if {$inhibit_req} {
       lappendState inhibit_req_record [currentState evalid]
    }
 
@@ -2718,7 +2720,7 @@ proc module {command args} {
    lpopState commandname
    lpopState always_read_full_file
 
-   if {$not_req || ![getConf implicit_requirement]} {
+   if {$inhibit_req} {
       lpopState inhibit_req_record
    }
 
