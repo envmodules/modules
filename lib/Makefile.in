@@ -24,7 +24,7 @@ endif
 
 all: libtclenvmodules@TCL_SHLIB_SUFFIX@
 
-envmodules.o: envmodules.c
+envmodules.o: envmodules.c envmodules.h config.h
 	$(ECHO_CC)
 	$(CC) $(CFLAGS) $(CFLAGS_COVERAGE) -c $< -o $@
 

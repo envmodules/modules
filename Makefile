@@ -669,31 +669,31 @@ script/modulecmd: script/modulecmd.in
 	chmod +x $@
 
 # Tcl extension library-related rules
-lib/libtclenvmodules$(SHLIB_SUFFIX):
+lib/libtclenvmodules$(SHLIB_SUFFIX): lib/envmodules.c lib/envmodules.h
 	$(MAKE) --no-print-directory -C lib $(@F)
 
-lib/libtestutil-closedir$(SHLIB_SUFFIX):
+lib/libtestutil-closedir$(SHLIB_SUFFIX): lib/testutil-closedir.c
 	$(MAKE) --no-print-directory -C lib $(@F)
 
-lib/libtestutil-getpwuid$(SHLIB_SUFFIX):
+lib/libtestutil-getpwuid$(SHLIB_SUFFIX): lib/testutil-getpwuid.c
 	$(MAKE) --no-print-directory -C lib $(@F)
 
-lib/libtestutil-getgroups$(SHLIB_SUFFIX):
+lib/libtestutil-getgroups$(SHLIB_SUFFIX): lib/testutil-getgroups.c
 	$(MAKE) --no-print-directory -C lib $(@F)
 
-lib/libtestutil-0getgroups$(SHLIB_SUFFIX):
+lib/libtestutil-0getgroups$(SHLIB_SUFFIX): lib/testutil-0getgroups.c
 	$(MAKE) --no-print-directory -C lib $(@F)
 
-lib/libtestutil-dupgetgroups$(SHLIB_SUFFIX):
+lib/libtestutil-dupgetgroups$(SHLIB_SUFFIX): lib/testutil-dupgetgroups.c
 	$(MAKE) --no-print-directory -C lib $(@F)
 
-lib/libtestutil-time$(SHLIB_SUFFIX):
+lib/libtestutil-time$(SHLIB_SUFFIX): lib/testutil-time.c
 	$(MAKE) --no-print-directory -C lib $(@F)
 
-lib/libtestutil-mktime$(SHLIB_SUFFIX):
+lib/libtestutil-mktime$(SHLIB_SUFFIX): lib/testutil-mktime.c
 	$(MAKE) --no-print-directory -C lib $(@F)
 
-lib/libtestutil-tcl_loadfile$(SHLIB_SUFFIX):
+lib/libtestutil-tcl_loadfile$(SHLIB_SUFFIX): lib/testutil-tcl_loadfile.c
 	$(MAKE) --no-print-directory -C lib $(@F)
 
 # example configs for test rules
