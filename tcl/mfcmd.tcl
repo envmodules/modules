@@ -1980,7 +1980,9 @@ proc sh-to-mod {elt_ignored_list args} {
    return $modcontent
 }
 
-proc parseSourceShArgs {args} {
+# parse arguments of source-sh modulefile command or sh-to-mod sub-command,
+# which is designated by cmd
+proc parseSourceShArgs {cmd args} {
    set elt_ignored_list {}
 
    set i 0
@@ -2013,8 +2015,12 @@ proc parseSourceShArgs {args} {
    }
 
    if {![info exists shell] || $i == [llength $args]} {
-      knerror "wrong # args: should be \"source-sh ?--ignore? ?eltlist? shell\
-         script ?arg ...?\""
+      if {$cmd eq {sh-to-mod}} {
+         knerrorModule 1 "Unexpected number of args for '$cmd' command"
+      } else {
+         knerror "wrong # args: should be \"source-sh ?--ignore? ?eltlist?\
+            shell script ?arg ...?\""
+      }
    }
 
    set script_args [lassign [lrange $args $i end] script]
@@ -2034,8 +2040,8 @@ proc parseSourceShArgs {args} {
 }
 
 proc source-sh {args} {
-   lassign [parseSourceShArgs {*}$args] elt_ignored_list shell script\
-      script_args
+   lassign [parseSourceShArgs source-sh {*}$args] elt_ignored_list shell\
+      script script_args
    # evaluate script and get the environment changes it performs translated
    # into modulefile commands
    set shtomodargs [list $shell $script {*}$script_args]
@@ -2056,8 +2062,8 @@ proc source-sh {args} {
 
 # undo source-sh in unload mode
 proc source-sh-un {args} {
-   lassign [parseSourceShArgs {*}$args] elt_ignored_list shell script\
-      script_args
+   lassign [parseSourceShArgs source-sh {*}$args] elt_ignored_list shell\
+      script script_args
    set shtomodargs [list $shell $script {*}$script_args]
    # find commands resulting from source-sh evaluation recorded in env
    set modcontent [getLoadedSourceShScriptContent [currentState modulename]\
@@ -2074,8 +2080,8 @@ proc source-sh-un {args} {
 
 # report underlying modulefile cmds in display mode
 proc source-sh-di {args} {
-   lassign [parseSourceShArgs {*}$args] elt_ignored_list shell script\
-      script_args
+   lassign [parseSourceShArgs source-sh {*}$args] elt_ignored_list shell\
+      script script_args
    set shtomodargs [list $shell $script {*}$script_args]
 
    # if module loaded, get as much content from environment as possible

@@ -280,6 +280,17 @@ proc parseModuleCommandArgs {topcall cmd ignerr ml_spec args} {
             --output {
                knerror "Missing value for '$arg' option"
             }
+            --ignore {
+               # switch and its value are parsed by sh-to-mod sub-command
+               if {$cmd eq {sh-to-mod}} {
+                  lappend otherargs $arg
+               } else {
+                  if {!$ignerr} {
+                     knerror "Unsupported option '$arg' on $cmd sub-command"
+                  }
+                  set ignore_next_arg 1
+               }
+            }
             default {
                lappend otherargs $arg
             }
@@ -675,6 +686,7 @@ if {[catch {
    # extract options and command switches from other args
    set otherargv {}
    set extraargv {}
+   set firstargv {}
    set ddelimarg 0
    # split first arg if multi-word string detected for compat with previous
    # doc on module usage with scripting language: module('load mod1 mod2')
@@ -690,6 +702,9 @@ if {[catch {
       } elseif {[info exists nextargisotherargv]} {
          lappend otherargv $arg
          unset nextargisotherargv
+      } elseif {[info exists nextargisfirstargv]} {
+         lappend firstargv $arg
+         unset nextargisfirstargv
       } elseif {[info exists nextargisval]} {
          ##nagelfar vartype nextargisval varName
          set $nextargisval $arg
@@ -808,6 +823,18 @@ if {[catch {
                lappend otherargv $arg
                set nextargisotherargv 1
             }
+            --ignore {
+               # set before sub-command name, switch and its value are moved
+               # right after this name. set after, they are kept in place as
+               # they may be arguments of the script passed to sh-to-mod
+               if {[llength $otherargv]} {
+                  lappend otherargv $arg
+                  set nextargisotherargv 1
+               } else {
+                  lappend firstargv $arg
+                  set nextargisfirstargv 1
+               }
+            }
             append-path - prepend-path - remove-path {
                # detect *-path commands to say -d means --delim, not --default
                set ddelimarg 1
@@ -882,7 +909,8 @@ if {[catch {
       }
    }
 
-   if {[info exists nextargisextraargv]} {
+   if {[info exists nextargisextraargv] || [info exists\
+      nextargisfirstargv]} {
       reportErrorAndExit "Missing value for '$prevarg' option\nTry 'module\
          --help' for more information."
    }
@@ -900,7 +928,8 @@ if {[catch {
    }
 
    setState subcmd [lindex $otherargv 0]
-   set otherargv [list {*}[lreplace $otherargv 0 0] {*}$extraargv]
+   set otherargv [list {*}$firstargv {*}[lreplace $otherargv 0 0]\
+      {*}$extraargv]
    setState subcmd_args $otherargv
    # call ml frontend if it is asked command
    if {[getState subcmd] eq {ml}} {

@@ -95,6 +95,10 @@ Modules 5.8.0 (not yet released)
   evaluated with :mfcmd:`source-sh` modulefile command or :subcmd:`sh-to-mod`
   sub-command. ``umask`` element is added to the ``--ignore`` option of
   :mfcmd:`source-sh`.
+* Add the :option:`--ignore` option to the :subcmd:`sh-to-mod` sub-command
+  to ignore the changes made by the evaluated shell script on specified shell
+  elements, like done by the ``--ignore`` option of :mfcmd:`source-sh`
+  modulefile command. (fix issue #532)
 
 
 .. _5.7 release notes:

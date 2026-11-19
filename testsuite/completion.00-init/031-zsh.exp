@@ -317,6 +317,11 @@ foreach subcmd $help_subcmds {
       ## nothing to insert
       set got [completion_zsh_inline "module $subcmd -"]
       completion_assert_eq $got "\a"
+   } elseif {[llength $expected] == 1} {
+      ## a single option is completed inline by the first Tab, so there is
+      ## no listing to get: check the text inserted after the typed '-'
+      set got [completion_zsh_inline "module $subcmd -"]
+      completion_assert_eq -[string trim $got] [lindex $expected 0]
    } else {
       ## 'config' is the only sub-command whose every option is long-form
       ## only ('--dump-state'/'--reset', no '-x' short forms): from a

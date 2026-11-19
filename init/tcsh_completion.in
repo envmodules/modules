@@ -81,7 +81,7 @@ complete module 'C,/*,f,' 'C,.*,f,' 'C,~/*,f,' \
         'n/paths/`_module_avail; echo "@comp_mfile_opts@"`/' \
         'n/path/`_module_avail; echo "@comp_mfile_opts@"`/' \
         'n/edit/`_module_avail`/' \
-        'n/sh-to-mod/n/' \
+        "n/sh-to-mod/(@comp_shtomod_opts@)/" \
         'n/source/f/' \
         "n/append-path/(@comp_path_opts@)/" \
         "n/prepend-path/(@comp_path_opts@)/" \

@@ -327,6 +327,11 @@ foreach subcmd $help_subcmds {
       ## zero completions, not just an ambiguous one
       set got [completion_bash_inline "module $subcmd -"]
       completion_assert_eq $got "\a"
+   } elseif {[llength $expected] == 1} {
+      ## a single option is completed inline by the first Tab, so there is
+      ## no listing to get: check the text inserted after the typed '-'
+      set got [completion_bash_inline "module $subcmd -"]
+      completion_assert_eq -[string trim $got] [lindex $expected 0]
    } else {
       ## 'config' is the only sub-command whose every option is long-form
       ## only ('--dump-state'/'--reset', no '-x' short forms): from a
@@ -363,6 +368,11 @@ foreach subcmd $help_subcmds {
    if {[llength $expected] == 0} {
       set got [completion_bash_inline "ml $subcmd -"]
       completion_assert_eq $got "\a"
+   } elseif {[llength $expected] == 1} {
+      ## a single option is completed inline by the first Tab, so there is
+      ## no listing to get: check the text inserted after the typed '-'
+      set got [completion_bash_inline "ml $subcmd -"]
+      completion_assert_eq -[string trim $got] [lindex $expected 0]
    } else {
       set dash [expr {$subcmd eq {config} ? {--} : {-}}]
       set got [completion_bash_list "ml $subcmd $dash"]

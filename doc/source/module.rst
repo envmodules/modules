@@ -387,6 +387,18 @@ switches are accepted:
        search query string and module specification on all sub-commands and
        modulefile Tcl commands.
 
+.. option:: --ignore LIST
+
+ On :subcmd:`sh-to-mod` sub-command, ignore the changes made by the evaluated
+ shell script on the shell elements in *LIST*. *LIST* corresponds to the
+ concatenation of multiple shell elements separated by colon character
+ (``:``). Accepted shell elements are: ``envvar``, ``alias``, ``function``,
+ ``chdir``, ``complete`` and ``umask``.
+
+ .. only:: html or latex
+
+    .. versionadded:: 5.8
+
 .. option:: --ignore-cache
 
  Ignore module cache.
@@ -2788,7 +2800,7 @@ Module Sub-Commands
        :option:`--terse`/:option:`-t` added to get one output line per
        *module-whatis* line
 
-.. subcmd:: sh-to-mod shell script [arg...]
+.. subcmd:: sh-to-mod [--ignore LIST] shell script [arg...]
 
  Evaluate with *shell* the designated *script* with defined *arguments* to
  find out the environment changes it does. Environment prior and after
@@ -2810,6 +2822,12 @@ Module Sub-Commands
  *Shell* could also be set to ``bash-eval``. In this mode, bash shell *script*
  is not sourced but the output resulting from its execution is evaluated to
  determine the environment changes it does.
+
+ The :option:`--ignore` option accepts a *LIST* of shell elements whose
+ changes made by *script* should be ignored, like the ``--ignore`` option of
+ :mfcmd:`source-sh` modulefile command. No modulefile command is produced for
+ the changes made on these elements. :option:`--ignore` and its value should
+ be set before *shell*, otherwise they are considered arguments of *script*.
 
  .. note:: *shell* is run in non-interactive mode without loading any shell
     configuration or profile. As a result, script does not have access to
@@ -2837,6 +2855,9 @@ Module Sub-Commands
 
     .. versionchanged:: 5.8
        Support for tracking file mode creation mask changes added
+
+    .. versionchanged:: 5.8
+       Option :option:`--ignore` added
 
 .. subcmd:: show modulefile...
 

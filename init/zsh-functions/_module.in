@@ -432,6 +432,11 @@ _module() {
                   '(-i --icase)'{-i,--icase}'[Case insensitive match]' \
                   "*::modulefile:{_module_notloaded_mods $cur}" && ret=0
                ;;
+            (sh-to-mod)
+               _arguments \
+                  '--ignore[Ignore kinds of environment change made by script]' \
+                  && ret=0
+               ;;
             (source)
                _arguments \
                   '--auto[Enable automated module handling mode]' \

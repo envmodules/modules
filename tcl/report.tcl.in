@@ -2170,7 +2170,7 @@ Other commands:
   config [--dump-state|name [val]|--reset name]
                                     Display or set Modules configuration
   state           [name]            Display Modules state
-  sh-to-mod       shell shellscript [arg ...]
+  sh-to-mod  [--ignore LIST] shell shellscript [arg ...]
                                     Make modulefile from script env changes
   mod-to-sh  [-f] [-i] [--auto|--no-auto] shell modulefile [...]
                                     Make shell code from modulefile env changes
@@ -2209,6 +2209,9 @@ Switches:
                   sub-commands)
   --priority N    Set priority of path elements (on 'use', 'prepend-path' or
                   'append-path' sub-commands)
+  --ignore LIST   Ignore kinds of environment change made by script on
+                  'sh-to-mod' sub-command (LIST is made of element names
+                  separated by ':')
   --index         Given value is an index in the variable's list, instead of
                   a value to look up (on 'remove-path' sub-command)
 
