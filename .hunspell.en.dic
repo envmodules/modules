@@ -519,6 +519,7 @@ indepth
 inhibitErrorReport
 init
 initStateClockSeconds
+initStateUmask
 initStateUsergroups
 initadd
 initclear
@@ -1674,3 +1675,5 @@ TMOD
 getPathElementWeight
 withdrawPriorityDemands
 getPathWeightList
+0o0077
+o0700
