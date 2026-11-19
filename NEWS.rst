@@ -91,6 +91,10 @@ Modules 5.8.0 (not yet released)
   file mode creation mask.
 * Lib: add the ``initStateUmask`` procedure to the Modules Tcl extension
   library to fetch the file mode creation mask of the current process.
+* Track the change of file mode creation mask made by a shell script
+  evaluated with :mfcmd:`source-sh` modulefile command or :subcmd:`sh-to-mod`
+  sub-command. ``umask`` element is added to the ``--ignore`` option of
+  :mfcmd:`source-sh`.
 
 
 .. _5.7 release notes:

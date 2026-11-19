@@ -1,0 +1,2 @@
+#%Module
+source-sh {*}$env(TESTSUITE_UMASK_SOURCE_SH) testsuite/example/umask-sh-to-mod

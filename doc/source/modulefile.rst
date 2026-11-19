@@ -1782,7 +1782,8 @@ the *modulefile* is being loaded.
  ``load`` time.
 
  Changes on environment variables, shell aliases, shell functions, shell
- completions and current working directory are tracked.
+ completions, current working directory and file mode creation mask are
+ tracked.
 
  Changes made on environment variable intended for Modules private use (e.g.,
  :envvar:`LOADEDMODULES`, :envvar:`_LMFILES_`, ``__MODULES_*``) are ignored.
@@ -1798,7 +1799,8 @@ the *modulefile* is being loaded.
  The ``--ignore`` option accepts a list of shell elements whose changes made
  by *script* should be ignored. *eltlist* corresponds to the concatenation of
  multiple shell element separated by colon character. Accepted shell elements
- are: ``envvar``, ``alias``, ``function``, ``chdir`` and ``complete``.
+ are: ``envvar``, ``alias``, ``function``, ``chdir``, ``complete`` and
+ ``umask``.
 
  .. note:: *shell* is run in non-interactive mode without loading any shell
     configuration or profile. As a result, script does not have access to
@@ -1826,6 +1828,9 @@ the *modulefile* is being loaded.
 
     .. versionchanged:: 5.8
        *Shell* is given an empty standard input
+
+    .. versionchanged:: 5.8
+       Support for tracking file mode creation mask changes added
 
 .. mfcmd:: system string
 

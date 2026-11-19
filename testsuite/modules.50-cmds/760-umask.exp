@@ -247,6 +247,75 @@ testouterr_cmd sh refresh OK {}
 
 
 #
+# mask changed by shell script
+#
+
+setenv_loaded_module {} {}
+unsetenv_var __MODULES_UMASK
+
+set mod4 umask/4
+set mod4p $mp/$mod4
+set script testsuite/example/umask-sh-to-mod
+
+# script sets a mask different than current one
+setenv_var TESTSUITE_UMASK_VALUE $other_mask
+foreach sh [list bash ksh zsh sh dash ksh93 fish csh tcsh] {
+    # mksh flavor of ksh and sh from FreeBSD are not supported
+    if {[auto_execok $sh] eq {} || ($sh eq {ksh} && $ksh_is_mksh) || ($sh eq\
+        {sh} && $os_name eq {freebsd})} {
+        continue
+    }
+    set tserr "#%Module\numask\t\t$other_mask"
+    testouterr_cmd sh "sh-to-mod $sh $script" OK $tserr
+}
+
+# script sets the mask already in effect
+setenv_var TESTSUITE_UMASK_VALUE $cur_mask
+testouterr_cmd sh "sh-to-mod bash $script" OK {}
+
+setenv_var TESTSUITE_UMASK_VALUE $other_mask
+setenv_var TESTSUITE_UMASK_SOURCE_SH bash
+set ans [list]
+lappend ans [list set _LMFILES_ $mod4p]
+lappend ans [list set LOADEDMODULES $mod4]
+lappend ans [list set __MODULES_LMSOURCESH "$mod4&bash $script|umask $other_mask"]
+lappend ans [list set __MODULES_UMASK "$mod4&$other_mask:&$cur_mask"]
+lappend ans [list umask $other_mask]
+testouterr_cmd sh "load $mod4" $ans {}
+
+set tserr "$modlin
+$mpre/$mod4:
+
+umask\t\t$other_mask
+$modlin"
+testouterr_cmd_re sh "display $mod4" OK $tserr
+
+# mask change recorded at load time is the one undone, whatever the script
+# does now
+setenv_loaded_module [list $mod4] [list $mod4p]
+setenv_var __MODULES_LMSOURCESH "$mod4&bash $script|umask $cur_mask"
+setenv_var __MODULES_UMASK "$mod4&$cur_mask:&0123"
+set ans [list]
+lappend ans [list unset _LMFILES_]
+lappend ans [list unset LOADEDMODULES]
+lappend ans [list unset __MODULES_LMSOURCESH]
+lappend ans [list unset __MODULES_UMASK]
+lappend ans [list umask 0123]
+testouterr_cmd sh "unload $mod4" $ans {}
+
+# mask change ignored
+setenv_loaded_module {} {}
+unsetenv_var __MODULES_LMSOURCESH
+unsetenv_var __MODULES_UMASK
+setenv_var TESTSUITE_UMASK_SOURCE_SH {--ignore umask bash}
+set ans [list]
+lappend ans [list set _LMFILES_ $mod4p]
+lappend ans [list set LOADEDMODULES $mod4]
+lappend ans [list set __MODULES_LMSOURCESH "$mod4&bash $script"]
+testouterr_cmd sh "load $mod4" $ans {}
+
+
+#
 #  Cleanup
 #
 
