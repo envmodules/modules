@@ -71,6 +71,7 @@ setenv
 source-sh
 system
 uname
+umask
 uncomplete
 unset-alias
 unset-function
@@ -207,6 +208,7 @@ set {::syntax(uname domain)} 0
 set {::syntax(uname release)} 0
 set {::syntax(uname version)} 0
 set {::syntax(uname machine)} 0
+set ::syntax(umask) 1
 set ::syntax(uncomplete) 1
 set ::syntax(unset-alias) 1
 set ::syntax(unset-function) 1

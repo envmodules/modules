@@ -2506,8 +2506,10 @@ Module Sub-Commands
  In this evaluation mode only the :mfcmd:`complete`, :mfcmd:`set-alias`,
  :mfcmd:`set-function` and :mfcmd:`puts` modulefile commands will produce
  environment changes. Other modulefile commands that produce environment
- changes (like :mfcmd:`setenv` or :mfcmd:`append-path`) are ignored during a
- ``refresh`` evaluation as their changes should already be applied.
+ changes (like :mfcmd:`setenv`, :mfcmd:`append-path` or :mfcmd:`umask`) are
+ ignored during a ``refresh`` evaluation as their changes should already be
+ applied: like environment variables, the file mode creation mask is inherited
+ by derived shells.
 
  Only the loaded modules defining non-persistent environment changes are
  evaluated in ``refresh`` mode. Such loaded modules are listed in the
@@ -3502,7 +3504,7 @@ an environment variable, a shell alias, a module specification, etc.
 Supported extra specifier *elements* are:
 
 * ``variant``, ``complete``, ``uncomplete``, ``set-alias``, ``unset-alias``,
-  ``set-function``, ``unset-function``, ``chdir``, ``tag``
+  ``set-function``, ``unset-function``, ``chdir``, ``umask``, ``tag``
 * ``setenv``, ``unsetenv``, ``append-path``, ``prepend-path``, ``remove-path``
   and ``pushenv``: these elements related to environment variable handling may
   also be aliased ``envvar``
@@ -4865,6 +4867,21 @@ ENVIRONMENT
        Elements are added to the reference counter variable only if added more
        than one time in the relative path-like variable
 
+
+.. envvar:: __MODULES_UMASK
+
+ Stack of file mode creation masks set by loaded modules. A colon-separated
+ list containing pairs of elements. A pair is formed by a loaded module name
+ followed by the mask set in this module with :mfcmd:`umask` command. An
+ ampersand character separates the two parts of the pair.
+
+ First element in list corresponds to the lastly set mask. The mask in effect
+ prior the first evaluated :mfcmd:`umask` command is associated to an empty
+ module name to record it as a pair element in :envvar:`__MODULES_UMASK`.
+
+ .. only:: html or latex
+
+    .. versionadded:: 5.8
 
 .. envvar:: _LMFILES_
 

@@ -132,6 +132,9 @@ No code is produced for *tcl*, *cmake*, *cmd* and *pwsh*: these shells have no
 mean to change their own mask. The command is silently ignored for them, as
 done for the other modulefile commands a shell cannot honor.
 
+On Windows platform, an error is raised when ``umask`` is evaluated in
+``load`` mode: there is no file mode creation mask to read or to set there.
+
 Limitations
 -----------
 

@@ -173,6 +173,16 @@ testouterr_cmd sh {avail -t extra chdir:/xtfoo} OK $tserr
 
 
 #
+# umask
+#
+
+setenv_var TESTSUITE_EXTRA umask1
+set tserr extra/1.0
+testouterr_cmd sh {avail -t extra umask:0027} OK $tserr
+testouterr_cmd sh {avail -t extra umask:0077} OK {}
+
+
+#
 # erroneous commands in modulefile
 #
 

@@ -1,0 +1,253 @@
+##############################################################################
+#   Modules Revision 3.0
+#   Providing a flexible user environment
+#
+#   File:		modules.50-cmds/%M%
+#   Revision:		%I%
+#   First Edition:	2026/11/19
+#   Last Mod.:		%U%, %G%
+#
+#   Authors:		Xavier Delaruelle, xavier.delaruelle@cea.fr
+#
+#   Description:	Testuite testsequence
+#   Command:		load, unload, switch, purge, display, help, test,
+#                   whatis, refresh
+#   Modulefiles:    umask
+#   Sub-Command:
+#
+#   Comment:	%C{
+#         Test umask modulefile command
+#		}C%
+#
+##############################################################################
+
+set mp $modpath.5
+set mpre [regsub -all "\(\[.+?\]\)" $mp {\\\1}]
+setenv_path_var MODULEPATH $mp
+
+# ensure auto symbolic versions are not set for these tests
+setenv_var MODULES_ADVANCED_VERSION_SPEC 0
+
+set mod1 umask/1
+set mod2 umask/2
+set mod3 umask/3
+set mod1p $mp/$mod1
+set mod2p $mp/$mod2
+set mod3p $mp/$mod3
+
+# mask of the testsuite process is the one seen by module command as the mask
+# of the shell session
+set cur_mask [format %04o [scan [exec sh -c umask] %o]]
+# a mask that is not the current one, to simulate a mask changed by user after
+# module load
+set other_mask [lindex {0070 0007} [string equal $cur_mask 0070]]
+
+setenv_loaded_module {} {}
+unsetenv_var __MODULES_UMASK
+
+
+#
+# load
+#
+
+set ans [list]
+lappend ans [list set _LMFILES_ $mod1p]
+lappend ans [list set LOADEDMODULES $mod1]
+lappend ans [list set __MODULES_UMASK "$mod1&0077:&$cur_mask"]
+lappend ans [list umask 0077]
+testouterr_cmd_re ALL "load $mod1" $ans {}
+
+skip_if_quick_mode
+
+# last loaded module wins
+set ans [list]
+lappend ans [list set _LMFILES_ $mod1p:$mod2p]
+lappend ans [list set LOADEDMODULES $mod1:$mod2]
+lappend ans [list set __MODULES_UMASK "$mod2&0027:$mod1&0077:&$cur_mask"]
+lappend ans [list umask 0027]
+testouterr_cmd sh "load $mod1 $mod2" $ans {}
+
+# stack already defined: mask saved prior first umask command is kept
+setenv_loaded_module [list $mod1] [list $mod1p]
+setenv_var __MODULES_UMASK "$mod1&0077:&0123"
+set ans [list]
+lappend ans [list set _LMFILES_ $mod1p:$mod2p]
+lappend ans [list set LOADEDMODULES $mod1:$mod2]
+lappend ans [list set __MODULES_UMASK "$mod2&0027:$mod1&0077:&0123"]
+lappend ans [list umask 0027]
+testouterr_cmd sh "load $mod2" $ans {}
+
+# command called several times in modulefile: last mask is retained
+setenv_loaded_module {} {}
+unsetenv_var __MODULES_UMASK
+setenv_var TESTSUITE_UMASK 2
+set ans [list]
+lappend ans [list set _LMFILES_ $mod3p]
+lappend ans [list set LOADEDMODULES $mod3]
+lappend ans [list set __MODULES_UMASK "$mod3&0002:&$cur_mask"]
+lappend ans [list umask 0002]
+testouterr_cmd sh "load $mod3" $ans {}
+
+setenv_loaded_module [list $mod1] [list $mod1p]
+setenv_var __MODULES_UMASK "$mod1&0077:&0123"
+set ans [list]
+lappend ans [list set _LMFILES_ $mod1p:$mod3p]
+lappend ans [list set LOADEDMODULES $mod1:$mod3]
+lappend ans [list set __MODULES_UMASK "$mod3&0002:$mod1&0077:&0123"]
+lappend ans [list umask 0002]
+testouterr_cmd sh "load $mod3" $ans {}
+
+
+#
+# erroneous values
+#
+
+setenv_loaded_module {} {}
+unsetenv_var __MODULES_UMASK
+
+foreach bad_mask [list 088 00077 u=rwx -1 0x1f {}] {
+    setenv_var TESTSUITE_UMASK $bad_mask
+    set tserr [msg_load $mod3 [msg_moderr "Invalid umask value '$bad_mask'"\
+        {umask $env(TESTSUITE_UMASK)} $mod3p 3]]
+    # mask set by modulefile prior error is not applied
+    testouterr_cmd sh "load $mod3" ERR $tserr
+}
+
+# mask set by other modulefile is applied
+set ans [list]
+lappend ans [list set LOADEDMODULES $mod1]
+lappend ans [list set _LMFILES_ $mod1p]
+lappend ans [list set __MODULES_UMASK "$mod1&0077:&$cur_mask"]
+lappend ans [list umask 0077]
+lappend ans [list ERR]
+testouterr_cmd sh "load $mod1 $mod3" $ans $tserr
+
+setenv_var TESTSUITE_UMASK 2
+
+# fake Windows platform if expected siteconfig file is installed
+if {[siteconfig_isStderrTty]} {
+    setenv_var TESTSUITE_ENABLE_SITECONFIG_WINDOWS_PLATFORM 1
+    set tserr [msg_load $mod1 [msg_moderr {umask not supported on Windows\
+        platform} {umask 77} $mod1p 2]]
+    testouterr_cmd sh "load $mod1" ERR $tserr
+    unsetenv_var TESTSUITE_ENABLE_SITECONFIG_WINDOWS_PLATFORM
+}
+
+
+#
+# unload
+#
+
+# mask set by module still in effect: previous mask is restored
+setenv_loaded_module [list $mod1] [list $mod1p]
+setenv_var __MODULES_UMASK "$mod1&$cur_mask:&0123"
+set ans [list]
+lappend ans [list unset _LMFILES_]
+lappend ans [list unset LOADEDMODULES]
+lappend ans [list unset __MODULES_UMASK]
+lappend ans [list umask 0123]
+testouterr_cmd_re ALL "unload $mod1" $ans {}
+
+# mask changed since module load: it is kept
+setenv_var __MODULES_UMASK "$mod1&$other_mask:&0123"
+set ans [list]
+lappend ans [list unset _LMFILES_]
+lappend ans [list unset LOADEDMODULES]
+lappend ans [list unset __MODULES_UMASK]
+testouterr_cmd sh "unload $mod1" $ans {}
+
+# no stack defined or no entry for module in stack
+unsetenv_var __MODULES_UMASK
+set ans [list]
+lappend ans [list unset _LMFILES_]
+lappend ans [list unset LOADEDMODULES]
+testouterr_cmd sh "unload $mod1" $ans {}
+
+setenv_var __MODULES_UMASK "foo/1&$cur_mask:&0123"
+testouterr_cmd sh "unload $mod1" $ans {}
+
+# unload of module that has not set the mask in effect
+setenv_loaded_module [list $mod1 $mod2] [list $mod1p $mod2p]
+setenv_var __MODULES_UMASK "$mod2&$cur_mask:$mod1&0077:&0123"
+set ans [list]
+lappend ans [list set _LMFILES_ $mod2p]
+lappend ans [list set LOADEDMODULES $mod2]
+lappend ans [list set __MODULES_UMASK "$mod2&$cur_mask:&0123"]
+testouterr_cmd sh "unload $mod1" $ans {}
+
+# mask of previously loaded module is restored
+set ans [list]
+lappend ans [list set _LMFILES_ $mod1p]
+lappend ans [list set LOADEDMODULES $mod1]
+lappend ans [list set __MODULES_UMASK "$mod1&0077:&0123"]
+lappend ans [list umask 0077]
+testouterr_cmd sh "unload $mod2" $ans {}
+
+# mask restored by an unload is the one in effect for the following ones
+setenv_var __MODULES_UMASK "$mod2&$cur_mask:$mod1&0077:&0123"
+set ans [list]
+lappend ans [list unset _LMFILES_]
+lappend ans [list unset LOADEDMODULES]
+lappend ans [list unset __MODULES_UMASK]
+lappend ans [list umask 0123]
+testouterr_cmd sh purge $ans {}
+
+# mask changed by user is kept whatever the number of module unloaded
+setenv_var __MODULES_UMASK "$mod2&$other_mask:$mod1&0077:&0123"
+set ans [list]
+lappend ans [list unset _LMFILES_]
+lappend ans [list unset LOADEDMODULES]
+lappend ans [list unset __MODULES_UMASK]
+testouterr_cmd sh purge $ans {}
+
+# switch: saved mask goes from unloaded to loaded module
+setenv_loaded_module [list $mod1] [list $mod1p]
+setenv_var __MODULES_UMASK "$mod1&$cur_mask:&0123"
+set ans [list]
+lappend ans [list set _LMFILES_ $mod2p]
+lappend ans [list set LOADEDMODULES $mod2]
+lappend ans [list set __MODULES_UMASK "$mod2&0027:&0123"]
+lappend ans [list umask 0027]
+testouterr_cmd sh "switch $mod1 $mod2" $ans {}
+
+
+#
+# other evaluation modes
+#
+
+setenv_loaded_module {} {}
+unsetenv_var __MODULES_UMASK
+
+set tserr "$modlin
+$mpre/$mod1:
+
+umask\t\t77
+$modlin"
+testouterr_cmd_re sh "display $mod1" OK $tserr
+
+set tserr "$modlin
+Module Specific Help for $mpre/$mod1:
+
+$warn_msgs: Unable to find ModulesHelp in $mpre/$mod1.
+$modlin"
+testouterr_cmd_re sh "help $mod1" OK $tserr
+
+set tserr "$modlin
+Module Specific Test for $mpre/$mod1:
+
+$warn_msgs: Unable to find ModulesTest in $mpre/$mod1.
+$modlin"
+testouterr_cmd_re sh "test $mod1" OK $tserr
+
+testouterr_cmd sh "whatis $mod1" OK {}
+
+setenv_loaded_module [list $mod1] [list $mod1p]
+setenv_var __MODULES_UMASK "$mod1&$other_mask:&0123"
+testouterr_cmd sh refresh OK {}
+
+
+#
+#  Cleanup
+#
+
+reset_test_env

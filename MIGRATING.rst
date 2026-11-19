@@ -127,6 +127,37 @@ The :mfcmd:`module-hide-regex` and :mfcmd:`module-forbid-regex` commands are
 also introduced as aliases of :mfcmd:`module-hide` and :mfcmd:`module-forbid`
 with ``--regexp`` option set.
 
+Setting file mode creation mask
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The :mfcmd:`umask` modulefile command is introduced to set the file mode
+creation mask of the shell session. It takes the mask to apply as an octal
+number.
+
+.. parsed-literal::
+
+    :ps:`$` cat /path/to/modulefiles/project/1.0
+    #%Module
+    umask 0077
+    :ps:`$` umask
+    0022
+    :ps:`$` module load project/1.0
+    :ps:`$` umask
+    0077
+
+The mask in effect prior modulefile load is restored when modulefile is
+unloaded, unless the mask of the shell session has been changed in the
+meantime.
+
+.. parsed-literal::
+
+    :ps:`$` module unload project/1.0
+    :ps:`$` umask
+    0022
+
+:mfcmd:`umask` applies to the shells and scripting languages that are able to
+change their own mask. See the :ref:`Shell support` section for details.
+
 
 v5.7
 ----

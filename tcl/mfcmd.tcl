@@ -871,6 +871,103 @@ proc chdir {dir} {
    return {}
 }
 
+# File mode creation mask in effect at this point of the module command run:
+# the one set by an already evaluated modulefile if any, elsewhere the one of
+# the shell session
+proc getCurrentUmask {} {
+   if {[info exists ::g_changeUmask]} {
+      return $::g_changeUmask
+   } else {
+      return [getState umask]
+   }
+}
+
+# Stack of masks set by loaded modules. An environment variable emptied when
+# unloading a module stays defined until the end of the module command run:
+# it is an empty stack
+proc getUmaskStack {} {
+   if {[isEnvVarDefined __MODULES_UMASK]} {
+      return [split $::env(__MODULES_UMASK) :]
+   } else {
+      return {}
+   }
+}
+
+# Position in umask value stack of the entry set by currently evaluated module
+# or -1 if there is none
+proc getUmaskStackIndex {stack_list} {
+   set prefix [currentState modulename]&
+   set prefix_len [string length $prefix]
+   set idx 0
+   foreach entry $stack_list {
+      if {[string equal -length $prefix_len $prefix $entry]} {
+         return $idx
+      }
+      incr idx
+   }
+   return -1
+}
+
+proc umask {value} {
+   # no shell available on this platform is able to change its mask
+   if {[getState is_win]} {
+      knerror {umask not supported on Windows platform}
+   }
+   if {![regexp {^[0-7]{1,4}$} $value]} {
+      knerror "Invalid umask value '$value'"
+   }
+   # same mask may be written several ways (22, 022, 0022): use a canonical
+   # form to compare masks on unload
+   set value [format %04o [scan $value %o]]
+
+   # stack has same structure than pushenv's one: newest entry first, mask
+   # prior first umask command saved in an entry without module name
+   set stack_var __MODULES_UMASK
+   set stack_list [getUmaskStack]
+   if {[llength $stack_list]} {
+      # only keep last mask set when command is called several times by module
+      set idx [getUmaskStackIndex $stack_list]
+      if {$idx != -1} {
+         remove-path --index $stack_var $idx
+      }
+   } else {
+      prepend-path $stack_var &[getCurrentUmask]
+   }
+   prepend-path $stack_var [currentState modulename]&$value
+
+   set ::g_changeUmask $value
+
+   return {}
+}
+
+# undo umask in unload mode
+proc umask-un {value} {
+   set stack_var __MODULES_UMASK
+   set stack_list [getUmaskStack]
+   set idx [getUmaskStackIndex $stack_list]
+   if {$idx == -1} {
+      return {}
+   }
+   set mod_mask [lindex [split [lindex $stack_list $idx] &] end]
+   set stack_list [lreplace $stack_list $idx $idx]
+   remove-path --index $stack_var $idx
+
+   # previous mask is restored only if mask of unloading module is still in
+   # effect: a mask set since then by another module or by user is kept
+   if {$idx == 0 && [llength $stack_list] && [getCurrentUmask] eq\
+      $mod_mask} {
+      set ::g_changeUmask [lindex [split [lindex $stack_list 0] &] end]
+   }
+
+   # clear the stack if it only holds the mask prior first umask command
+   if {[llength $stack_list] == 1 && [string index [lindex $stack_list 0]\
+      0] eq {&}} {
+      remove-path --index $stack_var 0
+   }
+
+   return {}
+}
+
 # supersede exit command to handle it if called within a modulefile
 # rather than exiting the whole process
 proc exitModfileCmd {{code 0}} {

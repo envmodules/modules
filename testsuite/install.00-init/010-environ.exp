@@ -43,7 +43,8 @@ unsetenv_var MODULES_QUARANTINE_SUPPORT
 foreach var [array names env] {
     switch -glob $var {
         __MODULES_SHARE_* - __MODULES_PUSHENV_* - __MODULES_QUAR_* - \
-        MODULES_FAMILY_* - MODULES_RUNENV_* - __MODULES_LM* {
+        MODULES_FAMILY_* - MODULES_RUNENV_* - __MODULES_LM* - \
+        __MODULES_UMASK {
             unsetenv_var $var
         }
     }

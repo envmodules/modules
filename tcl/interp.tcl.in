@@ -105,7 +105,7 @@ proc initModfileModeAliases {mode auto aliasesVN aliasesPassArgVN\
       # the evaluation mode
       set ::g_modfileEvalModes {load unload display help test whatis refresh\
          scan}
-      ##nagelfar ignore #52 Too long line
+      ##nagelfar ignore #53 Too long line
       array set g_modfilePerModeAliases {
 add-property   {add-property   nop            reportCmd      nop            nop            nop            nop          nop}
 always-load    {always-load    nop            reportCmd      nop            nop            nop            nop          always-load-sc}
@@ -152,6 +152,7 @@ setenv         {setenv         setenv-un      setenv         setenv         sete
 source-sh      {source-sh      source-sh-un   source-sh-di   nop            nop            nop            source-sh    source-sh   }
 system         {system         system         reportCmd      nop            nop            nop            nop          nop         }
 unique-name-conflict {unique-name-conflict nop nop           nop            nop            nop            nop          nop         }
+umask          {umask          umask-un       reportCmd      nop            nop            nop            nop          umask-sc    }
 uncomplete     {uncomplete     nop            reportCmd      nop            nop            nop            nop          uncomplete-sc}
 unset-alias    {unset-alias    nop            reportCmd      nop            nop            nop            nop          unset-alias-sc}
 unset-function {unset-function nop            reportCmd      nop            nop            nop            nop          unset-function-sc}

@@ -119,8 +119,8 @@ the end of this section to map these equivalents.
      - :mfcmd:`getvariant`, :mfcmd:`is-saved`, :mfcmd:`is-used`,
        :mfcmd:`lsb-release`, :mfcmd:`module-tag`, :mfcmd:`module-warn`,
        :mfcmd:`modulepath-ignore`, :mfcmd:`modulepath-label`,
-       :mfcmd:`provide`, :mfcmd:`reportWarning`, :mfcmd:`uncomplete`,
-       :mfcmd:`variant`, :mfcmd:`x-resource`
+       :mfcmd:`provide`, :mfcmd:`reportWarning`, :mfcmd:`umask`,
+       :mfcmd:`uncomplete`, :mfcmd:`variant`, :mfcmd:`x-resource`
 
 See the :ref:`Compatibility with Lmod Tcl modulefile` section for details on
 how the implementation of the Tcl modulefile commands differ between Lmod and

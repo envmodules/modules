@@ -65,6 +65,9 @@ if {[info exists env(TESTSUITE_EXTRA)]} {
         chdir1 {
             chdir /xtfoo
         }
+        umask1 {
+            umask 0027
+        }
         err1 {
             setenv {} value
         }

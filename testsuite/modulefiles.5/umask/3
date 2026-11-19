@@ -1,0 +1,3 @@
+#%Module
+umask 0007
+umask $env(TESTSUITE_UMASK)

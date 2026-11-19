@@ -185,8 +185,8 @@ proc renderSettings {} {
       g_stateAliases] || [array size g_newXResources] || [array size\
       g_stateFunctions] || [array size g_stateCompletes] || [array size\
       g_delXResources] || [info exists ::g_changeDir] || [info exists\
-      ::g_stdoutPuts] || [info exists ::g_prestdoutPuts] || [info exists\
-      ::g_return_text]} {
+      ::g_changeUmask] || [info exists ::g_stdoutPuts] || [info exists\
+      ::g_prestdoutPuts] || [info exists ::g_return_text]} {
       switch -- [getState shelltype] {
          python {
             lappend g_shcode_out {import os}
@@ -712,6 +712,32 @@ proc renderSettings {} {
          }
       }
       # cannot change current directory of cmake "shell"
+   }
+
+   if {[info exists ::g_changeUmask]} {
+      switch -- [getState shelltype] {
+         sh - csh - fish {
+            lappend g_shcode_out "umask $::g_changeUmask;"
+         }
+         perl {
+            lappend g_shcode_out "umask($::g_changeUmask);"
+         }
+         python {
+            lappend g_shcode_out "os.umask(0o$::g_changeUmask)"
+         }
+         ruby {
+            lappend g_shcode_out "File.umask($::g_changeUmask)"
+         }
+         lisp {
+            # Emacs expresses it as the permissions granted to new files
+            lappend g_shcode_out "(set-default-file-modes #o[format %04o\
+               [expr {0o777 & ~[scan $::g_changeUmask %o]}]])"
+         }
+         r {
+            lappend g_shcode_out "Sys.umask('$::g_changeUmask')"
+         }
+      }
+      # tcl, cmake, cmd and pwsh have no mean to change their own mask
    }
 
    # send content deferred during modulefile interpretation

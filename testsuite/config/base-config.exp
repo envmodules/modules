@@ -381,6 +381,41 @@ proc shell_unalias {test_shell var {re_mode 0}} {
     return $answer
 }
 
+proc shell_umask {test_shell val {re_mode 0}} {
+    if {$re_mode} {
+        set esc "\\"
+    } else {
+        set esc ""
+    }
+
+    switch -- $test_shell {
+        {sh} - {bash} - {ksh} - {zsh} - {csh} - {tcsh} - {fish} {
+            set answer "umask $val;"
+        }
+        {perl} {
+            set answer "umask${esc}($val${esc});"
+        }
+        {python} {
+            set answer "os.umask${esc}(0o$val${esc})"
+        }
+        {ruby} {
+            set answer "File.umask${esc}($val${esc})"
+        }
+        {lisp} {
+            set modes [format %04o [expr {0o777 & ~[scan $val %o]}]]
+            set answer "${esc}(set-default-file-modes #o$modes${esc})"
+        }
+        {r} {
+            set answer "Sys.umask${esc}('$val'${esc})"
+        }
+        default {
+            set answer ""
+        }
+    }
+
+    return $answer
+}
+
 proc shell_chdir {test_shell val {re_mode 0}} {
     if {$re_mode} {
         set esc "\\"
@@ -628,6 +663,13 @@ proc shell_out {test_shell out_list {re_mode 0} {auto_status 1}} {
             }
             {chdir} {
                 set ret [shell_chdir $test_shell $var $re_mode]
+                if {$ret ne ""} {
+                    lappend fixed_list $ret
+                    lappend answer_list $ret
+                }
+            }
+            {umask} {
+                set ret [shell_umask $test_shell $var $re_mode]
                 if {$ret ne ""} {
                     lappend fixed_list $ret
                     lappend answer_list $ret
