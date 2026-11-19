@@ -135,13 +135,25 @@ done for the other modulefile commands a shell cannot honor.
 On Windows platform, an error is raised when ``umask`` is evaluated in
 ``load`` mode: there is no file mode creation mask to read or to set there.
 
+Mask changed by shell script
+----------------------------
+
+:mfcmd:`source-sh` modulefile command and :subcmd:`sh-to-mod` sub-command
+track the mask change made by the shell script they evaluate. The ``umask``
+shell command is run prior and after script evaluation. If the two masks
+differ, a ``umask`` modulefile command setting the resulting mask is produced.
+
+Shells do not report the mask with the same number of digits, so both masks
+are normalized before being compared.
+
+``umask`` element can be set on the ``--ignore`` option of ``source-sh`` to
+ignore this change.
+
 Limitations
 -----------
 
 * A session that gets the loaded environment of another session without
   inheriting its mask (e.g., environment variables forwarded to a new login
   session) sees the module loaded whereas its mask is not applied.
-* Mask changes made by a shell script are not tracked by :mfcmd:`source-sh`
-  and :subcmd:`sh-to-mod`.
 
 .. vim:set tabstop=2 shiftwidth=2 expandtab autoindent:

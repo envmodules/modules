@@ -1553,9 +1553,10 @@ proc execShAndGetEnv {elt_ignored_list shell script args} {
          # it does not raise error if arguments are set
          ##nagelfar ignore +3 Found constant
          set command "export -p; echo $sep; declare -f 2>/dev/null; echo\
-            $sep; alias; echo $sep; echo $sep; pwd; echo $sep; . [listTo\
-            shell $shdesc] 2>&1; echo $sep; export -p; echo $sep; declare -f\
-            2>/dev/null; echo $sep; alias; echo $sep; echo $sep; pwd"
+            $sep; alias; echo $sep; echo $sep; pwd; echo $sep; umask; echo\
+            $sep; . [listTo shell $shdesc] 2>&1; echo $sep; export -p; echo\
+            $sep; declare -f 2>/dev/null; echo $sep; alias; echo $sep; echo\
+            $sep; pwd; echo $sep; umask"
          set varre {export (\S+?)=["']?(.*?)["']?$}
          set funcre {(\S+?) \(\)\s?\n?{\s?\n(.+?)\n}$}
          set aliasre {([^='\s]+?)='?(.*?)'$}
@@ -1563,11 +1564,12 @@ proc execShAndGetEnv {elt_ignored_list shell script args} {
          set alvalmap [list {'\''} ' {'"'"'} ']
       }
       bash {
-         ##nagelfar ignore +2 Found constant
+         ##nagelfar ignore +3 Found constant
          set command "export -p; echo $sep; declare -f; echo $sep; alias;\
-            echo $sep; complete; echo $sep; pwd; echo $sep; . [listTo shell\
-            $shdesc] 2>&1; echo $sep; export -p; echo $sep; declare -f; echo\
-            $sep; alias; echo $sep; complete; echo $sep; pwd"
+            echo $sep; complete; echo $sep; pwd; echo $sep; umask; echo $sep;\
+            . [listTo shell $shdesc] 2>&1; echo $sep; export -p; echo $sep;\
+            declare -f; echo $sep; alias; echo $sep; complete; echo $sep;\
+            pwd; echo $sep; umask"
          set varre {declare -x (\S+?)="(.*?)"$}
          set funcre {(\S+?) \(\)\s?\n{\s?\n(.+?)\n}$}
          set aliasre {alias (\S+?)='(.*?)'$}
@@ -1580,9 +1582,10 @@ proc execShAndGetEnv {elt_ignored_list shell script args} {
       bash-eval {
          ##nagelfar ignore +3 Found constant
          set command "export -p; echo $sep; declare -f; echo $sep; alias;\
-            echo $sep; complete; echo $sep; pwd; echo $sep; eval \"\$([listTo\
-            shell $shdesc] 2>/dev/null)\"; echo $sep; export -p; echo $sep;\
-            declare -f; echo $sep; alias; echo $sep; complete; echo $sep; pwd"
+            echo $sep; complete; echo $sep; pwd; echo $sep; umask; echo $sep;\
+            eval \"\$([listTo shell $shdesc] 2>/dev/null)\"; echo $sep;\
+            export -p; echo $sep; declare -f; echo $sep; alias; echo $sep;\
+            complete; echo $sep; pwd; echo $sep; umask"
          set varre {declare -x (\S+?)="(.*?)"$}
          set funcre {(\S+?) \(\)\s?\n{\s?\n(.+?)\n}$}
          set aliasre {alias (\S+?)='(.*?)'$}
@@ -1596,10 +1599,10 @@ proc execShAndGetEnv {elt_ignored_list shell script args} {
          ##nagelfar ignore +3 Found constant
          set command "typeset -x; echo $sep; typeset +f | while read f; do\
             typeset -f \${f%\\(\\)}; echo; done; echo $sep; alias; echo $sep;\
-            echo $sep; pwd; echo $sep; . [listTo shell $shdesc] 2>&1; echo\
-            $sep; typeset -x; echo $sep; typeset +f | while read f; do\
-            typeset -f \${f%\\(\\)}; echo; done; echo $sep; alias; echo $sep;\
-            echo $sep; pwd"
+            echo $sep; pwd; echo $sep; umask; echo $sep; . [listTo shell\
+            $shdesc] 2>&1; echo $sep; typeset -x; echo $sep; typeset +f |\
+            while read f; do typeset -f \${f%\\(\\)}; echo; done; echo $sep;\
+            alias; echo $sep; echo $sep; pwd; echo $sep; umask"
          set varre {(\S+?)=\$?'?(.*?)'?$}
          set funcre {(\S+?)\(\) {\n?(.+?)}[;\n]?$}
          set aliasre {(\S+?)=\$?'?(.*?)'?$}
@@ -1607,11 +1610,11 @@ proc execShAndGetEnv {elt_ignored_list shell script args} {
          set alvalmap [list {\"} \" {\\'} ' {\'} ' {\\\\} {\\}]
       }
       zsh {
-         ##nagelfar ignore +2 Found constant
+         ##nagelfar ignore +3 Found constant
          set command "typeset -x; echo $sep; declare -f; echo $sep; alias;\
-            echo $sep; echo $sep; pwd; echo $sep; . [listTo shell $shdesc]\
-            2>&1; echo $sep; typeset -x; echo $sep; declare -f; echo $sep;\
-            alias; echo $sep; echo $sep; pwd"
+            echo $sep; echo $sep; pwd; echo $sep; umask; echo $sep; . [listTo\
+            shell $shdesc] 2>&1; echo $sep; typeset -x; echo $sep; declare\
+            -f; echo $sep; alias; echo $sep; echo $sep; pwd; echo $sep; umask"
          set varre {(\S+?)=\$?'?(.*?)'?$}
          set funcre {(\S+?) \(\) {\n(.+?)\n}$}
          set aliasre {(\S+?)=\$?'?(.*?)'?$}
@@ -1621,9 +1624,9 @@ proc execShAndGetEnv {elt_ignored_list shell script args} {
       csh {
          ##nagelfar ignore +2 Found constant
          set command "setenv; echo $sep; echo $sep; alias; echo $sep; echo\
-            $sep; pwd; echo $sep; source [listTo shell $shdesc] >&\
-            /dev/stdout; echo $sep; setenv; echo $sep; echo $sep; alias; echo\
-            $sep; echo $sep; pwd"
+            $sep; pwd; echo $sep; umask; echo $sep; source [listTo shell\
+            $shdesc] >& /dev/stdout; echo $sep; setenv; echo $sep; echo $sep;\
+            alias; echo $sep; echo $sep; pwd; echo $sep; umask"
          set varre {(\S+?)=(.*?)$}
          set aliasre {(\S+?)\t(.*?)$}
          set varvalmap [list]
@@ -1631,11 +1634,12 @@ proc execShAndGetEnv {elt_ignored_list shell script args} {
          lappend shellopts -f
       }
       tcsh {
-         ##nagelfar ignore +2 Found constant
+         ##nagelfar ignore +3 Found constant
          set command "setenv; echo $sep; echo $sep; alias; echo $sep;\
-            complete; echo $sep; pwd; echo $sep; source [listTo shell\
-            $shdesc] >& /dev/stdout; echo $sep; setenv; echo $sep; echo $sep;\
-            alias; echo $sep; complete; echo $sep; pwd"
+            complete; echo $sep; pwd; echo $sep; umask; echo $sep; source\
+            [listTo shell $shdesc] >& /dev/stdout; echo $sep; setenv; echo\
+            $sep; echo $sep; alias; echo $sep; complete; echo $sep; pwd; echo\
+            $sep; umask"
          set varre {(\S+?)=(.*?)$}
          set aliasre {(\S+?)\t\(?(.*?)\)?$}
          set compre {(\S+?)\t(.*?)$}
@@ -1653,15 +1657,16 @@ proc execShAndGetEnv {elt_ignored_list shell script args} {
          ##nagelfar ignore +9 Found constant
          set command "set -xgL; echo '$sep'; status test-feature\
             regex-easyesc 2>/dev/null; and set escrepl '\\\\\\\\\$1'; or set\
-            escrepl '\\\\\\\\\\\\\\\$1'; set funcfilter \\^\\((string\
-            join '|' (string replace -r '(\\\[|\\.)' \$escrepl\
-            (builtin -n; functions -a -n | string split ', ' | string match\
-            -e -r '^_')))\\|fish\\.\\*\\)\\\$; $getfunc; $getfunc; string\
-            split \$funcout; echo '$sep'; string split \$funcout; echo\
-            '$sep'; complete; echo '$sep'; pwd; echo '$sep'; source [listTo\
-            shell $shdesc] 2>&1; or exit \$status; echo '$sep'; set -xgL;\
-            echo '$sep'; $getfunc; string split \$funcout; echo '$sep';\
-            string split \$funcout; echo '$sep'; complete; echo '$sep'; pwd"
+            escrepl '\\\\\\\\\\\\\\\$1'; set funcfilter \\^\\((string join\
+            '|' (string replace -r '(\\\[|\\.)' \$escrepl (builtin -n;\
+            functions -a -n | string split ', ' | string match -e -r\
+            '^_')))\\|fish\\.\\*\\)\\\$; $getfunc; $getfunc; string split\
+            \$funcout; echo '$sep'; string split \$funcout; echo '$sep';\
+            complete; echo '$sep'; pwd; echo '$sep'; umask; echo '$sep';\
+            source [listTo shell $shdesc] 2>&1; or exit \$status; echo\
+            '$sep'; set -xgL; echo '$sep'; $getfunc; string split \$funcout;\
+            echo '$sep'; string split \$funcout; echo '$sep'; complete; echo\
+            '$sep'; pwd; echo '$sep'; umask"
          set varre {^(\S+?\M) ?['"]?(.*?)['"]?$}
          # exclude alias from function list
          set funcre "^function (\\S+?)(?: \[^\\n\]*?--description\
@@ -1705,15 +1710,17 @@ proc execShAndGetEnv {elt_ignored_list shell script args} {
 
    # link result variables to calling context
    upvar cwdbefout cwdbefout cwdaftout cwdaftout
+   upvar umaskbefout umaskbefout umaskaftout umaskaftout
 
    # extract each output sections
    set idx 0
    foreach varout {varbefout funcbefout aliasbefout compbefout cwdbefout\
-      scriptout varaftout funcaftout aliasaftout compaftout cwdaftout} {
+      umaskbefout scriptout varaftout funcaftout aliasaftout compaftout\
+      cwdaftout umaskaftout} {
       ##nagelfar vartype varout varName
       if {[set sepidx [string first $sep $output $idx]] == -1} {
          set $varout [string trimright [string range $output $idx end] \n]
-         if {$varout ne {cwdaftout} && !$sherr} {
+         if {$varout ne {umaskaftout} && !$sherr} {
             knerror "Unexpected output when sourcing '$shdesc' in shell\
                '$shell'"
          }
@@ -1751,6 +1758,11 @@ proc execShAndGetEnv {elt_ignored_list shell script args} {
    # clear current directory change if ignored
    if {{chdir} in $elt_ignored_list} {
       set cwdaftout $cwdbefout
+   }
+
+   # clear file mode creation mask change if ignored
+   if {{umask} in $elt_ignored_list} {
+      set umaskaftout $umaskbefout
    }
 
    # extract environment variable information
@@ -1818,8 +1830,8 @@ proc sh-to-mod {elt_ignored_list args} {
    # evaluate script and retrieve environment before and after evaluation
    # procedure will set result variables in current context
    ##nagelfar implicitvarcmd {execShAndGetEnv *} ignvarlist cwdbefout\
-      cwdaftout varbef varaft funcbef funcaft aliasbef aliasaft compbef\
-      compaft
+      cwdaftout umaskbefout umaskaftout varbef varaft funcbef funcaft\
+      aliasbef aliasaft compbef compaft
    execShAndGetEnv $elt_ignored_list {*}$args
 
    # check environment variable change
@@ -1953,6 +1965,13 @@ proc sh-to-mod {elt_ignored_list args} {
    if {$cwdbefout ne $cwdaftout} {
       lappend modcontent [list chdir $cwdaftout]
    }
+   # check file mode creation mask change. shells do not report mask with the
+   # same number of digits
+   set umask_bef [format %04o [scan $umaskbefout %o]]
+   set umask_aft [format %04o [scan $umaskaftout %o]]
+   if {$umask_bef ne $umask_aft} {
+      lappend modcontent [list umask $umask_aft]
+   }
 
    # sort result to ensure consistent output whatever the evaluation shell
    set modcontent [lsort -dictionary $modcontent]
@@ -2002,7 +2021,8 @@ proc parseSourceShArgs {args} {
 
    if {[info exists ignore_opt_raw]} {
       set elt_ignored_list [split $ignore_opt_raw :]
-      set allowed_elt_ignored_list {envvar function alias chdir complete}
+      set allowed_elt_ignored_list {envvar function alias chdir complete\
+         umask}
       foreach elt_ignored $elt_ignored_list {
          if {$elt_ignored ni $allowed_elt_ignored_list} {
             knerror "Invalid ignored element '$elt_ignored'"

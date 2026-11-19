@@ -174,7 +174,7 @@ Specification
     - but it is an external command, so requires extra processing and an additional requirement
     - moreover it does not return shell functions in general, only exported Bash functions
 
-  - Shell builtin commands are used to query existing environment variables, aliases, functions, completions and current working directory
+  - Shell builtin commands are used to query existing environment variables, aliases, functions, completions, current working directory and file mode creation mask
 
     - which provides best processing efficiency
     - but leads to specific output parsing for each shell
@@ -235,6 +235,7 @@ Specification
     - ``function``
     - ``chdir``
     - ``complete``
+    - ``umask`` (added in version 5.8)
 
   - Shell elements changed by sourced script and listed on ``--ignore`` option are ignored (no modulefile command relative to these changes are produced)
 

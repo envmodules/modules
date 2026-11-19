@@ -2797,7 +2797,8 @@ Module Sub-Commands
  equivalent to the evaluation of shell script.
 
  Changes on environment variables, shell aliases, shell functions, shell
- completions and current working directory are tracked.
+ completions, current working directory and file mode creation mask are
+ tracked.
 
  Changes made on environment variable intended for Modules private use (e.g.,
  :envvar:`LOADEDMODULES`, :envvar:`_LMFILES_`, ``__MODULES_*``) are ignored.
@@ -2833,6 +2834,9 @@ Module Sub-Commands
 
     .. versionchanged:: 5.8
        *Shell* is given an empty standard input
+
+    .. versionchanged:: 5.8
+       Support for tracking file mode creation mask changes added
 
 .. subcmd:: show modulefile...
 

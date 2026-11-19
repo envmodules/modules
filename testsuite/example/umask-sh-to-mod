@@ -1,0 +1,2 @@
+# set file mode creation mask, with a syntax valid for sh, csh and fish shells
+umask $TESTSUITE_UMASK_VALUE
