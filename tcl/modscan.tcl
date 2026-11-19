@@ -133,6 +133,10 @@ proc chdir-sc {dir} {
    recordScanModuleElt $dir chdir
 }
 
+proc umask-sc {value} {
+   recordScanModuleElt $value umask
+}
+
 proc family-sc {name} {
    if {![string length $name] || ![regexp {^[A-Za-z0-9_]*$} $name]} {
       knerror "Invalid family name '$name'"

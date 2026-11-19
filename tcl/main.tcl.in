@@ -649,6 +649,7 @@ if {[catch {
       rename ::__initStateUsergroups ::initStateUsergroups
       rename ::__initStateUsername ::initStateUsername
       rename ::__initStateClockSeconds ::initStateClockSeconds
+      rename ::__initStateUmask ::initStateUmask
       rename ::__parseDateTimeArg ::parseDateTimeArg
    }
    ##nagelfar syntax readFile x x? x?
@@ -656,6 +657,7 @@ if {[catch {
    ##nagelfar syntax initStateUsergroups
    ##nagelfar syntax initStateUsername
    ##nagelfar syntax initStateClockSeconds
+   ##nagelfar syntax initStateUmask
    ##nagelfar syntax parseDateTimeArg x x
 
    # source site configuration script if any

@@ -26,6 +26,7 @@
 #include <errno.h>
 #include <limits.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <dirent.h>
 #include <pwd.h>
 #include <grp.h>
@@ -484,6 +485,39 @@ Envmodules_InitStateClockSecondsObjCmd(
 
 /*----------------------------------------------------------------------
  *
+ * Envmodules_InitStateUmaskObjCmd --
+ *
+ *	 This function is invoked to return the file mode creation mask of
+ *	 current process, as a 4-digit octal number.
+ *
+ * Results:
+ *	 A standard Tcl result.
+ *
+ * Side effects:
+ *	 None.
+ *
+ *---------------------------------------------------------------------*/
+
+int
+Envmodules_InitStateUmaskObjCmd(
+   ClientData dummy,       /* Not used. */
+   Tcl_Interp *interp,     /* Current interpreter. */
+   int objc,               /* Number of arguments. */
+   Tcl_Obj *const objv[])  /* Argument objects. */
+{
+   mode_t mask;
+
+   /* Mask can only be read by setting a new one, so restore it right
+    * after */
+   mask = umask(0);
+   umask(mask);
+
+   Tcl_SetObjResult(interp, Tcl_ObjPrintf("%04o", (unsigned int) mask));
+   return TCL_OK;
+}
+
+/*----------------------------------------------------------------------
+ *
  * Envmodules_ParseDateTimeArgObjCmd --
  *
  *	 This function is invoked to parse date time argument value and
@@ -602,6 +636,9 @@ Envmodules_Init(
       (Tcl_CmdDeleteProc*) NULL);
    Tcl_CreateObjCommand(interp, "initStateClockSeconds",
       Envmodules_InitStateClockSecondsObjCmd, (ClientData) NULL,
+      (Tcl_CmdDeleteProc*) NULL);
+   Tcl_CreateObjCommand(interp, "initStateUmask",
+      Envmodules_InitStateUmaskObjCmd, (ClientData) NULL,
       (Tcl_CmdDeleteProc*) NULL);
    Tcl_CreateObjCommand(interp, "parseDateTimeArg",
       Envmodules_ParseDateTimeArgObjCmd, (ClientData) NULL,

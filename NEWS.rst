@@ -83,6 +83,14 @@ Modules 5.8.0 (not yet released)
   *conflict unload* and *require via* mechanisms, one module loaded per module
   name, path entry reordering, *contains* search match and sticky modules kept
   with a warning on :subcmd:`purge`.
+* Add the :mfcmd:`umask` modulefile command that sets the file mode creation
+  mask of the shell session when modulefile is loaded and restores the
+  previous mask when it is unloaded. Masks set by loaded modules are recorded
+  in the :envvar:`__MODULES_UMASK` environment variable. (fix issue #649)
+* Add the ``umask`` extra specifier to search the modules that set a given
+  file mode creation mask.
+* Lib: add the ``initStateUmask`` procedure to the Modules Tcl extension
+  library to fetch the file mode creation mask of the current process.
 
 
 .. _5.7 release notes:

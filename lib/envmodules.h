@@ -43,6 +43,9 @@ MODULE_SCOPE int Envmodules_InitStateUsergroupsObjCmd (ClientData dummy,
 MODULE_SCOPE int Envmodules_InitStateClockSecondsObjCmd (ClientData dummy,
    Tcl_Interp *interp, int objc, Tcl_Obj *const objv[]);
 
+MODULE_SCOPE int Envmodules_InitStateUmaskObjCmd (ClientData dummy,
+   Tcl_Interp *interp, int objc, Tcl_Obj *const objv[]);
+
 MODULE_SCOPE int Envmodules_ParseDateTimeArgObjCmd (ClientData dummy,
    Tcl_Interp *interp, int objc, Tcl_Obj *const objv[]);
 

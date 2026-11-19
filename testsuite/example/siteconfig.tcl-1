@@ -765,6 +765,16 @@ if {[info exists env(TESTSUITE_ENABLE_SITECONFIG_ID)]} {
     report [__initStateUsergroups]
 }
 
+# test Tcl procedure fetching file mode creation mask, which is renamed when
+# tcl ext lib is not loaded
+if {[info exists env(TESTSUITE_ENABLE_SITECONFIG_UMASK)]} {
+    if {[info commands __initStateUmask] eq {}} {
+        report [initStateUmask]
+    } else {
+        report [__initStateUmask]
+    }
+}
+
 # fake id command if following environment variable is set
 if {[info exists env(TESTSUITE_ENABLE_RUNENVCOMMAND_UNSET)]} {
     runEnvCommand {UNK_VAR val} echo

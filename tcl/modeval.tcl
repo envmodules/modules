@@ -604,8 +604,8 @@ proc pushSettings {} {
    lappend ::g_SAVE_env [array get ::env]
 
    # save non-array variable and indication if it was set
-   foreach var {g_changeDir g_stdoutPuts g_prestdoutPuts g_return_text\
-      g_uReqUnFromDepReList g_depReList} {
+   foreach var {g_changeDir g_changeUmask g_stdoutPuts g_prestdoutPuts\
+      g_return_text g_uReqUnFromDepReList g_depReList} {
       ##nagelfar ignore #2 Badly formed if statement
       lappend save_var $var {*}[if {[info exists ::$var]} {list 1 [set\
          ::$var]} {list 0 {}}]
@@ -657,8 +657,8 @@ proc restoreSettings {} {
 proc flushEnvSettings {} {
    foreach var {g_Aliases g_stateEnvVars g_stateAliases g_stateFunctions\
       g_Functions g_stateCompletes g_Completes g_newXResources\
-      g_delXResources g_changeDir g_stdoutPuts g_prestdoutPuts\
-      g_return_text} {
+      g_delXResources g_changeDir g_changeUmask g_stdoutPuts\
+      g_prestdoutPuts g_return_text} {
       ##nagelfar ignore #2 Suspicious variable name
       if {[info exists ::$var]} {
          unset ::$var

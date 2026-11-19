@@ -319,7 +319,7 @@ array set configkind [list\
     variant_shortcut          l\
 ]
 
-set statelist [list always_read_full_file autoinit clock_seconds cmdline commandname domainname error_count extra_siteconfig_loaded false_rendered force hiding_threshold inhibit_errreport inhibit_interp init_error_report is_stderr_tty is_win kernelversion logfd logging lsb_codename lsb_id lsb_release machine nodename os osversion paginate path_separator report_format reportfd return_false shell shelltype siteconfig_loaded sub1_separator sub2_separator subcmd subcmd_args supported_shells tcl_ext_lib_loaded tcl_version term_columns usergroups username]
+set statelist [list always_read_full_file autoinit clock_seconds cmdline commandname domainname error_count extra_siteconfig_loaded false_rendered force hiding_threshold inhibit_errreport inhibit_interp init_error_report is_stderr_tty is_win kernelversion logfd logging lsb_codename lsb_id lsb_release machine nodename os osversion paginate path_separator report_format reportfd return_false shell shelltype siteconfig_loaded sub1_separator sub2_separator subcmd subcmd_args supported_shells tcl_ext_lib_loaded tcl_version term_columns umask usergroups username]
 
 if {[is_quick_mode]} {
     array unset configdfl

@@ -63,6 +63,7 @@ array set g_state_defs [list\
    tcl_version [list [info patchlevel]]\
    term_columns {<undef> initStateTermColumns}\
    timer {0}\
+   umask {<undef> initStateUmask}\
    usergroups {<undef> initStateUsergroups}\
    username {<undef> initStateUsername}\
 ]
@@ -647,6 +648,12 @@ proc __initStateUsername {} {
 # Get Epoch time (number of seconds elapsed since Unix epoch)
 proc __initStateClockSeconds {} {
    return [clock seconds]
+}
+
+# Get file mode creation mask of modulecmd.tcl process, which is inherited
+# from the shell session that runs it
+proc __initStateUmask {} {
+   return [format %04o [scan [runCommand sh -c umask] %o]]
 }
 
 proc parseEqualListConfValue {option envvar value {level Warning}} {

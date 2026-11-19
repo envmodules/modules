@@ -1156,7 +1156,8 @@ The following environment variables appeared on Modules 5.
 |            | :envvar:`MODULES_LIST_JSON_OUTPUT`,                             |
 |            | :envvar:`MODULES_SPIDER_JSON_OUTPUT`,                           |
 |            | :envvar:`__MODULES_PRIORITY_\<VAR\>`,                           |
-|            | :envvar:`MODULES_FAMILY_\<NAME\>_VERSION`                       |
+|            | :envvar:`MODULES_FAMILY_\<NAME\>_VERSION`,                      |
+|            | :envvar:`__MODULES_UMASK`                                       |
 +------------+-----------------------------------------------------------------+
 
 Modules Specific Tcl Commands
@@ -1188,7 +1189,8 @@ The following modulefile Tcl commands appeared on Modules 5.
 +------------+-----------------------------------------------------------------+
 | 5.8        | :mfcmd:`module-info modulename<module-info>`,                   |
 |            | :mfcmd:`module-info moduleversion<module-info>`,                |
-|            | :mfcmd:`module-forbid-regex`, :mfcmd:`module-hide-regex`        |
+|            | :mfcmd:`module-forbid-regex`, :mfcmd:`module-hide-regex`,       |
+|            | :mfcmd:`umask`                                                  |
 +------------+-----------------------------------------------------------------+
 
 :mfcmd:`system`, :mfcmd:`is-used`

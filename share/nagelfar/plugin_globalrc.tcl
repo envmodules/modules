@@ -27,9 +27,9 @@ proc statementWords {words info} {
       module - module-whatis - prepend-path - prereq - prereq-all -\
       prereq-any - pushenv - remove-path - reportError - reportWarning -\
       require-fullname - set-alias - set-function - setenv - source-sh -\
-      uncomplete - unset-alias - unset-function - unsetenv - variant -\
-      x-resource - add-property - remove-property - module-log - module-trace\
-      - module-user - module-verbosity {
+      umask - uncomplete - unset-alias - unset-function - unsetenv - variant\
+      - x-resource - add-property - remove-property - module-log -\
+      module-trace - module-user - module-verbosity {
          set res [list warning "Command \"[lindex $words 0]\" should not be\
             be used in global rc file"]
       }

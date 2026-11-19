@@ -23,8 +23,8 @@ syn keyword modCommand  module-info module-tag module-version
 syn keyword modCommand  module-virtual module-warn module-whatis modulepath-ignore modulepath-label
 syn keyword modCommand  prepend-path prereq prereq-all prereq-any provide pushenv
 syn keyword modCommand  remove-path reportError reportWarning require-fullname set-alias
-syn keyword modCommand  set-function setenv source-sh system uname uncomplete unset-alias
-syn keyword modCommand  unset-function unsetenv variant versioncmp x-resource
+syn keyword modCommand  set-function setenv source-sh system umask uname uncomplete
+syn keyword modCommand  unset-alias unset-function unsetenv variant versioncmp x-resource
 
 " Modulefile procedures
 syn keyword modProc     ModulesHelp ModulesDisplay ModulesTest
