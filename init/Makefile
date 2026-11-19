@@ -145,6 +145,7 @@ comp_isavail_opts := -i --icase
 comp_lint_opts := -a -i --all --icase
 comp_modtosh_opts := --auto --no-auto --force -f --icase -i
 comp_purge_opts := --force -f
+comp_shtomod_opts := --ignore
 comp_reload_opts := --force -f
 comp_reset_opts := --force -f
 comp_restore_opts := --force -f
@@ -183,6 +184,7 @@ sed -e 's|@prefix@|$(prefix)|g' \
 	-e 's|@comp_isavail_opts@|$(comp_isavail_opts)|g' \
 	-e 's|@comp_lint_opts@|$(comp_lint_opts)|g' \
 	-e 's|@comp_modtosh_opts@|$(comp_modtosh_opts)|g' \
+	-e 's|@comp_shtomod_opts@|$(comp_shtomod_opts)|g' \
 	-e 's|@comp_purge_opts@|$(comp_purge_opts)|g' \
 	-e 's|@comp_reload_opts@|$(comp_reload_opts)|g' \
 	-e 's|@comp_reset_opts@|$(comp_reset_opts)|g' \

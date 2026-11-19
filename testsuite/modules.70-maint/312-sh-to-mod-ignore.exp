@@ -1,0 +1,136 @@
+##############################################################################
+#   Modules Revision 3.0
+#   Providing a flexible user environment
+#
+#   File:		modules.70-maint/%M%
+#   Revision:		%I%
+#   First Edition:	2026/11/19
+#   Last Mod.:		%U%, %G%
+#
+#   Authors:		Xavier Delaruelle, xavier.delaruelle@cea.fr
+#
+#   Description:	Testuite testsequence
+#   Command:
+#   Modulefiles:
+#   Sub-Command:    sh-to-mod
+#
+#   Comment:	%C{
+#           Check '--ignore' option of 'sh-to-mod' sub-command
+#		}C%
+#
+##############################################################################
+
+set script testsuite/example/mini-sh-to-mod.sh
+
+# sh from FreeBSD is not supported by sh-to-mod
+if {[auto_execok bash] ne {}} {
+    set sh bash
+} elseif {$os_name ne {freebsd}} {
+    set sh sh
+} else {
+    send_user "\tskipping sh-to-mod tests as no supported shell found\n"
+    return
+}
+
+setenv_path_var MODULEPATH $modpath.2
+setenv_var FOOPATH /path/to/dir
+
+set tserr_all "#%Module
+prepend-path\tFOOPATH /path/to/mini
+set-alias\talmini {echo mini}
+setenv\t\tFOOMINI value"
+set tserr_noenvvar "#%Module
+set-alias\talmini {echo mini}"
+set tserr_noalias "#%Module
+prepend-path\tFOOPATH /path/to/mini
+setenv\t\tFOOMINI value"
+
+
+#
+# option set after sub-command name
+#
+
+testouterr_cmd sh "sh-to-mod $sh $script" OK $tserr_all
+testouterr_cmd sh "sh-to-mod --ignore envvar $sh $script" OK $tserr_noenvvar
+testouterr_cmd sh "sh-to-mod --ignore alias $sh $script" OK $tserr_noalias
+testouterr_cmd sh "sh-to-mod --ignore envvar:alias $sh $script" OK {}
+# elements not changed by script
+testouterr_cmd sh "sh-to-mod --ignore function:chdir:complete:umask $sh\
+    $script" OK $tserr_all
+# last option set wins
+testouterr_cmd sh "sh-to-mod --ignore envvar --ignore alias $sh $script" OK\
+    $tserr_noalias
+
+# ml command
+testouterr_cmd sh "ml sh-to-mod --ignore envvar $sh $script" OK\
+    $tserr_noenvvar
+
+
+#
+# option set before sub-command name
+#
+
+testouterr_cmd sh "--ignore envvar sh-to-mod $sh $script" OK $tserr_noenvvar
+testouterr_cmd sh "--ignore alias --ignore-user-rc sh-to-mod $sh $script" OK $tserr_noalias
+
+
+#
+# option set after shell or script is an argument for script
+#
+
+testouterr_cmd sh "sh-to-mod $sh $script --ignore envvar" OK $tserr_all
+testouterr_cmd sh "sh-to-mod $sh $script --ignore" OK $tserr_all
+testouterr_cmd sh "sh-to-mod $sh --ignore envvar" ERR "$error_msgs: Script\
+    '--ignore' cannot be found"
+
+
+#
+# other shell element
+#
+
+set cur_mask [exec sh -c umask]
+set other_mask 0027
+if {$cur_mask eq $other_mask} {
+    set other_mask 0022
+}
+setenv_var TESTSUITE_UMASK_VALUE $other_mask
+set umask_script testsuite/example/umask-sh-to-mod
+
+testouterr_cmd sh "sh-to-mod $sh $umask_script" OK "#%Module
+umask\t\t$other_mask"
+testouterr_cmd sh "sh-to-mod --ignore umask $sh $umask_script" OK {}
+
+unsetenv_var TESTSUITE_UMASK_VALUE
+
+
+#
+# erroneous usage
+#
+
+testouterr_cmd sh "sh-to-mod --ignore foo $sh $script" ERR "$error_msgs:\
+    Invalid ignored element 'foo'"
+testouterr_cmd sh "sh-to-mod --ignore envvar:foo $sh $script" ERR\
+    "$error_msgs: Invalid ignored element 'foo'"
+
+# missing value or script
+set tserr "$error_msgs: Unexpected number of args for 'sh-to-mod'\
+    command\n$err_typehelp"
+testouterr_cmd sh {sh-to-mod --ignore} ERR $tserr
+testouterr_cmd sh {sh-to-mod --ignore envvar} ERR $tserr
+testouterr_cmd sh "sh-to-mod --ignore envvar $sh" ERR $tserr
+testouterr_cmd sh {--ignore} ERR "[err_misoptval --ignore]\n$err_typehelp"
+
+# option not supported on other sub-commands
+testouterr_cmd sh {avail --ignore envvar} ERR [err_unsupportedopt --ignore\
+    avail]
+testouterr_cmd sh {--ignore envvar load foo} ERR [err_unsupportedopt\
+    --ignore load]
+testouterr_cmd sh {ml foo --ignore envvar} ERR [err_unsupportedopt --ignore\
+    load]
+
+
+#
+#  Cleanup
+#
+
+reset_test_env

@@ -2668,11 +2668,13 @@ proc cmdModuleConfig {dump_state args} {
 }
 
 proc cmdModuleShToMod {args} {
-   set scriptargs [lassign $args shell script]
+   lassign [parseSourceShArgs sh-to-mod {*}$args] elt_ignored_list shell\
+      script script_args
 
    # evaluate script and get the environment changes it performs translated
    # into modulefile commands
-   set modcontent [sh-to-mod {} {*}$args]
+   set modcontent [sh-to-mod $elt_ignored_list $shell $script\
+      {*}$script_args]
 
    # output resulting modulefile
    if {[llength $modcontent]} {

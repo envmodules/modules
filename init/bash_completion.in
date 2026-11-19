@@ -135,7 +135,11 @@ _module() {
                 -*) COMPREPLY=( $(compgen -W "@comp_source_opts@" -- "$cur") );;
                 *)  ;;               # let readline handle the completion
             esac;;
-    -h|--help|-V|--version|--dumpname|refresh|sh-to-mod|state|stashclear|cacheclear)
+    sh-to-mod)  case "$cur" in
+                -*) _module_comgen_words "@comp_shtomod_opts@" "$cur";;
+                *)  ;;               # let readline handle the completion
+            esac;;
+    -h|--help|-V|--version|--dumpname|refresh|state|stashclear|cacheclear)
                     ;;
     append-path|prepend-path)
                     COMPREPLY=( $(compgen -W "@comp_path_opts@" -- "$cur") );;
@@ -211,7 +215,11 @@ if type -t ml >/dev/null; then
                     -*) COMPREPLY=( $(compgen -W "@comp_source_opts@" -- "$cur") );;
                     *)  ;;               # let readline handle the completion
                 esac;;
-        -h|--help|-V|--version|--dumpname|refresh|sh-to-mod|state|stashclear|cacheclear)
+        sh-to-mod)  case "$cur" in
+                    -*) _module_comgen_words "@comp_shtomod_opts@" "$cur";;
+                    *)  ;;               # let readline handle the completion
+                esac;;
+        -h|--help|-V|--version|--dumpname|refresh|state|stashclear|cacheclear)
                         ;;
         append-path|prepend-path)
                         COMPREPLY=( $(compgen -W "@comp_path_opts@" -- "$cur") );;

@@ -886,6 +886,8 @@ The following command line switches appeared on Modules 5.
 | 5.7        | :option:`-p`, :option:`-P`,                                     |
 |            | :option:`--no-modulepath-ignore`                                |
 +------------+-----------------------------------------------------------------+
+| 5.8        | :option:`--ignore`                                              |
++------------+-----------------------------------------------------------------+
 
 :option:`--output`
 
@@ -1008,6 +1010,9 @@ The following module sub-commands appeared on Modules 5.
  changes for bash, tcsh and fish shells.
 
  Shell mode ``bash-eval`` is introduced on Modules version ``5.4``.
+
+ Starting Modules 5.8, the :option:`--ignore` option is added to ignore the
+ changes made by shell script on specified shell elements.
 
 :subcmd:`source`
 

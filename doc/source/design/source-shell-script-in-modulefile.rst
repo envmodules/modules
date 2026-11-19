@@ -238,6 +238,10 @@ Specification
     - ``umask`` (added in version 5.8)
 
   - Shell elements changed by sourced script and listed on ``--ignore`` option are ignored (no modulefile command relative to these changes are produced)
+  - Option is also available on ``sh-to-mod`` sub-command starting version 5.8
+
+    - Set before the sub-command name, ``--ignore`` and its value are moved right after this name
+    - Set after the *shell* argument, they are left in place as they are then arguments for the script
 
 - **FUTURE**: this feature may be extended to translate environment changes made by tools like Spack, Lmod or pkg-config. It may provide this way bridges between different realms.
 
