@@ -129,6 +129,7 @@ array set configdfl [list\
     sticky_purge              $install_stickypurge\
     tcl_ext_lib               lib/libtclenvmodules$install_shlib_suffix\
     tcl_linter                $install_tcllintercmd\
+    subcmd_alias              {}\
     tag_abbrev                $install_tagabbrev\
     tag_color_name            $install_tagcolorname\
     term_background           $install_termbg\
@@ -203,6 +204,7 @@ array set configvar [list\
     spider_output             MODULES_SPIDER_OUTPUT\
     spider_terse_output       MODULES_SPIDER_TERSE_OUTPUT\
     sticky_purge              MODULES_STICKY_PURGE\
+    subcmd_alias              MODULES_SUBCMD_ALIAS\
     tag_abbrev                MODULES_TAG_ABBREV\
     tag_color_name            MODULES_TAG_COLOR_NAME\
     tcl_linter                MODULES_TCL_LINTER\
@@ -314,6 +316,7 @@ array set configkind [list\
     spider_json_output        l\
     spider_output             l\
     spider_terse_output       l\
+    subcmd_alias              l\
     tag_abbrev                l\
     tag_color_name            l\
     variant_shortcut          l\
@@ -447,6 +450,8 @@ foreach param [array names configvar] {
         set val err=31
     } elseif {$param eq {tag_abbrev}} {
         set val loaded=L
+    } elseif {$param eq {subcmd_alias}} {
+        set val foo=avail
     } elseif {$param eq {variant_shortcut}} {
         set val foo=%
     } elseif {$param eq {pager}} {

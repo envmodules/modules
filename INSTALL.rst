@@ -2019,6 +2019,8 @@ installation.
 | :mconfig:`sticky_purge`           | ``error``                                    | :instopt:`--with-sticky-purge`,              |              |           |
 |                                   |                                              | :envvar:`MODULES_STICKY_PURGE`               |              |           |
 +-----------------------------------+----------------------------------------------+----------------------------------------------+--------------+-----------+
+| :mconfig:`subcmd_alias`           | *Empty by default*                           | :envvar:`MODULES_SUBCMD_ALIAS`               |              |           |
++-----------------------------------+----------------------------------------------+----------------------------------------------+--------------+-----------+
 | :mconfig:`tag_abbrev`             | auto-loaded=aL:loaded=L:hidden=H:\           | :instopt:`--with-tag-abbrev`,                |              |           |
 |                                   | hidden-loaded=H:forbidden=F:nearly-\         | :envvar:`MODULES_TAG_ABBREV`                 |              |           |
 |                                   | forbidden=nF:sticky=S:super-sticky=sS:\      |                                              |              |           |

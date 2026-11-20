@@ -68,6 +68,17 @@ proc ongoingCommandName {commandName} {
    return [expr {[lsearch -exact [getState commandname] $commandName] != -1}]
 }
 
+# Translate name into the sub-command it designates if it is an alias defined
+# in subcmd_alias config. Result is not an alias anymore, it should not be
+# passed again to this procedure.
+proc resolveSubcmdAlias {name} {
+   getConf subcmd_alias
+   if {[info exists ::g_subcmdAlias($name)]} {
+      set name $::g_subcmdAlias($name)
+   }
+   return $name
+}
+
 # analyze/translate command name passed to module
 proc parseModuleCommandName {command defaultcmd} {
    set cmdempty 0
@@ -558,8 +569,8 @@ proc ml {args} {
       addpath_pos not_req tag_list fargs
 
    # determine if first argument is a known module sub-command
-   lassign [parseModuleCommandName [lindex $fargs 0] list] command cmdvalid\
-      cmdempty
+   lassign [parseModuleCommandName [resolveSubcmdAlias [lindex $fargs 0]]\
+      list] command cmdvalid cmdempty
 
    if {$cmdempty} {
       # consider empty string supplied as first argument as module name
@@ -712,6 +723,14 @@ if {[catch {
          set $nextargisval $arg
          unset nextargisval
       } else {
+         # translate sub-command name if it is an alias. when ml is used,
+         # sub-command name is translated later by ml procedure
+         if {![llength $otherargv] && [string index $arg 0] ne {-}} {
+            set arg [resolveSubcmdAlias $arg]
+         } elseif {$otherargv eq {ml} && [resolveSubcmdAlias $arg] in\
+            {append-path prepend-path remove-path}} {
+            set ddelimarg 1
+         }
          switch -glob -- $arg {
             -T - --trace {
                set asked_verbosity trace
