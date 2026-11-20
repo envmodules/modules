@@ -1,7 +1,7 @@
 #!/usr/bin/env pwsh
 #
 # INSTALL_TEST_PWSH, pwsh test script for install non-reg suite
-# Copyright (C) 2024 Simon Lukas Märtens
+# Copyright (C) Modules Contributors
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

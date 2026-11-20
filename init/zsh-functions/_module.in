@@ -2,7 +2,7 @@
 
 #
 # Zsh command-line completion for module
-# Copyright (C) 2017 Xavier Delaruelle <xavier.delaruelle@cea.fr>
+# Copyright (C) Modules Contributors
 #
 
 _module_avail() {

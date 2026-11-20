@@ -2,7 +2,7 @@
 setlocal enabledelayedexpansion
 
 :: ENVML, setup environment with module then run specified command
-:: Copyright (C) 2015-2021 CEA/DAM
+:: Copyright (C) Modules Contributors
 ::
 :: This program is free software: you can redistribute it and/or modify
 :: it under the terms of the GNU General Public License as published by
