@@ -99,6 +99,8 @@ Modules 5.8.0 (not yet released)
   to ignore the changes made by the evaluated shell script on specified shell
   elements, like done by the ``--ignore`` option of :mfcmd:`source-sh`
   modulefile command. (fix issue #532)
+* Fix :command:`ml` command to correctly call a sub-command when command
+  line switches like :option:`--tag` are set before the sub-command name.
 
 
 .. _5.7 release notes:

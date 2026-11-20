@@ -45,6 +45,10 @@ testouterr_cmd sh {ml path extdfl} [list [list text $mp/extdfl/1.3.1]] {}
 testouterr_cmd sh {ml avail -t extdfl/1.3.1} OK "$mp:\nextdfl/1.3.1(default)"
 testouterr_cmd sh {ml av -t extdfl/1.3.1} OK "$mp:\nextdfl/1.3.1(default)"
 
+# switch set before sub-command name
+testouterr_cmd sh {ml --indepth path extdfl} [list [list text $mp/extdfl/1.3.1]] {}
+testouterr_cmd sh {ml --no-indepth --indepth av -t extdfl/1.3.1} OK "$mp:\nextdfl/1.3.1(default)"
+
 # try to load a module named load: sub-command call has higher priority
 set ans [list]
 lappend ans [list set __MODULES_LMALTNAME extdfl/1.3.1&extdfl/default&extdfl]
@@ -193,6 +197,18 @@ if {[is_conf_enabled advversspec]} {
 lappend ans [list set _LMFILES_ $mp/bar/2:$mp/foo/1]
 lappend ans [list set LOADEDMODULES bar/2:foo/1]
 testouterr_cmd_re sh {ml bar foo/1 -v} $ans [msg_load bar/2]\n[msg_load foo/1]
+
+# switch set before sub-command name
+set ans [list]
+if {[is_conf_enabled advversspec]} {
+    lappend ans [list set __MODULES_LMALTNAME bar/2&as|bar/default&as|bar/latest]
+}
+lappend ans [list set _LMFILES_ $mp/bar/2]
+lappend ans [list set LOADEDMODULES bar/2]
+lappend ans [list set __MODULES_LMEXTRATAG bar/2&foo]
+lappend ans [list set __MODULES_LMTAG bar/2&foo]
+testouterr_cmd sh {ml --tag=foo load bar} $ans {}
+testouterr_cmd sh {ml --icase --tag=foo add bar} $ans {}
 
 # unload only command
 testouterr_cmd sh {ml -v -bar} OK {}
