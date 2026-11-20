@@ -9,7 +9,7 @@ _module_avail() {
    local cur="${1:-}";
    # skip avail call if word currently being completed is an option keyword
    if [ -z "$cur" -o "${cur:0:1}" != '-' ]; then
-      module avail --color=never -s -t -S --no-indepth -o 'alias:indesym' $cur 2>&1
+      MODULES_SUBCMD_ALIAS='' module avail --color=never -s -t -S --no-indepth -o 'alias:indesym' $cur 2>&1
    fi
 }
 
@@ -17,22 +17,36 @@ _module_spider() {
    local cur="${1:-}";
    # skip spider call if word currently being completed is an option keyword
    if [ -z "$cur" -o "${cur:0:1}" != '-' ]; then
-      module spider --color=never -s -t -S --no-indepth -o 'alias:indesym' $cur 2>&1
+      MODULES_SUBCMD_ALIAS='' module spider --color=never -s -t -S --no-indepth -o 'alias:indesym' $cur 2>&1
    fi
 }
 
 _module_savelist() {
-   module savelist --color=never -s -t 2>&1 | sed '
+   MODULES_SUBCMD_ALIAS='' module savelist --color=never -s -t 2>&1 | sed '
       /No named collection\.$/d;
       /Named collection list$/d;
       /:$/d;'
 }
 
 _module_stashlist() {
-   module stashlist --color=never -s -t 2>&1 | sed '
+   MODULES_SUBCMD_ALIAS='' module stashlist --color=never -s -t 2>&1 | sed '
       /No stash collection\.$/d;
       /Stash collection list$/d;
       /:$/d;'
+}
+
+# Set reply array to the name and target of each sub-command alias defined
+# in MODULES_SUBCMD_ALIAS. Like module does, skip definitions made with
+# unexpected characters.
+_module_subcmd_aliases() {
+   local def
+   reply=()
+   for def in ${(s.:.)MODULES_SUBCMD_ALIAS}; do
+      if [[ $def =~ '^([A-Za-z0-9_][A-Za-z0-9_-]*)=([a-z][a-z-]*)$' \
+         && $match[1] != ml ]]; then
+         reply+=($match[1] $match[2])
+      fi
+   done
 }
 
 _module_not_yet_loaded() {
@@ -209,6 +223,12 @@ _module() {
             'cachebuild:Create cache file for modulepath(s)'
             'cacheclear:Delete cache file in enabled modulepath(s)'
          )
+         # add defined aliases, that replace sub-command of the same name
+         local name target
+         _module_subcmd_aliases
+         for name target in $reply; do
+            cmds=(${cmds:#${name}:*} "${name}:Alias for '${target}' sub-command")
+         done
          # show commands only with compatible options
          if (( !$+opt_args[-h] && !$+opt_args[--help] \
             && !$+opt_args[-V] && !$+opt_args[--version] \
@@ -219,6 +239,14 @@ _module() {
       (arg)
          local cmd="${words[1]}"
          local cur="${words[CURRENT]}"
+         # translate sub-command name if it is an alias
+         local name target
+         _module_subcmd_aliases
+         for name target in $reply; do
+            if [[ $name == ${words[1]} ]]; then
+               cmd=$target
+            fi
+         done
          case $cmd in
             (load|add|load-any|add-any|try-load|try-add)
                _arguments \

@@ -33,7 +33,7 @@ _module_avail() {
     local cur="${1:-}"
     # skip avail call if word currently being completed is an option keyword
     if [ -z "$cur" ] || [ "${cur:0:1}" != '-' ]; then
-        module avail --color=never -s -t -S --no-indepth -o 'alias:indesym' "$cur" 2>&1
+        MODULES_SUBCMD_ALIAS='' module avail --color=never -s -t -S --no-indepth -o 'alias:indesym' "$cur" 2>&1
     fi
 }
 
@@ -41,19 +41,19 @@ _module_spider() {
     local cur="${1:-}"
     # skip spider call if word currently being completed is an option keyword
     if [ -z "$cur" ] || [ "${cur:0:1}" != '-' ]; then
-        module spider --color=never -s -t -S --no-indepth -o 'alias:indesym' "$cur" 2>&1
+        MODULES_SUBCMD_ALIAS='' module spider --color=never -s -t -S --no-indepth -o 'alias:indesym' "$cur" 2>&1
     fi
 }
 
 _module_savelist() {
-    module savelist --color=never -s -t 2>&1 | sed '
+    MODULES_SUBCMD_ALIAS='' module savelist --color=never -s -t 2>&1 | sed '
         /No named collection\.$/d;
         /Named collection list$/d;
         /:$/d;'
 }
 
 _module_stashlist() {
-    module stashlist --color=never -s -t 2>&1 | sed '
+    MODULES_SUBCMD_ALIAS='' module stashlist --color=never -s -t 2>&1 | sed '
         /No stash collection\.$/d;
         /Stash collection list$/d;
         /:$/d;'
@@ -61,6 +61,50 @@ _module_stashlist() {
 
 _module_not_yet_loaded() {
     _module_avail "${1:-}" | sort | @SED_ERE@ "\%^(${LOADEDMODULES//:/|})$%d"
+}
+
+# Set REPLY to the sub-command designated by the word passed as argument if
+# this word is an alias defined in MODULES_SUBCMD_ALIAS, or to this word
+# otherwise. Set _module_alias_list to the names of the defined aliases.
+_module_subcmd_alias() {
+    local -a defs
+    local def name target
+    local name_re='^[A-Za-z0-9_][A-Za-z0-9_-]*$' target_re='^[a-z][a-z-]*$'
+
+    REPLY="$1"
+    _module_alias_list=''
+    IFS=: read -r -a defs <<<"${MODULES_SUBCMD_ALIAS:-}"
+    for def in "${defs[@]}"; do
+        name="${def%%=*}"
+        target="${def#*=}"
+        # like module does, skip definitions made with unexpected characters:
+        # names kept can safely be used as completion candidates
+        if [[ $def == *=* && $name != ml && $name =~ $name_re\
+            && $target =~ $target_re ]]; then
+            _module_alias_list+=" $name"
+            if [ "$name" = "$1" ]; then
+                REPLY="$target"
+            fi
+        fi
+    done
+}
+
+# Translate previous word if it is an alias set as sub-command name, which is
+# the first word that is not an option. Expect prev and aliases variables to
+# be local to the calling function.
+_module_resolve_prev() {
+    local i
+
+    _module_subcmd_alias "$prev"
+    aliases="$_module_alias_list"
+    for ((i = 1; i < COMP_CWORD; i++)); do
+        if [[ ${COMP_WORDS[i]} != -* && ${COMP_WORDS[i]} != "$1" ]]; then
+            if [ "$i" -eq $((COMP_CWORD - 1)) ]; then
+                prev="$REPLY"
+            fi
+            break
+        fi
+    done
 }
 
 _module_long_arg_list() {
@@ -72,7 +116,8 @@ _module_long_arg_list() {
         return
     fi
     for ((i = COMP_CWORD - 1; i > 0; i--))
-        do case ${COMP_WORDS[$i]} in
+        do _module_subcmd_alias "${COMP_WORDS[$i]}"
+        case $REPLY in
         add|load)
             _module_comgen_words_and_files "$(_module_not_yet_loaded "$cur")" "$cur"
             break;;
@@ -84,9 +129,10 @@ _module_long_arg_list() {
 }
 
 _module() {
-    local cur="$2" prev="$3"
+    local cur="$2" prev="$3" aliases
 
     COMPREPLY=()
+    _module_resolve_prev ''
 
     case "$prev" in
     add|add-any|load|load-any|try-add|try-load)
@@ -155,7 +201,7 @@ _module() {
             sw*)    COMPREPLY=( "switch" );;
 
             -*)     COMPREPLY=( $(compgen -W "@comp_opts@" -- "$cur") );;
-            *)      COMPREPLY=( $(compgen -W "@comp_opts@ @comp_cmds@" -- "$cur") );;
+            *)      COMPREPLY=( $(compgen -W "@comp_opts@ @comp_cmds@$aliases" -- "$cur") );;
             esac
         fi;;
     esac
@@ -164,9 +210,11 @@ _module() {
 # define completion for ml command if command exists
 if type -t ml >/dev/null; then
     _ml() {
-        local cur="$2" prev="$3"
+        local cur="$2" prev="$3" aliases
 
         COMPREPLY=()
+        # sub-command name comes after ml word when called through module
+        _module_resolve_prev ml
 
         case "$prev" in
         add|add-any|load|load-any|try-add|try-load)
@@ -241,7 +289,7 @@ if type -t ml >/dev/null; then
                         done
                         _module_comgen_words "@comp_load_opts@ $loaded_modules" "$cur";;
                 *)       _module_comgen_words_and_files "@comp_load_opts@ $(_module_not_yet_loaded "$cur")" "$cur"
-                        COMPREPLY=( "${COMPREPLY[@]}" $(compgen -W "@comp_opts@ @comp_cmds@" -- "$cur") )
+                        COMPREPLY=( "${COMPREPLY[@]}" $(compgen -W "@comp_opts@ @comp_cmds@$aliases" -- "$cur") )
                         loaded_modules=""
                         for i in ${LOADEDMODULES//:/ }; do
                             loaded_modules+="-${i} "
