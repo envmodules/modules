@@ -753,6 +753,7 @@ readModuleContent
 readline
 readlink
 repo
+reindex
 reportError
 reportUsage
 reportWarning

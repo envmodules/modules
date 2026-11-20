@@ -194,7 +194,9 @@ modulefiles are not affected.
 When the configuration option is changed from its default value using the
 :subcmd:`config` sub-command, the :envvar:`MODULES_SUBCMD_ALIAS` environment
 variable is defined accordingly. See the :envvar:`MODULES_SUBCMD_ALIAS`
-description for details.
+description for details and the :ref:`spack-like-sub-command-names` cookbook
+recipe for a complete example that maps the command names of the Spack
+package manager.
 
 
 v5.7

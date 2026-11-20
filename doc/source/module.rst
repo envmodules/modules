@@ -6535,7 +6535,12 @@ ENVIRONMENT
  They are not taken into account for the :mfcmd:`module` command evaluated in
  modulefiles, run-command files or initialization rc files. Defined aliases
  are listed at the end of the usage message returned by the :subcmd:`help`
- sub-command and they are taken into account by shell completion.
+ sub-command and they are taken into account by shell completion. On *tcsh*
+ shell, aliases should be defined prior shell completion setup to be
+ completed.
+
+ See the :ref:`spack-like-sub-command-names` cookbook recipe for a complete
+ example that maps the command names of the Spack package manager.
 
  When an alias makes a sub-command unreachable, like :subcmd:`config`, unset
  this environment variable to get back to the default sub-command names.
