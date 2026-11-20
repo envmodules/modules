@@ -446,6 +446,42 @@ file delete -force $marker
 
 
 #
+# sub-command aliases defined in MODULES_SUBCMD_ALIAS: alias names are
+# proposed as sub-commands and complete like their target, even when they
+# bear the name of an existing sub-command. Definitions made with unexpected
+# characters are ignored and cannot reach a shell expansion step
+#
+
+set marker "$env(TESTSUITEDIR)/completion-injection-marker"
+file delete -force $marker
+
+setenv_path_var MODULEPATH $modpath
+setenv_var MODULES_SUBCMD_ALIAS "find=avail:avail=list:list=avail:ls=list:\$(touch>$marker)=avail:`touch>$marker`=avail:x;touch>$marker=avail"
+
+completion_fish_start
+
+set got [completion_fish_list {module }]
+completion_assert_no_exec $marker
+completion_assert_contains $got {find ls avail list load}
+completion_assert_not_contains $got [list $marker]
+
+set got [completion_fish_list {module find }]
+completion_assert_no_exec $marker
+completion_assert_contains $got {advvers/ bar/ baz/ foo/}
+
+## list alias shadows list sub-command and targets avail, whose name is
+## itself aliased: modules are still fetched with the avail sub-command
+set got [completion_fish_list {module list }]
+completion_assert_contains $got {advvers/ bar/ baz/ foo/}
+
+completion_fish_close
+unsetenv_var MODULES_SUBCMD_ALIAS
+unsetenv_path_var MODULEPATH
+
+file delete -force $marker
+
+
+#
 #  Cleanup
 #
 

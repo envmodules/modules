@@ -1162,7 +1162,7 @@ The following environment variables appeared on Modules 5.
 |            | :envvar:`MODULES_SPIDER_JSON_OUTPUT`,                           |
 |            | :envvar:`__MODULES_PRIORITY_\<VAR\>`,                           |
 |            | :envvar:`MODULES_FAMILY_\<NAME\>_VERSION`,                      |
-|            | :envvar:`__MODULES_UMASK`                                       |
+|            | :envvar:`__MODULES_UMASK`, :envvar:`MODULES_SUBCMD_ALIAS`       |
 +------------+-----------------------------------------------------------------+
 
 Modules Specific Tcl Commands
@@ -1400,7 +1400,7 @@ The following Modules configuration option has been introduced on Modules 5.
 |            | :mconfig:`ignore_cache_subcmds`                                 |
 +------------+-----------------------------------------------------------------+
 | 5.8        | :mconfig:`avail_json_output`, :mconfig:`list_json_output`,      |
-|            | :mconfig:`spider_json_output`                                   |
+|            | :mconfig:`spider_json_output`, :mconfig:`subcmd_alias`          |
 +------------+-----------------------------------------------------------------+
 
 :mconfig:`auto_handling`

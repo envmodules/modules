@@ -1878,6 +1878,19 @@ Module Sub-Commands
 
      .. versionadded:: 5.4
 
+ .. mconfig:: subcmd_alias
+
+  Aliases defined for module sub-commands.
+
+  Default is an empty list. The :envvar:`MODULES_SUBCMD_ALIAS` environment
+  variable is defined by :subcmd:`config` sub-command when changing this
+  configuration option from its default value. See
+  :envvar:`MODULES_SUBCMD_ALIAS` description for details.
+
+  .. only:: html or latex
+
+     .. versionadded:: 5.8
+
  .. mconfig:: tag_abbrev
 
   Abbreviations to use to report module tags.
@@ -6489,6 +6502,56 @@ ENVIRONMENT
  .. only:: html or latex
 
     .. versionadded:: 5.4
+
+.. envvar:: MODULES_SUBCMD_ALIAS
+
+ Specifies the aliases to define for module sub-commands. An alias is an
+ additional name that designates a sub-command when set in its place on the
+ :command:`module` or :command:`ml` command line. An alias accepts the same
+ arguments and options than the sub-command it designates.
+
+ Value is a colon-separated list of alias definitions. Each definition has
+ the form ``alias=target``, like for instance ``find=avail:loaded=list``.
+
+ Alias name may be composed of letters, digits, underscore (``_``) and
+ hyphen-minus (``-``) characters and cannot start with a hyphen-minus. It
+ cannot be ``ml``. An alias may bear the name of an existing sub-command: in
+ this case the alias shadows this sub-command, which cannot be designated by
+ this name anymore.
+
+ Alias target is always a sub-command of the :command:`module` command,
+ designated by its name, one of its predefined aliases (like ``add`` for
+ :subcmd:`load`) or abbreviations. A target is never resolved as an alias
+ defined in this list. For instance with ``find=avail:avail=spider`` value,
+ ``find`` designates the :subcmd:`avail` sub-command even if ``avail`` name is
+ itself aliased to :subcmd:`spider`.
+
+ Definitions that do not comply with these rules are ignored. When the same
+ alias is defined several times, last definition applies. Alias name should be
+ fully typed to match: it cannot be abbreviated. Abbreviations of a shadowed
+ sub-command still designate this sub-command.
+
+ Aliases only apply to the sub-command name specified on the command line.
+ They are not taken into account for the :mfcmd:`module` command evaluated in
+ modulefiles, run-command files or initialization rc files. Defined aliases
+ are listed at the end of the usage message returned by the :subcmd:`help`
+ sub-command and they are taken into account by shell completion. On *tcsh*
+ shell, aliases should be defined prior shell completion setup to be
+ completed.
+
+ See the :ref:`spack-like-sub-command-names` cookbook recipe for a complete
+ example that maps the command names of the Spack package manager.
+
+ When an alias makes a sub-command unreachable, like :subcmd:`config`, unset
+ this environment variable to get back to the default sub-command names.
+
+ This environment variable value supersedes the default value set in the
+ :mconfig:`subcmd_alias` configuration option. It can be defined with the
+ :subcmd:`config` sub-command.
+
+ .. only:: html or latex
+
+    .. versionadded:: 5.8
 
 .. envvar:: MODULES_TAG_ABBREV
 

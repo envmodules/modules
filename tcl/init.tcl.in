@@ -165,6 +165,7 @@ array set g_config_defs [list\
    source_cache {MODULES_SOURCE_CACHE @sourcecache@ 0 b {0 1}}\
    sticky_purge {MODULES_STICKY_PURGE {@stickypurge@} 0 s {error warning\
       silent}}\
+   subcmd_alias {MODULES_SUBCMD_ALIAS {} 0 l {} {} initConfSubcmdAlias}\
    tag_abbrev {MODULES_TAG_ABBREV {@tagabbrev@} 0 l {} {} initConfTagAbbrev}\
    tag_color_name {MODULES_TAG_COLOR_NAME {@tagcolorname@} 0 l {} {}\
       initConfTagColorName}\
@@ -491,7 +492,8 @@ proc initStatePaginate {} {
    # some module sub-commands turn off pager
    set nopager_subcmd_list [list clear edit]
    if {[getState subcmd] in $nopager_subcmd_list || ([getState subcmd] eq\
-      {ml} && [lindex [getState subcmd_args] 0] in $nopager_subcmd_list)} {
+      {ml} && [resolveSubcmdAlias [lindex [getState subcmd_args] 0]] in\
+      $nopager_subcmd_list)} {
       return 0
    }
 
@@ -908,6 +910,45 @@ proc initConfVariantShortcut {envvar value validvallist intvallist} {
    }
 
    return $value
+}
+
+# Initialize sub-command alias table
+proc initConfSubcmdAlias {envvar value validvallist intvallist} {
+   if {[isEnvVarDefined $envvar]} {
+      set value $::env($envvar)
+   }
+
+   # table may already be filled if option value is changed during run
+   array unset ::g_subcmdAlias
+   set alias_list {}
+   foreach elt [split $value :] {
+      set elt_split [split $elt =]
+      lassign $elt_split alias target
+      # alias names are restricted to a set of characters shell completion
+      # scripts can safely handle. ml is not a sub-command: it cannot be
+      # shadowed
+      if {[llength $elt_split] == 2 && $alias ne {ml} && [regexp\
+         {^[A-Za-z0-9_][A-Za-z0-9_-]*$} $alias]} {
+         # target is resolved among the sub-commands known by module, never
+         # among aliases defined here: an alias cannot point to another one
+         lassign [parseModuleCommandName $target {}] target cmdvalid
+         if {$cmdvalid} {
+            # last definition of an alias wins
+            if {![info exists ::g_subcmdAlias($alias)]} {
+               lappend alias_list $alias
+            }
+            set ::g_subcmdAlias($alias) $target
+         }
+      }
+   }
+
+   # update value after above filtering step
+   set value {}
+   foreach alias $alias_list {
+      lappend value $alias=$::g_subcmdAlias($alias)
+   }
+
+   return [join $value :]
 }
 
 # Is currently set verbosity level is equal or higher than level passed as arg

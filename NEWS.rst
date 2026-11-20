@@ -101,6 +101,12 @@ Modules 5.8.0 (not yet released)
   modulefile command. (fix issue #532)
 * Fix :command:`ml` command to correctly call a sub-command when command
   line switches like :option:`--tag` are set before the sub-command name.
+* Add the :mconfig:`subcmd_alias` configuration option to define aliases for
+  module sub-commands. An alias may shadow an existing sub-command and always
+  designates a sub-command, never another alias. Defined aliases are reported
+  on usage message and handled by shell completion. When set, the
+  :envvar:`MODULES_SUBCMD_ALIAS` environment variable supersedes the option
+  value. (fix issue #712)
 
 
 .. _5.7 release notes:

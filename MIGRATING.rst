@@ -158,6 +158,46 @@ meantime.
 :mfcmd:`umask` applies to the shells and scripting languages that are able to
 change their own mask. See the :ref:`Shell support` section for details.
 
+Defining sub-command aliases
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+People using several tools side by side may expect the same action to bear
+the same name in each of them. The :mconfig:`subcmd_alias` configuration
+option is introduced to define additional names for the sub-commands of the
+:command:`module` and :command:`ml` commands. Its value is a colon-separated
+list of ``alias=target`` definitions.
+
+.. parsed-literal::
+
+    :ps:`$` module config subcmd_alias find=avail:loaded=list
+    :ps:`$` module find -t foo
+    /path/to/modulefiles:
+    foo/1.0
+    foo/2.0
+    :ps:`$` ml loaded
+    No Modulefiles Currently Loaded.
+
+An alias may bear the name of an existing sub-command, which is then
+shadowed. Alias target is always a sub-command of :command:`module`, never
+another alias: in the following example ``find`` still designates
+:subcmd:`avail`.
+
+.. parsed-literal::
+
+    :ps:`$` module config subcmd_alias find=avail:avail=spider
+
+Defined aliases are listed at the end of the :subcmd:`module help<help>`
+usage message and are completed like the sub-command they designate. Aliases
+apply to the command line only: :mfcmd:`module` commands written in
+modulefiles are not affected.
+
+When the configuration option is changed from its default value using the
+:subcmd:`config` sub-command, the :envvar:`MODULES_SUBCMD_ALIAS` environment
+variable is defined accordingly. See the :envvar:`MODULES_SUBCMD_ALIAS`
+description for details and the :ref:`spack-like-sub-command-names` cookbook
+recipe for a complete example that maps the command names of the Spack
+package manager.
+
 
 v5.7
 ----

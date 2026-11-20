@@ -2237,6 +2237,16 @@ Options:
                   Skip evaluation of user-specific module rc file
   --no-modulepath-ignore
                   Do not apply modulepath-ignore pattern definitions}
+
+   # aliases defined by configuration are part of the available sub-commands
+   getConf subcmd_alias
+   if {[array size ::g_subcmdAlias]} {
+      report "\nSub-command aliases:"
+      foreach alias [lsort [array names ::g_subcmdAlias]] {
+         report [format {  %-15s Alias for '%s' sub-command} $alias\
+            $::g_subcmdAlias($alias)]
+      }
+   }
 }
 
 # create appropriate message and kind of report when a requirement is not

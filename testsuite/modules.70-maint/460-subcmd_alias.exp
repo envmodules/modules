@@ -1,0 +1,131 @@
+##############################################################################
+#   Modules Revision 3.0
+#   Providing a flexible user environment
+#
+#   File:		modules.70-maint/%M%
+#   Revision:		%I%
+#   First Edition:	2026/11/20
+#   Last Mod.:		%U%, %G%
+#
+#   Authors:		Xavier Delaruelle, xavier.delaruelle@cea.fr
+#
+#   Description:	Testuite testsequence
+#   Command:		avail, list, ml, append-path, config, help, load
+#   Modulefiles:    loc_rc1, modbad
+#   Sub-Command:
+#
+#   Comment:	%C{
+#           Test subcmd_alias configuration option
+#		}C%
+#
+##############################################################################
+
+set mp $modpath
+setenv_var MODULEPATH $mp
+
+set tserr_avail "$mp:
+loc_rc1/1.0(foo)
+loc_rc1/2.0"
+set avail_args {-t loc_rc1}
+
+# no alias defined
+testouterr_cmd sh "find $avail_args" ERR [err_invcmd find]
+testouterr_cmd sh "ml find $avail_args" ERR "$err_path'find'"
+
+# simple alias
+setenv_var MODULES_SUBCMD_ALIAS find=avail
+testouterr_cmd sh "find $avail_args" OK $tserr_avail
+testouterr_cmd sh "avail $avail_args" OK $tserr_avail
+testouterr_cmd sh "ml find $avail_args" OK $tserr_avail
+# switch set prior alias name
+testouterr_cmd sh {-t find loc_rc1} OK $tserr_avail
+testouterr_cmd sh {ml -t find loc_rc1} OK $tserr_avail
+# alias name is not abbreviated and only matches as sub-command name
+testouterr_cmd sh "fin $avail_args" ERR [err_invcmd fin]
+testouterr_cmd sh {is-avail find} ERR {}
+
+# alias shadows an existing sub-command, a built-in alias or an abbreviation
+setenv_var MODULES_SUBCMD_ALIAS avail=list:show=avail:li=avail
+testouterr_cmd sh "avail $avail_args" OK $no_loaded
+testouterr_cmd sh "ml avail $avail_args" OK $no_loaded
+testouterr_cmd sh "show $avail_args" OK $tserr_avail
+testouterr_cmd sh "li $avail_args" OK $tserr_avail
+# abbreviation of shadowed sub-command still designates it
+testouterr_cmd sh "av $avail_args" OK $tserr_avail
+testouterr_cmd sh "lis $avail_args" OK $no_loaded
+
+# alias target is never resolved as an alias
+setenv_var MODULES_SUBCMD_ALIAS find=avail:avail=list
+testouterr_cmd sh "find $avail_args" OK $tserr_avail
+testouterr_cmd sh "ml find $avail_args" OK $tserr_avail
+testouterr_cmd sh "avail $avail_args" OK $no_loaded
+setenv_var MODULES_SUBCMD_ALIAS avail=list:list=avail
+testouterr_cmd sh "avail $avail_args" OK $no_loaded
+testouterr_cmd sh "list $avail_args" OK $tserr_avail
+testouterr_cmd sh "ml list $avail_args" OK $tserr_avail
+
+# target set as built-in alias or abbreviation
+setenv_var MODULES_SUBCMD_ALIAS find=av:see=show
+testouterr_cmd sh "find $avail_args" OK $tserr_avail
+testouterr_cmd_re sh {see loc_rc1/1.0} OK "$modlin\n[escre\
+    $mp/loc_rc1/1.0]:\n\n.*$modlin"
+
+# last definition wins
+setenv_var MODULES_SUBCMD_ALIAS find=list:find=avail
+testouterr_cmd sh "find $avail_args" OK $tserr_avail
+
+# invalid definitions are ignored
+setenv_var MODULES_SUBCMD_ALIAS\
+    unk=foo:ml=avail:toml=ml:-x=avail:f?=avail:a=b=c:noeq:=avail:em=::find=avail
+testouterr_cmd sh "find $avail_args" OK $tserr_avail
+testouterr_cmd sh {unk} ERR [err_invcmd unk]
+testouterr_cmd sh {toml} ERR [err_invcmd toml]
+testouterr_cmd sh {f?} ERR [err_invcmd f?]
+testouterr_cmd sh {a} ERR [err_invcmd a]
+testouterr_cmd sh {noeq} ERR [err_invcmd noeq]
+testouterr_cmd sh {em} ERR [err_invcmd em]
+testouterr_cmd sh {ml} OK $no_loaded
+testouterr_cmd_re sh {config subcmd_alias} OK\
+    ".*\nsubcmd_alias\\s+find=avail \\(env-var\\)"
+
+# value is reported with resolved target, in definition order
+setenv_var MODULES_SUBCMD_ALIAS ls=li:find=av:ls=list
+testouterr_cmd_re sh {config subcmd_alias} OK\
+    ".*\nsubcmd_alias\\s+ls=list:find=avail \\(env-var\\)"
+
+# alias on sub-command with specific option parsing
+setenv_var MODULES_SUBCMD_ALIAS ap=append-path:cfg=config
+set ans [list [list set FOO a,b]]
+testouterr_cmd sh {ap -d , FOO a,b,a} $ans {}
+testouterr_cmd sh {ml ap -d , FOO a,b,a} $ans {}
+testouterr_cmd_re sh {cfg subcmd_alias} OK\
+    ".*\nsubcmd_alias\\s+ap=append-path:cfg=config \\(env-var\\)"
+set ans [list [list set MODULES_SUBCMD_ALIAS ap=append-path:cfg=config:ls=list]]
+testouterr_cmd sh {cfg subcmd_alias +ls=list} $ans {}
+set ans [list [list set MODULES_SUBCMD_ALIAS ap=append-path]]
+testouterr_cmd sh {config subcmd_alias -cfg=config} $ans {}
+
+# aliases are listed on usage message
+setenv_var MODULES_SUBCMD_ALIAS ls=list:find=avail
+set tserr ".*\n\\s*--no-modulepath-ignore\n\\s*Do not apply modulepath-ignore\
+pattern definitions\n\nSub-command aliases:\n  find            Alias for\
+'avail' sub-command\n  ls              Alias for 'list' sub-command"
+testouterr_cmd_re sh {--help} OK $tserr
+testouterr_cmd_re sh {help} OK $tserr
+setenv_var MODULES_SUBCMD_ALIAS unk=foo
+testouterr_cmd_re sh {help} OK ".*\n\\s*--no-modulepath-ignore\n\\s*Do not apply\
+modulepath-ignore pattern definitions"
+
+# alias is not resolved on module command evaluated in modulefile
+setenv_var MODULES_SUBCMD_ALIAS foo=avail
+set tserr [msg_load modbad/foo [msg_moderr {module: Invalid command 'foo'}\
+    {module foo} $mp/modbad/foo 27]]
+testouterr_cmd sh {load modbad/foo} ERR $tserr
+testouterr_cmd sh "foo $avail_args" OK $tserr_avail
+
+
+#
+#  Cleanup
+#
+
+reset_test_env

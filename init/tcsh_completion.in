@@ -3,22 +3,22 @@
 #
 
 alias _module_avail '\\
-    @TCLSH@ "@libexecdir@/modulecmd.tcl" tcsh avail --color=never -s -t -S -o "alias:indesym" |& cat'
+    env MODULES_SUBCMD_ALIAS= @TCLSH@ "@libexecdir@/modulecmd.tcl" tcsh avail --color=never -s -t -S -o "alias:indesym" |& cat'
 
 alias _module_spider '\\
-    @TCLSH@ "@libexecdir@/modulecmd.tcl" tcsh spider --color=never -s -t -S -o "alias:indesym" |& cat'
+    env MODULES_SUBCMD_ALIAS= @TCLSH@ "@libexecdir@/modulecmd.tcl" tcsh spider --color=never -s -t -S -o "alias:indesym" |& cat'
 
 alias _module_loaded '\\
-    @TCLSH@ "@libexecdir@/modulecmd.tcl" tcsh list --color=never -s -t -o "" |& cat'
+    env MODULES_SUBCMD_ALIAS= @TCLSH@ "@libexecdir@/modulecmd.tcl" tcsh list --color=never -s -t -o "" |& cat'
 
 alias _module_savelist '\\
-    @TCLSH@ "@libexecdir@/modulecmd.tcl" tcsh savelist --color=never -s -t |& sed '"'"'\\
+    env MODULES_SUBCMD_ALIAS= @TCLSH@ "@libexecdir@/modulecmd.tcl" tcsh savelist --color=never -s -t |& sed '"'"'\\
         /No named collection\.$/d; \\
         /Named collection list$/d; \\
         /:$/d; '"'"
 
 alias _module_stashlist '\\
-    @TCLSH@ "@libexecdir@/modulecmd.tcl" tcsh stashlist --color=never -s -t |& sed '"'"'\\
+    env MODULES_SUBCMD_ALIAS= @TCLSH@ "@libexecdir@/modulecmd.tcl" tcsh stashlist --color=never -s -t |& sed '"'"'\\
         /No stash collection\.$/d; \\
         /Stash collection list$/d; \\
         /:$/d; '"'"
@@ -110,6 +110,38 @@ complete module 'C,/*,f,' 'C,.*,f,' 'C,~/*,f,' \
         'C/sw*/(switch)/' \
         "p/1/(@comp_cmds@ @comp_opts@)/" \
         "n/-*/(@comp_cmds@)/"
+
+# give each sub-command alias defined in MODULES_SUBCMD_ALIAS when this script
+# is sourced the completion rule of its target. Alias rules are set first to
+# take precedence over the rule of a sub-command they shadow. Like module does,
+# definitions made with unexpected characters are skipped
+if ($?MODULES_SUBCMD_ALIAS) then
+    # disable filename substitution on the rules passed to eval
+    set _module_noglob = $?noglob
+    set noglob
+    eval `complete module | awk 'BEGIN { \
+        getline line; rules = ""; names = ""; \
+        n = split(ENVIRON["MODULES_SUBCMD_ALIAS"], defs, ":"); \
+        for (i = 1; i <= n; i++) { \
+            if (match(defs[i], /^[A-Za-z0-9_][A-Za-z0-9_-]*=[a-z][a-z-]*/) \
+                && RLENGTH == length(defs[i])) { \
+                split(defs[i], def, "="); \
+                if (def[1] == "ml") continue; \
+                names = names def[1] " "; \
+                if (match(line, "\047n/" def[2] "/[^\047]*\047")) { \
+                    rule = substr(line, RSTART, RLENGTH); \
+                    sub("n/" def[2] "/", "n/" def[1] "/", rule); \
+                    rules = rule " " rules; \
+                } \
+            } \
+        } \
+        sub(/\047p\/1\/\(/, "&" names, line); \
+        sub(/\047n\/-\*\/\(/, "&" names, line); \
+        print "complete module " rules line; \
+    }'`
+    if ($_module_noglob == 0) unset noglob
+    unset _module_noglob
+endif
 
 complete ml \
         "C/--*/(@comp_long_opts@)/" \
