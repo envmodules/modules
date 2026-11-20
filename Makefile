@@ -614,19 +614,19 @@ modulecmd.tcl: tcl/cache.tcl tcl/coll.tcl tcl/envmngt.tcl tcl/init.tcl \
 	echo "#!$(TCLSH)" > $@
 	sed -e '3s/.*/# MODULECMD.TCL, a pure TCL implementation of the module command/' \
 		-e '1d' -e '/^# vim:/d' -e '/^# ;;;/d' tcl/init.tcl >> $@
-	sed -e '1,22d' -e '/^# vim:/d' -e '/^# ;;;/d' tcl/util.tcl >> $@
-	sed -e '1,22d' -e '/^# vim:/d' -e '/^# ;;;/d' tcl/envmngt.tcl >> $@
-	sed -e '1,22d' -e '/^# vim:/d' -e '/^# ;;;/d' tcl/report.tcl >> $@
-	sed -e '1,22d' -e '/^# vim:/d' -e '/^# ;;;/d' tcl/interp.tcl >> $@
-	sed -e '1,22d' -e '/^# vim:/d' -e '/^# ;;;/d' tcl/mfcmd.tcl >> $@
+	sed -e '1,20d' -e '/^# vim:/d' -e '/^# ;;;/d' tcl/util.tcl >> $@
+	sed -e '1,20d' -e '/^# vim:/d' -e '/^# ;;;/d' tcl/envmngt.tcl >> $@
+	sed -e '1,20d' -e '/^# vim:/d' -e '/^# ;;;/d' tcl/report.tcl >> $@
+	sed -e '1,20d' -e '/^# vim:/d' -e '/^# ;;;/d' tcl/interp.tcl >> $@
+	sed -e '1,20d' -e '/^# vim:/d' -e '/^# ;;;/d' tcl/mfcmd.tcl >> $@
 	sed -e '1,20d' -e '/^# vim:/d' -e '/^# ;;;/d' tcl/modscan.tcl >> $@
-	sed -e '1,22d' -e '/^# vim:/d' -e '/^# ;;;/d' tcl/modfind.tcl >> $@
-	sed -e '1,22d' -e '/^# vim:/d' -e '/^# ;;;/d' tcl/modeval.tcl >> $@
+	sed -e '1,20d' -e '/^# vim:/d' -e '/^# ;;;/d' tcl/modfind.tcl >> $@
+	sed -e '1,20d' -e '/^# vim:/d' -e '/^# ;;;/d' tcl/modeval.tcl >> $@
 	sed -e '1,20d' -e '/^# vim:/d' -e '/^# ;;;/d' tcl/modspec.tcl >> $@
 	sed -e '1,20d' -e '/^# vim:/d' -e '/^# ;;;/d' tcl/cache.tcl >> $@
 	sed -e '1,20d' -e '/^# vim:/d' -e '/^# ;;;/d' tcl/coll.tcl >> $@
-	sed -e '1,22d' -e '/^# vim:/d' -e '/^# ;;;/d' tcl/subcmd.tcl >> $@
-	sed -e '1,22d' -e '/^# vim:/d' -e '/^# ;;;/d' tcl/main.tcl >> $@
+	sed -e '1,20d' -e '/^# vim:/d' -e '/^# ;;;/d' tcl/subcmd.tcl >> $@
+	sed -e '1,20d' -e '/^# vim:/d' -e '/^# ;;;/d' tcl/main.tcl >> $@
 	chmod +x $@
 
 # generate an empty changelog file if not working from git repository

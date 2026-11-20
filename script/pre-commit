@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # PRE-COMMIT, hook script to verify what is about to be committed
-# Copyright (C) 2022-2023 Xavier Delaruelle
+# Copyright (C) Modules Contributors
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

@@ -1,6 +1,6 @@
 #
 # SYNTAXDB_MODULERC.tcl, Nagelfar syntax database to lint modulercs
-# Copyright (C) 2022-2026 Xavier Delaruelle
+# Copyright (C) Modules Contributors
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

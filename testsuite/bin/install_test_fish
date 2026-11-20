@@ -1,7 +1,7 @@
 #!/bin/fish
 #
 # INSTALL_TEST_SH, fish test launcher for install non-reg suite
-# Copyright (C) 2017-2021 Xavier Delaruelle
+# Copyright (C) Modules Contributors
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

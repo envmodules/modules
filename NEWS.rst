@@ -101,6 +101,9 @@ Modules 5.8.0 (not yet released)
   modulefile command. (fix issue #532)
 * Fix :command:`ml` command to correctly call a sub-command when command
   line switches like :option:`--tag` are set before the sub-command name.
+* Attribute the copyright of the files maintained by the project to the
+  *Modules Contributors* in their header, like done for the documentation.
+  Copyright years are no more mentioned on these collective notices.
 
 
 .. _5.7 release notes:

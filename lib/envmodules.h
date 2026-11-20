@@ -1,7 +1,7 @@
 /*************************************************************************
  *
  * ENVMODULES.H, Modules Tcl extension library
- * Copyright (C) 2018-2026 Xavier Delaruelle
+ * Copyright (C) Modules Contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
