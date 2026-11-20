@@ -568,8 +568,10 @@ proc ml {args} {
       }
       set margs $args
    } else {
-      # first argument was command name
-      set margs [lrange $args 1 end]
+      # withdraw command name from argument list: it is not the first
+      # argument if some switches are set before it
+      set cmdidx [lsearch -exact $args [lindex $fargs 0]]
+      set margs [lreplace $args $cmdidx $cmdidx]
    }
 
    # directly call module procedure if sub-command spotted as first argument

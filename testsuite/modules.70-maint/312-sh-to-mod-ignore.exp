@@ -64,6 +64,8 @@ testouterr_cmd sh "sh-to-mod --ignore envvar --ignore alias $sh $script" OK\
 # ml command
 testouterr_cmd sh "ml sh-to-mod --ignore envvar $sh $script" OK\
     $tserr_noenvvar
+testouterr_cmd sh "ml --ignore envvar sh-to-mod $sh $script" OK\
+    $tserr_noenvvar
 
 
 #
